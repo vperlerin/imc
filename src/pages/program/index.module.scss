@@ -1,0 +1,56 @@
+@use 'styles/index' as *;
+
+
+.programWrap {
+  dt { 
+    min-width: 9rem;
+  }
+
+  dd {
+    margin-bottom: 1rem;
+  }
+
+  .sessionWrap {
+    @include media-breakpoint-up(md) {
+      margin-left: 9rem;
+    } 
+  }
+
+  .sep {
+    background-color: var(--imc-program-sep-bg);
+    border-radius: 0.25rem;
+    padding: 0.115rem 0.25rem 0.115rem 0.5rem;
+    display: block;
+    width: 100%;
+  }
+
+  .arrow {
+    all: unset;
+    cursor: pointer;
+    font-size: 1rem;
+  
+    svg {
+      fill: var(--imc-primary);
+      stroke-width: 150px;
+      stroke: var(--imc-primary);
+    } 
+  }
+}
+
+.arrows {
+  border-bottom: 1px solid var(--imc-border);
+  padding-bottom: 1rem;
+
+  .arrow {
+    all: unset;
+    cursor: pointer;
+  
+    svg {
+      fill: var(--imc-primary);
+      stroke-width: 150px;
+      stroke: var(--imc-primary);
+    }
+  
+  }
+}
+

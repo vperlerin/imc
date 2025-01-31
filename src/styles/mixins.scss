@@ -1,0 +1,43 @@
+@mixin position($top, $right: $top, $bottom: $top, $left: $right) {
+  bottom: $bottom;
+  left: $left;
+  right: $right;
+  top: $top;
+}
+
+@mixin scrollY() {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+@mixin scrollX() {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+@mixin scrollStyledDark() {
+  scrollbar-color: var(--imc-scroll-thumb-bg) var(--imc-scroll-bg);
+  scrollbar-width: thin;
+
+  &::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--imc-scroll-bg);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--imc-scroll-thumb-bg);
+    border: 3px solid var(--imc-scroll-bg);
+    border-radius: .5rem;
+  }
+
+  @media (hover: none) and (pointer: coarse) {
+    &::-webkit-scrollbar {
+      display: none !important;
+    }
+  }
+}
+

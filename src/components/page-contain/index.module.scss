@@ -1,0 +1,31 @@
+@use 'styles/index' as *;
+
+.pageContain {
+  display: flex;
+  flex-flow: column;  
+  @include scrollY();
+  @include scrollStyledDark();
+  min-height: var(--app-height);
+}
+
+.illustration {
+  height: var(--imc-illus-mobile-max-height); 
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: 50% 50%;
+
+  @media(min-width: $max-width) {
+    border-radius: 1rem;
+    height: var(--imc-illus-desktop-max-height);
+  }
+
+  .logo {
+    max-height: 90%;
+  }
+}
+
+.title {
+  @include media-breakpoint-up(md) {
+    border-radius: 1rem;
+  }
+}

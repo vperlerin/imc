@@ -1,0 +1,62 @@
+@use "sass:map";
+@import './styles';
+
+
+:root {
+  // Boot
+  --bs-border-color: rgb(88, 88, 88);
+
+  --imc-primary: #{$primary};
+
+  // Main
+  --imc: #FFF;
+  --imc-border: var(--bs-border-color);
+  --imc-muted: #ccc;
+  --imc-bg: #202020;
+  --imc-bg-darker: #000000; // Menu item hover
+
+  // Header  
+  --imc-header-bg: var(--imc-bg);
+  --imc-header: var(--imc);
+
+  // Program
+  --imc-program-sep-bg:  #52565A;
+
+  // Scrollbar
+  --imc-scroll-bg: #29292A;
+  --imc-scroll-thumb-bg: #52565A;
+
+  // Side Menu
+  --imc-menu: var(--imc);
+  --imc-menu-caret: var(--imc-menu);
+  --imc-menu-bg: var(--imc-header-bg);
+  --imc-menu-item-hover-bg: var(--imc-bg-darker);
+  --imc-menu-item-active: #{$primary};
+  --imc-menu-item-active-bg: var(--imc-header-bg);
+  --imc-menu-item-active-hover: #{$primary};
+  --imc-menu-item-active-hover-bg: var(--imc-bg-darker);
+
+  // Overlay
+  --imc-bg-overlay: rgba(0 0 0 / 60%);
+
+  // Home
+  --imc-illus-mobile-max-height: 15rem;
+  --imc-illus-desktop-max-height: 20rem;
+
+
+}
+
+
+body,
+html {
+  background-color: var(--imc-bg);
+  color: var(--imc);
+  @include scrollY();
+  @include scrollStyledDark();
+}
+ 
+
+
+.fw-bolder {
+  font-weight: 900;
+}

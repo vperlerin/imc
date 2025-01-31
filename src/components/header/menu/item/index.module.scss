@@ -1,0 +1,74 @@
+@use 'styles/index' as *;
+
+.menuItem {
+  .menuItemTitle {
+    color:var(--imc-menu);
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 250ms;
+  }
+
+    &:hover {
+    .menuItemTitle {
+      opacity: .65;
+    }
+  }
+
+  .caret  {
+    padding-left: 1rem;
+
+    svg {
+      fill: var(--imc-menu-caret);
+      height: .5rem;
+      width: .5rem;
+      transition: all 350ms;
+    }
+
+    &.rotate {
+      svg {
+        animation: rotateAnim 350ms 1 normal forwards;
+      }
+    }
+
+    @keyframes rotateAnim {
+      0% { transform: rotate(0);}
+      100% { transform: rotate(90deg);}
+    }
+  }
+
+  b {
+    text-transform: uppercase;
+  }
+
+  .menuItemsHolder { 
+    overflow: hidden;
+    transition: max-height 200ms ease-in-out;
+    margin-left: .75rem;
+
+    a {
+      border-radius: 0.25rem;
+      color: var(--imc-menu);
+      display: block;
+      margin: 0.25rem 0.75rem;
+      padding: 0.75rem 0 0.75rem 1rem;
+      text-decoration: none; 
+      transition: background-color 250ms;
+      text-wrap: balance; 
+
+
+      &:first-child {
+        margin-top: .5rem;
+      }
+
+      &:focus, &:active, &:hover {
+        background-color: var(--imc-menu-item-hover-bg);
+      }
+    }
+
+    @include media-breakpoint-up(md) {
+      a {
+        padding: 0.5rem;
+      }
+    }
+  }
+}

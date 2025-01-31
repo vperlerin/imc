@@ -1,0 +1,10 @@
+@import './bootstrap-vars'; 
+@import './vars'; 
+  
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: var(--app-height);
+  max-width: $max-width;
+  margin: 0 auto;
+}

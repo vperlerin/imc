@@ -1,0 +1,79 @@
+@use 'styles/index' as *;
+
+.menuBtn,
+.menuCloseBtn {
+  all: unset;
+  cursor: pointer;
+  position: absolute;
+  padding: 1rem;
+  top: calc($header-height / 2);
+  right: 0;
+  transform: translateY(-50%);
+}
+
+.menuBtn {
+  @include media-breakpoint-up(md) {
+    top: calc($header-height-desktop / 2);
+    right: 0;
+  }
+}
+
+
+svg.menuIcon {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.swipeWrap {
+  bottom: 0;
+  overflow: hidden;
+  position: absolute;
+  top: 0;
+  width: $side-menu-width;
+  z-index: $zindex-page-swipe;
+  max-height: var(--app-height); 
+}
+
+.menuOpenOverlay {
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  background-color: var(--imc-bg-overlay);
+  position: absolute;
+  z-index: $zindex-side-menu-open-overlay;
+}
+
+.menu {
+  height: var(--app-height);
+  background-color: var(--imc-menu-bg);
+  color: var(--imc-color-menu);
+  @include scrollY();
+  @include scrollStyledDark();
+
+  .logo {
+    max-width: $logo-menu-max-width;
+  }
+}
+
+.active {
+  color: var(--imc-menu-item-active) !important;
+  background-color: var(--imc-menu-item-active-bg) !important;
+
+  &:hover {
+    color: var(--imc-menu-item-active-hover) !important;
+    background-color: var(--imc-menu-item-active-hover-bg) !important;
+  }
+}
+
+.footer {
+  color: var(--imc-muted);
+  font-size: 80%;
+  text-align: center;
+  text-wrap: balance;
+}
+
+
+:export {
+  sharedSideMenuWidth: $side-menu-width;
+}
