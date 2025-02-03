@@ -28,7 +28,7 @@ const Home = () => {
             <p>
               Join the International Meteor Organization (IMO) and connect with a global community of meteor enthusiasts! The International Meteor Conference (IMC) offers a <b>€5 discount on your first-year membership</b>, and <b>current members can save €5 on renewal at the conference</b>. Membership includes the <b>WGN journal and exclusive access to essential meteor observation resources</b>. Join today on the <a href="https://www.imo.net" target="_blank" rel="noopener noreferrer">IMO website</a>!
             </p>
-            <a className="btn btn-outline-primary fw-bolder mx-auto d-block" href="https://www.imo.net/members/imo_registration/register/" target="_blank" rel="noopener noreferrer">Join IMO</a>
+            <a className="btn btn-outline-primary fw-bolder mx-auto d-block" href="https://www.imo.net/members/imo_registration/register/" target="_blank" rel="noopener noreferrer">Join the IMO</a>
           </div>
           <div>
             <h2 className="mt-2 mb-3">{cd.welcome}</h2>

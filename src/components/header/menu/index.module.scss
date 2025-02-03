@@ -40,7 +40,7 @@ svg.menuIcon {
   left: 0;
   bottom: 0;
   background-color: var(--imc-bg-overlay);
-  position: absolute;
+  position: fixed;
   z-index: $zindex-side-menu-open-overlay;
 }
 
@@ -53,6 +53,10 @@ svg.menuIcon {
 
   .logo {
     max-width: $logo-menu-max-width;
+  }
+
+  a {
+    font-weight: normal;
   }
 }
 

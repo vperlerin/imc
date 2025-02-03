@@ -55,7 +55,10 @@ html {
   @include scrollStyledDark();
 }
  
-
+a {
+  font-weight: 900;
+  text-decoration: none;
+}
 
 .fw-bolder {
   font-weight: 900;

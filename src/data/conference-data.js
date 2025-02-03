@@ -9,6 +9,13 @@ export const conferenceData = {
     end: "2025-09-21"
   },
   location: "Soest, the Netherlands",
+  poster_dim: "100cmx100cm",
+  deadlines: 
+    {
+      reg: "2025-08-01",
+      paper: "2025-11-31",
+
+    },
   co_organizer: [
     {
       abbr: "IMO",
@@ -19,6 +26,6 @@ export const conferenceData = {
       abbr: "WGM",
       name: "KNVWS Meteor Section",
       website: "https://werkgroepmeteoren.nl/english"
-    } 
+    }
   ]
 };

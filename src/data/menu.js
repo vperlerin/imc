@@ -2,15 +2,15 @@ export const menuItems = [
   { title: 'Program', link: '/program',
     subLinks: [ 
       { title: 'Daily Program', link: '/program' },
-      { title: 'Posters', link: '/posters' },  
+      { title: 'Posters', link: '/program/posters' },  
     ]
    },
   {
-    title: 'Community & Activities', link: '/participants',
+    title: 'Community & Activities', link: '/comunity',
     subLinks: [ 
-      { title: 'Excursion', link: '/excursion' },
-      { title: 'Scientific and Local Organizing Committee', link: '/soc' },
-      { title: 'Participants', link: '/participants' },
+      { title: 'Excursion', link: '/community/excursion' },
+      { title: 'Scientific and Local Organizing Committee', link: '/community/soc' },
+      { title: 'Participants', link: '/community/participants' },
     ]
   },
   {
@@ -24,7 +24,7 @@ export const menuItems = [
     title: 'Location', link: '/location',
     subLinks: [
       { title: 'Conference Venue', link: '/location/venue' },
-      { title: 'Extra Accommodation', link: '/location/extra' },
+      { title: 'Extra Accommodations', link: '/location/extra' },
       { title: 'Travel Info', link: '/location/travel' },
       { title: 'Practical Info', link: '/location/practical' },
     ]
@@ -40,7 +40,6 @@ export const menuItems = [
   { title: 'Contact', link: '/contact' },
   { title: 'Service agreement & disclaimer', link: '/disclaimer', hideFromMenu: true },
   { title: 'Data Protection and Privacy', link: '/gdpr',  hideFromMenu: true }, 
-
   { title: 'Program - Day 1', link: '/program/day1',  hideFromMenu: true }, 
   { title: 'Program - Day 2', link: '/program/day2',  hideFromMenu: true }, 
   { title: 'Program - Day 3', link: '/program/day3',  hideFromMenu: true }, 

@@ -6,6 +6,10 @@
   @include scrollY();
   @include scrollStyledDark();
   min-height: var(--app-height);
+
+  h2 {
+    text-wrap: balance;
+  }
 }
 
 .illustration {

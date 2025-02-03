@@ -24,6 +24,6 @@ export const formatConferenceDates = (start, end) => {
 };
 
  
-export const formatFullDate = (dateStr, includeMonth = true) => {
-  return formatDate(dateStr, true, includeMonth, false);
+export const formatFullDate = (dateStr, includeMonth = true, includeYear = false,) => {
+  return formatDate(dateStr, true, includeMonth, includeYear);
 };

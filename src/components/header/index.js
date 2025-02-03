@@ -13,7 +13,6 @@ const Header = ({ showRegister = true }) => {
   const authUser = useSelector(authSlice.selectors.getUser);
   const title = `${cd.name} ${cd.year}`;
 
-
   return (
     <>
       <div className={classnames(showRegister && css.minWrap, 'd-flex align-items-center justify-content-between')}>
