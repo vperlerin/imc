@@ -6,6 +6,11 @@ header("Access-Control-Allow-Headers: Content-Type, Authorization");
 
 require_once "config.php";  
 
+ini_set('display_startup_errors', 1);
+ini_set('display_errors', 1);
+error_reporting(-1);
+
+
 $input = json_decode(file_get_contents("php://input"), true);
 
 if (!$input) {
