@@ -12,7 +12,7 @@ export const menuItems = [
       { title: 'Excursion', link: '/community/excursion' },
       { title: 'Scientific and Local Organizing Committee', link: '/community/soc' },
       { title: 'Participants', link: '/community/participants' },
-      { title: 'Sights & Surroundings', link: '/community/suroundings' },
+      { title: 'Sights & Surroundings', link: '/community/surroundings' },
     ]
   },
   {

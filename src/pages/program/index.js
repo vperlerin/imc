@@ -77,7 +77,7 @@ const Program = () => {
                       <>
                         <div className={classNames(item?.lectures?.length > 0 && css.sessionWrap, 'border-bottom pb-2 mb-2')}>
                           <h5 className="mb-0 mt-3">{item.session}</h5>
-                          {item.chair && <p className="mb-0"><d>Chair:</d> {item.chair}</p>}
+                          {item.chair && <p className="mb-0"><b>Chair:</b> {item.chair}</p>}
                         </div>
                         {item.lectures && (
                           item.lectures.map((lecture, idx) => (

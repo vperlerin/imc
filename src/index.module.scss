@@ -4,6 +4,7 @@
 
 :root {
   // Boot
+  --bs-body-bg: #141618; // input bg
   --bs-border-color: rgb(88, 88, 88);
 
   --imc-primary: #{$primary};
@@ -12,7 +13,7 @@
   --imc: #FFF;
   --imc-border: var(--bs-border-color);
   --imc-muted: #ccc;
-  --imc-bg: #202020;
+  --imc-bg: #212529;
   --imc-bg-darker: #000000; // Menu item hover
 
   // Header  
@@ -63,3 +64,4 @@ a {
 .fw-bolder {
   font-weight: 900;
 }
+ 

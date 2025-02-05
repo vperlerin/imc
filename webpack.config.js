@@ -1,3 +1,4 @@
+const Dotenv = require('dotenv-webpack');
 const path = require('path'); 
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
@@ -39,6 +40,7 @@ module.exports = (env, argv) => {
                 chunkFilename: devMode ? '[id].css' : '[id].[contenthash].css',
             }),
             new BundleAnalyzerPlugin({ analyzerMode: devMode ? "disabled" : "static" }),
+            new Dotenv(),
         ],
         module: {
             rules: [

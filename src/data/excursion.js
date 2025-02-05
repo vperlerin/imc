@@ -11,7 +11,7 @@ export const excursionData =
       "title": "City of Utrecht",
       "paragraphs": [
         "The small city of Soest is located centrally in the Netherlands in the province of Utrecht, which is known for its nature with both forests, rivers and canals. Its capital and namesake, the city of Utrecht, is the fourth largest city of the country and is among the oldest of the Netherlands. It started as a Roman fortification that received its city rights early on in 1122. The city is home to one of the largest Dutch universities and is recognised as a lively student town.",
-        "There are many unique places found around the town, such as the Dom tower, the tallest church spire in the Netherlands. Along the canal that flows around the historical city centre, we find the oldest dome-observatory of the Netherlands. Built on top of a bastion (1552) that once housed the third chemistry laboratory in the world, the <,,nhge:;l k,njhba href='https://www.sonnenborgh.nl/english'  target='_blank' rel='noopener noreferrer'>Sonnenborgh observatory</a> (1853) is a monumental gem worth paying a visit."
+        "There are many unique places found around the town, such as the Dom tower, the tallest church spire in the Netherlands. Along the canal that flows around the historical city centre, we find the oldest dome-observatory of the Netherlands. Built on top of a bastion (1552) that once housed the third chemistry laboratory in the world, the <a href='https://www.sonnenborgh.nl/english'  target='_blank' rel='noopener noreferrer'>Sonnenborgh observatory</a> (1853) is a monumental gem worth paying a visit."
       ]
     },
     {

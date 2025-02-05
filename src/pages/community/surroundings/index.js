@@ -1,16 +1,16 @@
-import sur1 from 'assets/img/illus/suroundings/sur1.jpg';
-import sur2 from 'assets/img/illus/suroundings/sur2.jpg';
-import sur3 from 'assets/img/illus/suroundings/sur3.jpg';
-import sur4 from 'assets/img/illus/suroundings/sur4.jpg';
+import sur1 from 'assets/img/illus/surroundings/sur1.jpg';
+import sur2 from 'assets/img/illus/surroundings/sur2.jpg';
+import sur3 from 'assets/img/illus/surroundings/sur3.jpg';
+import sur4 from 'assets/img/illus/surroundings/sur4.jpg';
 
 import classNames from 'classnames';
 import css from './index.module.scss';
 import PageContain from "components/page-contain";
 import React from "react";
 
-const Suroundings = () => {
+const Surroundings = () => {
   return (
-    <PageContain title="Suroundings">
+    <PageContain title="Sights & Surroundings">
 
       <div className="mx-md-3">
 
@@ -42,4 +42,4 @@ const Suroundings = () => {
   );
 };
 
-export default Suroundings;
+export default Surroundings;
