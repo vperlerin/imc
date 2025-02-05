@@ -41,7 +41,7 @@ $subject = htmlspecialchars($input['subject']);
 $message = htmlspecialchars($input['message']);
 
 // Example: Send email (update email settings accordingly)
-$to = "webmaster@imo.net";
+$to = "vperlerin@gmail.com";
 $headers = "From: $email\r\nReply-To: $email\r\nContent-Type: text/plain; charset=UTF-8";
 $mailSent = mail($to, "Contact Form: $subject", "Name: $name\nEmail: $email\n\nMessage:\n$message", $headers);
 
