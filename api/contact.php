@@ -4,13 +4,6 @@ header("Content-Type: application/json");
 header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
 
-require_once "config.php";  
-
-ini_set('display_startup_errors', 1);
-ini_set('display_errors', 1);
-error_reporting(-1);
-
-
 $input = json_decode(file_get_contents("php://input"), true);
 
 if (!$input) {
@@ -28,25 +21,29 @@ foreach ($requiredFields as $field) {
 }
 
 // Verify reCAPTCHA
-$recaptchaSecret = getenv("RECAPTCHA_SECRET_KEY");
-$recaptchaResponse = $input['token'];
+$recaptchaSecret = getenv("RECAPTCHA_SECRET_KEY"); // Use environment variable
+if (!$recaptchaSecret) {
+    echo json_encode(["success" => false, "message" => "Missing reCAPTCHA secret key"]);
+    exit;
+}
 
+$recaptchaResponse = $input['token'];
 $recaptchaVerify = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=$recaptchaSecret&response=$recaptchaResponse");
 $recaptchaData = json_decode($recaptchaVerify, true);
-
+error_log("reCAPTCHA Response: " . print_r($recaptchaData, true));
 if (!$recaptchaData['success']) {
     echo json_encode(["success" => false, "message" => "reCAPTCHA verification failed"]);
     exit;
 }
 
-// Process form (e.g., send an email or store in the database)
+// Process the form
 $name = htmlspecialchars($input['name']);
 $email = htmlspecialchars($input['email']);
 $subject = htmlspecialchars($input['subject']);
 $message = htmlspecialchars($input['message']);
 
-// Example: Send email (update email settings accordingly)
-$to = "vperlerin@gmail.com";
+// Example: Send email (modify as needed)
+$to = "webmaster@imo.net";
 $headers = "From: $email\r\nReply-To: $email\r\nContent-Type: text/plain; charset=UTF-8";
 $mailSent = mail($to, "Contact Form: $subject", "Name: $name\nEmail: $email\n\nMessage:\n$message", $headers);
 
