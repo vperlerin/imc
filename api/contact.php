@@ -21,7 +21,7 @@ foreach ($requiredFields as $field) {
 }
 
 // Verify reCAPTCHA
-$recaptchaSecret = getenv("RECAPTCHA_SECRET_KEY"); // Use environment variable
+$recaptchaSecret = getenv("RECAPTCHA_SECRET_KEY");  
 if (!$recaptchaSecret) {
     echo json_encode(["success" => false, "message" => "Missing reCAPTCHA secret key"]);
     exit;
@@ -43,7 +43,7 @@ $subject = htmlspecialchars($input['subject']);
 $message = htmlspecialchars($input['message']);
 
 // Example: Send email (modify as needed)
-$to = "webmaster@imo.net";
+$to = "vperlerin@gmail.com";
 $headers = "From: $email\r\nReply-To: $email\r\nContent-Type: text/plain; charset=UTF-8";
 $mailSent = mail($to, "Contact Form: $subject", "Name: $name\nEmail: $email\n\nMessage:\n$message", $headers);
 

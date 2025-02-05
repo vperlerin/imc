@@ -53,7 +53,7 @@ const Contact = () => {
     <PageContain title="Contact">
 
       {responseMessage && (
-        <p className={responseMessage.includes("successfully") ? "text-success" : "text-danger"}>{responseMessage}</p>
+        <p className={responseMessage.includes("successfully") ? "text-success fw-bolder text-center" : "text-danger fw-bolder text-center"}>{responseMessage}</p>
       )}
 
       <form onSubmit={handleSubmit(onSubmit)} className={classNames(css.form, 'mx-auto')}>
