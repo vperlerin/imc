@@ -3,6 +3,7 @@ export const menuItems = [
     subLinks: [ 
       { title: 'Daily Program', link: '/program' },
       { title: 'Posters', link: '/program/posters' },  
+      { title: 'Workshops', link: '/program/workshops' },  
     ]
    },
   {
@@ -11,6 +12,7 @@ export const menuItems = [
       { title: 'Excursion', link: '/community/excursion' },
       { title: 'Scientific and Local Organizing Committee', link: '/community/soc' },
       { title: 'Participants', link: '/community/participants' },
+      { title: 'Sights & Surroundings', link: '/community/suroundings' },
     ]
   },
   {

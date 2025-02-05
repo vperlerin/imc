@@ -23,7 +23,13 @@ export const formatConferenceDates = (start, end) => {
   return `${formatDate(start)} - ${formatDate(end, false, false).split(" ")[0]}`;
 };
 
- 
+
 export const formatFullDate = (dateStr, includeMonth = true, includeYear = false,) => {
   return formatDate(dateStr, true, includeMonth, includeYear);
+};
+
+export const formatFullDatePlusXDays = (dateStr, daysToAdd, includeMonth = true, includeYear = true) => {
+  const date = new Date(dateStr);
+  date.setDate(date.getDate() + daysToAdd);
+  return formatFullDate(date.toISOString(), includeMonth, includeYear);
 };

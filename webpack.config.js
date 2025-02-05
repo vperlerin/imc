@@ -1,14 +1,9 @@
-'use strict'
-
-const autoprefixer = require('autoprefixer');
-const path = require('path');
+const path = require('path'); 
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
-
-// npx webpack --mode production
 
 module.exports = (env, argv) => {
     const devMode = argv.mode !== 'production';
@@ -19,17 +14,17 @@ module.exports = (env, argv) => {
             filename: devMode ? '[name].js' : '[name].[contenthash].js',
             chunkFilename: devMode ? '[id].js' : '[id].[contenthash].js',
             path: path.resolve(__dirname, 'build'),
-            publicPath: '/', 
-            clean: true,  
+            publicPath: '/',
+            clean: true,
         },
         resolve: {
-          extensions: [ '.js', '.jsx', '.ts', '.tsx', '.css', '.scss' ],
-          modules: [
-            'node_modules',
-            path.resolve(__dirname, 'src'),
-          ],
+            extensions: ['.js', '.jsx', '.ts', '.tsx', '.css', '.scss'],
+            modules: [
+                'node_modules',
+                path.resolve(__dirname, 'src'),
+            ],
         },
-        plugins: [
+        plugins: [ 
             new HtmlWebpackPlugin({
                 template: path.join(__dirname, 'public', 'index.html'),
                 inject: true,
@@ -43,7 +38,7 @@ module.exports = (env, argv) => {
                 filename: devMode ? '[name].css' : '[name].[contenthash].css',
                 chunkFilename: devMode ? '[id].css' : '[id].[contenthash].css',
             }),
-            new BundleAnalyzerPlugin({ analyzerMode: devMode ? "disabled" : "static" }) // Helps analyze large bundles
+            new BundleAnalyzerPlugin({ analyzerMode: devMode ? "disabled" : "static" }),
         ],
         module: {
             rules: [
@@ -91,7 +86,7 @@ module.exports = (env, argv) => {
                             loader: 'css-loader',
                             options: {
                                 modules: {
-                                    auto: /\.module\.\w+$/, // Only treat filename.module.scss as a module
+                                    auto: /\.module\.\w+$/,
                                     localIdentName: '[name]__[local]--[hash:base64:5]',
                                 },
                                 importLoaders: 2,
@@ -101,7 +96,7 @@ module.exports = (env, argv) => {
                             loader: 'postcss-loader',
                             options: {
                                 postcssOptions: {
-                                    plugins: [autoprefixer],
+                                    plugins: ['autoprefixer'],
                                 },
                             },
                         },
@@ -123,21 +118,21 @@ module.exports = (env, argv) => {
                 new TerserPlugin({
                     parallel: true,
                     terserOptions: {
-                        compress: { drop_console: true }, // Removes console logs
+                        compress: { drop_console: true },
                         output: { comments: false },
                     }
                 }),
                 new CssMinimizerPlugin(),
             ],
             splitChunks: {
-                chunks: 'all', // Enables code splitting for all chunks
+                chunks: 'all',
                 minSize: 20000,
-                maxSize: 250000, // Adjusted to reduce large files
+                maxSize: 250000,
             },
-            runtimeChunk: 'single', // Extracts runtime into a separate file
+            runtimeChunk: 'single',
         },
         devServer: {
-            historyApiFallback: true, // Ensures direct URL access works in development
+            historyApiFallback: true,
             static: path.resolve(__dirname, 'build'),
             compress: true,
             hot: true,

@@ -1,0 +1,18 @@
+@use 'styles/index' as *;
+
+.gallery {
+  flex-wrap: wrap;
+
+  img {
+    max-width: calc(50% - .5rem);
+  }
+
+  @include media-breakpoint-up(md) {
+    flex-wrap: nowrap;
+
+    img {
+      max-width: calc(25% - 1rem);
+    }
+
+  }
+}

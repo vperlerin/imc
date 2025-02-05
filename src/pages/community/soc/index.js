@@ -7,14 +7,14 @@ import { socData as soc } from "data/soc";
 const Soc = () => {
   return (
     <PageContain title="Scientific and Local Organizing Committee">
-      <div className='d-flex flex-column flex-md-row-reverse gap-3 mt-3'>
+      <div className='d-flex flex-column flex-md-row-reverse gap-md-5 gap-3 mt-3 mx-md-3'>
 
         <div className={css.col}>
           <h3>Scientific Organizing Committee</h3>
 
           {soc.soc.intro && <p dangerouslySetInnerHTML={{ __html: soc.soc.intro }} />}
 
-          <h4>Chair</h4>
+          <h4 className="mt-md-4 mt-3">Chair</h4>
           <ul>
             {soc.soc.chair.map((chair, idx) => (
               <li key={`soc-chair-${idx}`} dangerouslySetInnerHTML={{ __html: chair }} />

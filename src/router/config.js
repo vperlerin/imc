@@ -14,9 +14,11 @@ import Pratical from "pages/location/pratical";
 import Program from "pages/program";
 import Register from "pages/register";
 import Soc from "pages/community/soc";
+import Suroundings from "pages/community/suroundings";
 import Travel from "pages/location/travel";
 import Topics from "pages/submission/topics";
 import Venue from "pages/location/venue";
+import Workshops from "pages/program/workshops";
 import React from "react";
 import { Routes, Route } from "react-router-dom";
  
@@ -33,7 +35,8 @@ const AppRoutes = () => {
       
       <Route path="/community/excursion" element={<Excursion />} />
       <Route path="/community/participants" element={<Participants />} />
-      <Route path="/community/soc" element={<Soc />} />
+      <Route path="/community/soc" element={<Soc />} /> 
+      <Route path="/community/suroundings" element={<Suroundings />} />
 
       <Route path="/gdpr" element={<Gdpr />} />
       
@@ -45,6 +48,7 @@ const AppRoutes = () => {
       <Route path="/program" element={<Program />} />
       <Route path="/program/:day" element={<Program />} />
       <Route path="/program/posters" element={<Posters />} />
+      <Route path="/program/workshops" element={<Workshops />} />
       
       <Route path="/register" element={<Register />} />
       <Route path="/register/online" element={<Online />} /> 
@@ -53,6 +57,8 @@ const AppRoutes = () => {
  
       <Route path="/submission/guidelines" element={<Guidelines />} />
       <Route path="/submission/topics" element={<Topics />} />
+
+ 
       <Route path="*" element={<Placeholder title="404 - Not Found" />} />
     </Routes>
   );

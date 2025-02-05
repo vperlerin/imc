@@ -13,9 +13,11 @@ export const conferenceData = {
   deadlines: 
     {
       reg: "2025-08-01",
-      paper: "2025-11-31",
-
+      paper: "2025-11-31", 
+      full_reimbursement_before: "2025-06-30", 
+      half_reimbursement_before: "2025-08-09",  
     },
+  admin_cost: "15€", 
   co_organizer: [
     {
       abbr: "IMO",
