@@ -1,32 +1,61 @@
 import classNames from "classnames";
 import css from './index.module.scss';
 import PageContain from "components/page-contain";
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import ReCAPTCHA from "react-google-recaptcha";
 import { useForm } from "react-hook-form";
- 
+import axios from "axios";
 
 const Contact = () => {
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm();
 
   const recaptchaRef = useRef(null);
+  const [loading, setLoading] = useState(false);
+  const [responseMessage, setResponseMessage] = useState("");
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     const token = recaptchaRef.current?.getValue();
     if (!token) {
       alert("Please complete the reCAPTCHA verification.");
       return;
     }
 
-    console.log({ ...data, token });
+    setLoading(true);
+    setResponseMessage("");
+
+    try {
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/contact`, {
+        ...data,
+        token,
+      });
+
+      if (response.data.success) {
+        setResponseMessage("Your message has been sent successfully!");
+        reset();
+        recaptchaRef.current.reset();
+      } else {
+        setResponseMessage("Something went wrong. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error sending contact form:", error);
+      setResponseMessage("An error occurred while sending your message.");
+    }
+
+    setLoading(false);
   };
 
   return (
     <PageContain title="Contact">
+
+      {responseMessage && (
+        <p className={responseMessage.includes("successfully") ? "text-success" : "text-danger"}>{responseMessage}</p>
+      )}
+
       <form onSubmit={handleSubmit(onSubmit)} className={classNames(css.form, 'mx-auto')}>
         <div className="mb-3">
           <label htmlFor="name" className="form-label">Name</label>
@@ -80,10 +109,14 @@ const Contact = () => {
         </div>
 
         <div className="my-3">
-          <ReCAPTCHA ref={recaptchaRef} sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY} theme="dark" /> 
+          <ReCAPTCHA ref={recaptchaRef} sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY} theme="dark" />
         </div>
 
-        <button type="submit" className="btn fw-bolder btn-primary">Submit</button>
+        <button type="submit" className="btn fw-bolder btn-primary" disabled={loading}>
+          {loading ? "Submitting..." : "Submit"}
+        </button>
+
+
       </form>
     </PageContain>
   );
