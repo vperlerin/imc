@@ -12,10 +12,11 @@ export const conferenceData = {
   poster_dim: "100cmx100cm",
   deadlines: 
     {
-      reg: "2025-08-01",
-      paper: "2025-11-31", 
-      full_reimbursement_before: "2025-06-30", 
-      half_reimbursement_before: "2025-08-09",  
+      reg: "2025-07-15",
+      paper: "2025-10-31", 
+      full_reimbursement_before: "2025-05-31", 
+      half_reimbursement_before: "2025-07-15",  
+      early_birds: "2025-05-31",
     },
   admin_cost: "15€", 
   co_organizer: [

@@ -1,9 +1,10 @@
-import illustration from 'assets/img/illus/main.jpg';
-import logo from 'assets/img/logo/logo.svg';
 import css from './index.module.scss';
 import classnames from 'classnames';
+import illustration from 'assets/img/illus/main.jpg';
+import logo from 'assets/img/logo/logo.svg';
 import Header from 'components/header';
 import React from 'react';
+import { Helmet } from 'react-helmet-async';
 import { conferenceData as cd } from 'data/conference-data';
 
 const topIllus = (
@@ -20,7 +21,11 @@ const PageContain = ({
   children
 }) => {
   return (
-    <div className={classnames(css.pageContain,' position-relative')}>
+    <>
+      <Helmet>
+
+      </Helmet>
+      <div className={classnames(css.pageContain,' position-relative')}>
       <Header />
       
       {title && (
@@ -35,6 +40,8 @@ const PageContain = ({
         {children}
       </div>
     </div>
+    </>
+
   );
 };
 

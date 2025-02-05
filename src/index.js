@@ -7,6 +7,7 @@ import React from 'react';
 import store from './store';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { createRoot } from 'react-dom/client';
+import { HelmetProvider } from 'react-helmet-async';
 import { Provider } from 'react-redux';
 
 const container = document.getElementById('root');
@@ -15,10 +16,12 @@ const root = createRoot(container);
 root.render(
   <React.StrictMode>
     <Provider store={store}>
-      <Router> 
-        <AppRoutes/>
-        <AppHeight />
-      </Router>
+      <HelmetProvider>
+        <Router>
+          <AppRoutes />
+          <AppHeight />
+        </Router>
+      </HelmetProvider>
     </Provider>
   </React.StrictMode >
 );

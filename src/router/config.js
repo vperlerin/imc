@@ -1,3 +1,4 @@
+import Loader from 'components/loader';
 import React, { Suspense, lazy } from "react";
 import { Routes, Route } from "react-router-dom";
 
@@ -27,7 +28,7 @@ const Placeholder = ({ title }) => <div><h2>{title}</h2></div>;
 
 const AppRoutes = () => {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<Loader/>}>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/disclaimer" element={<Disclaimer />} />
