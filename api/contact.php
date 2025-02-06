@@ -27,7 +27,7 @@ foreach ($requiredFields as $field) {
 }
 
 // Verify reCAPTCHA
-$recaptchaSecret = getenv("RECAPTCHA_SECRET_KEY");
+$recaptchaSecret = getenv("RECAPTCHA_SECRET_KEY") ?? $_ENV["RECAPTCHA_SECRET_KEY"] ?? $_SERVER["RECAPTCHA_SECRET_KEY"];
 if (!$recaptchaSecret) {
     echo json_encode(["success" => false, "message" => "Missing reCAPTCHA secret key"]);
     exit;
@@ -37,6 +37,7 @@ $recaptchaResponse = $input['token'];
 $recaptchaVerify = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=$recaptchaSecret&response=$recaptchaResponse");
 $recaptchaData = json_decode($recaptchaVerify, true);
 error_log("reCAPTCHA Response: " . print_r($recaptchaData, true));
+
 if (!$recaptchaData['success']) {
     echo json_encode(["success" => false, "message" => "reCAPTCHA verification failed"]);
     exit;
@@ -47,34 +48,33 @@ $name = htmlspecialchars($input['name']);
 $email = htmlspecialchars($input['email']);
 $subject = htmlspecialchars($input['subject']);
 $message = htmlspecialchars($input['message']);
-  
+
 $mail = new PHPMailer(true);
 
 try {
-    // Enable SMTP debugging if needed
-    $mail->SMTPDebug = 0; // Use 2 for debugging output
+    // SMTP Configuration
+    $mail->SMTPDebug = 0;  // Use 2 for debugging, 0 for production
     $mail->isSMTP();
-    $mail->Host = getenv("SMTP_HOST"); // Load from .env
+    $mail->Host = getenv("SMTP_HOST") ?? $_ENV["SMTP_HOST"] ?? $_SERVER["SMTP_HOST"];
     $mail->SMTPAuth = true;
-    $mail->Username = getenv("SMTP_USER"); // Gmail SMTP email
-    $mail->Password = getenv("SMTP_PWD"); // Gmail SMTP password or App Password
-    $mail->SMTPSecure = getenv("SMTP_SECURE"); // Use 'tls' or 'ssl'
-    $mail->Port = getenv("SMTP_TLS_PORT"); // Use 587 for TLS, 465 for SSL
+    $mail->Username = getenv("SMTP_USER") ?? $_ENV["SMTP_USER"] ?? $_SERVER["SMTP_USER"];
+    $mail->Password = getenv("SMTP_PWD") ?? $_ENV["SMTP_PWD"] ?? $_SERVER["SMTP_PWD"];
+    $mail->SMTPSecure = getenv("SMTP_SECURE") ?? $_ENV["SMTP_SECURE"] ?? $_SERVER["SMTP_SECURE"];
+    $mail->Port = (int) (getenv("SMTP_TLS_PORT") ?? $_ENV["SMTP_TLS_PORT"] ?? $_SERVER["SMTP_TLS_PORT"]);
 
     // Set sender and recipient
-    $mail->setFrom(getenv("SMTP_USER_EMAIL"), getenv("SMTP_USER_NAME"));
-    $mail->addAddress("vperlerin@gmail.com"); // Your receiving email
+    $mail->setFrom(getenv("SMTP_USER_EMAIL") ?? $_ENV["SMTP_USER_EMAIL"] ?? $_SERVER["SMTP_USER_EMAIL"], 
+                   getenv("SMTP_USER_NAME") ?? $_ENV["SMTP_USER_NAME"] ?? $_SERVER["SMTP_USER_NAME"]);
+    $mail->addAddress("vperlerin@gmail.com");
 
     // Email content
-    $mail->Subject = "Contact Form: " . htmlspecialchars($input['subject']);
-    $mail->Body = "Name: " . htmlspecialchars($input['name']) . "\n"
-                . "Email: " . htmlspecialchars($input['email']) . "\n\n"
-                . "Message:\n" . htmlspecialchars($input['message']);
+    $mail->Subject = "Contact Form: " . $subject;
+    $mail->Body = "Name: $name\nEmail: $email\n\nMessage:\n$message";
 
     // Send the email
     $mail->send();
     echo json_encode(["success" => true, "message" => "Message sent successfully"]);
 } catch (Exception $e) {
     error_log("Mailer Error: " . $mail->ErrorInfo);
-    echo json_encode(["success" => false, "message" => "Failed to send message"]);
+    echo json_encode(["success" => false, "message" => "Failed to send message. Check logs."]);
 }
