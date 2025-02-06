@@ -78,6 +78,6 @@ try {
     $mail->send();
     echo json_encode(["success" => true, "message" => "Message sent successfully"]);
 } catch (Exception $e) {
-    error_log("Mailer Error: " . $mail->ErrorInfo);
+    echo("Mailer Error: " . $mail->ErrorInfo);
     echo json_encode(["success" => false, "message" => "Failed to send message. Check logs."]);
 }
