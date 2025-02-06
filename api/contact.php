@@ -10,7 +10,7 @@ ini_set('display_errors', 'On');
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-require 'vendor/autoload.php'; 
+require '../vendor/autoload.php'; 
 require_once "config.php";
 
 $input = json_decode(file_get_contents("php://input"), true);
