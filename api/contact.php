@@ -47,28 +47,31 @@ $name = htmlspecialchars($input['name']);
 $email = htmlspecialchars($input['email']);
 $subject = htmlspecialchars($input['subject']);
 $message = htmlspecialchars($input['message']);
-
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
-
-require 'vendor/autoload.php';
-
+  
 $mail = new PHPMailer(true);
 
 try {
+    // Enable SMTP debugging if needed
+    $mail->SMTPDebug = 0; // Use 2 for debugging output
     $mail->isSMTP();
-    $mail->Host = 'smtp.example.com'; // Replace with your SMTP server
+    $mail->Host = getenv("SMTP_HOST"); // Load from .env
     $mail->SMTPAuth = true;
-    $mail->Username = 'your@email.com';
-    $mail->Password = 'yourpassword'; // Use app password for Gmail
-    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-    $mail->Port = 587;
+    $mail->Username = getenv("SMTP_USER"); // Gmail SMTP email
+    $mail->Password = getenv("SMTP_PWD"); // Gmail SMTP password or App Password
+    $mail->SMTPSecure = getenv("SMTP_SECURE"); // Use 'tls' or 'ssl'
+    $mail->Port = getenv("SMTP_TLS_PORT"); // Use 587 for TLS, 465 for SSL
 
-    $mail->setFrom($email, $name);
-    $mail->addAddress("vperlerin@gmail.com");
-    $mail->Subject = "Contact Form: $subject";
-    $mail->Body = "Name: $name\nEmail: $email\n\nMessage:\n$message";
+    // Set sender and recipient
+    $mail->setFrom(getenv("SMTP_USER_EMAIL"), getenv("SMTP_USER_NAME"));
+    $mail->addAddress("vperlerin@gmail.com"); // Your receiving email
 
+    // Email content
+    $mail->Subject = "Contact Form: " . htmlspecialchars($input['subject']);
+    $mail->Body = "Name: " . htmlspecialchars($input['name']) . "\n"
+                . "Email: " . htmlspecialchars($input['email']) . "\n\n"
+                . "Message:\n" . htmlspecialchars($input['message']);
+
+    // Send the email
     $mail->send();
     echo json_encode(["success" => true, "message" => "Message sent successfully"]);
 } catch (Exception $e) {
