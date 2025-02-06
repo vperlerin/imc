@@ -6,10 +6,10 @@ import css from './index.module.scss';
 import MenuItem from './item';
 import React, { useState, useEffect } from 'react';
 import { animated, useSpring } from '@react-spring/web';
+import { formatConferenceDates } from 'utils/date';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { menuItems } from 'data/menu';
 import { onStopPropagation } from 'utils/event';
-
 
 const sideMenuWidth = parseInt(css.sharedSideMenuWidth, 10) || 250;
 
@@ -29,7 +29,7 @@ const Menu = ({ cd }) => {
       setIsFullyClosed(false);
       api.start({ right: 0 });
       document.body.classList.add('overflow-hidden');
-      document.documentElement.classList.add('overflow-hidden'); 
+      document.documentElement.classList.add('overflow-hidden');
     } else {
       api.start({ right: -sideMenuWidth, onRest: () => setIsFullyClosed(true) });
       document.body.classList.remove('overflow-hidden');
@@ -40,12 +40,12 @@ const Menu = ({ cd }) => {
       document.body.classList.remove('overflow-hidden');
       document.documentElement.classList.remove('overflow-hidden');
     };
-}, [isMenuOpened, api]);
+  }, [isMenuOpened, api]);
 
 
   useEffect(() => {
     const handleResize = () => {
-      setIsMenuOpened(false);  
+      setIsMenuOpened(false);
     };
 
     window.addEventListener('resize', handleResize);
@@ -85,7 +85,12 @@ const Menu = ({ cd }) => {
           </button>
 
           <div className="mb-3">
-            <img className={classnames(css.logo, 'd-block mx-auto')} src={logo} alt={`${cd.name} ${cd.year}`} />
+            <img className={classnames(css.logo, 'd-block mx-auto my-2')} src={logo} alt={`${cd.name} ${cd.year}`} />
+
+            <div className="mx-3 text-center mb-3">
+              <h4 className="fw-bolder m-0">IMC {cd.year}</h4>
+              <small className="m-0">{formatConferenceDates(cd.dates.start, cd.dates.end)}<br/>{cd.location}</small>
+            </div> 
 
             {menuItems.map((item) => {
               const isActive = location.pathname.startsWith(item.link) ||

@@ -12,7 +12,6 @@ export const menuItems = [
       { title: 'Excursion', link: '/community/excursion' },
       { title: 'Scientific and Local Organizing Committee', link: '/community/soc' },
       { title: 'Participants', link: '/community/participants' },
-      { title: 'Sights & Surroundings', link: '/community/surroundings' },
     ]
   },
   {
@@ -29,6 +28,7 @@ export const menuItems = [
       { title: 'Extra Accommodations', link: '/location/extra' },
       { title: 'Travel Info', link: '/location/travel' },
       { title: 'Practical Info', link: '/location/practical' },
+      { title: 'Sights & Surroundings', link: '/location/surroundings' }, 
     ]
   },
   {

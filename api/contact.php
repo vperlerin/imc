@@ -4,6 +4,8 @@ header("Content-Type: application/json");
 header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
 
+require_once "config.php";
+
 $input = json_decode(file_get_contents("php://input"), true);
 
 if (!$input) {
@@ -21,7 +23,7 @@ foreach ($requiredFields as $field) {
 }
 
 // Verify reCAPTCHA
-$recaptchaSecret = getenv("RECAPTCHA_SECRET_KEY");  
+$recaptchaSecret = getenv("RECAPTCHA_SECRET_KEY");
 if (!$recaptchaSecret) {
     echo json_encode(["success" => false, "message" => "Missing reCAPTCHA secret key"]);
     exit;
@@ -52,4 +54,3 @@ if ($mailSent) {
 } else {
     echo json_encode(["success" => false, "message" => "Failed to send message"]);
 }
-?>

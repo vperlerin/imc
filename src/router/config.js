@@ -36,12 +36,12 @@ const AppRoutes = () => {
         <Route path="/community/excursion" element={<Excursion />} />
         <Route path="/community/participants" element={<Participants />} />
         <Route path="/community/soc" element={<Soc />} /> 
-        <Route path="/community/surroundings" element={<Surroundings />} />
         <Route path="/gdpr" element={<Gdpr />} />
         <Route path="/location/extra" element={<Extra />} />
         <Route path="/location/practical" element={<Practical />} />
         <Route path="/location/travel" element={<Travel />} />
         <Route path="/location/venue" element={<Venue />} />
+        <Route path="/location/surroundings" element={<Surroundings />} /> 
         <Route path="/program" element={<Program />} />
         <Route path="/program/:day" element={<Program />} />
         <Route path="/program/posters" element={<Posters />} />

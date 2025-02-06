@@ -1,7 +1,7 @@
 import logo from 'assets/img/logo/logo.svg';
 import illustration from 'assets/img/illus/main.jpg';
 import org1 from 'assets/img/org/1.svg';
-import org2 from 'assets/img/org/2.svg';
+import org2 from 'assets/img/org/2.png';
 //
 import classnames from 'classnames';
 import css from './index.module.scss';

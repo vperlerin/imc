@@ -20,7 +20,14 @@ const formatDate = (dateStr, includeWeekday = false, includeMonth = true, includ
 };
 
 export const formatConferenceDates = (start, end) => {
-  return `${formatDate(start)} - ${formatDate(end, false, false).split(" ")[0]}`;
+  const startDate = new Date(start);
+  const endDate = new Date(end);
+
+  const month = startDate.toLocaleString("en-US", { month: "long" });
+  const startDay = startDate.getDate();
+  const endDay = endDate.getDate();
+
+  return `${month} ${startDay}${getDaySuffix(startDay)} - ${endDay}${getDaySuffix(endDay)}`;
 };
 
 

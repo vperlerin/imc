@@ -18,13 +18,18 @@ const Header = ({ showRegister = true }) => {
       <div className={classnames(showRegister && css.minWrap, 'd-flex align-items-center justify-content-between')}>
         <nav className="p-0 flex-wrap" aria-label="Main navigation">
           <div className={classnames(css.header, 'd-flex flex-row flew-wrap px-2 mb-1 justify-content-between')}>
-            <a href="/" className={classnames('d-flex align-items-center text-dark text-decoration-none gap-2', css.title)}>
+            <Link
+              aria-label="IMC Homepage"
+              className={classnames('d-flex align-items-center text-dark text-decoration-none gap-2', css.title)}
+              to={'/'}
+              title="IMC Homepage"
+            >
               <img src={smallLogo} alt={title} className="rounded-circle border border-2 p-1" />
               <div className="d-flex flex-column">
                 <h1 className="m-0 fw-bolder">{cd.name} {cd.year}</h1>
                 <h2 className="m-0 d-none d-md-block">{formatConferenceDates(cd.dates.start, cd.dates.end)} - {cd.location}</h2>
               </div>
-            </a>
+            </Link>
           </div>
         </nav>
         {showRegister && (

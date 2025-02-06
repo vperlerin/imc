@@ -24,6 +24,7 @@ const Topics = () => {
         <li>Camera networks</li>
         <li>Analysis reports, results</li>
         <li>Meteorite recoveries, search activities</li>
+        <li>Meteorite studies</li>
       </ul>
 
       <h5>C - Parent bodies, meteoroids, meteorites, planets and their relation</h5>
@@ -58,6 +59,7 @@ const Topics = () => {
         <li>Spectroscopic</li>
         <li>Telescopic</li>
         <li>Radio</li>
+        <li>Seismic</li>
         <li>Lunar</li>
         <li>Observing from space</li>
         <li>Very low frequency radio observation</li>
@@ -77,6 +79,7 @@ const Topics = () => {
 
       <h5>H - Observing campaigns</h5>
       <ul>
+        <li>Citizen science & outreach</li>
         <li>Reports</li>
         <li>Anecdotes</li>
         <li>Future plans</li>
