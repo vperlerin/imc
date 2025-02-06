@@ -4,6 +4,10 @@ header("Content-Type: application/json");
 header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
 
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+require 'vendor/autoload.php'; 
 require_once "config.php";
 
 $input = json_decode(file_get_contents("php://input"), true);
@@ -44,13 +48,30 @@ $email = htmlspecialchars($input['email']);
 $subject = htmlspecialchars($input['subject']);
 $message = htmlspecialchars($input['message']);
 
-// Example: Send email (modify as needed)
-$to = "vperlerin@gmail.com";
-$headers = "From: $email\r\nReply-To: $email\r\nContent-Type: text/plain; charset=UTF-8";
-$mailSent = mail($to, "Contact Form: $subject", "Name: $name\nEmail: $email\n\nMessage:\n$message", $headers);
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
-if ($mailSent) {
+require 'vendor/autoload.php';
+
+$mail = new PHPMailer(true);
+
+try {
+    $mail->isSMTP();
+    $mail->Host = 'smtp.example.com'; // Replace with your SMTP server
+    $mail->SMTPAuth = true;
+    $mail->Username = 'your@email.com';
+    $mail->Password = 'yourpassword'; // Use app password for Gmail
+    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+    $mail->Port = 587;
+
+    $mail->setFrom($email, $name);
+    $mail->addAddress("vperlerin@gmail.com");
+    $mail->Subject = "Contact Form: $subject";
+    $mail->Body = "Name: $name\nEmail: $email\n\nMessage:\n$message";
+
+    $mail->send();
     echo json_encode(["success" => true, "message" => "Message sent successfully"]);
-} else {
+} catch (Exception $e) {
+    error_log("Mailer Error: " . $mail->ErrorInfo);
     echo json_encode(["success" => false, "message" => "Failed to send message"]);
 }
