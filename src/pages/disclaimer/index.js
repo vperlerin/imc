@@ -12,11 +12,11 @@ const Disclaimer = () => {
         </p>
 
         <p>
-          Extra nights before or after the IMC and/or private accommodation should be taken care of by the participant and are therefore beyond the responsibility of the IMC organizer. Information provided for this purpose on the <a href='https://www.imo.net'  target='_blank' rel='noopener noreferrer'>IMC website</a> is of an informative nature only. Accommodation is provided at the conference venue. Therefore, no transportation will be provided between the conference venue and hotels.
+          Extra nights before or after the IMC and/or private accommodation should be taken care of by the participant and are therefore beyond the responsibility of the IMC organizer. Information provided for this purpose on the <a href='/' rel='noopener noreferrer'>IMC website</a> is of an informative nature only. Accommodation is provided at the conference venue. Therefore, no transportation will be provided between the conference venue and hotels.
         </p>
 
         <p>
-          Food requirements can be honored only to the extent they can be handled by the catering of the IMC host. It is therefore recommended to check with the IMC organizer if special food requirements can be met, in particular if they are due to compelling medical reasons. The IMC registration fee is due immediately upon submitting the registration form. Registrations that remain without payment are deleted. All transaction costs are at the participant's expense. Notice in this regard that bank transfers in € within the European Union, Norway, Iceland, and Liechtenstein cost no more than domestic bank transfers (i.e., usually free). Follow the instructions of your bank in order to ensure that the beneficiary receives the complete amount due.
+          Food requirements can be honored only to the extent they can be handled by the catering of thoe IMC host. It is therefore recommended to check with the IMC organizer if special food requirements can be met, in particular if they are due to compelling medical reasons. The IMC registration fee is due immediately upon submitting the registration form. Registrations that remain without payment are deleted. All transaction costs are at the participant's expense. Notice in this regard that bank transfers in € within the European Union, Norway, Iceland, and Liechtenstein cost no more than domestic bank transfers (i.e., usually free). Follow the instructions of your bank in order to ensure that the beneficiary receives the complete amount due.
         </p>
 
 
@@ -37,13 +37,11 @@ const Disclaimer = () => {
         <p>
           The main aim of the IMC is to offer the opportunity to amateur and professional meteor astronomers to exchange knowledge and ideas through lectures, posters and socializing. The main activities are the lecture and poster sessions. As the conference is rather specialized, no outreach activities should be expected. Everybody is welcome to contribute to the conference program, but the number of lectures is limited. If a lecture does not fit the purpose of the conference, it may be rejected. If the total lecture time requested exceeds the available time, a selection will be made that guarantees the best quality lecture program. The number of posters, on the other hand, is not limited. Posters will only be rejected if their topic is not in line with the aim of the conference. As in most cases lectures and posters are summaries of more elaborate work, their content can and will be covered in the IMC Proceedings. Therefore, a paper for the IMC Proceedings is in principle mandatory for every lecture or poster presented at the IMC. These papers should preferably be submitted before or at the start of the conference, or at the latest on <b>{formatFullDate(cd.deadlines.paper)}</b>. Templates have been made available in both (PDF) LaTeX and Word.
         </p>
-
-
+ 
         <p>
           Participants take part in all IMC activities at their own risk. The IMC hosting accommodation fulfills all legal security requirements. However, if some personal accident happens during the IMC, then in no case the IMC organizer can be held responsible. Participants are recommended to take care of their individual travel insurance and to comply with the regulations of their national or private health insurance for travelling abroad and carry the required documents with them.
         </p>
-
-
+ 
         <p>
           Participants should be at least 18 years old. Underage participants should be accompanied by their parents or accompanied by another duly authorized adult carrying proof of this, signed by the parents, in accordance with the law of the country of origin and the international regulations for minors travelling abroad. Underage participants are assumed to inform themselves properly with their local authorities.
         </p>

@@ -153,7 +153,7 @@ const Menu = ({ cd }) => {
             </Link>
             <br />
             developed & maintained by<br />
-            <a href="https://https://www.mikehankey.com/html/" target="_blank" rel="noopener noreferrer">
+            <a href="https://www.mikehankey.com/html/" target="_blank" rel="noopener noreferrer">
               Mike Hankey & Associates
             </a>, LLC © {cd.year}
           </div>

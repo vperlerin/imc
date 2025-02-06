@@ -1,12 +1,13 @@
 export const socData = {
   soc: {
     intro: '',
-    chair: ['Christian Steyaert (IMO, BIRA-ISAB)'],
+    chair: ['Chris Steyaert (IMO, BIRA-ISAB)'],
     members: [
       'Felix Bettonvil (WGM, Leiden Observatory)',
       'Marc Gyssens (IMO, U. Hasselt)',
       'Regina Rudawska (ESA-ESTEC)',
       'Sebastiaan de Vet (WGM, TU Delft, Naturalis)',
+      'Maximilian Vovk (Western U.)',
     ]
 
   },

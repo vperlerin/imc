@@ -41,7 +41,7 @@ const Guidelines = () => {
         <h2>Topics</h2>
         <p>
           Presentations should be related to the domain of{' '}
-          <Link aria-label="Topics" to="/topics" title="Topics">
+          <Link aria-label="Topics" to="/submission/topics" title="Topics">
             meteor astronomy
           </Link>, off-topic items cannot be admitted.
         </p>
@@ -117,13 +117,7 @@ const Guidelines = () => {
         </div>
 
         <p>Please, note:</p>
-        <ul>
-          <li>
-            There is no formal page limit, but contributions should be concise. Most contributions fit within 4 pages (as printed in the proceedings), few exceed 6 pages. If you think you need more pages and can justify this, please {' '}
-            <Link aria-label="Contact" to="/contact" title="Contact">
-              contact
-            </Link>{' '} the {cf.year} IMC Proceedings editors or consider submitting the article to our journal WGN.
-          </li>
+        <ul> 
           <li>
             Convey content. Your contribution must have a purpose, and the text of your contribution should make that clear to the reader. Just a title and a collection of pictures with captions, for example, is not acceptable.
           </li>

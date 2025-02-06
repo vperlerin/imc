@@ -16,7 +16,7 @@ export const conferenceData = {
       paper: "2025-10-31", 
       full_reimbursement_before: "2025-05-31", 
       half_reimbursement_before: "2025-07-15",  
-      early_birds: "2025-05-31",
+      early_birds: "2025-05-1",
     },
   admin_cost: "15€", 
   co_organizer: [
