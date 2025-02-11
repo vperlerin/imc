@@ -7,15 +7,15 @@ import Menu from './menu';
 import { conferenceData as cd } from 'data/conference-data';
 import { formatConferenceDates } from 'utils/date';
 import { Link } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useSelector } from 'react-redux'; 
 
-const Header = ({ showRegister = true }) => {
+const Header = ({ showRegBtn = true }) => {
   const authUser = useSelector(authSlice.selectors.getUser);
   const title = `${cd.name} ${cd.year}`;
 
   return (
     <>
-      <div className={classnames(showRegister && css.minWrap, 'd-flex align-items-center justify-content-between')}>
+      <div className={classnames(showRegBtn && css.minWrap, 'd-flex align-items-center justify-content-between')}>
         <nav className="p-0 flex-wrap" aria-label="Main navigation">
           <div className={classnames(css.header, 'd-flex flex-row flew-wrap px-2 mb-1 justify-content-between')}>
             <Link
@@ -32,7 +32,7 @@ const Header = ({ showRegister = true }) => {
             </Link>
           </div>
         </nav>
-        {showRegister && (
+        {showRegBtn && (
           <Link
             aria-label="Register"
             className="btn btn-outline-primary fw-bolder"

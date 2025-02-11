@@ -12,7 +12,7 @@ const Surroundings = () => {
   return (
     <PageContain title="Sights & Surroundings">
 
-      <div className="mx-md-3">
+  
 
         <p>
           <b>
@@ -35,8 +35,7 @@ const Surroundings = () => {
           <img src={sur3} className=' rounded-2' />
           <img src={sur4} className=' rounded-2' />
         </div>
-
-      </div>
+ 
 
     </PageContain>
   );

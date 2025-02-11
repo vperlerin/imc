@@ -3,8 +3,12 @@ export const programData = {
     date: '09/18/2025',
     program: [ 
       {
+        period: '09:30 - 12:30',
+        display: 'Spectroscopy workshop & Radio workshop',
+      },
+      {
         period: '13:00 - …',
-        display: 'Arrival of participants'
+        display: 'Arrival of participants (who didn\'t participate in a workshop)'
       },
       {
         period: '18:15 - 19:15',

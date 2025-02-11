@@ -3,8 +3,7 @@ import React from "react";
 
 const Travel = () => {
   return (
-    <PageContain title="Travel Information">
-      <div className="mx-md-3">
+    <PageContain title="Travel Information"> 
       <h3>How to travel to Soest</h3>
       <p>he location of the IMC 2025 will be the small city of Soest, situated 10 kilometers away from Utrecht: the fourth largest city of the country, located in the centre of the Netherlands. Soest is easily reachable by road, train (thanks to the major railway hub Utrecht Central) and airplane (via Schiphol Airport and Rotterdam-The Hague Airport).</p>
 
@@ -34,8 +33,7 @@ const Travel = () => {
 
 
       <p><b>Parking:</b> You can park for free in front of the hostel. Charging of your electric car is possible at one of the charging stations at the parking area.</p>
- 
-      </div>
+  
     </PageContain>
   );
 };

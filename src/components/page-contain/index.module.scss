@@ -6,6 +6,7 @@
   @include scrollY();
   @include scrollStyledDark();
   min-height: var(--app-height);
+  height: 100%;
 
   h2 {
     text-wrap: balance;

@@ -1,3 +1,5 @@
+import Workshops from "../components/registration/workshops";
+
 export const conferenceData = {
   year: 2025,
   num: "44th",
@@ -10,15 +12,49 @@ export const conferenceData = {
   },
   location: "Soest, the Netherlands",
   poster_dim: "100cmx100cm",
-  deadlines: 
-    {
-      reg: "2025-07-15",
-      paper: "2025-10-31", 
-      full_reimbursement_before: "2025-05-31", 
-      half_reimbursement_before: "2025-07-15",  
-      early_birds: "2025-05-1",
+  consulat: "Dutch consulate",
+  deadlines:
+  {
+    reg: "2025-07-15",
+    paper: "2025-10-31",
+    full_reimbursement_before: "2025-05-31",
+    half_reimbursement_before: "2025-07-15",
+    early_birds: "2025-05-1", 
+  },
+  costs: {
+    after_early_birds: 20,
+    admin: "15€",
+    rooms: [
+      {
+        price: 250,
+        description: "Quadruple room in the IMC host",
+        number: 100,
+        type: "quadruple"
+      },
+      {
+        price: 350,
+        description: "Double room in the IMC host",
+        number: 100,
+        type: "double"
+      },
+      {
+        price: 500,
+        description: "Single room in the IMC host",
+        number: 100,
+          type: "single"
+      },
+      {
+        price: 200,
+        description: "No accommodation",
+      }
+    ],
+    tshirts: {
+      models: ['men', 'women'],
+      sizes: ['S', 'M', 'L', 'XL', 'XXL'],
+      price: 15,
     },
-  admin_cost: "15€", 
+    printed_proceedings: 20,
+  },
   co_organizer: [
     {
       abbr: "IMO",
@@ -29,6 +65,20 @@ export const conferenceData = {
       abbr: "WGM",
       name: "KNVWS Meteor Section",
       website: "https://werkgroepmeteoren.nl/english"
+    }
+  ],
+  workshops: [
+    {
+      title: "Spectroscopy Workshop",
+      date:  "2025-09-18",
+      period: "09:30 to 12:30 CEST",
+      cost: 15,
+    },
+    {
+      title: "Radio workshop",
+      date:  "2025-09-18",
+      period: "09:30 to 12:30 CEST",
+      cost: 15,
     }
   ]
 };

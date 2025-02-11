@@ -35,8 +35,7 @@ const Program = () => {
   }
 
   return (
-    <PageContain title="Daily Program">
-      <div className="mx-md-3">
+    <PageContain title="Daily Program"> 
         <div className={classNames(css.arrows, 'd-flex justify-content-between align-items-center mb-4 mt-3 d-md-none')}>
           {prevDay ? (
             <Link to={`/program/${prevDay}`} className={css.arrow}>
@@ -106,8 +105,7 @@ const Program = () => {
               </dl>
             </div>
           ))}
-        </div>
-      </div>
+        </div> 
     </PageContain>
   );
 };

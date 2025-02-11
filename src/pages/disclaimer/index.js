@@ -5,8 +5,7 @@ import { formatFullDate, formatFullDatePlusXDays } from 'utils/date';
 
 const Disclaimer = () => {
   return (
-    <PageContain title="Service agreement & disclaimer">
-      <div className="mx-md-3">
+    <PageContain title="Service agreement & disclaimer"> 
         <p>
           The “International Meteor Conference” is a low-cost non-profit event organized by unpaid volunteers who act according to the best of their abilities. In particular, a low-cost event implies that the accommodation provided is basic in order to be able to offer a low cost event. All participants should be aware that a low-cost event with basic accommodation organized by unpaid volunteers may cause some small inconveniences. The real IMC spirit is the kind of spirit you find around the camp fire of a youth camp. That was also the origin of the IMCs, and the flame of that spirit has been carried from IMC to IMC ever since. This youth-camp spirit is what makes people coming back year after year. Even if part of the accommodation in some recent years was more luxurious, the spirit described above always remained, with a simple functional accommodation for the common activities.
         </p>
@@ -23,7 +22,7 @@ const Disclaimer = () => {
         The cancellation policy for the IMC{cd.year} is as follows: 
         <ul>
           <li>
-            <b>Until {formatFullDate(cd.deadlines.full_reimbursement_before)}:</b>  full reimbursement, except for {cd.admin_cost} administrative costs.
+            <b>Until {formatFullDate(cd.deadlines.full_reimbursement_before)}:</b>  full reimbursement, except for {cd.costs.admin} administrative costs.
           </li>
           <li>
             <b>Between {formatFullDatePlusXDays(cd.deadlines.full_reimbursement_before, 1)}{' '}
@@ -52,10 +51,7 @@ const Disclaimer = () => {
 
         <p>
           Each participant declares to have read and accepted this service agreement and disclaimer by confirming this on the registration form.
-        </p>
-
-      </div>
-
+        </p> 
     </PageContain>
   );
 };

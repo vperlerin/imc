@@ -7,7 +7,7 @@ import { socData as soc } from "data/soc";
 const Soc = () => {
   return (
     <PageContain title="Scientific and Local Organizing Committee">
-      <div className='d-flex flex-column flex-md-row-reverse gap-md-5 gap-3 mt-3 mx-md-3'>
+      <div className='d-flex flex-column flex-md-row-reverse gap-md-5 gap-3 mt-3'>
 
         <div className={css.col}>
           <h3>Scientific Organizing Committee</h3>

@@ -10,10 +10,7 @@ const MSWordTemplate = "/files/MSWord-Template.docx";
 
 const Guidelines = () => {
   return (
-    <PageContain title="Submission and Proceedings Guidelines">
-      <div className="mx-md-3">
-
-
+    <PageContain title="Submission and Proceedings Guidelines"> 
         <div className="text-danger fw-bolder mt-3 mb-4">
           For ALL IMC presentations (poster or lecture), a paper for the IMC Proceedings is mandatory. Only in case of a specific reason, e.g., information of confidential nature related to submission in a professional journal, exceptions will be honored.
         </div>
@@ -212,10 +209,7 @@ const Guidelines = () => {
             <b className="d-block fw-bolder">
               Responsibility of the Author(s)</b>
             Authors retain copyright. The editors will assist with corrections, but final responsibility lies with the authors.</li>
-        </ol>
-
-
-      </div>
+        </ol> 
     </PageContain>
   );
 };
