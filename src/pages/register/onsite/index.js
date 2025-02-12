@@ -71,14 +71,14 @@ const MainForm = () => {
 
   if (!isDebugMode) {
     return (
-      <PageContain title="Register On-site">
+      <PageContain title="Register Onsite">
         Come back soon…
       </PageContain>
     )
   }
 
   return (
-    <PageContain title="Register On-site">
+    <PageContain title="Register Onsite">
       <form onSubmit={handleSubmit(onSubmit)} className="d-flex flex-grow-1 flex-column">
         {step === 1 && (
           <>
