@@ -1,13 +1,15 @@
 import classNames from "classnames";
 import cssForm from "styles/components/form.module.scss";
 import React, { useEffect } from "react";
+import StepDislay from "components/registration/stepDisplay"; 
 import { conferenceData as cd } from "data/conference-data";
 
 const AccomodationForm = ({
   register,
   errors,
   isDebugMode = false,
-  step = null,
+  step,
+  stepTotal,
   trigger,
   setValue,
   initialData
@@ -24,7 +26,7 @@ const AccomodationForm = ({
   }, [initialData, setValue]);
 
   const fillTestData = () => {
-    setValue("registrationType", cd.costs.rooms[1].price.toString()); // Defaulting to "Double Room"
+    setValue("registrationType", cd.costs.rooms[1].type);  
     setValue("paymentMethod", "Paypal");
     trigger();
   };
@@ -32,12 +34,11 @@ const AccomodationForm = ({
   return (
     <>
       <h4 className="mb-3 border-bottom pb-2">
-        {step && <><span >{step} </span>{' '}-{' '}</>}
+       <StepDislay step={step} stepTotal={stepTotal} /> 
         Accomodation & Payment Method
       </h4>
 
       <div className={classNames(cssForm.smallW, "mx-auto position-relative")}>
-
         {isDebugMode && (
           <button type="button" className="position-absolute top-0 end-0 btn btn-secondary" onClick={fillTestData}>
             Fill Test Data
@@ -53,8 +54,8 @@ const AccomodationForm = ({
                 <input
                   type="radio"
                   id={`room-${index}`}
-                  className="form-check-input"
-                  value={room.price.toString()}
+                  className={classNames("form-check-input", { "is-invalid": errors.registrationType })}
+                  value={room.type}
                   {...register("registrationType", { required: "Please select a registration type" })}
                 />
                 <label className="form-check-label" htmlFor={`room-${index}`}>
@@ -91,7 +92,7 @@ const AccomodationForm = ({
                 <input
                   type="radio"
                   id={`payment-${method.type}`}
-                  className="form-check-input"
+                  className={classNames("form-check-input", { "is-invalid": errors.paymentMethod })}
                   value={method.type}
                   {...register("paymentMethod", { required: "Please select a payment method" })}
                 />

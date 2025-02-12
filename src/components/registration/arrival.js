@@ -1,6 +1,7 @@
 import classNames from "classnames";
 import cssForm from "styles/components/form.module.scss";
 import React, { useEffect } from "react";
+import StepDislay from "components/registration/stepDisplay";  
 import { conferenceData as cd } from "data/conference-data";
 import { formatFullDate } from 'utils/date';
 
@@ -24,7 +25,8 @@ const ArrivalForm = ({
   register,
   errors,
   isDebugMode = false,
-  step = null,
+  step,
+  stepTotal,
   trigger,
   setValue,
   initialData
@@ -55,7 +57,7 @@ const ArrivalForm = ({
   return (
     <>
       <h4 className="mb-3 border-bottom pb-2">
-        {step && <><span >{step} </span>{' '}-{' '}</>}
+       <StepDislay step={step} stepTotal={stepTotal} /> 
         Personal Details
       </h4>
       <div className={classNames(cssForm.smallW, 'mx-auto position-relative')}>

@@ -41,11 +41,12 @@ export const conferenceData = {
         price: 500,
         description: "Single room in the IMC host",
         number: 100,
-          type: "single"
+        type: "single"
       },
       {
         price: 200,
         description: "No accommodation",
+        type: "no"
       }
     ],
     tshirts: {

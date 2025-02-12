@@ -32,3 +32,11 @@
     stroke: var(--imc); 
   } 
 }
+
+.gdpr {
+  color: var(--imc-gdpr);
+  font-family: Courier,Lucida Sans Typewriter,Lucida Typewriter,monospace;
+  max-height: 15rem;
+  overflow: auto;
+  background-color: var(--imc-gdpr-bg);
+}

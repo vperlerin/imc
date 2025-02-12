@@ -1,6 +1,6 @@
 import { conferenceData as cd } from 'data/conference-data';
 
-export const grdp = (
+export const gdpr = (
   <>
     <p>
       In compliance with the General Data Protection Regulation of the European Union, the data controller, the International Meteor Organization (IMO), international non-profit organization under Belgian Law, registration number 0441.894.089, Jozef Mattheessensstraat 60, 2540 Hove, represented by its President, Francis Verbeeck, president@imo.net, informs you of the following:</p>

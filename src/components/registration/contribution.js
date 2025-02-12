@@ -1,6 +1,7 @@
 import classNames from "classnames";
 import cssForm from "styles/components/form.module.scss";
 import React, { useEffect, useState } from "react";
+import StepDislay from "components/registration/stepDisplay";
 import TalkPosterForm from "./talkPoster";
 import { MdAdd } from "react-icons/md";
 import { conferenceData as cd } from "data/conference-data.js"
@@ -26,7 +27,8 @@ const ContributionForm = ({
   isDebugMode = false,
   register,
   errors,
-  step = null,
+  step,
+  stepTotal,
   trigger,
   setValue,
 }) => {
@@ -41,8 +43,21 @@ const ContributionForm = ({
           setValue(key, initialData[key]);
         }
       });
+
+      if ((initialData.talks && initialData.talks.length > 0) || (initialData.posters && initialData.posters.length > 0)) {
+        setWantsToContribute(true);
+
+        if (talks.length === 0) {
+          initialData.talks?.forEach((talk) => addTalk(talk));
+        }
+
+        if (posters.length === 0) {
+          initialData.posters?.forEach((poster) => addPoster(poster));
+        }
+      }
     }
-  }, [initialData, setValue]);
+  }, [initialData, setValue, addTalk, addPoster, talks.length, posters.length]);
+
 
   // Validate before adding new talk/poster
   const validateAndAdd = async (type) => {
@@ -85,7 +100,7 @@ const ContributionForm = ({
         </button>
       )}
       <h4 className="mb-3 border-bottom pb-2">
-        {step && <><span >{step} </span>{' '}-{' '}</>}
+        <StepDislay step={step} stepTotal={stepTotal} />
         Contributions
       </h4>
       <div className={classNames(cssForm.smallW, 'mx-auto position-relative')}>
@@ -94,7 +109,7 @@ const ContributionForm = ({
         <div className="mb-3 row">
           <label className={classNames('text-center fw-bold', cssForm.balance)}>Do you wish to contribute with a talk or a poster?</label>
           <div className="text-center btn-group d-block mt-3" role="group">
-            
+
             <input
               type="radio"
               className="btn-check"
@@ -104,16 +119,32 @@ const ContributionForm = ({
               onChange={() => setWantsToContribute(true)}
             />
             <label className="btn btn-outline-primary" htmlFor="contributeYes">Yes</label>
- 
+
             <input
               type="radio"
               className="btn-check"
               id="contributeNo"
               value="no"
               {...register("wantsToContribute", { required: "Please select an option" })}
-              onChange={() => setWantsToContribute(false)}
+              onChange={() => {
+                if (talks.length > 0 || posters.length > 0) {
+                  const confirmDelete = window.confirm(
+                    "Are you sure? All talks and posters you have entered will be deleted."
+                  );
+
+                  if (!confirmDelete) {
+                    return;
+                  }
+
+                  removeTalk();
+                  removePoster();
+                }
+
+                setWantsToContribute(false);
+              }}
             />
             <label className="btn btn-outline-primary" htmlFor="contributeNo">No</label>
+
           </div>
           {errors.wantsToContribute && <p className="text-danger fw-bold text-center"><small>{errors.wantsToContribute.message}</small></p>}
         </div>

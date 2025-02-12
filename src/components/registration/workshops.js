@@ -1,16 +1,16 @@
 import classNames from "classnames";
 import cssForm from "styles/components/form.module.scss";
 import React, { useEffect } from "react";
+import StepDislay from "components/registration/stepDisplay";
 import { conferenceData as cd } from "data/conference-data";
-import { useWatch } from "react-hook-form";
 
 const Workshops = ({
-  control,
   initialData,
   isDebugMode = false,
   register,
   errors,
-  step = null,
+  step,
+  stepTotal,
   trigger,
   setValue,
   watch
@@ -18,24 +18,24 @@ const Workshops = ({
   useEffect(() => {
     if (initialData?.workshops) {
       Object.entries(initialData.workshops).forEach(([key, value]) => {
-        setValue(key, value ? "true" : "false"); // Convert boolean to string for radio
+        setValue(key, value ? "true" : "false");
       });
     }
   }, [initialData, setValue]);
 
   const handleWorkshopChange = (workshopKey, value) => {
     setValue(workshopKey, value);
-    trigger(workshopKey); // Validate the field when changed
+    trigger(workshopKey);
   };
 
   const testData = {
     workshop_0: "true",
-    workshop_1: "false", // Store as string since radio buttons expect strings
+    workshop_1: "false",
   };
 
   const fillTestData = () => {
     Object.entries(testData).forEach(([key, value]) => setValue(key, value));
-    trigger(); // Trigger validation after setting values
+    trigger();
   };
 
   return (
@@ -50,11 +50,7 @@ const Workshops = ({
         </button>
       )}
       <h4 className="mb-3 border-bottom pb-2">
-        {step && (
-          <>
-            <span>{step}</span> {' - '} 
-          </>
-        )}
+        <StepDislay step={step} stepTotal={stepTotal} />
         Workshops
       </h4>
       <div className={classNames(cssForm.smallW, "mx-auto position-relative")}>

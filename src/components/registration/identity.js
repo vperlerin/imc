@@ -1,5 +1,6 @@
 import classNames from "classnames";
 import cssForm from "styles/components/form.module.scss";
+import StepDislay from "components/registration/stepDisplay";
 import React, { useEffect } from "react";
 import { countries } from 'data/countries';
 
@@ -14,7 +15,8 @@ const IdentityForm = ({
   register,
   errors,
   isDebugMode = false,
-  step = null,
+  step,
+  stepTotal,
   trigger,
   setValue,
   initialData
@@ -51,7 +53,7 @@ const IdentityForm = ({
   return (
     <>
       <h4 className="mb-3 border-bottom pb-2">
-        {step && <><span >{step} </span>{' '}-{' '}</>}
+        <StepDislay step={step} stepTotal={stepTotal} /> 
         Personal Details
       </h4>
       <div className={classNames(cssForm.smallW, 'mx-auto position-relative')}>
@@ -216,11 +218,11 @@ const IdentityForm = ({
           </div>
         </div>
 
-        {/* Organization (Optional) */}
+        {/* Organization   */}
         <div className="mb-3 row">
           <label className="col-sm-2 col-form-label fw-bold">Organization</label>
           <div className="col-sm-10">
-            <input className={classNames('form-control', cssForm.md50)} placeholder="Organization (optional)" {...register("organization")} />
+            <input className={classNames('form-control', cssForm.md50)} placeholder="Organization" {...register("organization")} />
           </div>
         </div>
 
@@ -233,7 +235,7 @@ const IdentityForm = ({
               <select
                 className={classNames('form-select', errors.dobDay && "is-invalid", cssForm.mdAuto)}
                 {...register("dobDay", { required: "Day is required" })} onBlur={() => trigger("dobDay")}>
-                <option value="">Day of Birth</option>
+                <option value="">Day</option>
                 {days.map((day) => (
                   <option key={day} value={day}>{day}</option>
                 ))}
@@ -244,7 +246,7 @@ const IdentityForm = ({
                 className={classNames('form-select', errors.dobMonth && "is-invalid", cssForm.mdAuto)}
 
                 {...register("dobMonth", { required: "Month is required" })} onBlur={() => trigger("dobMonth")}>
-                <option value="">Month of Birth</option>
+                <option value="">Month</option>
                 {months.map((month, index) => (
                   <option key={month} value={index + 1}>{month}</option>
                 ))}
@@ -254,7 +256,7 @@ const IdentityForm = ({
               <select
                 className={classNames('form-select', errors.dobYear && "is-invalid", cssForm.mdAuto)}
                 {...register("dobYear", { required: "Year is required" })} onBlur={() => trigger("dobYear")}>
-                <option value="">Year of Birth</option>
+                <option value="">Year</option>
                 {years.map((year) => (
                   <option key={year} value={year}>{year}</option>
                 ))}

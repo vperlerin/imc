@@ -1,19 +1,21 @@
 import classNames from "classnames";
 import cssForm from "styles/components/form.module.scss";
 import React, { useEffect, useState } from "react";
+import StepDislay from "components/registration/stepDisplay"; 
 import { conferenceData as cd } from "data/conference-data";
 
 const ExtrasForm = ({
   register,
   errors,
   isDebugMode = false,
-  step = null,
+  step,
+  stepTotal,
   trigger,
   setValue,
-  initialData }) => {
+  initialData
+}) => {
   const [wantsTShirt, setWantsTShirt] = useState(null);
 
-  // Generate T-Shirt Size Options
   const tShirtSizes = cd.costs.tshirts.models.flatMap((model) =>
     cd.costs.tshirts.sizes.map((size) => `${model.charAt(0).toUpperCase() + model.slice(1)} ${size}`)
   );
@@ -28,7 +30,6 @@ const ExtrasForm = ({
     }
   }, [initialData, setValue]);
 
-
   const fillTestData = () => {
     setValue("excursion", "yes");
     setValue("buyTShirt", "yes");
@@ -41,19 +42,17 @@ const ExtrasForm = ({
   return (
     <>
       <h4 className="mb-3 border-bottom pb-2">
-        {step && <><span >{step} </span>{' '}-{' '}</>}
+       <StepDislay step={step} stepTotal={stepTotal} /> 
         Extras
       </h4>
 
       <div className={classNames(cssForm.smallW, "mx-auto position-relative")}>
-
         {isDebugMode && (
-          <button type="button" className="position-fixed top-0 end-0 btn btn-secondary" onClick={fillTestData}>
+          <button type="button" className="position-absolute top-0 end-0 btn btn-secondary" onClick={fillTestData}>
             Fill Test Data
           </button>
         )}
 
-        {/* Excursion Participation */}
         <div className="mb-3">
           <label className="fw-bold">Do you want to participate in the excursion (at no extra cost)?</label>
           <div className="d-flex flex-column gap-2">
@@ -62,7 +61,7 @@ const ExtrasForm = ({
                 <input
                   type="radio"
                   id={`excursion-${option}`}
-                  className="form-check-input"
+                  className={classNames("form-check-input", { "is-invalid": errors.excursion })}
                   value={option}
                   {...register("excursion", { required: "Please select an option" })}
                 />
@@ -75,7 +74,6 @@ const ExtrasForm = ({
           {errors.excursion && <p className="text-danger"><small>{errors.excursion.message}</small></p>}
         </div>
 
-        {/* T-Shirt Purchase */}
         <div className="mb-3">
           <label className="fw-bold">Do you want to buy the official IMC2024 T-Shirt for 10€?</label>
           <div className="d-flex flex-column gap-2">
@@ -84,7 +82,7 @@ const ExtrasForm = ({
                 <input
                   type="radio"
                   id={`tshirt-${option}`}
-                  className="form-check-input"
+                  className={classNames("form-check-input", { "is-invalid": errors.buyTShirt })}
                   value={option}
                   {...register("buyTShirt", { required: "Please select an option" })}
                   onChange={(e) => setWantsTShirt(e.target.value === "yes")}
@@ -102,7 +100,7 @@ const ExtrasForm = ({
           <div className="mb-3">
             <label className="fw-bold">Select your T-Shirt size</label>
             <select
-              className={classNames("form-select", errors.tShirtSize && "is-invalid")}
+              className={classNames("form-select", { "is-invalid": errors.tShirtSize })}
               {...register("tShirtSize", { required: "Please select a T-Shirt size" })}
             >
               <option value="">Select size</option>
@@ -114,39 +112,26 @@ const ExtrasForm = ({
           </div>
         )}
 
-        {/* Proceedings Option */}
         <div className="mb-3">
           <label className="fw-bold">Proceedings</label>
           <div className="d-flex flex-column gap-2">
-            <div className="form-check">
-              <input
-                type="radio"
-                id="proceedings-pdf"
-                className="form-check-input"
-                value="pdf"
-                {...register("proceedings", { required: "Please select a proceedings option" })}
-              />
-              <label className="form-check-label" htmlFor="proceedings-pdf">
-                Only PDF (free)
-              </label>
-            </div>
-
-            <div className="form-check">
-              <input
-                type="radio"
-                id="proceedings-pdf-printed"
-                className="form-check-input"
-                value="pdf_printed"
-                {...register("proceedings", { required: "Please select a proceedings option" })}
-              />
-              <label className="form-check-label" htmlFor="proceedings-pdf-printed">
-                PDF & Printed copy ({cd.costs.printed_proceedings}€)
-              </label>
-            </div>
+            {["pdf", "pdf_printed"].map((option, index) => (
+              <div key={index} className="form-check">
+                <input
+                  type="radio"
+                  id={`proceedings-${option}`}
+                  className={classNames("form-check-input", { "is-invalid": errors.proceedings })}
+                  value={option}
+                  {...register("proceedings", { required: "Please select a proceedings option" })}
+                />
+                <label className="form-check-label" htmlFor={`proceedings-${option}`}>
+                  {option === "pdf" ? "Only PDF (free)" : `PDF & Printed copy (${cd.costs.printed_proceedings}€)`}
+                </label>
+              </div>
+            ))}
           </div>
           {errors.proceedings && <p className="text-danger"><small>{errors.proceedings.message}</small></p>}
         </div>
-
       </div>
     </>
   );

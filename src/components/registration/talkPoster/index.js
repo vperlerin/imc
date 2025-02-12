@@ -69,7 +69,6 @@ const TalkPosterForm = ({
             {...register(`${type}s.${index}.abstract`, { required: "Abstract is required" })}
           ></textarea>
           {errors?.[`${type}s`]?.[index]?.abstract && <p className="text-danger"><small>{errors[`${type}s`][index].abstract.message}</small></p>}
-
         </div>
       </div>
 

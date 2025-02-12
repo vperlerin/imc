@@ -16,7 +16,7 @@ import { formatFullDate } from 'utils/date';
 import { useForm } from "react-hook-form";
 import { useLocation } from "react-router-dom";
 
-const totalStep = 8;
+const totalStep = 7;
 
 const calculateAge = (dob) => {
   if (!dob) return null;
@@ -35,12 +35,23 @@ const MainForm = () => {
   const [step, setStep] = useState(1);
   const location = useLocation();
   const isDebugMode = new URLSearchParams(location.search).get("debug") === "1";
-  const { control, register, handleSubmit, formState: { errors }, getValues, setValue, trigger, watch } = useForm();
+  const {
+    control,
+    register,
+    handleSubmit,
+    formState: { errors },
+    getValues,
+    setValue,
+    trigger,
+    watch
+  } = useForm();
 
   // Watch the dob field
   const dob = watch("dob");
   const age = calculateAge(dob);
-  const isUnder16 = true; //age !== null && age < 16;
+  const isUnder16 = age !== null && age < 16;
+
+  const initialData = null; // replace with the API res
 
   const nextStep = async () => {
     const isValid = await trigger();
@@ -64,22 +75,27 @@ const MainForm = () => {
             <p className="border rounded-2 p-3">
               <b>People who need an invitation letter for Visa</b> must send their request without any delay to imc{cd.year}@imo.net. Please, provide your legal private domicile or professional address, passport number and the address of the {cd.consulate} where your visa application will be submitted.
             </p>
-            <p className="d-flex border rounded-2 p-3 border-info text-info gap-2 mb-5">
-              <CiWarning className={css.warning} />
-              <span>
-                <span className="d-block fw-bolder">After {formatFullDate(cd.deadlines.early_birds)}, a late booking fee of {cd.costs.after_early_birds}€ is added to the registration fee</span>
-                <small>— because the early birds got the discount, and the latecomers just get the worms (and a fee :).</small>
-              </span>
-            </p>
+
+            {new Date() < new Date(cd.deadlines.early_birds) && (
+              <p className="d-flex border rounded-2 p-3 border-info text-info gap-2 mb-5">
+                <CiWarning className={css.warning} />
+                <span>
+                  <span className="d-block fw-bolder">Hurry up! After {formatFullDate(cd.deadlines.early_birds)}, a late booking fee of {cd.costs.after_early_birds}€ is added to the registration fee</span>
+                  <small>— because the early birds got the discount, and the latecomers just get the worms (and a fee :).</small>
+                </span>
+              </p>
+            )}
           </>
         )}
 
-        {step === 8 && (
+        {step === 1 && (
           <Identitity
             register={register}
             errors={errors}
             isDebugMode={isDebugMode}
-            step={`${step}/${totalStep}`}
+            initialData={initialData}
+            step={step}
+            stepTotal={totalStep}
             setValue={setValue}
             trigger={trigger}
           />
@@ -89,8 +105,10 @@ const MainForm = () => {
           <Workshops
             register={register}
             errors={errors}
-            isDebugMode={isDebugMode}
-            step={`${step}/${totalStep}`}
+            isDebugMode={isDebugMode} 
+            initialData={initialData}
+            step={step}
+            stepTotal={totalStep}
             setValue={setValue}
             trigger={trigger}
             watch={watch}
@@ -100,8 +118,10 @@ const MainForm = () => {
           <Arrival
             register={register}
             errors={errors}
-            isDebugMode={isDebugMode}
-            step={`${step}/${totalStep}`}
+            isDebugMode={isDebugMode} 
+            initialData={initialData}
+            step={step}
+            stepTotal={totalStep}
             setValue={setValue}
             trigger={trigger}
           />
@@ -112,10 +132,15 @@ const MainForm = () => {
             register={register}
             isDebugMode={isDebugMode}
             errors={errors}
-            step={`${step}/${totalStep}`}
+            step={step}
+            stepTotal={totalStep}
             setValue={setValue}
             trigger={trigger}
             watch={watch}
+            initialData={{
+              talks:  initialData?.talks || getValues("talks") || [],
+              posters:  initialData?.posters ||  getValues("posters") || [],
+            }}
           />
         }
         {step === 5 &&
@@ -123,8 +148,10 @@ const MainForm = () => {
             control={control}
             register={register}
             isDebugMode={isDebugMode}
+            initialData={initialData}
             errors={errors}
-            step={`${step}/${totalStep}`}
+            step={step}
+            stepTotal={totalStep}
             setValue={setValue}
             trigger={trigger}
           />
@@ -133,58 +160,28 @@ const MainForm = () => {
           <Extras
             register={register}
             errors={errors}
-            isDebugMode={isDebugMode}
-            step={`${step}/${totalStep}`}
+            isDebugMode={isDebugMode}  
+            initialData={initialData}
+            step={step}
+            stepTotal={totalStep}
             setValue={setValue}
             trigger={trigger}
           />
         )}
 
-        {step === 1 && (
+        {step === 7 && (
           <Comments
             register={register}
             errors={errors}
             isDebugMode={isDebugMode}
-            step={`${step}/${totalStep}`}
+            initialData={initialData}
+            isUnder16={isUnder16}
+            showGdpr={true}
+            step={step}
+            stepTotal={totalStep}
             setValue={setValue}
             trigger={trigger}
           />
-        )}
-
-        {/* If the user is under 16, add extra fields on the last step */}
-        {step === 1 && isUnder16 && (
-          <div className="border p-3 rounded-2 mt-3">
-            <h5>Additional Information for Minors</h5>
-            <div className="mb-3">
-              <label className="form-label">Parent/Guardian Full Name</label>
-              <input
-                type="text"
-                className="form-control"
-                {...register("guardian_name", { required: "Parent/Guardian name is required" })}
-              />
-              {errors.guardian_name && <p className="text-danger">{errors.guardian_name.message}</p>}
-            </div>
-
-            <div className="mb-3">
-              <label className="form-label">Parent/Guardian Contact Number</label>
-              <input
-                type="tel"
-                className="form-control"
-                {...register("guardian_contact", { required: "Contact number is required" })}
-              />
-              {errors.guardian_contact && <p className="text-danger">{errors.guardian_contact.message}</p>}
-            </div>
-
-            <div className="mb-3">
-              <label className="form-label">Parent/Guardian Email</label>
-              <input
-                type="email"
-                className="form-control"
-                {...register("guardian_contact", { required: "Email is required" })}
-              />
-              {errors.guardian_email && <p className="text-danger">{errors.guardian_email.message}</p>}
-            </div>
-          </div>
         )}
 
         <div className="mt-auto pt-3">
@@ -199,9 +196,9 @@ const MainForm = () => {
                 Continue <SlArrowRight style={{ strokeWidth: "110px" }} />
               </button>
             )}
-          </div>
 
-          {step === totalStep && <button className="btn btn-outline-primary fw-bolder" type="submit">Submit</button>}
+            {step === totalStep && <button className="btn btn-primary fw-bolder" type="submit">Submit</button>}
+          </div> 
         </div>
       </form>
     </PageContain>
