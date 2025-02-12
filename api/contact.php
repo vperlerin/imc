@@ -56,7 +56,7 @@ $mail = new PHPMailer(true);
 
 try {
     // SMTP Configuration
-    $mail->SMTPDebug = 0;  // Use 2 for debugging, 0 for production
+    $mail->SMTPDebug = 2;  // Use 2 for debugging, 0 for production
     $mail->isSMTP();
     $mail->Host = getenv("SMTP_HOST") ?? $_ENV["SMTP_HOST"] ?? $_SERVER["SMTP_HOST"];
     $mail->SMTPAuth = true;
