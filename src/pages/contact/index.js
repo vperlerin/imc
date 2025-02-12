@@ -56,7 +56,7 @@ const Contact = () => {
         <p className={responseMessage.includes("successfully") ? "text-success fw-bolder text-center" : "text-danger fw-bolder text-center"}>{responseMessage}</p>
       )}
 
-      <form onSubmit={handleSubmit(onSubmit)} className={classNames(css.form, 'mx-auto')}>
+      <form onSubmit={handleSubmit(onSubmit)} className={classNames(css.form, 'mx-auto w-100')}>
         <div className="mb-3">
           <label htmlFor="name" className="form-label">Name</label>
           <input

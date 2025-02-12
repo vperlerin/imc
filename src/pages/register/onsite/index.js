@@ -35,6 +35,7 @@ const MainForm = () => {
   const [step, setStep] = useState(1);
   const location = useLocation();
   const isDebugMode = new URLSearchParams(location.search).get("debug") === "1";
+
   const {
     control,
     register,
@@ -52,6 +53,7 @@ const MainForm = () => {
   const isUnder16 = age !== null && age < 16;
 
   const initialData = null; // replace with the API res
+  const isEarlyBird = initialData?.isEarlyBird || new Date() < new Date(cd.deadlines.early_birds);
 
   const nextStep = async () => {
     const isValid = await trigger();
@@ -64,8 +66,16 @@ const MainForm = () => {
   const prevStep = () => setStep(step - 1);
 
   const onSubmit = (data) => {
-    console.log("Final Form Data:", data);
+    //console.log("Final Form Data:", data);
   };
+
+  if (!isDebugMode) {
+    return (
+      <PageContain title="Register On-site">
+        Come back soon…
+      </PageContain>
+    )
+  }
 
   return (
     <PageContain title="Register On-site">
@@ -88,6 +98,13 @@ const MainForm = () => {
           </>
         )}
 
+        <input
+          name="isEarlyBird"
+          type="hidden"
+          value={isEarlyBird}
+          {...register("isEarlyBird")}
+        />
+
         {step === 1 && (
           <Identitity
             register={register}
@@ -105,7 +122,7 @@ const MainForm = () => {
           <Workshops
             register={register}
             errors={errors}
-            isDebugMode={isDebugMode} 
+            isDebugMode={isDebugMode}
             initialData={initialData}
             step={step}
             stepTotal={totalStep}
@@ -118,7 +135,7 @@ const MainForm = () => {
           <Arrival
             register={register}
             errors={errors}
-            isDebugMode={isDebugMode} 
+            isDebugMode={isDebugMode}
             initialData={initialData}
             step={step}
             stepTotal={totalStep}
@@ -138,8 +155,8 @@ const MainForm = () => {
             trigger={trigger}
             watch={watch}
             initialData={{
-              talks:  initialData?.talks || getValues("talks") || [],
-              posters:  initialData?.posters ||  getValues("posters") || [],
+              talks: initialData?.talks || getValues("talks") || [],
+              posters: initialData?.posters || getValues("posters") || [],
             }}
           />
         }
@@ -156,11 +173,12 @@ const MainForm = () => {
             trigger={trigger}
           />
         }
+
         {step === 6 && (
           <Extras
             register={register}
             errors={errors}
-            isDebugMode={isDebugMode}  
+            isDebugMode={isDebugMode}
             initialData={initialData}
             step={step}
             stepTotal={totalStep}
@@ -198,7 +216,7 @@ const MainForm = () => {
             )}
 
             {step === totalStep && <button className="btn btn-primary fw-bolder" type="submit">Submit</button>}
-          </div> 
+          </div>
         </div>
       </form>
     </PageContain>

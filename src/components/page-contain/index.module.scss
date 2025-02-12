@@ -29,8 +29,11 @@
   }
 }
 
-.title {
+.title { 
   @include media-breakpoint-up(md) {
     border-radius: 1rem;
+    max-width: calc(100% - 1rem);
+    margin: 0 auto;
+    width: 100%;
   }
 }

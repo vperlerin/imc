@@ -53,8 +53,8 @@ const ExtrasForm = ({
           </button>
         )}
 
-        <div className="mb-3">
-          <label className="fw-bold">Do you want to participate in the excursion (at no extra cost)?</label>
+        <div className="mb-4">
+          <label className="fw-bold mb-2">Do you want to participate in the excursion (at no extra cost)?</label>
           <div className="d-flex flex-column gap-2">
             {["yes", "no"].map((option) => (
               <div key={option} className="form-check">
@@ -75,7 +75,7 @@ const ExtrasForm = ({
         </div>
 
         <div className="mb-3">
-          <label className="fw-bold">Do you want to buy the official IMC2024 T-Shirt for 10€?</label>
+          <label className="fw-bold mb-2">Do you want to buy the official IMC2024 T-Shirt for 10€?</label>
           <div className="d-flex flex-column gap-2">
             {["yes", "no"].map((option) => (
               <div key={option} className="form-check">
@@ -97,8 +97,8 @@ const ExtrasForm = ({
         </div>
 
         {wantsTShirt && (
-          <div className="mb-3">
-            <label className="fw-bold">Select your T-Shirt size</label>
+          <div className="mb-4">
+            <label className="fw-bold mb-2">Select your T-Shirt size</label>
             <select
               className={classNames("form-select", { "is-invalid": errors.tShirtSize })}
               {...register("tShirtSize", { required: "Please select a T-Shirt size" })}
@@ -113,7 +113,7 @@ const ExtrasForm = ({
         )}
 
         <div className="mb-3">
-          <label className="fw-bold">Proceedings</label>
+          <label className="fw-bold mb-2">Proceedings</label>
           <div className="d-flex flex-column gap-2">
             {["pdf", "pdf_printed"].map((option, index) => (
               <div key={index} className="form-check">
