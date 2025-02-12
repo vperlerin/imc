@@ -1,5 +1,5 @@
 <?php
-header("Access-Control-Allow-Origin: https://imc2025.imo.net");
+header("Access-Control-Allow-Origin: https://imo.net");
 header("Content-Type: application/json");
 header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
