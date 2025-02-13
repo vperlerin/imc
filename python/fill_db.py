@@ -15,23 +15,23 @@ with open(JSON_PATH, "r", encoding="utf-8") as file:
 # Extract workshops (Fixed)
 workshop_inserts = [
     f"INSERT INTO workshops (title, price) VALUES ('{workshop['title']}', {workshop['cost']});"
-    for workshop in data["workshops"]
+    for workshop in data['workshops']  
 ]
 
 # Extract registration types (Fixed)
 registration_inserts = [
     f"INSERT INTO registration_types (type, price, description) VALUES "
     f"('{room['type']}', {room['price']}, '{room['description']}');"
-    for room in data["costs"]["rooms"]
+    for room in data['costs']['rooms']
 ]
 
 # Extract T-shirt sizes & pricing (Fixed)
-tshirt_price = data["costs"]["tshirts"]["price"]
+tshirt_price = data['costs']['tshirts']['price']
 tshirt_sizes = [
     f"INSERT INTO extra_options (participant_id, buy_tshirt, tshirt_size, tshirt_price) VALUES "
     f"(@participant_id, TRUE, '{model.capitalize()} {size}', {tshirt_price});"
-    for model in data["costs"]["tshirts"]["models"]
-    for size in data["costs"]["tshirts"]["sizes"]
+    for model in data['costs']['tshirts']['models"]
+    for size in data['costs']['tshirts']['sizes']
 ]
 
 # Combine all SQL statements
