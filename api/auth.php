@@ -11,7 +11,7 @@ use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\OAuth;
 use League\OAuth2\Client\Provider\Google;
 
-require '../vendor/autoload.php'; 
+require '../vendor/autoload.php';
 require_once "config.php";
 
 session_start();
@@ -37,8 +37,8 @@ if (!in_array($providerName, ['Google', 'Microsoft', 'Yahoo'], true)) {
 }
 
 // OAuth App Credentials (Replace with actual credentials)
-$clientId = getenv("GOOGLE_CLIENT_ID") ;
-$clientSecret = getenv("GOOGLE_CLIENT_SECRET");y
+$clientId = getenv("GOOGLE_CLIENT_ID");
+$clientSecret = getenv("GOOGLE_CLIENT_SECRET");
 
 // Redirect URI (Set this properly in your OAuth app settings)
 $redirectUri = 'https://imc2025.imo.net/api/auth.php';
@@ -70,7 +70,7 @@ if (!isset($_GET['code'])) {
     // Step 1: Get Authorization URL and Redirect
     $_SESSION['provider'] = $providerName;
     $_SESSION['oauth2state'] = $provider->getState();
-    
+
     header('Location: ' . $provider->getAuthorizationUrl($options));
     exit;
 }
