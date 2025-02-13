@@ -5,7 +5,7 @@ use PHPMailer\PHPMailer\Exception;
 use PHPMailer\PHPMailer\OAuth;
 use League\OAuth2\Client\Provider\Google;
 
-require '../../vendor/autoload.php';
+require '../../vendor/autoload.php'; 
 require_once "../config.php";
 
 class Mail {
