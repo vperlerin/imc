@@ -8,8 +8,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 JSON_PATH = os.path.join(BASE_DIR, "src", "data", "conference-data.json")   
 SQL_PATH = os.path.join(BASE_DIR, "python", "insert_data.sql")   
 
-# Load JSON file
-with open(JSON_PATH, "r", encoding="utf-8") as file:
+# Load JSON file - note if python 3 is installed on day use
+#  with open(JSON_PATH, "r", encoding="utf-8") as file:
+with open(JSON_PATH, "r") as file:   
     data = json.load(file)
 
 # Extract workshops
