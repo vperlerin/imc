@@ -10,35 +10,35 @@ ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
 
 $provider = new Google([
-  'clientId'     => getenv("SMTP_CLIENT_ID")
-  'clientSecret' => getenv("SMTP_CLIENT_SECRET")
+  'clientId'     => getenv("SMTP_CLIENT_ID"),
+  'clientSecret' => getenv("SMTP_CLIENT_SECRET"),
   'redirectUri'  => 'https://imc2025.imo.net',
-  'accessType' => 'offline',
+  'accessType'   => 'offline',
 ]);
+
 if (!empty($_GET['error'])) {
-  // Got an error; probably user denied access
   exit('Got error: ' . htmlspecialchars($_GET['error'], ENT_QUOTES, 'UTF-8'));
 } elseif (empty($_GET['code'])) {
-  // If we don't have an authorization code, then get one
+  // If we don't have an authorization code, request one
   $authUrl = $provider->getAuthorizationUrl([
-    'scope' => [
-      'https://mail.google.com/'
-    ]
+    'scope' => ['https://mail.google.com/']
   ]);
 
-  echo "ERROR";
-  //header('Location: ' . $authUrl);
+  echo "Authorization URL: <a href='$authUrl'>$authUrl</a>";
   exit;
 } else {
-  // Try to get an access token (using the authorization code grant)
-  $token = $provider->getAccessToken('authorization_code', [
-    'code' => $_GET['code']
-  ]);
+  try {
+    // Get an access token
+    $token = $provider->getAccessToken('authorization_code', [
+      'code' => $_GET['code']
+    ]);
 
-  echo ($token);
-
-  // Use this to get a new access token if the old one expires
-  $refreshToken = $token->getRefreshToken();
-
-  echo ($refreshToken);
+    echo json_encode([
+      "access_token" => $token->getToken(),
+      "expires_in"   => $token->getExpires(),
+      "refresh_token"=> $token->getRefreshToken()
+    ]);
+  } catch (Exception $e) {
+    echo "Error obtaining access token: " . $e->getMessage();
+  }
 }
