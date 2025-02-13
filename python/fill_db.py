@@ -1,3 +1,5 @@
+#python python/fill_db.py
+#mysql -u imc2025 -p imc2025 < python/insert_data.sql 
 import json
 import os
 
@@ -59,3 +61,4 @@ with open(SQL_PATH, "w") as sql_file:
     sql_file.write(sql_script)
 
 print("SQL script generated successfully: {}".format(SQL_PATH))
+print("RUN mysql -u imc2025 -p imc2025 < python/insert_data.sql ")
