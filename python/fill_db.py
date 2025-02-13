@@ -2,6 +2,7 @@
 #mysql -u imc2025 -p imc2025 < python/insert_data.sql 
 import json
 import os
+import bcrypt  
 
 # Define paths
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  
@@ -37,7 +38,7 @@ registration_inserts = [
     for room in data["costs"]["rooms"]
 ]
 
-# Extract admin users from .env
+# Extract admin users from .env with bcrypt hashing
 admin_inserts = []
 for i in range(1, 3):  # Support for ADMIN1 and ADMIN2
     email_key = "ADMIN{}_EMAIL".format(i)
@@ -47,9 +48,12 @@ for i in range(1, 3):  # Support for ADMIN1 and ADMIN2
     password = os.environ.get(pwd_key)
 
     if email and password:
+        # Hash password using bcrypt (same encoding as PHP's password_hash)
+        hashed_password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+
         admin_inserts.append(
-            "INSERT INTO admins (email, password_hash) VALUES ('{email}', '{password}');".format(
-                email=email, password=password
+            "INSERT INTO admins (email, password_hash) VALUES ('{email}', '{password_hash}');".format(
+                email=email, password_hash=hashed_password
             )
         )
 
