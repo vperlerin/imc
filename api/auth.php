@@ -5,10 +5,7 @@ declare(strict_types=1);
 ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
-
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\SMTP;
-use PHPMailer\PHPMailer\OAuth;
+ 
 use League\OAuth2\Client\Provider\Google;
 
 require '../vendor/autoload.php';
@@ -75,9 +72,9 @@ if (!isset($_GET['code'])) {
     exit;
 }
 
-// Step 2: Validate CSRF State
-if (empty($_GET['state']) || ($_GET['state'] !== ($_SESSION['oauth2state'] ?? ''))) {
-    session_unset();
+// Step 2: Validate CSRF State 
+if (empty($_GET['state']) || ($_GET['state'] !== $_SESSION['oauth2state'])) {
+    unset($_SESSION['oauth2state']);
     die('Invalid state. Possible CSRF attack detected.');
 }
 
