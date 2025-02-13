@@ -1,5 +1,3 @@
-#python python/fill_db.py
-#mysql -u imc2025 -p imc2025 < python/insert_data.sql 
 import json
 import os
 
@@ -7,13 +5,20 @@ import os
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  
 JSON_PATH = os.path.join(BASE_DIR, "imc", "src", "data", "conference-data.json")   
 SQL_PATH = os.path.join(BASE_DIR, "python", "insert_data.sql")   
+ENV_PATH = os.path.join(BASE_DIR, "env", ".env")   
 
-# Load JSON file - note if python 3 is installed on day use
-#  with open(JSON_PATH, "r", encoding="utf-8") as file:
+# Load environment variables
+if os.path.exists(ENV_PATH):
+    with open(ENV_PATH, "r") as env_file:
+        for line in env_file:
+            if line.strip() and not line.startswith("#"):
+                key, value = line.strip().split("=", 1)
+                os.environ[key] = value
+
+# Load JSON file
 with open(JSON_PATH, "r") as file:   
     data = json.load(file)
 
- 
 # Extract workshops
 workshop_inserts = [
     "INSERT INTO workshops (title, price) VALUES ('{title}', {cost});".format(
@@ -30,8 +35,24 @@ registration_inserts = [
     for room in data["costs"]["rooms"]
 ]
 
+# Extract admin users from .env
+admin_inserts = []
+for i in range(1, 3):  # Support for ADMIN1 and ADMIN2
+    email_key = "ADMIN{}_EMAIL".format(i)
+    pwd_key = "ADMIN{}_PWD".format(i)
+
+    email = os.environ.get(email_key)
+    password = os.environ.get(pwd_key)
+
+    if email and password:
+        admin_inserts.append(
+            "INSERT INTO admins (email, password_hash) VALUES ('{email}', '{password}');".format(
+                email=email, password=password
+            )
+        )
+
 # Combine all SQL statements
-sql_script = "\n".join(workshop_inserts + registration_inserts)
+sql_script = "\n".join(workshop_inserts + registration_inserts + admin_inserts)
 
 # Save to file
 with open(SQL_PATH, "w") as sql_file:
