@@ -4,7 +4,7 @@ USE MYSQL_DATABASE;
 CREATE USER 'MYSQL_USER'@'localhost' IDENTIFIED BY 'MYSQL_PASSWORD'; 
 GRANT ALL PRIVILEGES ON MYSQL_DATABASE.* TO 'MYSQL_USER'@'localhost';
 FLUSH PRIVILEGES;
- 
+
 CREATE TABLE IF NOT EXISTS participants (
     id INT AUTO_INCREMENT PRIMARY KEY,
     title ENUM('Mr.', 'Ms.', 'Mrs.', 'Dr.', 'Prof.') NOT NULL,
@@ -22,8 +22,8 @@ CREATE TABLE IF NOT EXISTS participants (
     password_hash VARCHAR(255) NOT NULL, 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);  
- 
+);
+
 CREATE TABLE IF NOT EXISTS workshops (
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
@@ -40,8 +40,7 @@ CREATE TABLE IF NOT EXISTS participant_workshops (
     FOREIGN KEY (participant_id) REFERENCES participants(id) ON DELETE CASCADE,
     FOREIGN KEY (workshop_id) REFERENCES workshops(id) ON DELETE CASCADE
 );
- 
- 
+
 CREATE TABLE IF NOT EXISTS participant_arrival (
     id INT AUTO_INCREMENT PRIMARY KEY,
     participant_id INT NOT NULL,
@@ -57,14 +56,12 @@ CREATE TABLE IF NOT EXISTS participant_arrival (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (participant_id) REFERENCES participants(id) ON DELETE CASCADE
 );
- 
- 
+
 CREATE TABLE IF NOT EXISTS imc_sessions (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL UNIQUE
 );
- 
- 
+
 CREATE TABLE IF NOT EXISTS contributions (
     id INT AUTO_INCREMENT PRIMARY KEY,
     participant_id INT NOT NULL,
@@ -80,7 +77,6 @@ CREATE TABLE IF NOT EXISTS contributions (
     FOREIGN KEY (participant_id) REFERENCES participants(id) ON DELETE CASCADE,
     FOREIGN KEY (session_id) REFERENCES imc_sessions(id) ON DELETE CASCADE
 );
- 
 
 CREATE TABLE IF NOT EXISTS registration_types (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -88,13 +84,13 @@ CREATE TABLE IF NOT EXISTS registration_types (
     price DECIMAL(10,2) NOT NULL,
     description TEXT NOT NULL
 );
-   
+
 CREATE TABLE IF NOT EXISTS payment_methods (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    method VARCHAR(50) NOT NULL UNIQUE, 
+    method VARCHAR(50) NOT NULL UNIQUE 
 );
 
-INSERT IGNORE INTO payment_methods (method, note) VALUES
+INSERT IGNORE INTO payment_methods (method) VALUES
 ('Paypal'),
 ('Bank Transfer'),
 ('Other');
@@ -111,8 +107,7 @@ CREATE TABLE IF NOT EXISTS participant_accommodation (
     FOREIGN KEY (registration_type_id) REFERENCES registration_types(id) ON DELETE CASCADE,
     FOREIGN KEY (payment_method_id) REFERENCES payment_methods(id) ON DELETE CASCADE
 );
- 
- 
+
 CREATE TABLE IF NOT EXISTS extra_options (
     id INT AUTO_INCREMENT PRIMARY KEY,
     participant_id INT NOT NULL,
@@ -125,9 +120,8 @@ CREATE TABLE IF NOT EXISTS extra_options (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (participant_id) REFERENCES participants(id) ON DELETE CASCADE
 );
- 
 
- CREATE TABLE IF NOT EXISTS participant_comments (
+CREATE TABLE IF NOT EXISTS participant_comments (
     id INT AUTO_INCREMENT PRIMARY KEY,
     participant_id INT NOT NULL,
     comments TEXT DEFAULT NULL,   
@@ -139,4 +133,4 @@ CREATE TABLE IF NOT EXISTS extra_options (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (participant_id) REFERENCES participants(id) ON DELETE CASCADE
-); 
+);
