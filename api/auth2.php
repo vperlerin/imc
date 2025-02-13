@@ -21,13 +21,18 @@ if (!empty($_GET['error'])) {
       'https://mail.google.com/'
     ]
   ]);
-  header('Location: ' . $authUrl);
+
+  echo "ERROR";
+  //header('Location: ' . $authUrl);
   exit;
 } else {
   // Try to get an access token (using the authorization code grant)
   $token = $provider->getAccessToken('authorization_code', [
     'code' => $_GET['code']
   ]);
+
+  echo ($token);
+
   // Use this to get a new access token if the old one expires
   $refreshToken = $token->getRefreshToken();
 
