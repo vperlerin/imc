@@ -5,6 +5,10 @@ use League\OAuth2\Client\Provider\Google;
 require '../vendor/autoload.php';
 require_once "config.php";
 
+ini_set('display_errors', '1');
+ini_set('display_startup_errors', '1');
+error_reporting(E_ALL);
+
 $provider = new Google([
   'clientId'     => getenv("SMTP_CLIENT_ID")
   'clientSecret' => getenv("SMTP_CLIENT_SECRET")
