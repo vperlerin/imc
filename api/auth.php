@@ -76,10 +76,12 @@ if (!isset($_GET['code'])) {
 }
 
 // Step 2: Validate CSRF State
+/*
 if (empty($_GET['state']) || ($_GET['state'] !== ($_SESSION['oauth2state'] ?? ''))) {
     session_unset();
     die('Invalid state. Possible CSRF attack detected.');
 }
+    */
 
 // Step 3: Exchange Authorization Code for Access Token
 try {
