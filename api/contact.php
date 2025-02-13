@@ -9,6 +9,8 @@ ini_set('display_errors', 'On');
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
+use PHPMailer\PHPMailer\OAuth;
+use League\OAuth2\Client\Provider\Google;
 
 require '../vendor/autoload.php'; 
 require_once "config.php";
