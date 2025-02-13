@@ -12,6 +12,8 @@ if (file_exists($envPath)) {
         $_SERVER[$key] = $value;
     }
 }
+
+define('BASE_PATH', dirname(__DIR__, 2));  
  
 ?>
  
