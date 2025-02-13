@@ -52,22 +52,38 @@ $email = htmlspecialchars($input['email']);
 $subject = htmlspecialchars($input['subject']);
 $message = htmlspecialchars($input['message']);
 
-$mail = new PHPMailer(true);
-
 try {
+    // OAuth2 Configuration
+    $clientId = getenv("GOOGLE_CLIENT_ID");
+    $clientSecret = getenv("GOOGLE_CLIENT_SECRET");
+    $refreshToken = getenv("SMTP_REFRESH_TOKEN");
+    $emailSender = getenv("SMTP_USER_EMAIL");
+
+    // Set up the OAuth2 provider
+    $provider = new Google([
+        'clientId'     => $clientId,
+        'clientSecret' => $clientSecret,
+    ]);
+
+    // Pass the OAuth provider and token information to PHPMailer
+    $mail->setOAuth(new OAuth([
+        'provider'     => $provider,
+        'clientId'     => $clientId,
+        'clientSecret' => $clientSecret,
+        'refreshToken' => $refreshToken,
+        'userName'     => $emailSender,
+    ]));
+
     // SMTP Configuration
-    $mail->SMTPDebug = 2;  // Use 2 for debugging, 0 for production
     $mail->isSMTP();
-    $mail->Host = getenv("SMTP_HOST") ?? $_ENV["SMTP_HOST"] ?? $_SERVER["SMTP_HOST"];
+    $mail->Host = 'smtp.gmail.com';
     $mail->SMTPAuth = true;
-    $mail->Username = getenv("SMTP_USER") ?? $_ENV["SMTP_USER"] ?? $_SERVER["SMTP_USER"];
-    $mail->Password = getenv("SMTP_PWD") ?? $_ENV["SMTP_PWD"] ?? $_SERVER["SMTP_PWD"];
-    $mail->SMTPSecure = getenv("SMTP_SECURE") ?? $_ENV["SMTP_SECURE"] ?? $_SERVER["SMTP_SECURE"];
-    $mail->Port = (int) (getenv("SMTP_TLS_PORT") ?? $_ENV["SMTP_TLS_PORT"] ?? $_SERVER["SMTP_TLS_PORT"]);
+    $mail->AuthType = 'XOAUTH2';
+    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+    $mail->Port = 587;
 
     // Set sender and recipient
-    $mail->setFrom(getenv("SMTP_USER_EMAIL") ?? $_ENV["SMTP_USER_EMAIL"] ?? $_SERVER["SMTP_USER_EMAIL"], 
-                   getenv("SMTP_USER_NAME") ?? $_ENV["SMTP_USER_NAME"] ?? $_SERVER["SMTP_USER_NAME"]);
+    $mail->setFrom($emailSender, getenv("SMTP_USER_NAME"));
     $mail->addAddress("vperlerin@gmail.com");
 
     // Email content
@@ -78,6 +94,6 @@ try {
     $mail->send();
     echo json_encode(["success" => true, "message" => "Message sent successfully"]);
 } catch (Exception $e) {
-    echo("Mailer Error: " . $mail->ErrorInfo);
+    error_log("Mailer Error: " . $mail->ErrorInfo);
     echo json_encode(["success" => false, "message" => "Failed to send message. Check logs."]);
 }
