@@ -7,7 +7,7 @@ IMC
 5- And then create the DB: mysql -u imc2025 -p imc2025 < python/insert_data.sql
 
 For other updates
-1- Update ./deploy.sh
+1- Update ./deploy.sh ( chmod 755 deploy.sh if neeed)
 1- Update src/
 2- Once pushed on the server, use ./deploy.sh to deploy the files in the proper directories.
 
