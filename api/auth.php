@@ -1,15 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
-
-declare(strict_types=1);
-
-session_start();
-var_dump($_SESSION);
-
-
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
@@ -43,7 +38,7 @@ if (!in_array($providerName, ['Google', 'Microsoft', 'Yahoo'], true)) {
 
 // OAuth App Credentials (Replace with actual credentials)
 $clientId = getenv("GOOGLE_CLIENT_ID") ;
-$clientSecret = getenv("GOOGLE_CLIENT_SECRET");
+$clientSecret = getenv("GOOGLE_CLIENT_SECRET");y
 
 // Redirect URI (Set this properly in your OAuth app settings)
 $redirectUri = 'https://imc2025.imo.net/api/auth.php';
