@@ -54,6 +54,8 @@ $email = htmlspecialchars($input['email']);
 $subject = htmlspecialchars($input['subject']);
 $message = htmlspecialchars($input['message']);
 
+$mail = new PHPMailer(true);
+
 try {
     // OAuth2 Configuration
     $clientId = getenv("GOOGLE_CLIENT_ID");
