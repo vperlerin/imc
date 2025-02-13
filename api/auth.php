@@ -41,7 +41,7 @@ $clientId = getenv("GOOGLE_CLIENT_ID") ;
 $clientSecret = getenv("GOOGLE_CLIENT_SECRET");
 
 // Redirect URI (Set this properly in your OAuth app settings)
-$redirectUri = 'https://imc2023.imo.net/auth.php';
+$redirectUri = 'https://imc2025.imo.net/auth.php';
 
 // OAuth2 Provider Configuration
 $params = [
