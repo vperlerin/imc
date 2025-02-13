@@ -6,8 +6,8 @@ require '../vendor/autoload.php';
 require_once "config.php";
 
 $provider = new Google([
-  'clientId'     => getenv("GOOGLE_CLIENT_ID"),
-  'clientSecret' => getenv("GOOGLE_CLIENT_SECRET"),
+  'clientId'     => getenv("SMTP_CLIENT_ID")
+  'clientSecret' => getenv("SMTP_CLIENT_SECRET")
   'redirectUri'  => 'https://imc2025.imo.net',
   'accessType' => 'offline',
 ]);

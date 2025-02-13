@@ -58,8 +58,8 @@ $mail = new PHPMailer(true);
 
 try {
     // OAuth2 Configuration
-    $clientId = getenv("GOOGLE_CLIENT_ID");
-    $clientSecret = getenv("GOOGLE_CLIENT_SECRET");
+    $clientId = getenv("SMTP_CLIENT_ID");
+    $clientSecret = getenv("SMTP_CLIENT_SECRET");
     $refreshToken = getenv("SMTP_REFRESH_TOKEN");
     $emailSender = getenv("SMTP_USER_EMAIL");
 
@@ -88,11 +88,11 @@ try {
 
     // Set sender and recipient
     $mail->setFrom($emailSender, getenv("SMTP_USER_NAME"));
-    $mail->addAddress("vperlerin@gmail.com");
+    $mail->addAddress("imc2025@imo.net");
 
     // Email content
-    $mail->Subject = "Contact Form: " . $subject;
-    $mail->Body = "Name: $name\nEmail: $email\n\nMessage:\n$message";
+    $mail->Subject = $subject;
+    $mail->Body = "This message has been sent from the IMC2025 contact from\nName: $name\nEmail: $email\n\nMessage:\n$message";
 
     // Send the email
     $mail->send();
