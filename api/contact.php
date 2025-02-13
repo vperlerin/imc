@@ -1,4 +1,5 @@
 <?php
+
 header("Access-Control-Allow-Origin: https://imo.net");
 header("Content-Type: application/json");
 header("Access-Control-Allow-Methods: POST");
@@ -7,13 +8,9 @@ header("Access-Control-Allow-Headers: Content-Type, Authorization");
 error_reporting(E_ALL);
 ini_set('display_errors', 'On');
 
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
-use PHPMailer\PHPMailer\OAuth;
-use League\OAuth2\Client\Provider\Google;
-
-require '../vendor/autoload.php'; 
+require '../vendor/autoload.php';
 require_once "config.php";
+require_once "./class/Mail.php";
 
 $input = json_decode(file_get_contents("php://input"), true);
 
@@ -54,50 +51,7 @@ $email = htmlspecialchars($input['email']);
 $subject = htmlspecialchars($input['subject']);
 $message = htmlspecialchars($input['message']);
 
-$mail = new PHPMailer(true);
+$mailer = new Mail();
+$response = $mailer->sendEmail(["vperlerin@gmail.com"], $subject, "This message has been sent from the IMC2025 contact from\nName: $name\nEmail: $email\n\nMessage:\n$message", $email);
 
-try {
-    // OAuth2 Configuration
-    $clientId = getenv("SMTP_CLIENT_ID");
-    $clientSecret = getenv("SMTP_CLIENT_SECRET");
-    $refreshToken = getenv("SMTP_REFRESH_TOKEN");
-    $emailSender = getenv("SMTP_USER_EMAIL");
-
-    // Set up the OAuth2 provider
-    $provider = new Google([
-        'clientId'     => $clientId,
-        'clientSecret' => $clientSecret,
-    ]);
-
-    // Pass the OAuth provider and token information to PHPMailer
-    $mail->setOAuth(new OAuth([
-        'provider'     => $provider,
-        'clientId'     => $clientId,
-        'clientSecret' => $clientSecret,
-        'refreshToken' => $refreshToken,
-        'userName'     => $emailSender,
-    ]));
-
-    // SMTP Configuration
-    $mail->isSMTP();
-    $mail->Host = 'smtp.gmail.com';
-    $mail->SMTPAuth = true;
-    $mail->AuthType = 'XOAUTH2';
-    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-    $mail->Port = 587;
-
-    // Set sender and recipient
-    $mail->setFrom($emailSender, getenv("SMTP_USER_NAME"));
-    $mail->addAddress("imc2025@imo.net");
-
-    // Email content
-    $mail->Subject = $subject;
-    $mail->Body = "This message has been sent from the IMC2025 contact from\nName: $name\nEmail: $email\n\nMessage:\n$message";
-
-    // Send the email
-    $mail->send();
-    echo json_encode(["success" => true, "message" => "Message sent successfully"]);
-} catch (Exception $e) {
-    error_log("Mailer Error: " . $mail->ErrorInfo);
-    echo json_encode(["success" => false, "message" => "Failed to send message. Check logs."]);
-}
+echo json_encode($response);
