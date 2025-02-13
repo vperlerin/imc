@@ -5,7 +5,7 @@ import os
 
 # Define paths
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  
-JSON_PATH = os.path.join(BASE_DIR, "src", "data", "conference-data.json")   
+JSON_PATH = os.path.join(BASE_DIR, "imc", "src", "data", "conference-data.json")   
 SQL_PATH = os.path.join(BASE_DIR, "python", "insert_data.sql")   
 
 # Load JSON file - note if python 3 is installed on day use
