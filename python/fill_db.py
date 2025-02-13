@@ -1,6 +1,6 @@
 #python python/create_db.py
 #mysql -u imc2025 -p imc2025 < build/insert_data.sql 
-
+ 
 import json
 import os
 
