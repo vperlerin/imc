@@ -9,8 +9,8 @@ error_reporting(E_ALL);
 ini_set('display_errors', 'On');
 
 require_once "config.php";
-require_once BASE_PATH . '/vendor/autoload.php';
-require_once __DIR__ . "/class/Mail.php";
+require_once __DIR__ . '/../vendor/autoload.php'; 
+require_once __DIR__ . '/class/Mail.php';
 
 $input = json_decode(file_get_contents("php://input"), true);
 
