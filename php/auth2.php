@@ -12,7 +12,7 @@ error_reporting(E_ALL);
 $provider = new Google([
   'clientId'     => getenv("SMTP_CLIENT_ID"),
   'clientSecret' => getenv("SMTP_CLIENT_SECRET"),
-  'redirectUri'  => 'https://imc2025.imo.net',
+  'redirectUri'  => getenv("SMTP_REDIRECT_URL"),
   'accessType'   => 'offline',
 ]);
 
