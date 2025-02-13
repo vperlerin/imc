@@ -1,6 +1,5 @@
 #python python/create_db.py
 #mysql -u imc2025 -p imc2025 < build/insert_data.sql 
- 
 import json
 import os
 
@@ -13,20 +12,20 @@ SQL_PATH = os.path.join(BASE_DIR, "python", "insert_data.sql")
 with open(JSON_PATH, "r", encoding="utf-8") as file:
     data = json.load(file)
 
-# Extract workshops
+# Extract workshops (Fixed)
 workshop_inserts = [
     f"INSERT INTO workshops (title, price) VALUES ('{workshop['title']}', {workshop['cost']});"
     for workshop in data["workshops"]
 ]
 
-# Extract registration types (rooms)
+# Extract registration types (Fixed)
 registration_inserts = [
     f"INSERT INTO registration_types (type, price, description) VALUES "
     f"('{room['type']}', {room['price']}, '{room['description']}');"
     for room in data["costs"]["rooms"]
 ]
 
-# Extract T-shirt sizes & pricing
+# Extract T-shirt sizes & pricing (Fixed)
 tshirt_price = data["costs"]["tshirts"]["price"]
 tshirt_sizes = [
     f"INSERT INTO extra_options (participant_id, buy_tshirt, tshirt_size, tshirt_price) VALUES "
