@@ -32,7 +32,7 @@ foreach ($requiredFields as $field) {
 }
 
 // Verify reCAPTCHA
-$recaptchaSecret = getenv("RECAPTCHA_SECRET_KEY") ?? $_ENV["RECAPTCHA_SECRET_KEY"] ?? $_SERVER["RECAPTCHA_SECRET_KEY"];
+$recaptchaSecret = getenv("RECAPTCHA_SECRET_KEY");
 if (!$recaptchaSecret) {
     echo json_encode(["success" => false, "message" => "Missing reCAPTCHA secret key"]);
     exit;
