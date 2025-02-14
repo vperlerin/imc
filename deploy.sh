@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# Define color codes
+RED='\e[31m'
+GREEN='\e[32m'
+YELLOW='\e[33m'
+CYAN='\e[36m'
+RESET='\e[0m'
+
 # Define source and destination directories
 PYTHON_SRC="/DATA/sites/imc2025.imo.net/imc/python"
 PYTHON_DEST="/DATA/sites/imc2025.imo.net/python"
@@ -20,16 +27,17 @@ move_files() {
 
     # Ensure the source directory exists
     if [ ! -d "$SRC" ]; then
-        echo "Source directory does not exist: $SRC"
+        echo -e "${RED}Error: Source directory does not exist: $SRC${RESET}"
         exit 1
     fi
 
     # Ensure the destination directory exists
     mkdir -p "$DEST"
 
-    echo "Moving files from $SRC to $DEST..."
+    echo -e "${CYAN}Moving files from $SRC to $DEST...${RESET}"
     mv "$SRC"/* "$DEST"/
-    echo "Move completed: $SRC to $DEST"
+    echo -e "${GREEN}Move completed: $SRC to $DEST${RESET}"
+    echo -e "${YELLOW}----------------------------------${RESET}"
 }
 
 # Move Python files
@@ -41,12 +49,11 @@ move_files "$MYSQL_SRC" "$MYSQL_DEST"
 # Move PHP files
 move_files "$PHP_SRC" "$PHP_DEST"
 
-
-# Delete all files under /build
+# Delete all files under /build before copying imc/build to /build
 if [ -d "$BUILD_DEST" ]; then
-    echo "Deleting all files under $BUILD_DEST..."
+    echo -e "${CYAN}Deleting all files under $BUILD_DEST...${RESET}"
     rm -rf "$BUILD_DEST"/*
-    echo "All files in $BUILD_DEST deleted."
+    echo -e "${GREEN}All files in $BUILD_DEST deleted.${RESET}"
     echo ""
     echo ""
 fi
@@ -55,4 +62,4 @@ fi
 move_files "$BUILD_SRC" "$BUILD_DEST"
 
 # Confirm completion
-echo "All operations completed successfully."
+echo -e "${GREEN}All operations completed successfully.${RESET}"

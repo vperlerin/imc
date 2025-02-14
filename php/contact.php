@@ -80,11 +80,11 @@ try {
 
     // SMTP Configuration
     $mail->isSMTP();
-    $mail->Host = 'smtp.gmail.com';
+    $mail->Host = getenv("SMTP_HOST");
     $mail->SMTPAuth = true;
-    $mail->AuthType = 'XOAUTH2';
+    $mail->AuthType = getenv("SMTP_AUTH_TYPE");
     $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-    $mail->Port = 587;
+    $mail->Port = getenv("SMTP_TLS_PORT");
 
     // Set sender and recipient
     $mail->setFrom($emailSender, getenv("SMTP_USER_NAME"));
