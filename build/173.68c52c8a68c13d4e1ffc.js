@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkimc2025=self.webpackChunkimc2025||[]).push([[173],{4774:(s,t,c)=>{c.r(t),c.d(t,{default:()=>i});var e=c(7450),a=(c(6540),c(4848));const i=()=>(0,a.jsx)(e.A,{title:"Participants"})}}]);
