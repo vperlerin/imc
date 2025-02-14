@@ -42,11 +42,13 @@ move_files "$MYSQL_SRC" "$MYSQL_DEST"
 move_files "$PHP_SRC" "$PHP_DEST"
 
 
-# Delete all files under /imc/build
-if [ -d "$BUILD_DIR" ]; then
+# Delete all files under /build
+if [ -d "$BUILD_DEST" ]; then
     echo "Deleting all files under $BUILD_DEST..."
     rm -rf "$BUILD_DEST"/*
     echo "All files in $BUILD_DEST deleted."
+    echo ""
+    echo ""
 fi
  
 # Move Build files
