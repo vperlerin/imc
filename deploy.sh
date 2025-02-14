@@ -10,7 +10,8 @@ MYSQL_DEST="/DATA/sites/imc2025.imo.net/mysql"
 PHP_SRC="/DATA/sites/imc2025.imo.net/imc/php"
 PHP_DEST="/DATA/sites/imc2025.imo.net/php"
 
-BUILD_DIR="/DATA/sites/imc2025.imo.net/imc/build"
+BUILD_SRC="/DATA/sites/imc2025.imo.net/imc/build"
+BUILD_DEST="/DATA/sites/imc2025.imo.net/build"
 
 # Function to move files from source to destination
 move_files() {
@@ -40,12 +41,16 @@ move_files "$MYSQL_SRC" "$MYSQL_DEST"
 # Move PHP files
 move_files "$PHP_SRC" "$PHP_DEST"
 
+
 # Delete all files under /imc/build
 if [ -d "$BUILD_DIR" ]; then
-    echo "Deleting all files under $BUILD_DIR..."
-    rm -rf "$BUILD_DIR"/*
-    echo "All files in $BUILD_DIR deleted."
+    echo "Deleting all files under $BUILD_DEST..."
+    rm -rf "$BUILD_DEST"/*
+    echo "All files in $BUILD_DEST deleted."
 fi
+ 
+# Move Build files
+move_files "$BUILD_SRC" "$BUILD_DEST"
 
 # Confirm completion
 echo "All operations completed successfully."
