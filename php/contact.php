@@ -7,14 +7,14 @@ header("Access-Control-Allow-Headers: Content-Type, Authorization");
 error_reporting(E_ALL);
 ini_set('display_errors', 'On');
 
+require '../vendor/autoload.php'; 
+require_once "config.php";
+
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 use PHPMailer\PHPMailer\OAuth;
 use League\OAuth2\Client\Provider\Google;
-
-require '../vendor/autoload.php'; 
-require_once "config.php";
-
+ 
 $input = json_decode(file_get_contents("php://input"), true);
 
 if (!$input) {
