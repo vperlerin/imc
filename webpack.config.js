@@ -40,7 +40,7 @@ module.exports = (env, argv) => {
                 chunkFilename: devMode ? '[id].css' : '[id].[contenthash].css',
             }),
             new BundleAnalyzerPlugin({ analyzerMode: devMode ? "disabled" : "static" }),
-            new Dotenv(),
+            new Dotenv({ path: path.resolve(__dirname, './env/.env') }),
         ],
         module: {
             rules: [

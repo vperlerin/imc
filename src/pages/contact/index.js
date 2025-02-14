@@ -17,7 +17,7 @@ const Contact = () => {
   const recaptchaRef = useRef(null);
   const [loading, setLoading] = useState(false);
   const [responseMessage, setResponseMessage] = useState("");
-
+  
   const onSubmit = async (data) => {
     const token = recaptchaRef.current?.getValue();
     if (!token) {
@@ -27,7 +27,6 @@ const Contact = () => {
 
     setLoading(true);
     setResponseMessage("");
-
     try {
       const response = await axios.post(`${process.env.REACT_APP_API_URL}/contact`, {
         ...data,
