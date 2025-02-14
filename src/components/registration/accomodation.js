@@ -1,13 +1,15 @@
 import classNames from "classnames";
 import cssForm from "styles/components/form.module.scss";
 import React, { useEffect } from "react";
-import StepDislay from "components/registration/stepDisplay"; 
+import StepDislay from "components/registration/stepDisplay";
 import { conferenceData as cd } from "data/conference-data";
 
 const AccomodationForm = ({
   register,
   errors,
   isDebugMode = false,
+  isEarlyBird,
+  isOnline = false,
   step,
   stepTotal,
   trigger,
@@ -26,7 +28,7 @@ const AccomodationForm = ({
   }, [initialData, setValue]);
 
   const fillTestData = () => {
-    setValue("registrationType", cd.costs.rooms[1].type);  
+    setValue("registrationType", cd.costs.rooms[1].type);
     setValue("paymentMethod", "Paypal");
     trigger();
   };
@@ -34,8 +36,8 @@ const AccomodationForm = ({
   return (
     <>
       <h4 className="mb-3 border-bottom pb-2">
-       <StepDislay step={step} stepTotal={stepTotal} /> 
-        Accomodation & Payment Method
+        <StepDislay step={step} stepTotal={stepTotal} />
+        {!isOnline && <>Accomodation &</>} Payment Method
       </h4>
 
       <div className={classNames(cssForm.smallW, "mx-auto position-relative")}>
@@ -46,31 +48,40 @@ const AccomodationForm = ({
         )}
 
         {/* Registration Type */}
-        <div className="mb-4 mt-2">
-          <label className="fw-bold mb-2">Registration Type</label>
-          <div className="d-flex flex-column gap-2">
-            {cd.costs.rooms.map((room, index) => (
-              <div key={index} className="form-check">
-                <input
-                  type="radio"
-                  id={`room-${index}`}
-                  className={classNames("form-check-input", { "is-invalid": errors.registrationType })}
-                  value={room.type}
-                  {...register("registrationType", { required: "Please select a registration type" })}
-                />
-                <label className="form-check-label" htmlFor={`room-${index}`}>
-                  <strong>{room.price}€</strong> - {room.description}
-                  <small className="text-muted d-block">
-                    {room.number
-                      ? `Standard accommodation in a ${room.type} room for 3 nights (only) with full board + participation in the conference, conference materials, coffee breaks, and excursion (price per person).`
-                      : `All meals except breakfasts + participation in the conference, conference materials, coffee breaks, and excursion.`}
-                  </small>
-                </label>
-              </div>
-            ))}
+        {!isOnline && (
+          <div className="mb-4 mt-2">
+            <label className="fw-bold mb-2">Registration Type</label>
+            <div className="d-flex flex-column gap-2">
+              {cd.costs.rooms.map((room, index) => (
+                <div key={index} className="form-check">
+                  <input
+                    type="radio"
+                    id={`room-${index}`}
+                    className={classNames("form-check-input", { "is-invalid": errors.registrationType })}
+                    value={room.type}
+                    {...register("registrationType", { required: "Please select a registration type" })}
+                  />
+                  <label className="form-check-label" htmlFor={`room-${index}`}>
+                    <strong>{isEarlyBird ? room.price : (room.price + cd.costs.after_early_birds)}€</strong> - {room.description}
+                    <small className="text-muted d-block">
+                      {room.number
+                        ? `Standard accommodation in a ${room.type} room for 3 nights (only) with full board + participation in the conference, conference materials, coffee breaks, and excursion (price per person).`
+                        : `All meals except breakfasts + participation in the conference, conference materials, coffee breaks, and excursion.`}
+                    </small>
+                  </label>
+                </div>
+              ))}
+            </div>
+            {errors.registrationType && <p className="text-danger"><small>{errors.registrationType.message}</small></p>}
           </div>
-          {errors.registrationType && <p className="text-danger"><small>{errors.registrationType.message}</small></p>}
-        </div>
+        )}
+
+        {isOnline && (
+          <p>
+            The price of the online participation is <b className="fw-bolder">{cd.costs.online}€</b>.
+          </p>
+        )}
+
 
         {/* Payment Method */}
         <div className="mb-3">

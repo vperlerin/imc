@@ -10,13 +10,14 @@ import Extras from "components/registration/extras.js";
 import Identitity from "components/registration/identity.js";
 import PageContain from "components/page-contain";
 import React, { useState } from "react";
+import Summary from "components/billing/summary/";
 import Workshops from "components/registration/workshops";
 import { conferenceData as cd } from "data/conference-data";
 import { formatFullDate } from 'utils/date';
 import { useForm } from "react-hook-form";
 import { useLocation } from "react-router-dom";
 
-const totalStep = 7;
+const totalStep = 8;
 
 const calculateAge = (dob) => {
   if (!dob) return null;
@@ -105,6 +106,13 @@ const MainForm = () => {
           {...register("isEarlyBird")}
         />
 
+        <input 
+          name="type"
+          type="hidden"
+          value="onsite"
+          {...register("type")}
+        />
+
         {step === 1 && (
           <Identitity
             register={register}
@@ -166,6 +174,7 @@ const MainForm = () => {
             register={register}
             isDebugMode={isDebugMode}
             initialData={initialData}
+            isEarlyBird={isEarlyBird}
             errors={errors}
             step={step}
             stepTotal={totalStep}
@@ -202,6 +211,13 @@ const MainForm = () => {
           />
         )}
 
+        {step === 8 && (
+          <Summary
+            getValues={getValues}
+            isEarlyBird={isEarlyBird}
+            conferenceData={cd}
+          />
+        )}
         <div className="mt-auto pt-3">
           <div className="d-flex gap-3 justify-content-end">
             {step > 1 && (

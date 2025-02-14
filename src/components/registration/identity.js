@@ -15,6 +15,7 @@ const IdentityForm = ({
   register,
   errors,
   isDebugMode = false,
+  isOnline = false,
   step,
   stepTotal,
   trigger,
@@ -53,17 +54,16 @@ const IdentityForm = ({
   return (
     <>
       <h4 className="mb-3 border-bottom pb-2">
-        <StepDislay step={step} stepTotal={stepTotal} /> 
+        <StepDislay step={step} stepTotal={stepTotal} />
         Personal Details
       </h4>
-      <div className={classNames(cssForm.smallW, 'mx-auto position-relative')}>
+      <div className={classNames(cssForm.smallW, 'mx-auto position-relative w-100')}>
 
         {isDebugMode &&
           <button type="button" className="position-absolute top-0 end-0 btn btn-secondary" onClick={fillTestData}>
             Fill Test Data
           </button>
         }
-
 
         {/* Title */}
         <div className="mb-3 row">
@@ -95,7 +95,9 @@ const IdentityForm = ({
               {...register("firstName", { required: "First name is required" })}
               onBlur={() => trigger("firstName")}
             />
-            <div className="form-text">If you need a <b>visa invitation letter</b>, enter your <b>First Name exactly as on your Passport</b>.</div>
+            {!isOnline && (
+              <div className="form-text">If you need a <b>visa invitation letter</b>, enter your <b>First Name exactly as on your Passport</b>.</div>
+            )}
             {errors.firstName && <p className="text-danger mb-0"><small>{errors.firstName.message}</small></p>}
           </div>
         </div>
@@ -110,7 +112,9 @@ const IdentityForm = ({
               {...register("lastName", { required: "Last name is required" })}
               onBlur={() => trigger("lastName")}
             />
-            <div className="form-text">If you need a <b>visa invitation letter</b>, enter your <b>Last Name exactly as on your Passport</b>.</div>
+            {!isOnline && (
+              <div className="form-text">If you need a <b>visa invitation letter</b>, enter your <b>Last Name exactly as on your Passport</b>.</div>
+            )}
             {errors.lastName && <p className="text-danger mb-0"><small>{errors.lastName.message}</small></p>}
           </div>
         </div>
@@ -163,42 +167,50 @@ const IdentityForm = ({
               onBlur={() => trigger("email")}
             />
             {errors.email && <p className="text-danger mb-0"><small>{errors.email.message}</small></p>}
+            {isOnline && (
+              <div className="form-text">We will use this email to send you the access details for the online conference.</div>
+            )}
           </div>
         </div>
 
         {/* Address */}
-        <div className="mb-3 row">
-          <label className="col-sm-2 col-form-label fw-bold">Address</label>
-          <div className="col-sm-10">
-            <input className={classNames('form-control', errors.address && "is-invalid")} placeholder="Address" {...register("address", { required: "Address is required" })} onBlur={() => trigger("address")} />
-            {errors.address && <p className="text-danger mb-0"><small>{errors.address.message}</small></p>}
-            <div className="form-text">If you need a <b>visa invitation letter</b>, the address above should be your <b>official legal domicile or your professional contact address at your institute</b>.</div>
-
+        {!isOnline && (
+          <div className="mb-3 row">
+            <label className="col-sm-2 col-form-label fw-bold">Address</label>
+            <div className="col-sm-10">
+              <input className={classNames('form-control', errors.address && "is-invalid")} placeholder="Address" {...register("address", { required: "Address is required" })} onBlur={() => trigger("address")} />
+              {errors.address && <p className="text-danger mb-0"><small>{errors.address.message}</small></p>}
+              <div className="form-text">If you need a <b>visa invitation letter</b>, the address above should be your <b>official legal domicile or your professional contact address at your institute</b>.</div>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Post Code */}
-        <div className="mb-3 row">
-          <label className="col-sm-2 col-form-label fw-bold">Postal Code</label>
-          <div className="col-sm-10">
-            <input
-              className={classNames('form-control', errors.email && "is-invalid", cssForm.md50)}
-              placeholder="Postal Code"
-              {...register("postal_code", { required: "Postal Code is required" })}
-              onBlur={() => trigger("postal_code")} />
-            {errors.postal_code && <p className="text-danger mb-0"><small>{errors.postal_code.message}</small></p>}
+        {!isOnline && (
+          <div className="mb-3 row">
+            <label className="col-sm-2 col-form-label fw-bold">Postal Code</label>
+            <div className="col-sm-10">
+              <input
+                className={classNames('form-control', errors.email && "is-invalid", cssForm.md50)}
+                placeholder="Postal Code"
+                {...register("postal_code", { required: "Postal Code is required" })}
+                onBlur={() => trigger("postal_code")} />
+              {errors.postal_code && <p className="text-danger mb-0"><small>{errors.postal_code.message}</small></p>}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* City */}
-        <div className="mb-3 row">
-          <label className="col-sm-2 col-form-label fw-bold">City</label>
-          <div className="col-sm-10">
-            <input className={classNames('form-control', errors.city && "is-invalid", cssForm.md50)} placeholder="City"
-              {...register("city", { required: "City is required" })} onBlur={() => trigger("city")} />
-            {errors.city && <p className="text-danger mb-0"><small>{errors.city.message}</small></p>}
+        {!isOnline && (
+          <div className="mb-3 row">
+            <label className="col-sm-2 col-form-label fw-bold">City</label>
+            <div className="col-sm-10">
+              <input className={classNames('form-control', errors.city && "is-invalid", cssForm.md50)} placeholder="City"
+                {...register("city", { required: "City is required" })} onBlur={() => trigger("city")} />
+              {errors.city && <p className="text-danger mb-0"><small>{errors.city.message}</small></p>}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Country */}
         <div className="mb-3 row">
@@ -263,9 +275,11 @@ const IdentityForm = ({
               </select>
             </div>
 
-            <div className="form-text">
-              <b>Underaged IMC participants</b> must be accompanied and have the <b>legalized documents for travelling abroad without parents</b>.
-            </div>
+            {!isOnline && (
+              <div className="form-text">
+                <b>Underaged IMC participants</b> must be accompanied and have the <b>legalized documents for travelling abroad without parents</b>.
+              </div>
+            )}
           </div>
 
           <div className="row">

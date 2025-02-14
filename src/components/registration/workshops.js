@@ -7,6 +7,7 @@ import { conferenceData as cd } from "data/conference-data";
 const Workshops = ({
   initialData,
   isDebugMode = false,
+  isOnline = false,
   register,
   errors,
   step,
@@ -17,20 +18,20 @@ const Workshops = ({
 }) => {
   useEffect(() => {
     if (initialData?.workshops) {
-      Object.entries(initialData.workshops).forEach(([key, value]) => {
-        setValue(key, value ? "true" : "false");
+      Object.entries(initialData.workshops).forEach(([title, value]) => {
+        setValue(title, value ? "true" : "false");
       });
     }
   }, [initialData, setValue]);
 
-  const handleWorkshopChange = (workshopKey, value) => {
-    setValue(workshopKey, value);
-    trigger(workshopKey);
+  const handleWorkshopChange = (workshopTitle, value) => {
+    setValue(workshopTitle, value);
+    trigger(workshopTitle);
   };
 
   const testData = {
-    workshop_0: "true",
-    workshop_1: "false",
+    "Spectroscopy Workshop": "true",
+    "Radio workshop": "false",
   };
 
   const fillTestData = () => {
@@ -54,45 +55,47 @@ const Workshops = ({
         Workshops
       </h4>
       <div className={classNames(cssForm.smallW, "mx-auto position-relative")}>
-        {cd.workshops.map((workshop, index) => {
-          const workshopKey = `workshop_${index}`;
-          const selectedWorkshop = watch(workshopKey); // Watch form state
+        {cd.workshops.map((workshop) => {
+          const workshopTitle = workshop.title;
+          const selectedWorkshop = watch(workshopTitle); // Watch form state
 
           return (
-            <div className="mb-5 row" key={workshopKey}>
+            <div className="mb-5 row" key={workshopTitle}>
               <label className={classNames("text-md-center", cssForm.balance)}>
-                Do you wish to attend the <b>{workshop.title}</b> organized on {new Date(workshop.date).toLocaleDateString("en-GB", { weekday: 'long', day: 'numeric', month: 'long' })} from {workshop.period} for an extra price of {workshop.cost}€ (including conference materials and coffee break)?
+                Do you wish to attend the <b>{workshop.title}</b> organized on {new Date(workshop.date).toLocaleDateString("en-GB", { weekday: 'long', day: 'numeric', month: 'long' })} from {workshop.period} 
+                {' '}for an extra price of {!isOnline ? workshop.cost : workshop.cost_online}€ 
+                {!isOnline && <>{' '}(including conference materials and coffee break)</>}?
               </label>
               <div className="text-center btn-group d-block mt-3" role="group">
                 <input
                   type="radio"
                   className="btn-check"
-                  id={`${workshopKey}Yes`}
+                  id={`${workshopTitle}Yes`}
                   value="true"
-                  {...register(workshopKey, { required: "Please select an option" })}
-                  onChange={() => handleWorkshopChange(workshopKey, "true")}
+                  {...register(workshopTitle, { required: "Please select an option" })}
+                  onChange={() => handleWorkshopChange(workshopTitle, "true")}
                   checked={selectedWorkshop === "true"}
                 />
-                <label className="btn btn-outline-primary" htmlFor={`${workshopKey}Yes`}>
+                <label className="btn btn-outline-primary" htmlFor={`${workshopTitle}Yes`}>
                   Yes
                 </label>
 
                 <input
                   type="radio"
                   className="btn-check"
-                  id={`${workshopKey}No`}
+                  id={`${workshopTitle}No`}
                   value="false"
-                  {...register(workshopKey, { required: "Please select an option" })}
-                  onChange={() => handleWorkshopChange(workshopKey, "false")}
+                  {...register(workshopTitle, { required: "Please select an option" })}
+                  onChange={() => handleWorkshopChange(workshopTitle, "false")}
                   checked={selectedWorkshop === "false"}
                 />
-                <label className="btn btn-outline-primary" htmlFor={`${workshopKey}No`}>
+                <label className="btn btn-outline-primary" htmlFor={`${workshopTitle}No`}>
                   No
                 </label>
               </div>
-              {errors[workshopKey] && (
+              {errors[workshopTitle] && (
                 <p className="text-danger fw-bold text-center">
-                  <small>{errors[workshopKey].message}</small>
+                  <small>{errors[workshopTitle].message}</small>
                 </p>
               )}
             </div>
