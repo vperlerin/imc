@@ -21,9 +21,9 @@ sed -i "s/MYSQL_USER/$MYSQL_USER/g" "$TEMP_SQL"
 sed -i "s/MYSQL_PASSWORD/$MYSQL_PASSWORD/g" "$TEMP_SQL"
 
 # Execute the SQL script using the root user
-#mysql -u root -p < "$TEMP_SQL"
+mysql -u root -p < "$TEMP_SQL"
 
 # Remove the temporary SQL file after execution
-#rm "$TEMP_SQL"
+rm "$TEMP_SQL"
 
 echo "Database setup completed successfully!"

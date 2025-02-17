@@ -72,24 +72,6 @@ const Login = () => {
     </div>
   );
 };
-
-// Simulated API Call (Replace with actual API request)
-const fakeLoginAPI = async (email, password) => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      if (email === "user@example.com" && password === "password123") {
-        resolve({
-          success: true,
-          data: { 
-            oauth: "fake_token_12345",
-            user: { email, is_guest: false, isAdmin: false } 
-          }
-        });
-      } else {
-        resolve({ success: false, message: "Invalid email or password" });
-      }
-    }, 1000);
-  });
-};
+ 
 
 export default Login;
