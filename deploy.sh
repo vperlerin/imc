@@ -7,18 +7,36 @@ YELLOW='\e[33m'
 CYAN='\e[36m'
 RESET='\e[0m'
 
-# Define source and destination directories
-PYTHON_SRC="/DATA/sites/imc2025.imo.net/imc/python"
-PYTHON_DEST="/DATA/sites/imc2025.imo.net/python"
+# Load environment variables from .env
+ENV_FILE="./env/.env"
 
-MYSQL_SRC="/DATA/sites/imc2025.imo.net/imc/mysql"
-MYSQL_DEST="/DATA/sites/imc2025.imo.net/mysql"
+if [ ! -f "$ENV_FILE" ]; then
+    echo -e "${RED}Error: .env file not found at $ENV_FILE!${RESET}"
+    exit 1
+fi
 
-PHP_SRC="/DATA/sites/imc2025.imo.net/imc/php"
-PHP_DEST="/DATA/sites/imc2025.imo.net/php"
+export $(grep -v '^#' "$ENV_FILE" | xargs)
 
-BUILD_SRC="/DATA/sites/imc2025.imo.net/imc/build"
-BUILD_DEST="/DATA/sites/imc2025.imo.net/build"
+# Ensure MYSQL_DATABASE is set
+if [ -z "$MYSQL_DATABASE" ]; then
+    echo -e "${RED}Error: MYSQL_DATABASE is not set in .env file!${RESET}"
+    exit 1
+fi
+
+# Define source and destination directories using MYSQL_DATABASE from .env
+BASE_PATH="/DATA/sites/$MYSQL_DATABASE.imo.net"
+
+PYTHON_SRC="$BASE_PATH/imc/python"
+PYTHON_DEST="$BASE_PATH/python"
+
+MYSQL_SRC="$BASE_PATH/imc/mysql"
+MYSQL_DEST="$BASE_PATH/mysql"
+
+PHP_SRC="$BASE_PATH/imc/php"
+PHP_DEST="$BASE_PATH/php"
+
+BUILD_SRC="$BASE_PATH/imc/build"
+BUILD_DEST="$BASE_PATH/build"
 
 # Function to move files from source to destination
 move_files() {
@@ -49,15 +67,28 @@ move_files "$MYSQL_SRC" "$MYSQL_DEST"
 # Move PHP files
 move_files "$PHP_SRC" "$PHP_DEST"
 
-# Delete all files under /build before copying imc/build to /build
+# Ask for confirmation before deleting BUILD_DEST files
 if [ -d "$BUILD_DEST" ]; then
-    echo -e "${CYAN}Deleting all files under $BUILD_DEST...${RESET}"
-    rm -rf "$BUILD_DEST"/*
-    echo -e "${GREEN}All files in $BUILD_DEST deleted.${RESET}"
+    echo -e "${CYAN}⚠️ WARNING: This will DELETE all files in $BUILD_DEST!${RESET}"
+    echo -e "${RED}⚠️ THIS ACTION CANNOT BE UNDONE.${RESET}"
     echo ""
-    echo ""
+
+    # Prompt user for confirmation
+    read -p "Do you want to continue? (y/N): " confirm
+
+    # Convert input to lowercase
+    confirm=${confirm,,}  
+
+    if [ "$confirm" == "y" ]; then
+        echo -e "${CYAN}Deleting all files under $BUILD_DEST...${RESET}"
+        rm -rf "$BUILD_DEST"/*
+        echo -e "${GREEN}All files in $BUILD_DEST deleted.${RESET}"
+        echo ""
+    else
+        echo -e "${YELLOW}Skipped deleting files in $BUILD_DEST.${RESET}"
+    fi
 fi
- 
+
 # Move Build files
 move_files "$BUILD_SRC" "$BUILD_DEST"
 
