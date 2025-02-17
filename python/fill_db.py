@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 #python python/fill_db.py
 import json
 import os
