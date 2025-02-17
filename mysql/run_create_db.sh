@@ -7,7 +7,14 @@ if [ ! -f "$ENV_FILE" ]; then
     exit 1
 fi
 
-export $(grep -v '^#' "$ENV_FILE" | xargs)
+# Load .env file safely (handles spaces properly)
+while IFS='=' read -r key value; do
+    # Ignore commented lines and empty lines
+    if [[ ! "$key" =~ ^# && -n "$key" ]]; then
+        export "$key"="${value}"
+    fi
+done < "$ENV_FILE"
+
 
 TEMP_SQL="temp_create_db.sql"
 
