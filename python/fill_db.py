@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-#python python/fill_db.py
 import json
 import os
 import bcrypt
@@ -14,7 +13,7 @@ ENV_PATH = os.path.join(BASE_DIR, "env", ".env")
 
 # Load environment variables manually
 if os.path.exists(ENV_PATH):
-    with open(ENV_PATH, "rb") as env_file:  # 'rb' for Python 2 compatibility
+    with open(ENV_PATH, "rb") as env_file:
         for line in env_file:
             line = line.strip()
             if line and not line.startswith("#"):
@@ -35,11 +34,15 @@ except MySQLdb.Error as e:
     print "Error connecting to MySQL: %s" % str(e)
     exit(1)
 
-# Function to check if a table has data
-def table_has_data(table_name):
-    cursor.execute("SELECT COUNT(*) FROM %s" % table_name)
-    count = cursor.fetchone()[0]
-    return count > 0
+# Function to check if a table is empty
+def table_is_empty(table_name):
+    try:
+        cursor.execute("SELECT COUNT(*) FROM `%s`" % table_name)
+        count = cursor.fetchone()[0]
+        return count == 0  # Returns True if table is empty
+    except MySQLdb.Error as e:
+        print "Error checking table %s: %s" % (table_name, str(e))
+        return False
 
 # Load JSON data
 with open(JSON_PATH, "rb") as file:
@@ -48,16 +51,15 @@ with open(JSON_PATH, "rb") as file:
 # SQL statement storage
 sql_statements = []
 
-# Insert imc_sessions if table is empty
-if not table_has_data("imc_sessions"):
+# Insert `imc_sessions` if the table is empty
+if table_is_empty("imc_sessions"):
     for session in data.get("conferenceData", {}).get("sessions", []):
         sql_statements.append(
             "INSERT INTO imc_sessions (name) VALUES ('%s');" % session.replace("'", "''")
         )
 
- 
-# Insert workshops if table is empty
-if not table_has_data("workshops"):
+# Insert `workshops` if the table is empty
+if table_is_empty("workshops"):
     for workshop in data.get("workshops", []):
         sql_statements.append(
             "INSERT INTO workshops (title, price) VALUES ('%s', %.2f);" % (
@@ -65,8 +67,8 @@ if not table_has_data("workshops"):
             )
         )
 
-# Insert registration types (rooms) if table is empty
-if not table_has_data("registration_types"):
+# Insert `registration_types` (rooms) if the table is empty
+if table_is_empty("registration_types"):
     for room in data.get("costs", {}).get("rooms", []):
         sql_statements.append(
             "INSERT INTO registration_types (type, price, description) VALUES ('%s', %.2f, '%s');" % (
@@ -74,8 +76,9 @@ if not table_has_data("registration_types"):
             )
         )
 
-# Insert admin users from .env if table is empty
-if not table_has_data("admins"):
+
+# Insert `admins` from .env if the table is empty
+if table_is_empty("admins"):
     admin_count = 1
     while True:
         email_key = "ADMIN%d_EMAIL" % admin_count
@@ -85,7 +88,6 @@ if not table_has_data("admins"):
         password = os.environ.get(pwd_key)
 
         if email and password:
-            # Hash password securely
             hashed_password = bcrypt.hashpw(password, bcrypt.gensalt())
 
             sql_statements.append(
@@ -94,8 +96,8 @@ if not table_has_data("admins"):
                 )
             )
         else:
-            break  
-        admin_count += 1   
+            break
+        admin_count += 1
 
 # Close MySQL connection
 cursor.close()
@@ -104,14 +106,14 @@ conn.close()
 # Save SQL statements to file if there are new inserts
 if sql_statements:
     sql_script = "\n".join(sql_statements)
-    with open(SQL_PATH, "wb") as sql_file:  
+    with open(SQL_PATH, "wb") as sql_file:
         sql_file.write(sql_script)
 
     print "SQL script generated successfully: %s" % SQL_PATH
 
     # Run MySQL command automatically
     mysql_command = "mysql -u %s -p%s %s < %s" % (DB_USER, DB_PASSWORD, DB_NAME, SQL_PATH)
-    print "Running:", mysql_command  
+    print "Running:", mysql_command
     os.system(mysql_command)
 
     print "✅ Database updated successfully!"
