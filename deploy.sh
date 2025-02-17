@@ -15,7 +15,12 @@ if [ ! -f "$ENV_FILE" ]; then
     exit 1
 fi
 
-export $(grep -v '^#' "$ENV_FILE" | xargs)
+# Load .env file safely (handles spaces and quotes)
+while IFS='=' read -r key value; do
+    if [[ ! "$key" =~ ^# && -n "$key" ]]; then
+        export "$key"="$(echo "$value" | sed 's/^"\|"$//g')"  # Strip quotes if present
+    fi
+done < "$ENV_FILE"
 
 # Ensure MYSQL_DATABASE is set
 if [ -z "$MYSQL_DATABASE" ]; then
