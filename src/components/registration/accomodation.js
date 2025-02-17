@@ -2,9 +2,9 @@ import classNames from "classnames";
 import cssForm from "styles/components/form.module.scss";
 import React, { useEffect } from "react";
 import StepDislay from "components/registration/stepDisplay";
-import { conferenceData as cd } from "data/conference-data";
 
 const AccomodationForm = ({
+  conferenceData,
   register,
   errors,
   isDebugMode = false,
@@ -28,7 +28,7 @@ const AccomodationForm = ({
   }, [initialData, setValue]);
 
   const fillTestData = () => {
-    setValue("registrationType", cd.costs.rooms[1].type);
+    setValue("registrationType", conferenceData.costs.rooms[1].type);
     setValue("paymentMethod", "Paypal");
     trigger();
   };
@@ -52,7 +52,7 @@ const AccomodationForm = ({
           <div className="mb-4 mt-2">
             <label className="fw-bold mb-2">Registration Type</label>
             <div className="d-flex flex-column gap-2">
-              {cd.costs.rooms.map((room, index) => (
+              {conferenceData.costs.rooms.map((room, index) => (
                 <div key={index} className="form-check">
                   <input
                     type="radio"
@@ -62,7 +62,7 @@ const AccomodationForm = ({
                     {...register("registrationType", { required: "Please select a registration type" })}
                   />
                   <label className="form-check-label" htmlFor={`room-${index}`}>
-                    <strong>{isEarlyBird ? room.price : (room.price + cd.costs.after_early_birds)}€</strong> - {room.description}
+                    <strong>{isEarlyBird ? room.price : (room.price + conferenceData.costs.after_early_birds)}€</strong> - {room.description}
                     <small className="text-muted d-block">
                       {room.number
                         ? `Standard accommodation in a ${room.type} room for 3 nights (only) with full board + participation in the conference, conference materials, coffee breaks, and excursion (price per person).`
@@ -78,7 +78,7 @@ const AccomodationForm = ({
 
         {isOnline && (
           <p>
-            The price of the online participation is <b className="fw-bolder">{cd.costs.online}€</b>.
+            The price of the online participation is <b className="fw-bolder">{conferenceData.costs.online}€</b>.
           </p>
         )}
 

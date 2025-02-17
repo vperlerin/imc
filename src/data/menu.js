@@ -40,6 +40,7 @@ export const menuItems = [
     ]
   },
   { title: 'Contact', link: '/contact' },
+  { title: 'Login', link: '/login',  hideFromMenu: true }, 
   { title: 'Service agreement & disclaimer', link: '/disclaimer', hideFromMenu: true },
   { title: 'Data Protection and Privacy', link: '/gdpr',  hideFromMenu: true }, 
   { title: 'Program - Day 1', link: '/program/day1',  hideFromMenu: true }, 

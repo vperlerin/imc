@@ -1,5 +1,5 @@
 const Dotenv = require('dotenv-webpack');
-const path = require('path'); 
+const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
@@ -25,7 +25,7 @@ module.exports = (env, argv) => {
                 path.resolve(__dirname, 'src'),
             ],
         },
-        plugins: [ 
+        plugins: [
             new HtmlWebpackPlugin({
                 template: path.join(__dirname, 'public', 'index.html'),
                 inject: true,

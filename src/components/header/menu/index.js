@@ -89,8 +89,8 @@ const Menu = ({ cd }) => {
 
             <div className="mx-3 text-center mb-3">
               <h4 className="fw-bolder m-0">IMC {cd.year}</h4>
-              <small className="m-0">{formatConferenceDates(cd.dates.start, cd.dates.end)}<br/>{cd.location}</small>
-            </div> 
+              <small className="m-0">{formatConferenceDates(cd.dates.start, cd.dates.end)}<br />{cd.location}</small>
+            </div>
 
             {menuItems.map((item) => {
               const isActive = location.pathname.startsWith(item.link) ||
@@ -131,33 +131,46 @@ const Menu = ({ cd }) => {
             })}
           </div>
 
-          <div className={classnames(css.footer, 'p-3 mt-3 border-top mt-auto')}>
-            <Link
-              aria-label="Service agreement & disclaimer"
-              className="d-block"
-              onClick={() => goTo('/disclaimer')}
-              to={'/disclaimer'}
-              title="Service agreement & disclaimer"
-            >
-              Service agreement & disclaimer
-            </Link>
+          <div className={classnames(css.footer, 'mt-auto')}> 
+            <div className="d-flex justify-content-center mb-3 p-3">
+              <Link
+                aria-label="Login"
+                className="btn btn-outline-primary px-3 fw-bolder"
+                onClick={() => goTo('/login')}
+                to={'/login'}
+                title="Login"
+              >
+                Login
+              </Link>
+            </div>
 
-            <Link
-              aria-label="Data Protection and Privacy"
-              className="d-block"
-              onClick={() => goTo('/gdpr')}
-              to={'/gdpr'}
-              title="Data Protection and Privacy"
-            >
-              Data Protection and Privacy
-            </Link>
-            <br />
-            developed & maintained by<br />
-            <a href="https://www.mikehankey.com/html/" target="_blank" rel="noopener noreferrer">
-              Mike Hankey & Associates
-            </a>, LLC © {cd.year}
+            <div className="border-top p-3">
+              <Link
+                aria-label="Service agreement & disclaimer"
+                className="d-block"
+                onClick={() => goTo('/disclaimer')}
+                to={'/disclaimer'}
+                title="Service agreement & disclaimer"
+              >
+                Service agreement & disclaimer
+              </Link>
+
+              <Link
+                aria-label="Data Protection and Privacy"
+                className="d-block"
+                onClick={() => goTo('/gdpr')}
+                to={'/gdpr'}
+                title="Data Protection and Privacy"
+              >
+                Data Protection and Privacy
+              </Link>
+              <br />
+              developed & maintained by<br />
+              <a href="https://www.mikehankey.com/html/" target="_blank" rel="noopener noreferrer">
+                Mike Hankey & Associates
+              </a>, LLC © {cd.year}
+            </div>
           </div>
-
         </div>
       </animated.div>
     </>

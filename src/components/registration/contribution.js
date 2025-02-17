@@ -3,8 +3,7 @@ import cssForm from "styles/components/form.module.scss";
 import React, { useEffect, useState } from "react";
 import StepDislay from "components/registration/stepDisplay";
 import TalkPosterForm from "./talkPoster";
-import { MdAdd } from "react-icons/md";
-import { conferenceData as cd } from "data/conference-data.js"
+import { MdAdd } from "react-icons/md"; 
 import { FiInfo } from "react-icons/fi";
 import { formatFullDate } from "utils/date";
 import { useFieldArray } from "react-hook-form";
@@ -16,13 +15,10 @@ const imcSessions = [
 ];
 
 const talkDurations = ["10min", "15min", "20min", "25min", "30min"];
-const paperDeliveryOptions = [
-  { label: "Before the IMC", value: "before_imc" },
-  { label: "During the IMC", value: "during_imc" },
-  { label: `No later than ${formatFullDate(cd.deadlines.paper)}`, value: "after_imc" }
-];
+
 
 const ContributionForm = ({
+  conferenceData,
   control,
   initialData,
   isDebugMode = false,
@@ -35,6 +31,12 @@ const ContributionForm = ({
   setValue,
 }) => {
   const [wantsToContribute, setWantsToContribute] = useState(null);
+
+  const paperDeliveryOptions = [
+    { label: "Before the IMC", value: "before_imc" },
+    { label: "During the IMC", value: "during_imc" },
+    { label: `No later than ${formatFullDate(conferenceData.deadlines.paper)}`, value: "after_imc" }
+  ];
   const { fields: talks, append: addTalk, remove: removeTalk } = useFieldArray({ control, name: "talks" });
   const { fields: posters, append: addPoster, remove: removePoster } = useFieldArray({ control, name: "posters" });
 
@@ -114,7 +116,7 @@ const ContributionForm = ({
         <div className="mb-3 row">
           <label className={classNames('text-center fw-bold', cssForm.balance)}>
             Would you like to contribute a talk
-            {!isOnline && (<>or a poster</>)}  to the main IMC {cd.year} conference?</label> 
+            {!isOnline && (<>or a poster</>)}  to the main IMC {conferenceData.year} conference?</label> 
           <div className="text-center btn-group d-block mt-3" role="group">
             <input
               type="radio"
@@ -162,12 +164,12 @@ const ContributionForm = ({
           <div className="border border-2 p-3 rounded-2 bg-tertiary mb-3 mx-md-5">
             <h6 className="fw-bolder gap-2 d-inline-flex"><FiInfo /> Do not register a lecture {!isOnline && (<>or poster</>)} without having a topic.</h6>
             <p>
-              If you consider to present a lecture {!isOnline && (<>or a poster</>)} but have not yet decided on the topic, skip this item and for now just continue with your registration. You can add your talk {!isOnline && (<>or poster</>)} later. The absolute deadline for <b className="text-danger">submitting talks {!isOnline && (<>and posters</>)} is {formatFullDate(cd.deadlines.paper)},</b> but if we cannot accommodate all presentations, priority may be given to those registered early.
+              If you consider to present a lecture {!isOnline && (<>or a poster</>)} but have not yet decided on the topic, skip this item and for now just continue with your registration. You can add your talk {!isOnline && (<>or poster</>)} later. The absolute deadline for <b className="text-danger">submitting talks {!isOnline && (<>and posters</>)} is {formatFullDate(conferenceData.deadlines.paper)},</b> but if we cannot accommodate all presentations, priority may be given to those registered early.
             </p>
 
             <h6 className="fw-bolder gap-2 d-inline-flex mt-2"><FiInfo />  For all lectures {!isOnline && (<>and posters</>)}, a paper for the IMC Proceedings is required.</h6>
             <p>
-              Ideally, papers for the Proceedings should be submitted before the start of the conference. <b className="text-danger">The absolute deadline for Proceedings paper delivery is {formatFullDate(cd.deadlines.paper)}</b>.
+              Ideally, papers for the Proceedings should be submitted before the start of the conference. <b className="text-danger">The absolute deadline for Proceedings paper delivery is {formatFullDate(conferenceData.deadlines.paper)}</b>.
             </p>
           </div>
 

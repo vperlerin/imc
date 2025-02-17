@@ -2,7 +2,6 @@ import classNames from "classnames";
 import cssForm from "styles/components/form.module.scss";
 import React, { useEffect } from "react";
 import StepDislay from "components/registration/stepDisplay";  
-import { conferenceData as cd } from "data/conference-data";
 import { formatFullDate } from 'utils/date';
 
 const getDateRange = (startDate, endDate) => {
@@ -17,11 +16,12 @@ const getDateRange = (startDate, endDate) => {
   return dates;
 };
 
-const availableDates = getDateRange(cd.dates.start, cd.dates.end);
+
 const hours = Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, "0"));
 const minutes = Array.from({ length: 6 }, (_, i) => (i * 10).toString().padStart(2, "0"));
 
 const ArrivalForm = ({
+  conferenceData,
   register,
   errors,
   isDebugMode = false,
@@ -31,6 +31,8 @@ const ArrivalForm = ({
   setValue,
   initialData
 }) => {
+
+  const availableDates = getDateRange(conferenceData.dates.start, conferenceData.dates.end);
 
   const fillTestData = () => {
     setValue("arrivalDate", availableDates[0]);

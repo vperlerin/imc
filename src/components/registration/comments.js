@@ -1,9 +1,7 @@
 import classNames from "classnames";
 import cssForm from "styles/components/form.module.scss";
 import StepDislay from "components/registration/stepDisplay";
-import React, { useEffect } from "react";
-import { conferenceData as cd } from "data/conference-data";
-import { formatFullDate } from 'utils/date';
+import React, { useEffect } from "react"; 
 import { gdpr } from 'data/gdpr';
 
 const Comments = ({

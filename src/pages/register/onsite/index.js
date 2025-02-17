@@ -106,7 +106,7 @@ const MainForm = () => {
           {...register("isEarlyBird")}
         />
 
-        <input 
+        <input
           name="type"
           type="hidden"
           value="onsite"
@@ -126,8 +126,11 @@ const MainForm = () => {
           />
         )}
 
+
+
         {step === 2 && cd?.workshops?.length > 0 && (
           <Workshops
+            conferenceData={cd}
             register={register}
             errors={errors}
             isDebugMode={isDebugMode}
@@ -141,6 +144,7 @@ const MainForm = () => {
         )}
         {step === 3 &&
           <Arrival
+            conferenceData={cd}
             register={register}
             errors={errors}
             isDebugMode={isDebugMode}
@@ -153,6 +157,7 @@ const MainForm = () => {
         }
         {step === 4 &&
           <Contribution
+            conferenceData={cd}
             control={control}
             register={register}
             isDebugMode={isDebugMode}
@@ -170,6 +175,7 @@ const MainForm = () => {
         }
         {step === 5 &&
           <Accomodation
+            conferenceData={cd}
             control={control}
             register={register}
             isDebugMode={isDebugMode}
@@ -185,6 +191,7 @@ const MainForm = () => {
 
         {step === 6 && (
           <Extras
+            conferenceData={cd}
             register={register}
             errors={errors}
             isDebugMode={isDebugMode}

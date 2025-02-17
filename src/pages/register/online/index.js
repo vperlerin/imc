@@ -99,6 +99,7 @@ const MainForm = () => {
 
         {step === 2 && cd?.workshops?.length > 0 && (
           <Workshops
+            conferenceData={cd}
             register={register}
             errors={errors}
             isDebugMode={isDebugMode}
@@ -114,6 +115,7 @@ const MainForm = () => {
 
         {step === 3 &&
           <Contribution
+            conferenceData={cd}
             control={control}
             register={register}
             isDebugMode={isDebugMode}
@@ -133,6 +135,7 @@ const MainForm = () => {
 
         {step === 4 &&
           <Accomodation
+            conferenceData={cd}
             control={control}
             register={register}
             isDebugMode={isDebugMode}

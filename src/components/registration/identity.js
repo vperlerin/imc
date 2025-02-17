@@ -11,7 +11,7 @@ const months = [
 ];
 const days = Array.from({ length: 31 }, (_, i) => i + 1);
 
-const IdentityForm = ({
+const IdentityForm = ({ 
   register,
   errors,
   isDebugMode = false,

@@ -2,9 +2,9 @@ import classNames from "classnames";
 import cssForm from "styles/components/form.module.scss";
 import React, { useEffect } from "react";
 import StepDislay from "components/registration/stepDisplay";
-import { conferenceData as cd } from "data/conference-data";
 
 const Workshops = ({
+  conferenceData,
   initialData,
   isDebugMode = false,
   isOnline = false,
@@ -29,7 +29,7 @@ const Workshops = ({
     trigger(workshopTitle);
   };
 
-  const testData = !isOnline ?  {
+  const testData = !isOnline ? {
     "Spectroscopy Workshop": "true",
     "Radio workshop": "false",
   } : {
@@ -57,11 +57,11 @@ const Workshops = ({
         Workshops
       </h4>
       <div className={classNames(cssForm.smallW, "mx-auto position-relative")}>
-        {cd.workshops
-          .filter(workshop => !isOnline || workshop.cost_online)  
+        {conferenceData.workshops
+          .filter(workshop => !isOnline || workshop.cost_online)
           .map((workshop) => {
             const workshopTitle = workshop.title;
-            const selectedWorkshop = watch(workshopTitle);  
+            const selectedWorkshop = watch(workshopTitle);
 
             return (
               <div className="mb-5 row" key={workshopTitle}>

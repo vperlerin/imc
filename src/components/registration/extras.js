@@ -2,9 +2,9 @@ import classNames from "classnames";
 import cssForm from "styles/components/form.module.scss";
 import React, { useEffect, useState } from "react";
 import StepDislay from "components/registration/stepDisplay"; 
-import { conferenceData as cd } from "data/conference-data";
 
 const ExtrasForm = ({
+  conferenceData,
   register,
   errors,
   isDebugMode = false,
@@ -16,8 +16,8 @@ const ExtrasForm = ({
 }) => {
   const [wantsTShirt, setWantsTShirt] = useState(null);
 
-  const tShirtSizes = cd.costs.tshirts.models.flatMap((model) =>
-    cd.costs.tshirts.sizes.map((size) => `${model.charAt(0).toUpperCase() + model.slice(1)} ${size}`)
+  const tShirtSizes = conferenceData.costs.tshirts.models.flatMap((model) =>
+    conferenceData.costs.tshirts.sizes.map((size) => `${model.charAt(0).toUpperCase() + model.slice(1)} ${size}`)
   );
 
   useEffect(() => {
@@ -125,7 +125,7 @@ const ExtrasForm = ({
                   {...register("proceedings", { required: "Please select a proceedings option" })}
                 />
                 <label className="form-check-label" htmlFor={`proceedings-${option}`}>
-                  {option === "pdf" ? "Only PDF (free)" : `PDF & Printed copy (${cd.costs.printed_proceedings}€)`}
+                  {option === "pdf" ? "Only PDF (free)" : `PDF & Printed copy (${conferenceData.costs.printed_proceedings}€)`}
                 </label>
               </div>
             ))}
