@@ -72,7 +72,7 @@ if table_is_empty("registration_types"):
     for room in data.get("costs", {}).get("rooms", []):
         total = int(room.get("total", 0))  
         sql_statements.append(
-            "INSERT INTO registration_types (type, price, description, total, `left`) VALUES ('%s', %.2f, '%s', %d, %d);" % (
+            "INSERT INTO registration_types (type, price, description, total, room_left) VALUES ('%s', %.2f, '%s', %d, %d);" % (
                 room["type"].replace("'", "''"), 
                 float(room["price"]), 
                 room["description"].replace("'", "''"), 
