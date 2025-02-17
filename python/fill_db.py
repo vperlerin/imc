@@ -53,6 +53,7 @@ sql_statements = []
 
 # Insert `imc_sessions` if the table is empty
 if table_is_empty("imc_sessions"):
+    print "Filling imc_sessions" 
     for session in data.get("conferenceData", {}).get("sessions", []):
         sql_statements.append(
             "INSERT INTO imc_sessions (name) VALUES ('%s');" % session.replace("'", "''")
