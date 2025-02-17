@@ -1,19 +1,23 @@
-CREATE DATABASE IF NOT EXISTS MYSQL_DATABASE;
+-- Database Setup
+CREATE DATABASE IF NOT EXISTS MYSQL_DATABASE DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE MYSQL_DATABASE;
 
+-- User Management
 DROP USER IF EXISTS 'MYSQL_USER'@'localhost';
-CREATE USER 'MYSQL_USER'@'localhost' IDENTIFIED BY 'MYSQL_PASSWORD'; 
+CREATE USER IF NOT EXISTS 'MYSQL_USER'@'localhost' IDENTIFIED BY 'MYSQL_PASSWORD';
 GRANT ALL PRIVILEGES ON MYSQL_DATABASE.* TO 'MYSQL_USER'@'localhost';
 FLUSH PRIVILEGES;
 
+-- Admin Table
 CREATE TABLE IF NOT EXISTS admins (
     id INT AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(255) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Participants Table
 CREATE TABLE IF NOT EXISTS participants (
     id INT AUTO_INCREMENT PRIMARY KEY,
     title ENUM('Mr.', 'Ms.', 'Mrs.', 'Dr.', 'Prof.') NOT NULL,
@@ -26,21 +30,29 @@ CREATE TABLE IF NOT EXISTS participants (
     postal_code VARCHAR(20) NOT NULL,
     city VARCHAR(100) NOT NULL,
     country CHAR(2) NOT NULL,
-    organization VARCHAR(255),
+    organization VARCHAR(255) DEFAULT NULL,
     dob DATE NOT NULL,
+    admin_notes TEXT DEFAULT NULL,
+    is_online BOOLEAN NOT NULL DEFAULT FALSE,
+    confirmation_sent BOOLEAN NOT NULL DEFAULT FALSE,
+    confirmation_date TIMESTAMP DEFAULT NULL,
     password_hash VARCHAR(255) NOT NULL, 
+    total_due DECIMAL(10,2) UNSIGNED NOT NULL DEFAULT 0.00,
+    total_paid DECIMAL(10,2) UNSIGNED NOT NULL DEFAULT 0.00, 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Workshops Table
 CREATE TABLE IF NOT EXISTS workshops (
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
-    price DECIMAL(10,2) NOT NULL,
+    price DECIMAL(10,2) UNSIGNED NOT NULL DEFAULT 0.00,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Participant-Workshops Relation Table
 CREATE TABLE IF NOT EXISTS participant_workshops (
     id INT AUTO_INCREMENT PRIMARY KEY,
     participant_id INT NOT NULL,
@@ -50,27 +62,30 @@ CREATE TABLE IF NOT EXISTS participant_workshops (
     FOREIGN KEY (workshop_id) REFERENCES workshops(id) ON DELETE CASCADE
 );
 
+-- Participant Arrival Table
 CREATE TABLE IF NOT EXISTS participant_arrival (
     id INT AUTO_INCREMENT PRIMARY KEY,
     participant_id INT NOT NULL,
     arrival_date DATE NOT NULL,
-    arrival_hour TINYINT NOT NULL CHECK (arrival_hour BETWEEN 0 AND 23),
-    arrival_minute TINYINT NOT NULL CHECK (arrival_minute BETWEEN 0 AND 59),
+    arrival_hour TINYINT UNSIGNED NOT NULL CHECK (arrival_hour BETWEEN 0 AND 23),
+    arrival_minute TINYINT UNSIGNED NOT NULL CHECK (arrival_minute BETWEEN 0 AND 59),
     departure_date DATE NOT NULL,
-    departure_hour TINYINT NOT NULL CHECK (departure_hour BETWEEN 0 AND 23),
-    departure_minute TINYINT NOT NULL CHECK (departure_minute BETWEEN 0 AND 59),
+    departure_hour TINYINT UNSIGNED NOT NULL CHECK (departure_hour BETWEEN 0 AND 23),
+    departure_minute TINYINT UNSIGNED NOT NULL CHECK (departure_minute BETWEEN 0 AND 59),
     travelling ENUM('car', 'bus', 'plane', 'train', 'local', 'undecided') NOT NULL,
-    travelling_details TEXT,
+    travelling_details TEXT DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (participant_id) REFERENCES participants(id) ON DELETE CASCADE
-);
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- IMC Sessions Table
 CREATE TABLE IF NOT EXISTS imc_sessions (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL UNIQUE
-);
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Contributions Table
 CREATE TABLE IF NOT EXISTS contributions (
     id INT AUTO_INCREMENT PRIMARY KEY,
     participant_id INT NOT NULL,
@@ -85,51 +100,53 @@ CREATE TABLE IF NOT EXISTS contributions (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (participant_id) REFERENCES participants(id) ON DELETE CASCADE,
     FOREIGN KEY (session_id) REFERENCES imc_sessions(id) ON DELETE CASCADE
-);
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Registration Types Table
 CREATE TABLE IF NOT EXISTS registration_types (
     id INT AUTO_INCREMENT PRIMARY KEY,
     type VARCHAR(100) NOT NULL UNIQUE,
-    price DECIMAL(10,2) NOT NULL,
+    price DECIMAL(10,2) UNSIGNED NOT NULL DEFAULT 0.00,
     description TEXT NOT NULL
-);
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Payment Methods Table
 CREATE TABLE IF NOT EXISTS payment_methods (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    method VARCHAR(50) NOT NULL UNIQUE 
-);
+    method VARCHAR(50) NOT NULL UNIQUE
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-INSERT IGNORE INTO payment_methods (method) VALUES
-('Paypal'),
-('Bank Transfer'),
-('Other');
+INSERT IGNORE INTO payment_methods (method) VALUES ('Paypal'), ('Bank Transfer'), ('Other');
 
+-- Participant Accommodation Table
 CREATE TABLE IF NOT EXISTS participant_accommodation (
     id INT AUTO_INCREMENT PRIMARY KEY,
     participant_id INT NOT NULL,
     registration_type_id INT NOT NULL,
-    late_booking_fee DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+    late_booking_fee DECIMAL(10,2) UNSIGNED NOT NULL DEFAULT 0.00,
     payment_method_id INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (participant_id) REFERENCES participants(id) ON DELETE CASCADE,
     FOREIGN KEY (registration_type_id) REFERENCES registration_types(id) ON DELETE CASCADE,
     FOREIGN KEY (payment_method_id) REFERENCES payment_methods(id) ON DELETE CASCADE
-);
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Extra Options Table
 CREATE TABLE IF NOT EXISTS extra_options (
     id INT AUTO_INCREMENT PRIMARY KEY,
     participant_id INT NOT NULL,
     excursion BOOLEAN NOT NULL DEFAULT FALSE,   
     buy_tshirt BOOLEAN NOT NULL DEFAULT FALSE, 
     tshirt_size VARCHAR(50) DEFAULT NULL, 
-    tshirt_price DECIMAL(10,2) NOT NULL,
+    tshirt_price DECIMAL(10,2) UNSIGNED NOT NULL DEFAULT 0.00,
     proceedings ENUM('pdf', 'pdf_printed') NOT NULL,  
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (participant_id) REFERENCES participants(id) ON DELETE CASCADE
-);
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Participant Comments Table
 CREATE TABLE IF NOT EXISTS participant_comments (
     id INT AUTO_INCREMENT PRIMARY KEY,
     participant_id INT NOT NULL,
@@ -142,4 +159,4 @@ CREATE TABLE IF NOT EXISTS participant_comments (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (participant_id) REFERENCES participants(id) ON DELETE CASCADE
-);
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

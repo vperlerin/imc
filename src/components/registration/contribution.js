@@ -73,10 +73,10 @@ const ContributionForm = ({
     setValue("wantsToContribute", "yes");
     setWantsToContribute(true);
     removeTalk();
-    if(!isOnline) {
-      removePoster(); 
+    if (!isOnline) {
+      removePoster();
     }
-   
+
     addTalk({
       title: "Meteor Observation Techniques",
       authors: "John Doe, Jane Smith",
@@ -86,7 +86,7 @@ const ContributionForm = ({
       paperDate: "before_imc"
     });
 
-    if(!isOnline) {
+    if (!isOnline) {
       addPoster({
         title: "Radio Meteor Detection",
         authors: "Alice Brown, Bob White",
@@ -95,7 +95,7 @@ const ContributionForm = ({
         paperDate: "after_imc"
       });
     }
-   
+
   };
 
   return (
@@ -112,8 +112,9 @@ const ContributionForm = ({
 
       <div className={classNames(cssForm.smallW, 'mx-auto position-relative')}>
         <div className="mb-3 row">
-          <label className={classNames('text-center fw-bold', cssForm.balance)}>Do you wish to contribute with a talk 
-            {!isOnline && (<>or a poster</>)}?</label>
+          <label className={classNames('text-center fw-bold', cssForm.balance)}>
+            Would you like to contribute a talk
+            {!isOnline && (<>or a poster</>)}  to the main IMC {cd.year} conference?</label> 
           <div className="text-center btn-group d-block mt-3" role="group">
             <input
               type="radio"
@@ -204,8 +205,8 @@ const ContributionForm = ({
           <div className="d-flex gap-3 justify-content-center">
             <button type="button" className="fw-bold btn btn-outline-secondary my-2" onClick={() => validateAndAdd("talk")}>
               <MdAdd /> Add Talk
-            </button> 
-            
+            </button>
+
             {!isOnline && (
               <button type="button" className="fw-bold btn btn-outline-secondary my-2" onClick={() => validateAndAdd("poster")}>
                 <MdAdd /> Add Poster

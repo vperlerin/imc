@@ -62,7 +62,7 @@ const MainForm = () => {
   const prevStep = () => setStep(step - 1);
 
   const onSubmit = (data) => {
-    //console.log("Final Form Data:", data);
+    console.log("Final Form Data:", data);
   };
 
   if (!isDebugMode) {
