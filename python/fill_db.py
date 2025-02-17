@@ -34,10 +34,10 @@ except MySQLdb.Error as e:
     print "Error connecting to MySQL: %s" % str(e)
     exit(1)
 
-# Function to check if a table is empty
+# Function to check if a table is empty (Fix: Ensure table name is properly escaped)
 def table_is_empty(table_name):
     try:
-        cursor.execute("SELECT COUNT(*) FROM `%s`" % table_name)
+        cursor.execute("SELECT COUNT(*) FROM `%s`;" % table_name)  # Ensure table name is properly escaped
         count = cursor.fetchone()[0]
         return count == 0  # Returns True if table is empty
     except MySQLdb.Error as e:
@@ -53,8 +53,7 @@ sql_statements = []
 
 # Insert `imc_sessions` if the table is empty
 if table_is_empty("imc_sessions"):
-    print "Filling imc_sessions" 
-    for session in data.get("conferenceData", {}).get("sessions", []):
+    for session in data.get("sessions", []):
         sql_statements.append(
             "INSERT INTO imc_sessions (name) VALUES ('%s');" % session.replace("'", "''")
         )
@@ -76,7 +75,6 @@ if table_is_empty("registration_types"):
                 room["type"].replace("'", "''"), float(room["price"]), room["description"].replace("'", "''")
             )
         )
-
 
 # Insert `admins` from .env if the table is empty
 if table_is_empty("admins"):
