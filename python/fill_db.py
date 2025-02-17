@@ -70,11 +70,17 @@ if table_is_empty("workshops"):
 # Insert `registration_types` (rooms) if the table is empty
 if table_is_empty("registration_types"):
     for room in data.get("costs", {}).get("rooms", []):
+        total = int(room.get("total", 0))  
         sql_statements.append(
-            "INSERT INTO registration_types (type, price, description) VALUES ('%s', %.2f, '%s');" % (
-                room["type"].replace("'", "''"), float(room["price"]), room["description"].replace("'", "''")
+            "INSERT INTO registration_types (type, price, description, total, `left`) VALUES ('%s', %.2f, '%s', %d, %d);" % (
+                room["type"].replace("'", "''"), 
+                float(room["price"]), 
+                room["description"].replace("'", "''"), 
+                total,  # Set total
+                total   # Set left = total
             )
         )
+
 
 # Insert `admins` from .env if the table is empty
 if table_is_empty("admins"):

@@ -110,8 +110,11 @@ CREATE TABLE IF NOT EXISTS registration_types (
     id INT AUTO_INCREMENT PRIMARY KEY,
     type VARCHAR(100) NOT NULL UNIQUE,
     price DECIMAL(10,2) UNSIGNED NOT NULL DEFAULT 0.00,
-    description TEXT NOT NULL
+    description TEXT NOT NULL,
+    total INT UNSIGNED NOT NULL DEFAULT 0,  
+    room_left INT UNSIGNED NOT NULL DEFAULT 0   
 ) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 
 -- Payment Methods Table
 CREATE TABLE IF NOT EXISTS payment_methods (
