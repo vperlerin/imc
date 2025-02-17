@@ -117,7 +117,7 @@ if sql_statements:
     print "SQL script generated successfully: %s" % SQL_PATH
 
     # Run MySQL command automatically
-    mysql_command = "mysql -u %s -p%s %s < %s" % (DB_USER, DB_PASSWORD, DB_NAME, SQL_PATH)
+    mysql_command = "mysql -A -u %s -p%s %s < %s" % (DB_USER, DB_PASSWORD, DB_NAME, SQL_PATH)
     print "Running:", mysql_command
     os.system(mysql_command)
 
