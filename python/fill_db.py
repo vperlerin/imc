@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-
-#python python/fill_db.py
 import json
 import os
 import bcrypt
@@ -19,7 +17,7 @@ if os.path.exists(ENV_PATH):
             line = line.strip()
             if line and not line.startswith("#"):
                 key, value = line.split("=", 1)
-                os.environ[key] = value
+                os.environ[key] = value.decode("utf-8")  # Ensure UTF-8 compatibility
 
 # Database connection details from .env
 DB_HOST = os.environ.get("MYSQL_HOST", "localhost")
@@ -48,46 +46,12 @@ with open(JSON_PATH, "rb") as file:
 # SQL statement storage
 sql_statements = []
 
-# Insert workshops if table is empty
-if not table_has_data("workshops"):
-    for workshop in data.get("workshops", []):
+# Insert imc_sessions if table is empty
+if not table_has_data("imc_sessions"):
+    for session in data.get("conferenceData", {}).get("sessions", []):
         sql_statements.append(
-            "INSERT INTO workshops (title, price) VALUES ('%s', %.2f);" % (
-                workshop["title"].replace("'", "''"), float(workshop["cost"])
-            )
+            "INSERT INTO imc_sessions (name) VALUES ('%s');" % session.replace("'", "''")
         )
-
-# Insert registration types (rooms) if table is empty
-if not table_has_data("registration_types"):
-    for room in data.get("costs", {}).get("rooms", []):
-        sql_statements.append(
-            "INSERT INTO registration_types (type, price, description) VALUES ('%s', %.2f, '%s');" % (
-                room["type"].replace("'", "''"), float(room["price"]), room["description"].replace("'", "''")
-            )
-        )
-
-# Insert admin users from .env if table is empty
-if not table_has_data("admins"):
-    admin_count = 1
-    while True:
-        email_key = "ADMIN%d_EMAIL" % admin_count
-        pwd_key = "ADMIN%d_PWD" % admin_count
-
-        email = os.environ.get(email_key)
-        password = os.environ.get(pwd_key)
-
-        if email and password:
-            # Hash password securely
-            hashed_password = bcrypt.hashpw(password, bcrypt.gensalt())
-
-            sql_statements.append(
-                "INSERT INTO admins (email, password_hash) VALUES ('%s', '%s');" % (
-                    email.replace("'", "''"), hashed_password
-                )
-            )
-        else:
-            break  
-        admin_count += 1   
 
 # Close MySQL connection
 cursor.close()
@@ -96,14 +60,14 @@ conn.close()
 # Save SQL statements to file if there are new inserts
 if sql_statements:
     sql_script = "\n".join(sql_statements)
-    with open(SQL_PATH, "wb") as sql_file:  
+    with open(SQL_PATH, "wb") as sql_file:  # 'wb' for binary mode in Python 2
         sql_file.write(sql_script)
 
     print "SQL script generated successfully: %s" % SQL_PATH
 
     # Run MySQL command automatically
     mysql_command = "mysql -u %s -p%s %s < %s" % (DB_USER, DB_PASSWORD, DB_NAME, SQL_PATH)
-    print "Running:", mysql_command  
+    print "Running:", mysql_command  # Print the command before execution
     os.system(mysql_command)
 
     print "✅ Database updated successfully!"

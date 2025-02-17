@@ -18,10 +18,20 @@
     "half_reimbursement_before": "2025-07-15",
     "early_birds": "2025-05-01"
   },
+  "sessions": [
+    "Video meteor work",
+    "Radio meteor work",
+    "Visual meteor work",
+    "Meteor physics and dynamics",
+    "Meteor stream analyses and modelling",
+    "Meteor related software and hardware",
+    "Ongoing meteor work",
+    "Miscellaneous"
+  ],
   "costs": {
     "after_early_birds": 30,
     "admin": "15€",
-    "online": 15, 
+    "online": 15,
     "rooms": [
       {
         "price": 250,
@@ -48,8 +58,17 @@
       }
     ],
     "tshirts": {
-      "models": ["men", "women"],
-      "sizes": ["S", "M", "L", "XL", "XXL"],
+      "models": [
+        "men",
+        "women"
+      ],
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL",
+        "XXL"
+      ],
       "price": 15
     },
     "printed_proceedings": 20

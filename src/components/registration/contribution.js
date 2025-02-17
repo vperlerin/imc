@@ -7,16 +7,10 @@ import { MdAdd } from "react-icons/md";
 import { FiInfo } from "react-icons/fi";
 import { formatFullDate } from "utils/date";
 import { useFieldArray } from "react-hook-form";
-
-const imcSessions = [
-  "Video meteor work", "Radio meteor work", "Visual meteor work",
-  "Meteor physics and dynamics", "Meteor stream analyses and modelling",
-  "Meteor related software and hardware", "Ongoing meteor work", "Miscellaneous"
-];
-
+ 
+// !hardcode in DB
 const talkDurations = ["10min", "15min", "20min", "25min", "30min"];
-
-
+ 
 const ContributionForm = ({
   conferenceData,
   control,
@@ -32,6 +26,7 @@ const ContributionForm = ({
 }) => {
   const [wantsToContribute, setWantsToContribute] = useState(null);
 
+  const imcSessions = conferenceData.sessions;
   const paperDeliveryOptions = [
     { label: "Before the IMC", value: "before_imc" },
     { label: "During the IMC", value: "during_imc" },
