@@ -68,7 +68,7 @@ const Workshops = ({
                 <label className={classNames("text-md-center", cssForm.balance)}>
                   Do you wish to attend the <b>{workshop.title}</b> organized on {new Date(workshop.date).toLocaleDateString("en-GB", { weekday: 'long', day: 'numeric', month: 'long' })} from {workshop.period}
                   {' '}for an extra price of {!isOnline ? workshop.cost : workshop.cost_online}€
-                  {!isOnline && <>{' '}(including conference materials and coffee break)</>}?
+                  {!isOnline && <>{' '}({workshop.description})</>}?
                 </label>
                 <div className="text-center btn-group d-block mt-3" role="group">
                   <input

@@ -1,7 +1,8 @@
+import axios from "axios";
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
-import { useNavigate, Link } from "react-router-dom"; // Navigate after login
-import { authActions } from "store/auth"; // Import Redux auth actions
+import { useNavigate, Link } from "react-router-dom";  
+import { authActions } from "store/auth";  
 import classNames from "classnames";
 import css from "./index.module.scss";
 import cssForm from "styles/components/form.module.scss";
@@ -14,27 +15,34 @@ const Login = () => {
   const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
-    event.preventDefault();  
-
-    try { 
-      const response = await fakeLoginAPI(email, password);
-
-      if (!response.success) {
-        throw new Error(response.message || "Login failed");
+    event.preventDefault();
+  
+    try {
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/login.php`, {
+        email,
+        password,
+      }, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,  
+      });
+  
+      if (!response.data.success) {
+        throw new Error(response.data.message || "Login failed");
       }
- 
-      dispatch(authActions.setAuth(response.data)); 
-      navigate("/");  
+  
+      dispatch(authActions.setAuth(response.data.user));
+      navigate("/");
     } catch (err) {
-      setError(err.message); 
+      setError(err.message);
     }
   };
 
   return (
     <div className={classNames(css.login, "flex-grow-1 d-flex h-100 align-items-center justify-content-center")}>
-      <form onSubmit={handleSubmit} className={classNames(cssForm.xSmallW, "w-100 border p-3 rounded-2")}>
-       
-
+      <form onSubmit={handleSubmit} className={classNames(cssForm.xSmallW, "w-100 border p-3 rounded-2")}> 
+      {error && <div className="alert alert-danger">{error}</div>}  
         <div className="mb-3">
           <label htmlFor="emailInput" className="form-label">Email address</label>
           <input 
@@ -47,8 +55,7 @@ const Login = () => {
             onChange={(e) => setEmail(e.target.value)}
             required 
           />
-        </div>
-        
+        </div> 
         <div className="mb-3">
           <label htmlFor="passwordInput" className="form-label">Password</label>
           <input 
@@ -60,9 +67,7 @@ const Login = () => {
             required 
           />
         </div>
-
-        {error && <div className="alert alert-danger">{error}</div>}  
-
+ 
  
         <div className="d-flex justify-content-between align-items-center">
           <Link to="/forgot-password" className="text-decoration-none">Forgot your password?</Link>

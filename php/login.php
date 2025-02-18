@@ -1,8 +1,11 @@
 <?php
-header("Content-Type: application/json");
-require_once "config.php";
-
+header("Access-Control-Allow-Origin: https://imc2025.imo.net");
+header("Access-Control-Allow-Credentials: true");
+header("Access-Control-Allow-Methods: POST");
+header("Access-Control-Allow-Headers: Content-Type");
 session_start();
+ 
+require_once "config.php";
 
 $host = "localhost";  
 $user = getenv("MYSQL_USER");

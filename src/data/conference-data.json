@@ -90,13 +90,15 @@
       "title": "Spectroscopy Workshop",
       "date": "2025-09-18",
       "period": "09:30 to 12:30 CEST",
-      "cost": 15
+      "cost": 22.50,
+      "description": "including coffee break and lunch"
     },
     {
       "title": "Radio workshop",
       "date": "2025-09-18",
       "period": "09:30 to 12:30 CEST",
-      "cost": 15,
+      "cost": 29,
+      "description": "including coffee break and lunch",
       "cost_online": 5
     }
   ]
