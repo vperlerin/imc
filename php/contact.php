@@ -4,8 +4,8 @@ header("Content-Type: application/json");
 header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
 
-error_reporting(E_ALL);
-ini_set('display_errors', 'On');
+error_reporting(0);
+ini_set('display_errors', 'Off');
 
 require '../vendor/autoload.php'; 
 require_once "config.php";
@@ -15,14 +15,9 @@ use PHPMailer\PHPMailer\Exception;
 use PHPMailer\PHPMailer\OAuth;
 use League\OAuth2\Client\Provider\Google;
 
-// Capture raw input for debugging
-$rawInput = file_get_contents("php://input");
-echo "Raw Input: " . $rawInput . "\n";
-
-$input = json_decode($rawInput, true);
+$input = json_decode(file_get_contents("php://input"), true);
 
 if (!$input) {
-    echo "Invalid input received.\n";
     echo json_encode(["success" => false, "message" => "Invalid input"]);
     exit;
 }
@@ -31,7 +26,6 @@ if (!$input) {
 $requiredFields = ['name', 'email', 'subject', 'message', 'token'];
 foreach ($requiredFields as $field) {
     if (empty($input[$field])) {
-        echo "Missing field: $field\n";
         echo json_encode(["success" => false, "message" => ucfirst($field) . " is required"]);
         exit;
     }
@@ -40,7 +34,6 @@ foreach ($requiredFields as $field) {
 // Verify reCAPTCHA
 $recaptchaSecret = getenv("RECAPTCHA_SECRET_KEY");
 if (!$recaptchaSecret) {
-    echo "Missing reCAPTCHA secret key.\n";
     echo json_encode(["success" => false, "message" => "Missing reCAPTCHA secret key"]);
     exit;
 }
@@ -48,10 +41,8 @@ if (!$recaptchaSecret) {
 $recaptchaResponse = $input['token'];
 $recaptchaVerify = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=$recaptchaSecret&response=$recaptchaResponse");
 $recaptchaData = json_decode($recaptchaVerify, true);
-echo "reCAPTCHA Response: " . print_r($recaptchaData, true) . "\n";
 
 if (!$recaptchaData['success']) {
-    echo "reCAPTCHA verification failed: " . print_r($recaptchaData, true) . "\n";
     echo json_encode(["success" => false, "message" => "reCAPTCHA verification failed"]);
     exit;
 }
@@ -71,7 +62,6 @@ try {
     $refreshToken = getenv("SMTP_REFRESH_TOKEN");
     $emailSender = getenv("SMTP_USER_EMAIL");
 
-     
     if (!$clientId || !$clientSecret || !$refreshToken || !$emailSender) {
         throw new Exception("Missing OAuth credentials.");
     }
@@ -97,7 +87,7 @@ try {
     $mail->AuthType = getenv("SMTP_AUTH_TYPE");
     $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
     $mail->Port = getenv("SMTP_TLS_PORT");
- 
+
     // Set sender and recipient
     $mail->setFrom($emailSender, getenv("SMTP_USER_NAME"));
     $mail->addAddress("vperlerin@gmail.com");
@@ -110,9 +100,8 @@ try {
     if ($mail->send()) { 
         echo json_encode(["success" => true, "message" => "Message sent successfully"]);
     } else { 
-        echo json_encode(["success" => false, "message" => "Failed to send message. Check logs."]);
+        echo json_encode(["success" => false, "message" => "Failed to send message."]);
     }
 } catch (Exception $e) {
-    echo "Mailer Exception: " . $e->getMessage() . "\n";
-    echo json_encode(["success" => false, "message" => "Failed to send message. Check logs."]);
+    echo json_encode(["success" => false, "message" => "Failed to send message."]);
 }
