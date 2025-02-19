@@ -17,12 +17,12 @@ use League\OAuth2\Client\Provider\Google;
 
 // Capture raw input for debugging
 $rawInput = file_get_contents("php://input");
-var_dump("Raw Input: " . $rawInput);
+echo "Raw Input: " . $rawInput . "\n";
 
 $input = json_decode($rawInput, true);
 
 if (!$input) {
-    var_dump("Invalid input received.");
+    echo "Invalid input received.\n";
     echo json_encode(["success" => false, "message" => "Invalid input"]);
     exit;
 }
@@ -31,7 +31,7 @@ if (!$input) {
 $requiredFields = ['name', 'email', 'subject', 'message', 'token'];
 foreach ($requiredFields as $field) {
     if (empty($input[$field])) {
-        var_dump("Missing field: $field");
+        echo "Missing field: $field\n";
         echo json_encode(["success" => false, "message" => ucfirst($field) . " is required"]);
         exit;
     }
@@ -40,7 +40,7 @@ foreach ($requiredFields as $field) {
 // Verify reCAPTCHA
 $recaptchaSecret = getenv("RECAPTCHA_SECRET_KEY");
 if (!$recaptchaSecret) {
-    var_dump("Missing reCAPTCHA secret key.");
+    echo "Missing reCAPTCHA secret key.\n";
     echo json_encode(["success" => false, "message" => "Missing reCAPTCHA secret key"]);
     exit;
 }
@@ -48,10 +48,10 @@ if (!$recaptchaSecret) {
 $recaptchaResponse = $input['token'];
 $recaptchaVerify = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=$recaptchaSecret&response=$recaptchaResponse");
 $recaptchaData = json_decode($recaptchaVerify, true);
-var_dump("reCAPTCHA Response: " . print_r($recaptchaData, true));
+echo "reCAPTCHA Response: " . print_r($recaptchaData, true) . "\n";
 
 if (!$recaptchaData['success']) {
-    var_dump("reCAPTCHA verification failed: " . print_r($recaptchaData, true));
+    echo "reCAPTCHA verification failed: " . print_r($recaptchaData, true) . "\n";
     echo json_encode(["success" => false, "message" => "reCAPTCHA verification failed"]);
     exit;
 }
@@ -72,11 +72,11 @@ try {
     $emailSender = getenv("SMTP_USER_EMAIL");
 
     // Log OAuth settings
-    var_dump("OAuth2 Setup:");
-    var_dump("Client ID: " . ($clientId ? "Loaded" : "Missing"));
-    var_dump("Client Secret: " . ($clientSecret ? "Loaded" : "Missing"));
-    var_dump("Refresh Token: " . ($refreshToken ? "Loaded" : "Missing"));
-    var_dump("Sender Email: " . ($emailSender ? $emailSender : "Missing"));
+    echo "OAuth2 Setup:\n";
+    echo "Client ID: " . ($clientId ? "Loaded\n" : "Missing\n");
+    echo "Client Secret: " . ($clientSecret ? "Loaded\n" : "Missing\n");
+    echo "Refresh Token: " . ($refreshToken ? "Loaded\n" : "Missing\n");
+    echo "Sender Email: " . ($emailSender ? $emailSender . "\n" : "Missing\n");
 
     if (!$clientId || !$clientSecret || !$refreshToken || !$emailSender) {
         throw new Exception("Missing OAuth credentials.");
@@ -104,11 +104,11 @@ try {
     $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
     $mail->Port = getenv("SMTP_TLS_PORT");
 
-    var_dump("SMTP Configuration:");
-    var_dump("SMTP Host: " . getenv("SMTP_HOST"));
-    var_dump("Auth Type: " . getenv("SMTP_AUTH_TYPE"));
-    var_dump("SMTP Secure: " . PHPMailer::ENCRYPTION_STARTTLS);
-    var_dump("SMTP Port: " . getenv("SMTP_TLS_PORT"));
+    echo "SMTP Configuration:\n";
+    echo "SMTP Host: " . getenv("SMTP_HOST") . "\n";
+    echo "Auth Type: " . getenv("SMTP_AUTH_TYPE") . "\n";
+    echo "SMTP Secure: " . PHPMailer::ENCRYPTION_STARTTLS . "\n";
+    echo "SMTP Port: " . getenv("SMTP_TLS_PORT") . "\n";
 
     // Set sender and recipient
     $mail->setFrom($emailSender, getenv("SMTP_USER_NAME"));
@@ -120,13 +120,13 @@ try {
 
     // Attempt to send email
     if ($mail->send()) {
-        var_dump("Email sent successfully to vperlerin@gmail.com");
+        echo "Email sent successfully to vperlerin@gmail.com\n";
         echo json_encode(["success" => true, "message" => "Message sent successfully"]);
     } else {
-        var_dump("Email failed to send: " . $mail->ErrorInfo);
+        echo "Email failed to send: " . $mail->ErrorInfo . "\n";
         echo json_encode(["success" => false, "message" => "Failed to send message. Check logs."]);
     }
 } catch (Exception $e) {
-    var_dump("Mailer Exception: " . $e->getMessage());
+    echo "Mailer Exception: " . $e->getMessage() . "\n";
     echo json_encode(["success" => false, "message" => "Failed to send message. Check logs."]);
 }
