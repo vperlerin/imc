@@ -71,13 +71,7 @@ try {
     $refreshToken = getenv("SMTP_REFRESH_TOKEN");
     $emailSender = getenv("SMTP_USER_EMAIL");
 
-    // Log OAuth settings
-    echo "OAuth2 Setup:\n";
-    echo "Client ID: " . ($clientId ? "Loaded\n" : "Missing\n");
-    echo "Client Secret: " . ($clientSecret ? "Loaded\n" : "Missing\n");
-    echo "Refresh Token: " . ($refreshToken ? "Loaded\n" : "Missing\n");
-    echo "Sender Email: " . ($emailSender ? $emailSender . "\n" : "Missing\n");
-
+     
     if (!$clientId || !$clientSecret || !$refreshToken || !$emailSender) {
         throw new Exception("Missing OAuth credentials.");
     }
@@ -103,13 +97,7 @@ try {
     $mail->AuthType = getenv("SMTP_AUTH_TYPE");
     $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
     $mail->Port = getenv("SMTP_TLS_PORT");
-
-    echo "SMTP Configuration:\n";
-    echo "SMTP Host: " . getenv("SMTP_HOST") . "\n";
-    echo "Auth Type: " . getenv("SMTP_AUTH_TYPE") . "\n";
-    echo "SMTP Secure: " . PHPMailer::ENCRYPTION_STARTTLS . "\n";
-    echo "SMTP Port: " . getenv("SMTP_TLS_PORT") . "\n";
-
+ 
     // Set sender and recipient
     $mail->setFrom($emailSender, getenv("SMTP_USER_NAME"));
     $mail->addAddress("vperlerin@gmail.com");
@@ -119,11 +107,9 @@ try {
     $mail->Body = "This message has been sent from the IMC2025 contact form\n\nName: $name\nEmail: $email\n\nMessage:\n$message";
 
     // Attempt to send email
-    if ($mail->send()) {
-        echo "Email sent successfully to vperlerin@gmail.com\n";
+    if ($mail->send()) { 
         echo json_encode(["success" => true, "message" => "Message sent successfully"]);
-    } else {
-        echo "Email failed to send: " . $mail->ErrorInfo . "\n";
+    } else { 
         echo json_encode(["success" => false, "message" => "Failed to send message. Check logs."]);
     }
 } catch (Exception $e) {
