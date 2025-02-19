@@ -57,8 +57,7 @@ const Workshops = () => {
       </p>
 
       <p>
-        Participation in the <strong>Radio Workshop</strong> is available <strong>on-site</strong> for <strong>€22.50</strong>
-        (including a coffee break and lunch) or <strong>online</strong> for <strong>€5.00</strong>.
+        Participation in the <strong>Radio Workshop</strong> is available <strong>on-site</strong> for <strong>€22.50</strong> (including a coffee break and lunch) or <strong>online</strong> for <strong>€5.00</strong>.
       </p>
 
       
