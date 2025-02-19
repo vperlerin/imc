@@ -1,15 +1,7 @@
 export const programData = {
   day1: {
     date: '09/18/2025',
-    program: [ 
-      {
-        period: '09:30 - 12:30',
-        display: 'Spectroscopy workshop',
-      },
-      {
-        period: '09:30 - 17:00',
-        display: 'Radio workshop',
-      },
+    program: [  
       {
         period: '13:00 - …',
         display: 'Arrival of participants (who didn\'t participate in a workshop)'
