@@ -4,18 +4,18 @@ header("Content-Type: application/json");
 header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
 
-error_reporting(0);
-ini_set('display_errors', 'Off');
+error_reporting(E_ALL);
+ini_set('display_errors', 'On');
 
 require '../vendor/autoload.php'; 
 require_once "config.php";
+require_once "./class/Mail.php";  
 
-use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
-use PHPMailer\PHPMailer\OAuth;
-use League\OAuth2\Client\Provider\Google;
 
-$input = json_decode(file_get_contents("php://input"), true);
+// Capture raw input for debugging
+$rawInput = file_get_contents("php://input");
+$input = json_decode($rawInput, true);
 
 if (!$input) {
     echo json_encode(["success" => false, "message" => "Invalid input"]);
@@ -53,55 +53,18 @@ $email = htmlspecialchars($input['email']);
 $subject = htmlspecialchars($input['subject']);
 $message = htmlspecialchars($input['message']);
 
-$mail = new PHPMailer(true);
+// Prepare email content
+$emailMessage = "This message has been sent from the IMC2025 contact form\n\n";
+$emailMessage .= "Name: $name\n";
+$emailMessage .= "Email: $email\n\n";
+$emailMessage .= "Message:\n$message";
 
-try {
-    // OAuth2 Configuration
-    $clientId = getenv("SMTP_CLIENT_ID");
-    $clientSecret = getenv("SMTP_CLIENT_SECRET");
-    $refreshToken = getenv("SMTP_REFRESH_TOKEN");
-    $emailSender = getenv("SMTP_USER_EMAIL");
+// Define the Reply-To address
+$to=getenv("SMTP_REPLY_TO");
+$replyTo = getenv("SMTP_REPLY_TO");
 
-    if (!$clientId || !$clientSecret || !$refreshToken || !$emailSender) {
-        throw new Exception("Missing OAuth credentials.");
-    }
+// Initialize Mail class and send email
+$mailer = new Mail();
+$response = $mailer->sendEmail([$to], $subject, $emailMessage, $replyTo);
 
-    // Set up the OAuth2 provider
-    $provider = new Google([
-        'clientId'     => $clientId,
-        'clientSecret' => $clientSecret,
-    ]);
-
-    $mail->setOAuth(new OAuth([
-        'provider'     => $provider,
-        'clientId'     => $clientId,
-        'clientSecret' => $clientSecret,
-        'refreshToken' => $refreshToken,
-        'userName'     => $emailSender,
-    ]));
-
-    // SMTP Configuration
-    $mail->isSMTP();
-    $mail->Host = getenv("SMTP_HOST");
-    $mail->SMTPAuth = true;
-    $mail->AuthType = getenv("SMTP_AUTH_TYPE");
-    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-    $mail->Port = getenv("SMTP_TLS_PORT");
-
-    // Set sender and recipient
-    $mail->setFrom($emailSender, getenv("SMTP_USER_NAME"));
-    $mail->addAddress("vperlerin@gmail.com");
-
-    // Email content
-    $mail->Subject = $subject;
-    $mail->Body = "This message has been sent from the IMC2025 contact form\n\nName: $name\nEmail: $email\n\nMessage:\n$message";
-
-    // Attempt to send email
-    if ($mail->send()) { 
-        echo json_encode(["success" => true, "message" => "Message sent successfully"]);
-    } else { 
-        echo json_encode(["success" => false, "message" => "Failed to send message."]);
-    }
-} catch (Exception $e) {
-    echo json_encode(["success" => false, "message" => "Failed to send message."]);
-}
+echo json_encode($response);
