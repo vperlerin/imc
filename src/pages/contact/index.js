@@ -108,7 +108,7 @@ const Contact = () => {
         </div>
 
         <div className="my-3">
-          <ReCAPTCHA ref={recaptchaRef} sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY} theme="dark" />
+          <ReCAPTCHA ref={recaptchaRef} sitekey={process.env.RECAPTCHA_SECRET_KEY} theme="dark" />
         </div>
 
         <button type="submit" className="btn fw-bolder btn-primary" disabled={loading}>
