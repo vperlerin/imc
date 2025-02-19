@@ -165,7 +165,7 @@ const Menu = ({ cd }) => {
                 Data Protection and Privacy
               </Link>
               <br />
-              developed & maintained by<br />
+              developed & maintained by<br/>Vincent Perlerin for<br />
               <a href="https://www.mikehankey.com/html/" target="_blank" rel="noopener noreferrer">
                 Mike Hankey & Associates
               </a>, LLC © {cd.year}
