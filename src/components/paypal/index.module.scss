@@ -1,0 +1,9 @@
+.paypal {
+  border-color: #60CDFF !important;
+  color: #FFF;
+
+  &:hover {
+    color: #000;
+    background-color: rgb(184, 184, 184);
+  }
+}

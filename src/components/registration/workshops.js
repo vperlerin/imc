@@ -67,7 +67,7 @@ const Workshops = ({
               <div className="mb-5 row" key={workshopTitle}>
                 <label className={classNames("text-md-center", cssForm.balance)}>
                   Do you wish to attend the <b>{workshop.title}</b> organized on {new Date(workshop.date).toLocaleDateString("en-GB", { weekday: 'long', day: 'numeric', month: 'long' })} from {workshop.period}
-                  {' '}for an extra price of {!isOnline ? workshop.cost : workshop.cost_online}€
+                  {' '}for an extra price of {!isOnline ? workshop.cost.toFixed(2) : workshop.cost_online.toFixed(2)}€
                   {!isOnline && <>{' '}({workshop.description})</>}?
                 </label>
                 <div className="text-center btn-group d-block mt-3" role="group">

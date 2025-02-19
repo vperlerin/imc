@@ -4,6 +4,7 @@ import { FiTrash2 } from "react-icons/fi";
 import React from "react";
 
 const TalkPosterForm = ({
+  conferenceData,
   index,
   register,
   remove,
@@ -11,7 +12,6 @@ const TalkPosterForm = ({
   errors,
   imcSessions,
   talkDurations = [],
-  paperDeliveryOptions,
   initialValues = {}
 }) => {
   const isTalk = type === "talk";
@@ -110,24 +110,35 @@ const TalkPosterForm = ({
         </div>
       )}
 
-      {/* Paper Delivery Date */}
-      <div className="mb-3 row">
-        <label className="col-sm-2 col-form-label fw-bold pb-0">Paper Delivery</label>
-        <div className="col-sm-10">
-          <select
-            className={classNames("form-select", errors?.[`${type}s`]?.[index]?.paperDate && "is-invalid", cssForm.mdAuto)}
-            defaultValue={initialValues.paperDate || ""}
-            {...register(`${type}s.${index}.paperDate`, { required: "Paper delivery date is required" })}
-          >
-            <option value="">Select an option</option>
-            {paperDeliveryOptions.map((option) => (
-              <option key={option.value} value={option.value}>{option.label}</option>
-            ))}
-          </select>
-          {errors?.[`${type}s`]?.[index]?.paperDate && <p className="text-danger"><small>{errors[`${type}s`][index].paperDate.message}</small></p>}
-        </div>
-      </div>
+      {/* Printing */}
+      {!isTalk && (
+        <div className="mb-3 row">
+          <label className="fw-bold pb-0">Do you want to have your poster printed on-site for {conferenceData.poster_print.price}€?</label>
+          <p className="form-text mt-0">{conferenceData.poster_print.desc}</p>
+          <div className="text-center btn-group d-block" role="group">
+            <input
+              type="radio"
+              className="btn-check"
+              id={`printOnSiteYes${index}`}
+              value="true"
+              {...register(`${type}s.${index}.printOnSite`, { required: "Please select an option" })}
+              defaultChecked={initialValues.printOnSite === "true"}
+            />
+            <label className="btn btn-outline-neutral" htmlFor={`printOnSiteYes${index}`}>Yes</label>
 
+            <input
+              type="radio"
+              className="btn-check"
+              id={`printOnSiteNo${index}`}
+              value="false"
+              {...register(`${type}s.${index}.printOnSite`, { required: "Please select an option" })}
+              defaultChecked={initialValues.printOnSite === "false"}
+            />
+            <label className="btn btn-outline-neutral" htmlFor={`printOnSiteNo${index}`}>No</label>
+          </div>
+         
+        </div>
+      )} 
     </div>
   );
 };

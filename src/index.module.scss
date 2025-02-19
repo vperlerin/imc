@@ -25,10 +25,10 @@
   // Header  
   --imc-header-bg: var(--imc-bg);
   --imc-header: var(--imc);
- 
+
 
   // Program
-  --imc-program-sep-bg:  #52565A;
+  --imc-program-sep-bg: #52565A;
 
   // Scrollbar
   --imc-scroll-bg: #29292A;
@@ -49,7 +49,7 @@
 
   // Home
   --imc-illus-mobile-max-height: 15rem;
-  --imc-illus-desktop-max-height: 20rem;
+  --imc-illus-desktop-max-height: 17rem;
 
 
 }
@@ -63,12 +63,26 @@ html {
   @include scrollStyledDark();
 }
  
-a {
-  font-weight: 900;
-  text-decoration: none;
-}
-
 .fw-bolder {
   font-weight: 900;
 }
- 
+
+:global {
+  a { 
+    text-decoration: none;
+  
+    &:hover {
+      text-decoration: underline;
+    }
+  
+    &.btn {
+      &:hover {
+        text-decoration: none;
+      }
+    }
+  }
+
+  .form-check-input {
+    border-color: #FFF;
+  }
+}

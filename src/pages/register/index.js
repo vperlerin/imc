@@ -1,6 +1,8 @@
 import PageContain from "components/page-contain";
 import React from "react";
 import { Link } from 'react-router-dom';
+import { conferenceData as cd } from 'data/conference-data';
+import {  formatFullDate } from 'utils/date';
 
 const Register = () => {
   return (
@@ -13,10 +15,15 @@ const Register = () => {
         Register now and be part of this global gathering of meteor enthusiasts and researchers!
       </p>
 
+      <div className="alert alert-info">
+        Registration Deadline: <span className="fw-bolder">{formatFullDate(cd.deadlines.reg)}</span>
+      </div>
+     
+
       <div className="d-flex gap-3 justify-content-center mt-3"> 
         <Link
           aria-label="Register ONSITE"
-          className="btn btn-outline-primary fw-bolder"
+          className="btn btn-outline-primary fw-bolder" 
           to="/register/onsite"
           title="Register ONSITE"
         >

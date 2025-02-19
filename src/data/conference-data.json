@@ -18,6 +18,11 @@
     "half_reimbursement_before": "2025-07-15",
     "early_birds": "2025-05-01"
   },
+  "poster_print": {
+    "desc": "Maximum size A1 (59.4cm x 84.1cm / 23.4″ x 33.1″), uploaded in PDF, deadline for sending September 1.",
+    "price": 35,
+    "size": "A1 size (59.4cm x 84.1cm / 23.4″ x 33.1″)"
+  },
   "sessions": [
     "Video meteor work",
     "Radio meteor work",
@@ -88,16 +93,16 @@
   "workshops": [
     {
       "title": "Spectroscopy Workshop",
-      "date": "2025-09-18",
+      "date": "2025-09-17",
       "period": "09:30 to 12:30 CEST",
       "cost": 22.50,
       "description": "including coffee break and lunch"
     },
     {
       "title": "Radio workshop",
-      "date": "2025-09-18",
-      "period": "09:30 to 12:30 CEST",
-      "cost": 29,
+      "date": "2025-09-17",
+      "period": "09:30 to 17:00 CEST",
+      "cost": 26.5,
       "description": "including coffee break and lunch",
       "cost_online": 5
     }

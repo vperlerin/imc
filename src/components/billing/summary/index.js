@@ -16,6 +16,8 @@ const Summary = ({
 }) => {
   const allValues = initialData || getValues();
 
+  console.log("ALL VALUES ", allValues);
+
   // Registration & Accommodation Cost
   const registrationType = allValues.registrationType || "no"; // Default to "no"
   const selectedRoom = conferenceData.costs.rooms.find(room => room.type === registrationType);
@@ -32,12 +34,22 @@ const Summary = ({
   // T-shirt Cost
   const tshirtCost = allValues.buyTShirt ? conferenceData.costs.tshirts.price : 0;
 
+  // Printed Posters Cost
+  // Count and cost of printed posters
+  const printedPosters = allValues.posters
+    ? allValues.posters.filter(poster => poster.printOnSite === "true")
+    : [];
+
+  const numberOfPrintedPosters = printedPosters.length;
+  const printedPostersCost = numberOfPrintedPosters * conferenceData.poster_print.price;
+
+
   // Printed Proceedings Cost
   const proceedingsPrintedCost = allValues.proceedings === "pdf_printed" ? conferenceData.costs.printed_proceedings : 0;
 
   // Payment Method Fee (PayPal)
   const paymentMethod = allValues.paymentMethod || "bank"; // Default to bank transfer
-  let totalCost = totalRoomCost + workshopCost + tshirtCost + proceedingsPrintedCost;
+  let totalCost = totalRoomCost + workshopCost + tshirtCost + proceedingsPrintedCost + printedPostersCost;
   const paypalFee = paymentMethod.toLowerCase() === "paypal" ? getPaypalPrice(totalCost) - totalCost : 0;
   totalCost += paypalFee;
 
@@ -109,6 +121,17 @@ const Summary = ({
                 </tr>
               ))}
 
+            {/* Printed posters */}
+            {numberOfPrintedPosters > 0 && (
+              <tr>
+                <td className="ps-3 text-muted">
+                  Poster{numberOfPrintedPosters > 1 && 's'} to print x {numberOfPrintedPosters}
+                </td>
+                <td className="text-end">{printedPostersCost.toFixed(2)}€</td>
+              </tr>
+            )}
+
+
             {/* T-shirt */}
             {allValues.buyTShirt && (
               <tr>
@@ -131,7 +154,7 @@ const Summary = ({
                 <td className="ps-3 text-muted">PayPal Fee (3.4% + 0.35€)</td>
                 <td className="text-end">
                   {!isOnline ? <>{paypalFee.toFixed(2)}€</> : <>{onlinePaypalFee.toFixed(2)}€</>}
-                  </td>
+                </td>
               </tr>
             )}
 

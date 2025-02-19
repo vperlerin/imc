@@ -36,6 +36,7 @@ export const menuItems = [
     subLinks: [
       { title: 'Onsite conference', link: '/register/onsite' },
       { title: 'Online conference', link: '/register/online' },
+      { title: 'Payment', link: '/register/payment' },
       { title: 'IMO Membership', link: '/register/membership' },
     ]
   },

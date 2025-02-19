@@ -7,6 +7,12 @@ session_start();
  
 require_once "config.php";
 
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(204);  
+    exit;
+}
+
+
 $host = "localhost";  
 $user = getenv("MYSQL_USER");
 $pass = getenv("MYSQL_PASSWORD");

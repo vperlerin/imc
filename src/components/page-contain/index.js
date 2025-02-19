@@ -8,7 +8,7 @@ import { Helmet } from 'react-helmet-async';
 import { conferenceData as cd } from 'data/conference-data';
 
 const topIllus = (
-  <div className={classnames(css.illustration, 'd-flex align-items-center justify-content-center')}
+  <div className={classnames(css.illustration, 'd-flex align-items-center justify-content-center mt-2')}
     style={{ backgroundImage: `url(${illustration})` }}>
     <img className={classnames(css.logo, 'd-block mx-auto')} src={logo} alt={`${cd.name} ${cd.year}`} />
   </div>

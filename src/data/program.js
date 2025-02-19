@@ -4,7 +4,11 @@ export const programData = {
     program: [ 
       {
         period: '09:30 - 12:30',
-        display: 'Spectroscopy workshop & Radio workshop',
+        display: 'Spectroscopy workshop',
+      },
+      {
+        period: '09:30 - 17:00',
+        display: 'Radio workshop',
       },
       {
         period: '13:00 - …',

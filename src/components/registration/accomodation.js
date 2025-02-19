@@ -37,7 +37,7 @@ const AccomodationForm = ({
     <>
       <h4 className="mb-3 border-bottom pb-2">
         <StepDislay step={step} stepTotal={stepTotal} />
-        {!isOnline && <>Accomodation &</>} Payment Method
+        {!isOnline && <>Accommodation &</>} Payment Method
       </h4>
 
       <div className={classNames(cssForm.smallW, "mx-auto position-relative")}>
@@ -61,12 +61,12 @@ const AccomodationForm = ({
                     value={room.type}
                     {...register("registrationType", { required: "Please select a registration type" })}
                   />
-                  <label className="form-check-label" htmlFor={`room-${index}`}>
+                  <label className="form-check-label d-block" htmlFor={`room-${index}`}>
                     <strong>{isEarlyBird ? room.price : (room.price + conferenceData.costs.after_early_birds)}€</strong> - {room.description}
                     <small className="text-muted d-block">
                       {room.number
                         ? `Standard accommodation in a ${room.type} room for 3 nights (only) with full board + participation in the conference, conference materials, coffee breaks, and excursion (price per person).`
-                        : `All meals except breakfasts + participation in the conference, conference materials, coffee breaks, and excursion.`}
+                        : `All meals except breakfasts + participation in the conference, conference materials, coffee breaks, and excursion (price per person).`}
                     </small>
                   </label>
                 </div>
@@ -107,12 +107,13 @@ const AccomodationForm = ({
                   value={method.type}
                   {...register("paymentMethod", { required: "Please select a payment method" })}
                 />
-                <label className="form-check-label" htmlFor={`payment-${method.type}`}>
+                <label className="form-check-label d-block" htmlFor={`payment-${method.type}`}>
                   {method.type}
-                </label>
-                <div className="form-text">
+                  <div className="form-text">
                   {method.note}
                 </div>
+                </label>
+               
               </div>
             ))}
           </div>

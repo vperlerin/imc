@@ -69,6 +69,9 @@ const ArrivalForm = ({
           </button>
         )}
 
+        <p className="fw-bolder">If you plan to arrive before {availableDates[0]}, you must arrange your own accommodation.</p>
+
+
         <div className={cssForm.smallW}>
           {/* Arrival Date & Time */}
           <div className="mb-3 row">
@@ -164,7 +167,7 @@ const ArrivalForm = ({
             <div className="col-sm-10">
               <select
                 className={classNames('form-select', errors.travelling && "is-invalid", cssForm.mdAuto)}
-                {...register("travelling")}
+                {...register("travelling", { required: "Mode of Transportation is required" })}
                 onBlur={() => trigger("travelling")}
               >
                 <option value="">Select a Mode of Transportation</option>

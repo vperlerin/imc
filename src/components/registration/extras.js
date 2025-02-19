@@ -75,7 +75,7 @@ const ExtrasForm = ({
         </div>
 
         <div className="mb-3">
-          <label className="fw-bold mb-2">Do you want to buy the official IMC2024 T-Shirt for 10€?</label>
+          <label className="fw-bold mb-2">Do you want to buy the official IMC{conferenceData.year} T-Shirt for {conferenceData.costs.tshirts.price}€?</label>
           <div className="d-flex flex-column gap-2">
             {["yes", "no"].map((option) => (
               <div key={option} className="form-check">

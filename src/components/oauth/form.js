@@ -1,22 +1,25 @@
 import axios from "axios";
 import React, { useState } from "react";
+import Loader from "components/loader";
 import { useDispatch } from "react-redux";
-import { useNavigate, Link } from "react-router-dom";  
-import { authActions } from "store/auth";  
+import { useNavigate, Link } from "react-router-dom";
+import { authActions } from "store/auth";
 import classNames from "classnames";
 import css from "./index.module.scss";
 import cssForm from "styles/components/form.module.scss";
 
 const Login = () => {
   const [email, setEmail] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const [password, setPassword] = useState("");
-  const [error, setError] = useState(null);  
+  const [error, setError] = useState(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-  
+    setIsLoading(true);
+
     try {
       const response = await axios.post(`${process.env.REACT_APP_API_URL}/login.php`, {
         email,
@@ -25,58 +28,74 @@ const Login = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        withCredentials: true,  
+        withCredentials: true,
       });
-  
+
       if (!response.data.success) {
         throw new Error(response.data.message || "Login failed");
       }
-  
+
       dispatch(authActions.setAuth(response.data.user));
-      navigate("/");
+
+      if (response.data.user.isAdmin) {
+        navigate("/admin");
+      } else {
+        navigate("/");
+      }
+ 
     } catch (err) {
       setError(err.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className={classNames(css.login, "flex-grow-1 d-flex h-100 align-items-center justify-content-center")}>
-      <form onSubmit={handleSubmit} className={classNames(cssForm.xSmallW, "w-100 border p-3 rounded-2")}> 
-      {error && <div className="alert alert-danger">{error}</div>}  
+    <div className={classNames(css.login, "flex-grow-1 d-flex h-100 align-items-center justify-content-center position-relative")}>
+      {isLoading && <Loader/>}
+      <form onSubmit={handleSubmit} className={classNames(cssForm.xSmallW, "w-100 border p-3 rounded-2")}>
+        {error && <div className="alert alert-danger">{error}</div>}
         <div className="mb-3">
           <label htmlFor="emailInput" className="form-label">Email address</label>
-          <input 
-            autoFocus 
-            type="email" 
-            className="form-control" 
-            id="emailInput" 
-            aria-describedby="emailHelp" 
-            value={email} 
+          <input
+            autoFocus
+            disabled={isLoading}
+            type="email"
+            className="form-control"
+            id="emailInput"
+            aria-describedby="emailHelp"
+            value={email}
             onChange={(e) => setEmail(e.target.value)}
-            required 
-          />
-        </div> 
-        <div className="mb-3">
-          <label htmlFor="passwordInput" className="form-label">Password</label>
-          <input 
-            type="password" 
-            className="form-control" 
-            id="passwordInput" 
-            value={password} 
-            onChange={(e) => setPassword(e.target.value)}
-            required 
+            required
           />
         </div>
- 
- 
+        <div className="mb-3">
+          <label htmlFor="passwordInput" className="form-label">Password</label>
+          <input
+            disabled={isLoading}
+            type="password"
+            className="form-control"
+            id="passwordInput"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </div>
+
+
         <div className="d-flex justify-content-between align-items-center">
           <Link to="/forgot-password" className="text-decoration-none">Forgot your password?</Link>
-          <button type="submit" className="btn btn-outline-primary fw-bolder">Login</button>
+          <button
+            disabled={isLoading}
+            type="submit"
+            className="btn btn-outline-primary fw-bolder"
+          > Login
+          </button>
         </div>
       </form>
     </div>
   );
 };
- 
+
 
 export default Login;
