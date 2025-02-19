@@ -96,7 +96,11 @@
       "date": "2025-09-17",
       "period": "09:30 to 12:30 CEST",
       "cost": 22.50,
-      "description": "including coffee break and lunch"
+      "description": "including coffee break and lunch",
+      "email_to": {
+        "name": "Joe Zender",
+        "email": "joe.zender@esa.int"
+      }
     },
     {
       "title": "Radio workshop",
@@ -104,7 +108,11 @@
       "period": "09:30 to 17:00 CEST",
       "cost": 26.5,
       "description": "including coffee break and lunch",
-      "cost_online": 5
+      "cost_online": 5,
+      "email_to": {
+        "name": "Hervé Lamy",
+        "email": "herve.lamy@aeronomie.be"
+      }
     }
   ]
 }
