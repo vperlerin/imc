@@ -1,5 +1,6 @@
 import classNames from "classnames";
 import css from './index.module.scss';
+import Loader from "components/loader";
 import PageContain from "components/page-contain";
 import React, { useRef, useState } from "react";
 import ReCAPTCHA from "react-google-recaptcha";
@@ -55,7 +56,8 @@ const Contact = () => {
         <p className={responseMessage.includes("successfully") ? "text-success fw-bolder text-center" : "text-danger fw-bolder text-center"}>{responseMessage}</p>
       )}
 
-      <form onSubmit={handleSubmit(onSubmit)} className={classNames(css.form, 'mx-auto w-100')}>
+      <form onSubmit={handleSubmit(onSubmit)} className={classNames(css.form, 'mx-auto w-100 position-relative')}>
+        {loading && <Loader/>}
         <div className="mb-3">
           <label htmlFor="name" className="form-label">Name</label>
           <input
