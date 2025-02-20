@@ -46,6 +46,8 @@ const Program = () => {
 
   return (
     <PageContain title="Daily Program"> 
+        <p>Times are in CEST = UTC + 2h</p>
+    
         <div className={classNames(css.arrows, 'd-flex justify-content-between align-items-center mb-4 mt-3 d-md-none')}>
           {prevDay ? (
             <Link to={`/program/${prevDay}`} className={css.arrow}>

@@ -26,7 +26,8 @@ const lazyPages = {
   Travel: lazy(() => import("pages/location/travel")),
   Topics: lazy(() => import("pages/submission/topics")),
   Venue: lazy(() => import("pages/location/venue")),
-  Workshops: lazy(() => import("pages/program/workshops")),
+  WorkshopRadio: lazy(() => import("pages/program/workshops/radio")),
+  WorkshopSpectro: lazy(() => import("pages/program/workshops/spectro")),
 };
 
 // Placeholder component for 404
@@ -53,7 +54,8 @@ const routeConfig = [
   { path: "/program", element: <lazyPages.Program /> },
   { path: "/program/:day", element: <lazyPages.Program /> },
   { path: "/program/posters", element: <lazyPages.Posters /> },
-  { path: "/program/workshops", element: <lazyPages.Workshops /> },
+  { path: "/program/workshops/radio", element: <lazyPages.WorkshopRadio /> },
+  { path: "/program/workshops/spectro", element: <lazyPages.WorkshopSpectro /> },
   { path: "/register", element: <lazyPages.Register /> },
   { path: "/register/online", element: <lazyPages.Online /> },
   { path: "/register/onsite", element: <lazyPages.Onsite /> },
