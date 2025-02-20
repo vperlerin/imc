@@ -60,7 +60,7 @@ const Guidelines = () => {
         Many contributions are less suitable for a lecture; the poster session offers a valuable alternative to present topics without the constraints of an oral presentation.
       </p>
 
-      <p>The poster panel dimension at the conference venue is {cf.poster_dim}.</p>
+      <p className="fw-bolder">The maximum poster dimensions at the conference venue are {cf.poster_dim}.</p>
 
       <h2 className="mt-4">Instructions for all authors</h2>
       <ul>

@@ -5,7 +5,7 @@ import PayPalForm from 'components/paypal';
 import { CiWarning } from "react-icons/ci";
 import { conferenceData as cd } from "data/conference-data";
 import { formatFullDate, formatFullDatePlusXDays } from 'utils/date';
-import { Link } from 'react-router-dom'; 
+import { Link } from 'react-router-dom';
 
 const Payment = () => {
   const hasWorkShops = cd.workshops?.length > 0;
@@ -32,7 +32,7 @@ const Payment = () => {
 
       <h3>Registration fees</h3>
       <p>
-        Together with the IMC registration form, the full IMC registration fee together with supplements for T-shirt ({cd.costs.tshirts.price}€), printed posters ({cd.poster_print.price}€ per poster) {!hasWorkShops ? <>,</> : <>and</>} printed proceedings ({cd.costs.printed_proceedings}€)
+        Together with the IMC registration form, the full IMC registration fee together with supplements for T-shirt ({cd.costs.tshirts.price}€), printed posters ({cd.poster_print.price}€ per poster) {!hasWorkShops ? <>,</> : <>and</>}
         {hasWorkShops && (<>, and any workshop participation ( {cd.workshops.map((workshop, index) => (
           <span key={index}>
             {index > 0 && " – "}
@@ -40,6 +40,8 @@ const Payment = () => {
           </span>
         ))}),</>)} must be paid.
       </p>
+
+      <p>Please note that the LOC cannot print posters larger than {cd.poster_print.size}.</p>
 
       <p>
         The IMC onsite registration fee is either:
@@ -74,9 +76,7 @@ const Payment = () => {
       </p>
 
       <p>
-        T-shirts and printed proceedings can be purchased upon registering at an additional charge.
         Accompanying persons sharing a room with a participant must also register as a participant.
-        Please note that the LOC cannot print posters larger than {cd.poster_print.size}.
       </p>
 
       <h3 className="mt-3">Payment</h3>
@@ -102,7 +102,7 @@ const Payment = () => {
       <p>
         When paying, make sure that the IBAN account number and BIC bank code are both mentioned! Always contact your local bank to verify charges for international transfers, which are at the participant's expense.
       </p>
- 
+
       <p>Transfers in Euro from an EU member state or another EEA country (Norway, Iceland, and Liechtenstein) should be free, however, or at least no more expensive than a domestic bank transfer, provided they are done correctly.</p>
 
       <h4>3. Other payment methods</h4>
@@ -111,18 +111,18 @@ const Payment = () => {
 
       <h3 className="mt-3">Cancellation Policy</h3>
       <p>The cancellation policy for the IMC{cd.year} is as follows: </p>
-        <ul>
-          <li>
-            <b>Until {formatFullDate(cd.deadlines.full_reimbursement_before)}:</b>  full reimbursement, except for {cd.costs.admin} administrative costs.
-          </li>
-          <li>
-            <b>Between {formatFullDatePlusXDays(cd.deadlines.full_reimbursement_before, 1)}{' '}
+      <ul>
+        <li>
+          <b>Until {formatFullDate(cd.deadlines.full_reimbursement_before)}:</b>  full reimbursement, except for {cd.costs.admin} administrative costs.
+        </li>
+        <li>
+          <b>Between {formatFullDatePlusXDays(cd.deadlines.full_reimbursement_before, 1)}{' '}
             and {formatFullDate(cd.deadlines.half_reimbursement_before)}:</b> partial reimbursement of half of the registration fee;
-          </li>
-          <li>
-            After <b>{formatFullDatePlusXDays(cd.deadlines.half_reimbursement_before, 1)}{' '}</b>: no reimbursement.
-          </li>
-        </ul>
+        </li>
+        <li>
+          After <b>{formatFullDatePlusXDays(cd.deadlines.half_reimbursement_before, 1)}{' '}</b>: no reimbursement.
+        </li>
+      </ul>
 
 
     </PageContain >

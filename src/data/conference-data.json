@@ -9,7 +9,6 @@
     "end": "2025-09-21"
   },
   "location": "Soest, the Netherlands",
-  "poster_dim": "100cmx100cm",
   "consulat": "Dutch consulate",
   "deadlines": {
     "reg": "2025-07-15",
@@ -18,6 +17,7 @@
     "half_reimbursement_before": "2025-07-15",
     "early_birds": "2025-05-01"
   },
+  "poster_dim": "A1 size (59.4cm x 84.1cm / 23.4″ x 33.1″)",
   "poster_print": {
     "desc": "Maximum size A1 (59.4cm x 84.1cm / 23.4″ x 33.1″), uploaded in PDF, deadline for sending September 1.",
     "price": 35,
