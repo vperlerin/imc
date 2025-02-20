@@ -61,7 +61,53 @@ module.exports = (env, argv) => {
                     test: /\.css$/i,
                     use: [
                         devMode ? "style-loader" : MiniCssExtractPlugin.loader,
-                        "css-loader"
+                        "css-loader",
+                        {
+                            loader: 'postcss-loader',
+                            options: {
+                                postcssOptions: {
+                                    plugins: [
+                                        'autoprefixer',
+                                        'postcss-discard-duplicates' 
+                                    ],
+                                },
+                            },
+                        },
+                    ],
+                },
+                {
+                    test: /\.scss$/,
+                    use: [
+                        devMode ? "style-loader" : MiniCssExtractPlugin.loader,
+                        {
+                            loader: 'css-loader',
+                            options: {
+                                importLoaders: 2,
+                                modules: {
+                                    auto: /\.module\.\w+$/,
+                                    localIdentName: '[name]__[local]--[hash:base64:5]',
+                                },
+                            },
+                        },
+                        {
+                            loader: 'postcss-loader',
+                            options: {
+                                postcssOptions: {
+                                    plugins: [
+                                        'autoprefixer',
+                                        'postcss-discard-duplicates'  
+                                    ],
+                                },
+                            },
+                        },
+                        {
+                            loader: 'sass-loader',
+                            options: {
+                                sassOptions: {
+                                    includePaths: [path.resolve(__dirname, 'src/styles')],
+                                },
+                            },
+                        },
                     ],
                 },
                 {
@@ -79,38 +125,6 @@ module.exports = (env, argv) => {
                             }
                         }
                     ]
-                },
-                {
-                    test: /\.scss$/,
-                    use: [
-                        devMode ? "style-loader" : MiniCssExtractPlugin.loader,
-                        {
-                            loader: 'css-loader',
-                            options: {
-                                modules: {
-                                    auto: /\.module\.\w+$/,
-                                    localIdentName: '[name]__[local]--[hash:base64:5]',
-                                },
-                                importLoaders: 2,
-                            },
-                        },
-                        {
-                            loader: 'postcss-loader',
-                            options: {
-                                postcssOptions: {
-                                    plugins: ['autoprefixer'],
-                                },
-                            },
-                        },
-                        {
-                            loader: 'sass-loader',
-                            options: {
-                                sassOptions: {
-                                    includePaths: [path.resolve(__dirname, 'src/styles')],
-                                },
-                            },
-                        },
-                    ],
                 },
             ],
         },

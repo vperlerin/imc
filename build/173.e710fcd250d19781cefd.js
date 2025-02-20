@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkimc2025=self.webpackChunkimc2025||[]).push([[173],{4774:(c,e,s)=>{s.r(e),s.d(e,{default:()=>i});var t=s(7450),a=(s(6540),s(4848));const i=()=>(0,a.jsx)(t.A,{title:"Participants",children:"Come back soon"})}}]);
