@@ -13,14 +13,7 @@ export const menuItems = [
       { title: 'Scientific and Local Organizing Committee', link: '/community/soc' },
       { title: 'Participants', link: '/community/participants' },
     ]
-  },
-  {
-    title: 'Submissions', link: '/submission',
-    subLinks: [
-      { title: 'Submission and Proceedings Guidelines', link: '/submission/guidelines' },
-      { title: 'Topics', link: '/submission/topics' },
-    ]
-  },
+  }, 
   {
     title: 'Location', link: '/location',
     subLinks: [
@@ -38,6 +31,13 @@ export const menuItems = [
       { title: 'Online conference', link: '/register/online' },
       { title: 'Payment', link: '/register/payment' },
       { title: 'IMO Membership', link: '/register/membership' },
+    ]
+  },
+  {
+    title: 'Submissions', link: '/submission',
+    subLinks: [
+      { title: 'Submission and Proceedings Guidelines', link: '/submission/guidelines' },
+      { title: 'Topics', link: '/submission/topics' },
     ]
   },
   { title: 'Contact', link: '/contact' },
