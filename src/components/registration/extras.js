@@ -34,7 +34,7 @@ const ExtrasForm = ({
     setValue("excursion", "yes");
     setValue("buyTShirt", "yes");
     setValue("tShirtSize", "Men L");
-    setValue("proceedings", "pdf_printed");
+    //setValue("proceedings", "pdf_printed");
     setWantsTShirt(true);
     trigger();
   };
@@ -112,6 +112,7 @@ const ExtrasForm = ({
           </div>
         )}
 
+        {/*
         <div className="mb-3">
           <label className="fw-bold mb-2">Proceedings</label>
           <div className="d-flex flex-column gap-2">
@@ -132,6 +133,7 @@ const ExtrasForm = ({
           </div>
           {errors.proceedings && <p className="text-danger"><small>{errors.proceedings.message}</small></p>}
         </div>
+        */}
       </div>
     </>
   );
