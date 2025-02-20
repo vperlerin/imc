@@ -25,6 +25,16 @@ const Program = () => {
     setActiveTab(selectedDay);
   }, [selectedDay]);
 
+  useEffect(() => {
+    const today = new Date();
+    const formattedToday = `${String(today.getMonth() + 1).padStart(2, "0")}-${String(
+      today.getDate()
+    ).padStart(2, "0")}-${today.getFullYear()}`;
+  
+    const currentDay = Object.entries(pd).find(([key, data]) => data.date === formattedToday)?.[0] || "day1";
+    setActiveTab(day || currentDay);
+  }, [day]);
+
   if (!dayProgram) {
     return (
       <PageContain padding={false}>

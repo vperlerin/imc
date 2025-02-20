@@ -11,7 +11,7 @@ const Workshops = () => {
         Participation in a workshop requires you to {' '}
         <Link
           aria-label="Register"
-          className="btn btn-outline-primary fw-bolder "
+          className="btn btn-outline-primary fw-bolder mt-md-0 mt-2"
           to="/register"
           title="Register Now"
         >
@@ -38,7 +38,7 @@ const Workshops = () => {
       <p> The workshop is aimed at non-specialists in the spectral field (amateurs and professionals).</p>
 
       <p>
-        The <strong>Radio Workshop</strong> will take place on <strong>Thursday morning from 09:30 to 12:30 CEST</strong>, with a <strong>maximum of 15 participants</strong>.
+        The <strong>Spectroscopy Workshop</strong> will take place on <strong>Thursday morning from 09:30 to 12:30 CEST</strong>, with a <strong>maximum of 15 participants</strong>.
       </p>
 
       <p>
