@@ -6,6 +6,8 @@ import css from './index.module.scss';
 import MenuItem from './item';
 import React, { useState, useEffect } from 'react';
 import { animated, useSpring } from '@react-spring/web';
+import { useSelector } from 'react-redux';
+import { authSelectors } from 'store/auth';
 import { formatConferenceDates } from 'utils/date';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { menuItems } from 'data/menu';
@@ -18,6 +20,8 @@ const Menu = ({ cd }) => {
   const [isFullyClosed, setIsFullyClosed] = useState(true);
   const location = useLocation();
   const navigate = useNavigate();
+  const isLoggedIn = useSelector(authSelectors.isLoggedIn);
+
 
   const [spring, api] = useSpring(() => ({
     right: -sideMenuWidth,
@@ -131,18 +135,21 @@ const Menu = ({ cd }) => {
             })}
           </div>
 
-          <div className={classnames(css.footer, 'mt-auto')}> 
-            <div className="d-flex justify-content-center mb-3 p-3">
-              <Link
-                aria-label="Login"
-                className="btn btn-outline-primary px-3 fw-bolder"
-                onClick={() => goTo('/login')}
-                to={'/login'}
-                title="Login"
-              >
-                Login
-              </Link>
-            </div>
+          <div className={classnames(css.footer, 'mt-auto')}>
+            {!isLoggedIn && (
+              <div className="d-flex justify-content-center mb-3 p-3">
+                <Link
+                  aria-label="Login"
+                  className="btn btn-outline-primary px-3 fw-bolder"
+                  onClick={() => goTo('/login')}
+                  to={'/login'}
+                  title="Login"
+                >
+                  Login
+                </Link>
+              </div>
+            )}
+
 
             <div className="border-top p-3">
               <Link
@@ -165,7 +172,7 @@ const Menu = ({ cd }) => {
                 Data Protection and Privacy
               </Link>
               <br />
-              developed & maintained by<br/>Vincent Perlerin for<br />
+              developed & maintained by<br />Vincent Perlerin for<br />
               <a href="https://www.mikehankey.com/html/" target="_blank" rel="noopener noreferrer">
                 Mike Hankey & Associates
               </a>, LLC © {cd.year}

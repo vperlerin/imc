@@ -1,5 +1,12 @@
 <?php
-header("Access-Control-Allow-Origin: https://imc2025.imo.net");
+$allowed_origins = [
+    "https://imc2025.imo.net",
+    "http://localhost:3000"
+];
+
+if (isset($_SERVER['HTTP_ORIGIN']) && in_array($_SERVER['HTTP_ORIGIN'], $allowed_origins)) {
+    header("Access-Control-Allow-Origin: " . $_SERVER['HTTP_ORIGIN']);
+}
 header("Access-Control-Allow-Credentials: true");
 header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Allow-Headers: Content-Type");
