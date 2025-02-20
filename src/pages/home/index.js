@@ -36,6 +36,7 @@ const Home = () => {
         <div>
           <h2 className="mb-3 fw-bolder">{cd.welcome}</h2>
           <p>
+            The {cd.num} International Meteor Conference (IMC {cd.year}) will be held in {cd.location} from {formatConferenceDates(cd.dates.start, cd.dates.end)}.
             The IMC is the annual meeting of the IMO, which brings together amateurs from all over the world who engage in meteor observation, analysis and instrumentation.
           </p>
           <p>
@@ -57,8 +58,6 @@ const Home = () => {
           </div>
 
           <p>
-            The {cd.num} International Meteor Conference (IMC {cd.year}) will be held in {cd.location} from {formatConferenceDates(cd.dates.start, cd.dates.end)}.
-
             IMC {cd.year} is jointly organized by
             {cd.co_organizer.map((org, index) => (
               <React.Fragment key={org.abbr}>
