@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS admins (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Participants Table
+-- Participants Table  
 CREATE TABLE IF NOT EXISTS participants (
     id INT AUTO_INCREMENT PRIMARY KEY,
     title ENUM('Mr.', 'Ms.', 'Mrs.', 'Dr.', 'Prof.') NOT NULL,
@@ -42,8 +42,32 @@ CREATE TABLE IF NOT EXISTS participants (
     password_hash VARCHAR(255) NOT NULL, 
     total_due DECIMAL(10,2) UNSIGNED NOT NULL DEFAULT 0.00,
     total_paid DECIMAL(10,2) UNSIGNED NOT NULL DEFAULT 0.00, 
+    status ENUM('active', 'deleted') NOT NULL DEFAULT 'active',
+    deleted_at TIMESTAMP NULL DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Payment Methods Table
+CREATE TABLE IF NOT EXISTS payment_methods (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    method VARCHAR(50) NOT NULL UNIQUE
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT IGNORE INTO payment_methods (method) VALUES ('Paypal'), ('Bank Transfer'), ('Other');
+
+-- Payments Table (NEW)
+CREATE TABLE IF NOT EXISTS payments (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    participant_id INT NOT NULL,
+    payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Date of payment
+    amount DECIMAL(10,2) UNSIGNED NOT NULL, -- Payment amount
+    payment_method_id INT NOT NULL, -- Link to payment method
+    admin_note TEXT DEFAULT NULL, -- Optional admin note
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (participant_id) REFERENCES participants(id) ON DELETE CASCADE,
+    FOREIGN KEY (payment_method_id) REFERENCES payment_methods(id) ON DELETE CASCADE
 ) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Workshops Table
@@ -115,15 +139,6 @@ CREATE TABLE IF NOT EXISTS registration_types (
     room_left INT UNSIGNED NOT NULL DEFAULT 0   
 ) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-
--- Payment Methods Table
-CREATE TABLE IF NOT EXISTS payment_methods (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    method VARCHAR(50) NOT NULL UNIQUE
-) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-INSERT IGNORE INTO payment_methods (method) VALUES ('Paypal'), ('Bank Transfer'), ('Other');
-
 -- Participant Accommodation Table
 CREATE TABLE IF NOT EXISTS participant_accommodation (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -147,21 +162,6 @@ CREATE TABLE IF NOT EXISTS extra_options (
     tshirt_size VARCHAR(50) DEFAULT NULL, 
     tshirt_price DECIMAL(10,2) UNSIGNED NOT NULL DEFAULT 0.00,
     proceedings ENUM('pdf', 'pdf_printed') NOT NULL,  
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (participant_id) REFERENCES participants(id) ON DELETE CASCADE
-) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Participant Comments Table
-CREATE TABLE IF NOT EXISTS participant_comments (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    participant_id INT NOT NULL,
-    comments TEXT DEFAULT NULL,   
-    service_agreement BOOLEAN NOT NULL DEFAULT FALSE,  
-    guardian_name VARCHAR(255) DEFAULT NULL,  
-    guardian_contact VARCHAR(50) DEFAULT NULL,  
-    guardian_email VARCHAR(255) DEFAULT NULL, 
-    parental_consent BOOLEAN DEFAULT NULL, 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (participant_id) REFERENCES participants(id) ON DELETE CASCADE

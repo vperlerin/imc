@@ -35,9 +35,9 @@ const Login = () => {
         throw new Error(response.data.message || "Login failed");
       }
 
-      dispatch(authActions.setAuth(response.data.user));
+      dispatch(authActions.setAuth({ oauth: response.data.oauth, user: response.data.user }));
 
-      if (response.data.user.isAdmin) {
+      if (response.data.user.is_admin) {
         navigate("/admin");
       } else {
         navigate("/");

@@ -1,11 +1,14 @@
 import logo from 'assets/img/logo/logo.svg';
 import { SlClose, SlMenu } from "react-icons/sl";
 
+
 import classnames from 'classnames';
 import css from './index.module.scss';
 import MenuItem from './item';
 import React, { useState, useEffect } from 'react';
 import { animated, useSpring } from '@react-spring/web';
+import { authActions } from 'store/auth';
+import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
 import { authSelectors } from 'store/auth';
 import { formatConferenceDates } from 'utils/date';
@@ -18,15 +21,21 @@ const sideMenuWidth = parseInt(css.sharedSideMenuWidth, 10) || 250;
 const Menu = ({ cd }) => {
   const [isMenuOpened, setIsMenuOpened] = useState(false);
   const [isFullyClosed, setIsFullyClosed] = useState(true);
+  const dispatch = useDispatch();
   const location = useLocation();
   const navigate = useNavigate();
+  const isAdmin = useSelector(authSelectors.isAdmin);
   const isLoggedIn = useSelector(authSelectors.isLoggedIn);
-
 
   const [spring, api] = useSpring(() => ({
     right: -sideMenuWidth,
     config: { tension: 350, friction: 30 }
   }));
+
+  const handleLogout = () => {
+    dispatch(authActions.logout());
+    goTo('/');
+  };
 
   useEffect(() => {
     if (isMenuOpened) {
@@ -136,19 +145,51 @@ const Menu = ({ cd }) => {
           </div>
 
           <div className={classnames(css.footer, 'mt-auto')}>
-            {!isLoggedIn && (
+            {!isLoggedIn ? (
               <div className="d-flex justify-content-center mb-3 p-3">
                 <Link
                   aria-label="Login"
                   className="btn btn-outline-primary px-3 fw-bolder"
-                  onClick={() => goTo('/login')}
-                  to={'/login'}
+                  to="/login"
                   title="Login"
                 >
                   Login
                 </Link>
               </div>
+            ) : (
+              <>
+                {!isAdmin ? (
+                  <Link
+                    aria-label="Admin"
+                    className="btn btn-outline-tertiary fw-bolder"
+                    to="/admin"
+                    title="Admin"
+                  >
+                    Admin
+                  </Link>
+                ) : (
+                  <Link
+                    aria-label="Register"
+                    className="btn btn-outline-tertiary fw-bolder"
+                    to="/register"
+                    title="Register"
+                  >
+                    Edit your record
+                  </Link>
+                )}
+                <div className="d-flex justify-content-center mb-3 p-3">
+                  <button
+                    aria-label="Logout"
+                    className="btn btn-outline-danger px-3 fw-bolder"
+                    onClick={handleLogout}
+                    title="Logout"
+                  >
+                    Logout
+                  </button>
+                </div>
+              </>
             )}
+
 
 
             <div className="border-top p-3">

@@ -1,16 +1,16 @@
 import smallLogo from 'assets/img/logo/small.svg';
 //
-import authSlice from 'store/auth';
 import classnames from 'classnames';
 import css from './index.module.scss';
 import Menu from './menu';
+import { authSelectors } from 'store/auth';
 import { conferenceData as cd } from 'data/conference-data';
 import { formatConferenceDates } from 'utils/date';
 import { Link } from 'react-router-dom';
-import { useSelector } from 'react-redux'; 
+import { useSelector } from 'react-redux';
 
 const Header = ({ showRegBtn = true }) => {
-  const authUser = useSelector(authSlice.selectors.getUser);
+  const isLoggedIn = useSelector(authSelectors.isLoggedIn);
   const title = `${cd.name} ${cd.year}`;
 
   return (
@@ -32,7 +32,7 @@ const Header = ({ showRegBtn = true }) => {
             </Link>
           </div>
         </nav>
-        {showRegBtn && (
+        {showRegBtn && !isLoggedIn && (
           <Link
             aria-label="Register"
             className="btn btn-outline-primary fw-bolder"
@@ -42,6 +42,8 @@ const Header = ({ showRegBtn = true }) => {
             Register <span className="d-none d-sm-inline-block">Now!</span>
           </Link>
         )}
+
+       
       </div>
       <Menu cd={cd} />
     </>
