@@ -1,0 +1,11 @@
+@use 'styles/index' as *;
+
+.p404 {
+  display: flex ;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: var(--app-height);
+    text-align: center;
+    flex-direction: column;
+}

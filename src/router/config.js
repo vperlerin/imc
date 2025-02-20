@@ -1,5 +1,7 @@
+import css from "./index.module.scss";
 import React, { Suspense, lazy } from "react";
 import { Routes, Route } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Loader from "components/loader";
 
 // Lazy-load pages using relative paths (Webpack resolves them correctly)
@@ -32,8 +34,9 @@ const lazyPages = {
 
 // Placeholder component for 404
 const Placeholder = ({ title }) => (
-  <div>
+  <div className={css.p404}>
     <h2>{title}</h2>
+    <Link to="/" className="btn btn-outline-primary fw-bolder mt-3">Go back to safety</Link>
   </div>
 );
 
@@ -54,6 +57,7 @@ const routeConfig = [
   { path: "/program", element: <lazyPages.Program /> },
   { path: "/program/:day", element: <lazyPages.Program /> },
   { path: "/program/posters", element: <lazyPages.Posters /> },
+  { path: "/program/workshops", element: <lazyPages.WorkshopRadio /> },
   { path: "/program/workshops/radio", element: <lazyPages.WorkshopRadio /> },
   { path: "/program/workshops/spectro", element: <lazyPages.WorkshopSpectro /> },
   { path: "/register", element: <lazyPages.Register /> },
@@ -63,7 +67,7 @@ const routeConfig = [
   { path: "/register/payment", element: <lazyPages.Payment /> },
   { path: "/submission/guidelines", element: <lazyPages.Guidelines /> },
   { path: "/submission/topics", element: <lazyPages.Topics /> },
-  { path: "*", element: <Placeholder title="404 - Not Found" /> },
+  { path: "*", element: <Placeholder title="Oops! Looks like you’ve taken a wrong turn into the meteor shower. This page has burned up in the atmosphere!" /> },
 ];
 
 const AppRoutes = () => (

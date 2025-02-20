@@ -6,6 +6,7 @@ import React, { useState, useEffect } from "react";
 import PageContain from "components/page-contain";
 import { formatFullDate } from "utils/date";
 import { Link, useParams } from "react-router-dom";
+import { Navigate } from "react-router-dom";  
 import { programData as pd } from "data/program";
 
 const Program = () => {
@@ -36,12 +37,7 @@ const Program = () => {
   }, [day]);
 
   if (!dayProgram) {
-    return (
-      <PageContain padding={false}>
-        <h2>Program not found</h2>
-        <p>The requested program day does not exist.</p>
-      </PageContain>
-    );
+    return <Navigate to="/404" replace />;
   }
 
   return (
