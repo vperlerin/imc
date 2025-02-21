@@ -11,7 +11,9 @@ require '../vendor/autoload.php';
 require_once "config.php";
 require_once "./class/Mail.php";  
 
-use PHPMailer\PHPMailer\Exception;
+ini_set('display_errors', '1');
+ini_set('display_startup_errors', '1');
+error_reporting(E_ALL);
 
 // Capture raw input for debugging
 $rawInput = file_get_contents("php://input");
