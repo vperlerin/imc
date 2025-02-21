@@ -11,9 +11,9 @@ header("Access-Control-Allow-Credentials: true");
 header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Allow-Headers: Content-Type");
 
-require_once "config.php";
-require_once "./class/connect_db.php";
-require_once "./class/Mail.php";  
+require_once __DIR__ . "/config.php";
+require_once __DIR__ . "/class/connect_db.php";
+require_once __DIR__ . "/class/Mail.php";  
 
 $data = json_decode(file_get_contents("php://input"), true);
 $email = isset($data["email"]) ? trim($data["email"]) : "";
@@ -50,15 +50,18 @@ try {
     ");
     $stmt->execute([$email, $token, $expires_at]);
 
-    // Send reset email
-    $reset_link = "https://imc".getenv("YEAR")."imo.net/reset-password?token=$token";
+    // Corrected reset link construction
+    $reset_link = "https://imc" . getenv("YEAR") . ".imo.net/reset-password?token=$token";
 
+    // Send reset email
     $mail = new Mail();
     $emailResponse = $mail->sendEmail([$email], "Password Reset", "Password Reset", "Click the link to reset your password: $reset_link", "From: no-reply@imo.net");
-    
 
-
-    echo json_encode(["success" => true, "message" => "Password reset email sent"]);
+    if ($emailResponse === true) {
+        echo json_encode(["success" => true, "message" => "Password reset email sent"]);
+    } else {
+        echo json_encode(["success" => false, "message" => "Email sending failed"]);
+    }
 
 } catch (PDOException $e) {
     echo json_encode(["success" => false, "message" => "Database error: " . $e->getMessage()]);
