@@ -54,7 +54,7 @@ try {
     $reset_link = "https://imc".getenv("YEAR")."imo.net/reset-password?token=$token";
 
     $mail = new Mail();
-    $emailResponse = $mail->sendEmail([$email], "Password Reset", "Password Reset", "Click the link to reset your password: $reset_link", "From: no-reply@imo.net");
+    $emailResponse = $mail->sendEmail($email, "Password Reset", "Password Reset", "Click the link to reset your password: $reset_link", "From: no-reply@imo.net");
     
 
 
