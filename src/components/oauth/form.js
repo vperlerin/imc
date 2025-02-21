@@ -1,6 +1,7 @@
 import axios from "axios";
 import React, { useState } from "react";
 import Loader from "components/loader";
+import PasswordInput from 'components/form/pwd';
 import { useDispatch } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
 import { authActions } from "store/auth";
@@ -18,6 +19,7 @@ const Login = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    setError(null);
     setIsLoading(true);
 
     try {
@@ -31,18 +33,16 @@ const Login = () => {
         withCredentials: true,
       });
 
-      if (!response.data.success) {
-        throw new Error(response.data.message || "Login failed");
+      if (!response.data?.success) {
+        throw new Error(response.data?.message || "Invalid response from server");
       }
+
 
       dispatch(authActions.setAuth({ oauth: response.data.oauth, user: response.data.user }));
 
-      if (response.data.user.is_admin) {
-        navigate("/admin");
-      } else {
-        navigate("/");
-      }
- 
+      const user = response.data.user || {};
+      navigate(user.is_admin ? "/admin" : "/");
+
     } catch (err) {
       setError(err.message);
     } finally {
@@ -50,11 +50,12 @@ const Login = () => {
     }
   };
 
+
   return (
     <div className={classNames(css.login, "flex-grow-1 d-flex h-100 align-items-center justify-content-center position-relative")}>
-      {isLoading && <Loader/>}
+      {isLoading && <Loader />}
       <form onSubmit={handleSubmit} className={classNames(cssForm.xSmallW, "w-100 border p-3 rounded-2")}>
-        {error && <div className="alert alert-danger">{error}</div>}
+        {error && <div className="alert alert-danger fw-bolder">{error}</div>}
         <div className="mb-3">
           <label htmlFor="emailInput" className="form-label">Email address</label>
           <input
@@ -66,36 +67,34 @@ const Login = () => {
             aria-describedby="emailHelp"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            placeholder="Your email"
             required
           />
         </div>
         <div className="mb-3">
           <label htmlFor="passwordInput" className="form-label">Password</label>
-          <input
+          <PasswordInput
             disabled={isLoading}
-            type="password"
-            className="form-control"
-            id="passwordInput"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            className="w-100"
             required
           />
         </div>
 
-
         <div className="d-flex justify-content-between align-items-center">
           <Link to="/forgot-password" className="text-decoration-none">Forgot your password?</Link>
           <button
-            disabled={isLoading}
+            disabled={isLoading || !email || !password}
             type="submit"
             className="btn btn-outline-primary fw-bolder"
-          > Login
+          >
+            Login
           </button>
         </div>
       </form>
     </div>
   );
 };
-
 
 export default Login;

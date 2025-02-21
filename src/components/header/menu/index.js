@@ -145,39 +145,41 @@ const Menu = ({ cd }) => {
           </div>
 
           <div className={classnames(css.footer, 'mt-auto')}>
-            {!isLoggedIn ? (
-              <div className="d-flex justify-content-center mb-3 p-3">
-                <Link
-                  aria-label="Login"
-                  className="btn btn-outline-primary px-3 fw-bolder"
-                  to="/login"
-                  title="Login"
-                >
-                  Login
-                </Link>
-              </div>
-            ) : (
-              <>
-                {!isAdmin ? (
-                  <Link
-                    aria-label="Admin"
-                    className="btn btn-outline-tertiary fw-bolder"
-                    to="/admin"
-                    title="Admin"
-                  >
-                    Admin
-                  </Link>
-                ) : (
-                  <Link
-                    aria-label="Register"
-                    className="btn btn-outline-tertiary fw-bolder"
-                    to="/register"
-                    title="Register"
-                  >
-                    Edit your record
-                  </Link>
-                )}
+
+            <div className="d-flex flex-column justify-content-center mb-3 p-3 gap-2 px-4">
+              {!isLoggedIn ? (
                 <div className="d-flex justify-content-center mb-3 p-3">
+                  <Link
+                    aria-label="Login"
+                    className="btn btn-outline-primary px-3 fw-bolder"
+                    to="/login"
+                    title="Login"
+                  >
+                    Login
+                  </Link>
+                </div>
+              ) : (
+                <>
+                  {isAdmin ? (
+                    <Link
+                      aria-label="Admin"
+                      className="btn btn-outline-tertiary px-3 fw-bolder"
+                      to="/admin"
+                      title="Admin"
+                    >
+                      Admin
+                    </Link>
+                  ) : (
+                    <Link
+                      aria-label="Edit your record"
+                      className="btn btn-outline-tertiary px-3 fw-bolder"
+                      to="/register"
+                      title="Register"
+                    >
+                      Edit your record
+                    </Link>
+                  )}
+
                   <button
                     aria-label="Logout"
                     className="btn btn-outline-danger px-3 fw-bolder"
@@ -186,11 +188,9 @@ const Menu = ({ cd }) => {
                   >
                     Logout
                   </button>
-                </div>
-              </>
-            )}
-
-
+                </>
+              )}
+            </div>
 
             <div className="border-top p-3">
               <Link

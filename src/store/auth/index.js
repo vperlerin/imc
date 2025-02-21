@@ -4,7 +4,11 @@ import { createSlice } from '@reduxjs/toolkit';
 const loadAuthState = () => {
   try {
     const serializedState = localStorage.getItem('auth');
-    return serializedState ? JSON.parse(serializedState) : { oauth: null, user: null };
+    const parsedState = serializedState ? JSON.parse(serializedState) : { oauth: null, user: null };
+    return {
+      ...parsedState,
+      user: parsedState.user ? { ...parsedState.user } : null,  
+    };
   } catch (err) {
     console.error('Error loading auth state:', err);
     return { oauth: null, user: null };
@@ -22,13 +26,14 @@ const authSlice = createSlice({
       state.isAuthenticated = true;
     },
     setUser: (state, action) => {
-      state.user = action.payload;
+      state.user = { ...action.payload };
       state.isAuthenticated = true;
     },
     logout: (state) => {
       state.oauth = null;
       state.user = null;
       state.isAuthenticated = false;
+      state.isAdmin = false;
       localStorage.removeItem('auth'); 
     },
   },

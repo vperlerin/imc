@@ -28,12 +28,12 @@ const Workshops = ({
     setValue(workshopTitle, value);
     trigger(workshopTitle);
   };
-
+ 
   const testData = !isOnline ? {
     "Spectroscopy Workshop": "true",
-    "Radio workshop": "false",
+    "Radio Workshop": "false",
   } : {
-    "Radio workshop": "true",
+    "Radio Workshop": "true",
   };
 
   const fillTestData = () => {
