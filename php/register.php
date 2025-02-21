@@ -15,13 +15,13 @@ session_start();
 require_once __DIR__ . "/config.php";
 require_once __DIR__ . "/class/Connect.class.php";
 require_once __DIR__ . "/class/Mail.class.php";
-require_once __DIR__ . "/class/ParticipantManager.php";
-require_once __DIR__ . "/class/WorkshopManager.php";
-require_once __DIR__ . "/class/ArrivalManager.php";
-require_once __DIR__ . "/class/ContributionManager.php";
-require_once __DIR__ . "/class/AccommodationManager.php";
-require_once __DIR__ . "/class/PaymentManager.php";
-require_once __DIR__ . "/class/ExtraOptionsManager.php";
+require_once __DIR__ . "/class/Participant.class.php";
+require_once __DIR__ . "/class/Workshop.class.php";
+require_once __DIR__ . "/class/Arrival.class.php";
+require_once __DIR__ . "/class/Contribution.class.php";
+require_once __DIR__ . "/class/Accommodation.class.php";
+require_once __DIR__ . "/class/Payment.class.php";
+require_once __DIR__ . "/class/ExtraOptions.class.php";
 
 try {
     $data = json_decode(file_get_contents("php://input"), true);
