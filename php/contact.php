@@ -1,19 +1,19 @@
 <?php
-header("Access-Control-Allow-Origin: https://imc2025.imo.net");
+$allowed_origins = [
+    "https://imc2025.imo.net",
+    "http://localhost:3000"
+];
+
+if (isset($_SERVER['HTTP_ORIGIN']) && in_array($_SERVER['HTTP_ORIGIN'], $allowed_origins)) {
+    header("Access-Control-Allow-Origin: " . $_SERVER['HTTP_ORIGIN']);
+}
 header("Content-Type: application/json");
 header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
-
-error_reporting(E_ALL);
-ini_set('display_errors', 'On');
-
+ 
 require '../vendor/autoload.php'; 
-require_once "config.php";
-require_once "./class/Mail.php";  
-
-ini_set('display_errors', '1');
-ini_set('display_startup_errors', '1');
-error_reporting(E_ALL);
+require_once __DIR__ . "/config.php";
+require_once __DIR__ . "/class/Mail.class.php";
 
 // Capture raw input for debugging
 $rawInput = file_get_contents("php://input");

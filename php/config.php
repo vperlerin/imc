@@ -1,4 +1,10 @@
 <?php
+
+// Debug 
+ini_set('display_errors', '1');
+ini_set('display_startup_errors', '1');
+error_reporting(E_ALL);
+
 // Load environment variables from /DATA/sites/imc2025.imo.net/env/.env
 $envPath = realpath(__DIR__ . '/../env/.env');   
 

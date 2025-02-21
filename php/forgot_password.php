@@ -13,8 +13,8 @@ header("Access-Control-Allow-Headers: Content-Type");
 header("Content-Type: application/json"); // Ensure JSON response
 
 require_once __DIR__ . "/config.php";
-require_once __DIR__ . "/class/connect_db.php";
-require_once __DIR__ . "/class/Mail.php";
+require_once __DIR__ . "/class/Connect.class.php";
+require_once __DIR__ . "/class/Mail.class.php";
 
 $data = json_decode(file_get_contents("php://input"), true);
 $email = isset($data["email"]) ? trim($data["email"]) : "";

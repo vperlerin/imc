@@ -23,7 +23,7 @@ const ResetPassword = () => {
     e.preventDefault();
     setError(null);
     setMessage(null);
-    
+
     // Validate password before sending request
     if (!passwordRegex.test(password)) {
       setError("Password must be at least 8 characters, include an uppercase letter, a lowercase letter, and a number.");
@@ -56,11 +56,20 @@ const ResetPassword = () => {
 
       <form onSubmit={handleSubmit} className={classNames(cssForm.xSmallW, "w-100 border p-3 rounded-2")}>
         {error && <div className="alert alert-danger fw-bolder">{error}</div>}
-        {message && <p className="text-success fw-bolder">{message}</p>}
+        {message && (
+          <div className="alert alert-success fw-bolder">
+            {message}
+            <div className="mt-3">
+              <Link to="/login" className="btn btn-primary fw-bolder">
+                Log in now
+              </Link>
+            </div>
+          </div>
+        )}
 
         <div className="mb-3">
           <PasswordInput
-            autoFocus 
+            autoFocus
             disabled={isLoading}
             type="password"
             placeholder="Enter new password"

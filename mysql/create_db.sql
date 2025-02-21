@@ -37,6 +37,7 @@ CREATE TABLE IF NOT EXISTS participants (
     dob DATE NOT NULL,
     admin_notes TEXT DEFAULT NULL,
     is_online BOOLEAN NOT NULL DEFAULT FALSE,
+    is_early_bird BOOLEAN NOT NULL DEFAULT FALSE,
     confirmation_sent BOOLEAN NOT NULL DEFAULT FALSE,
     confirmation_date DATETIME DEFAULT NULL,
     password_hash VARCHAR(255) NOT NULL, 

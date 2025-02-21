@@ -1,5 +1,5 @@
 <?php
-require_once "./class/connect_db.php"; // Use PDO connection from connect_db.php
+require_once __DIR__ . "/class/Connect.class.php";
 
 $data = json_decode(file_get_contents("php://input"), true);
 $token = isset($data["token"]) ? trim($data["token"]) : "";

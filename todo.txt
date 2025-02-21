@@ -1,1 +1,10 @@
-- Send emails after workshops registration
+$participantManager = new ParticipantManager($pdo);
+
+$participantId = 5; // Example participant ID
+$confirmed = $participantManager->markConfirmationSent($participantId);
+
+if ($confirmed) {
+    echo "Confirmation marked as sent!";
+} else {
+    echo "Failed to update confirmation status.";
+}

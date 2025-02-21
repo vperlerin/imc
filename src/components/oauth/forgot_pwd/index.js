@@ -22,6 +22,7 @@ const ForgotPassword = () => {
 
       if (response.data.success) {
         setMessage(response.data.message || "Password reset email sent successfully.");
+        setEmail("");
       } else {
         setError(response.data.message || "Something went wrong. Please try again.");
       }
