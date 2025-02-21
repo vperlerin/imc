@@ -10,7 +10,9 @@ if (isset($_SERVER['HTTP_ORIGIN']) && in_array($_SERVER['HTTP_ORIGIN'], $allowed
 header("Access-Control-Allow-Credentials: true");
 header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Allow-Headers: Content-Type");
-
+ini_set('display_errors', '1');
+ini_set('display_startup_errors', '1');
+error_reporting(E_ALL);
 require_once "config.php";
 require_once "./class/connect_db.php";
 require_once "./class/Mail.php";  
@@ -54,7 +56,7 @@ try {
     $reset_link = "https://imc".getenv("YEAR")."imo.net/reset-password?token=$token";
 
     $mail = new Mail();
-    $emailResponse = $mail->sendEmail($email, "Password Reset", "Password Reset", "Click the link to reset your password: $reset_link", "From: no-reply@imo.net");
+    $emailResponse = $mail->sendEmail([$email], "Password Reset", "Password Reset", "Click the link to reset your password: $reset_link", "From: no-reply@imo.net");
     
 
 
