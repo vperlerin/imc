@@ -53,10 +53,10 @@ const MainForm = () => {
     watch
   } = useForm();
 
-    // Watch the dob field
-    const dob = watch("dob");
-    const age = calculateAge(dob);
-    const isUnder16 = age !== null && age < 16;
+  // Watch the dob field
+  const dob = watch("dob");
+  const age = calculateAge(dob);
+  const isUnder16 = age !== null && age < 16;
 
   const initialData = null;
   const is_early_bird = initialData?.is_early_bird || new Date() < new Date(cd.deadlines.early_birds);
@@ -114,9 +114,9 @@ const MainForm = () => {
     <PageContain title="Register Onsite">
       {errorMsg && <div className="alert alert-danger">{errorMsg}</div>}
       {successMsg && <div className="alert alert-success">{successMsg}</div>}
-      
+
       <form onSubmit={handleSubmit(onSubmit)} className="d-flex flex-grow-1 flex-column position-relative">
-        {loading && <Loader/>}
+        {loading && <Loader />}
 
         <input name="is_early_bird" type="hidden" value={is_early_bird} {...register("is_early_bird")} />
         <input name="is_online" type="hidden" value="false" {...register("is_online")} />
@@ -138,7 +138,7 @@ const MainForm = () => {
             )}
           </>
         )}
-       
+
         {step === 1 && (
           <Identitity
             register={register}
@@ -151,7 +151,7 @@ const MainForm = () => {
             trigger={trigger}
           />
         )}
-  
+
         {step === 2 && cd?.workshops?.length > 0 && (
           <Workshops
             conferenceData={cd}
