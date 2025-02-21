@@ -57,12 +57,17 @@ try {
     $stmt->execute([$email, $token, $expires_at]);
 
     // Construct reset link
-    $year = getenv("YEAR") ?: date("Y"); // Use current year if env variable is missing
+    $year = getenv("YEAR") ?: date("Y");  
     $reset_link = "https://imc{$year}.imo.net/reset-password?token=$token";
 
     // Send reset email
     $mailer = new Mail();
-    $response = $mailer->sendEmail([$email], "Password Reset", "Click the link to reset your password: $reset_link", "no-reply@imo.net");
+    $response = $mailer->sendEmail(
+        [$email], 
+        "Password Reset", 
+        "Click the link to reset your IMC{$year} password:\n\n$reset_link\n\nPlease do not reply to this email as it is automatically generated.", 
+        "no-reply@imo.net"
+    );
 
     if ($response["success"]) {
         echo json_encode(["success" => true, "message" => "Password reset email sent"]);
