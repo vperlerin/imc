@@ -37,7 +37,12 @@ const ResetPassword = () => {
         token,
         password
       });
-      setMessage(response.data.message);
+
+      if (response.data.success) {
+        setMessage(response.data.message || "Password reset email sent successfully.");
+      } else {
+        setError(response.data.message || "Something went wrong. Please try again.");
+      }
     } catch (err) {
       setError("Error resetting password");
     } finally {
