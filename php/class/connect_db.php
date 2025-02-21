@@ -1,6 +1,6 @@
 <?php
 
-require_once "config.php";
+require_once "../config.php";
 
 $host = "localhost";
 $dbname = getenv("MYSQL_DATABASE");

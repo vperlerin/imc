@@ -43,7 +43,13 @@ PHP_DEST="$BASE_PATH/php"
 BUILD_SRC="$BASE_PATH/imc/build"
 BUILD_DEST="$BASE_PATH/build"
 
-# Function to move files from source to destination
+# Ensure rsync is installed
+if ! command -v rsync &> /dev/null; then
+    echo -e "${RED}Error: rsync is not installed. Please install it and try again.${RESET}"
+    exit 1
+fi
+
+# Function to move files and subdirectories while keeping structure
 move_files() {
     local SRC=$1
     local DEST=$2
@@ -51,14 +57,20 @@ move_files() {
     # Ensure the source directory exists
     if [ ! -d "$SRC" ]; then
         echo -e "${RED}Error: Source directory does not exist: $SRC${RESET}"
-        exit 1
+        return 1
     fi
 
     # Ensure the destination directory exists
     mkdir -p "$DEST"
 
-    echo -e "${CYAN}Moving files from $SRC to $DEST...${RESET}"
-    mv "$SRC"/* "$DEST"/
+    echo -e "${CYAN}Moving files and directories from $SRC to $DEST...${RESET}"
+
+    # Use rsync to move files, including subdirectories
+    rsync -a --remove-source-files "$SRC"/ "$DEST"/
+
+    # Remove empty source directories after moving
+    find "$SRC" -type d -empty -delete
+
     echo -e "${GREEN}Move completed: $SRC to $DEST${RESET}"
     echo -e "${YELLOW}----------------------------------${RESET}"
 }
