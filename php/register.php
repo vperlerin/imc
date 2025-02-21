@@ -21,7 +21,7 @@ require_once __DIR__ . "/class/Arrival.class.php";
 require_once __DIR__ . "/class/Contribution.class.php";
 require_once __DIR__ . "/class/Accommodation.class.php";
 require_once __DIR__ . "/class/Payment.class.php";
-require_once __DIR__ . "/class/ExtraOptions.class.php";
+require_once __DIR__ . "/class/Extras.class.php";
 
 try {
     $data = json_decode(file_get_contents("php://input"), true);
