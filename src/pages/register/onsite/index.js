@@ -1,5 +1,6 @@
 import { SlArrowLeft, SlArrowRight } from "react-icons/sl";
 import { CiWarning } from "react-icons/ci";
+import css from "./index.module.scss";
 import Accomodation from "components/registration/accomodation.js";
 import Arrival from "components/registration/arrival.js";
 import Comments from "components/registration/comments";
@@ -19,6 +20,20 @@ import axios from "axios";
 
 const totalStep = 8;
 
+const calculateAge = (dob) => {
+  if (!dob) return null;
+  const birthDate = new Date(dob);
+  const today = new Date();
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDiff = today.getMonth() - birthDate.getMonth();
+
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+    age--;
+  }
+  return age;
+};
+
+
 const MainForm = () => {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -37,6 +52,11 @@ const MainForm = () => {
     trigger,
     watch
   } = useForm();
+
+    // Watch the dob field
+    const dob = watch("dob");
+    const age = calculateAge(dob);
+    const isUnder16 = age !== null && age < 16;
 
   const initialData = null;
   const is_early_bird = initialData?.is_early_bird || new Date() < new Date(cd.deadlines.early_birds);
@@ -100,6 +120,24 @@ const MainForm = () => {
 
         <input name="is_early_bird" type="hidden" value={is_early_bird} {...register("is_early_bird")} />
         <input name="is_online" type="hidden" value="false" {...register("is_online")} />
+
+        {step === 1 && (
+          <>
+            <p className="border rounded-2 p-3">
+              <b>People who need an invitation letter for Visa</b> must send their request without any delay to imc{cd.year}@imo.net. Please, provide your legal private domicile or professional address, passport number and the address of the {cd.consulate} where your visa application will be submitted.
+            </p>
+
+            {new Date() < new Date(cd.deadlines.early_birds) && (
+              <p className="d-flex border rounded-2 p-3 border-info text-info gap-2 mb-5">
+                <CiWarning className={css.warning} />
+                <span>
+                  <span className="d-block fw-bolder">Hurry up! After {formatFullDate(cd.deadlines.early_birds)}, a late booking fee of {cd.costs.after_early_birds}€ is added to the registration fee</span>
+                  <small>— because the early birds got the discount, and the latecomers just get the worms (and a fee :).</small>
+                </span>
+              </p>
+            )}
+          </>
+        )}
        
         {step === 1 && (
           <Identitity
