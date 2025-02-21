@@ -171,9 +171,7 @@ CREATE TABLE IF NOT EXISTS participant_accommodation (
     FOREIGN KEY (registration_type_id) REFERENCES registration_types(id) ON DELETE CASCADE
 ) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-
 -- Extra Options Table
-
 CREATE TABLE IF NOT EXISTS extra_options (
     id INT AUTO_INCREMENT PRIMARY KEY,
     participant_id INT NOT NULL,
