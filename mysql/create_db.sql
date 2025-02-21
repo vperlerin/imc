@@ -53,8 +53,7 @@ CREATE TABLE IF NOT EXISTS participants (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-
--- Password reset
+-- Password Reset Table
 CREATE TABLE IF NOT EXISTS password_resets (
     id INT AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(255) NOT NULL,
@@ -71,9 +70,12 @@ CREATE TABLE IF NOT EXISTS payment_methods (
     method VARCHAR(50) NOT NULL UNIQUE
 ) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-INSERT IGNORE INTO payment_methods (method) VALUES ('Paypal'), ('Bank Transfer'), ('Other');
+-- Insert payment methods safely
+INSERT IGNORE INTO payment_methods (method) VALUES ('Paypal');
+INSERT IGNORE INTO payment_methods (method) VALUES ('Bank Transfer');
+INSERT IGNORE INTO payment_methods (method) VALUES ('Other');
 
--- Payments Table (NEW)
+-- Payments Table
 CREATE TABLE IF NOT EXISTS payments (
     id INT AUTO_INCREMENT PRIMARY KEY,
     participant_id INT NOT NULL,
@@ -105,7 +107,7 @@ CREATE TABLE IF NOT EXISTS participant_workshops (
     attending BOOLEAN NOT NULL DEFAULT FALSE,
     FOREIGN KEY (participant_id) REFERENCES participants(id) ON DELETE CASCADE,
     FOREIGN KEY (workshop_id) REFERENCES workshops(id) ON DELETE CASCADE
-);
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Participant Arrival Table
 CREATE TABLE IF NOT EXISTS participant_arrival (
@@ -166,10 +168,12 @@ CREATE TABLE IF NOT EXISTS participant_accommodation (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (participant_id) REFERENCES participants(id) ON DELETE CASCADE,
-    FOREIGN KEY (registration_type_id) REFERENCES registration_types(id) ON DELETE CASCADE,
+    FOREIGN KEY (registration_type_id) REFERENCES registration_types(id) ON DELETE CASCADE
 ) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+
 -- Extra Options Table
+
 CREATE TABLE IF NOT EXISTS extra_options (
     id INT AUTO_INCREMENT PRIMARY KEY,
     participant_id INT NOT NULL,

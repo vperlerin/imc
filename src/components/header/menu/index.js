@@ -153,6 +153,7 @@ const Menu = ({ cd }) => {
                     aria-label="Login"
                     className="btn btn-outline-primary px-3 fw-bolder"
                     to="/login"
+                    onClick={() => goTo('/login')}
                     title="Login"
                   >
                     Login
@@ -164,7 +165,8 @@ const Menu = ({ cd }) => {
                     <Link
                       aria-label="Admin"
                       className="btn btn-outline-tertiary px-3 fw-bolder"
-                      to="/admin"
+                      to="/admin" 
+                      onClick={() => goTo('/admin')}
                       title="Admin"
                     >
                       Admin
@@ -174,6 +176,7 @@ const Menu = ({ cd }) => {
                       aria-label="Edit your record"
                       className="btn btn-outline-tertiary px-3 fw-bolder"
                       to="/register"
+                      onClick={() => goTo('/register')}
                       title="Register"
                     >
                       Edit your record
