@@ -55,7 +55,7 @@ try {
 
     // Send reset email
     $mail = new Mail();
-    $emailResponse = $mail->sendEmail([$email], "Password Reset", "Password Reset", "Click the link to reset your password: $reset_link", "From: no-reply@imo.net");
+    $emailResponse = $mail->sendEmail([$email], "Password Reset",  "Click the link to reset your password: $reset_link", "From: no-reply@imo.net");
 
     if ($emailResponse === true) {
         echo json_encode(["success" => true, "message" => "Password reset email sent"]);
