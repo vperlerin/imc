@@ -13,7 +13,7 @@ header("Access-Control-Allow-Headers: Content-Type");
 
 require_once __DIR__ . "/config.php";
 require_once __DIR__ . "/class/connect_db.php";
-require_once __DIR__ . "/class/Mail.php";  
+require_once __DIR__ . "/class/Mail.php";
 
 $data = json_decode(file_get_contents("php://input"), true);
 $email = isset($data["email"]) ? trim($data["email"]) : "";
@@ -24,7 +24,8 @@ if (empty($email)) {
 }
 
 // Check if email exists in either table
-function getUserByEmail($pdo, $email) {
+function getUserByEmail($pdo, $email)
+{
     $stmt = $pdo->prepare("SELECT id, email FROM admins WHERE email = ? UNION SELECT id, email FROM participants WHERE email = ?");
     $stmt->execute([$email, $email]);
     return $stmt->fetch(PDO::FETCH_ASSOC);
@@ -54,17 +55,14 @@ try {
     $reset_link = "https://imc" . getenv("YEAR") . ".imo.net/reset-password?token=$token";
 
     // Send reset email
-    $mail = new Mail();
-    $emailResponse = $mail->sendEmail([$email], "Password Reset",  "Click the link to reset your password: $reset_link", "From: no-reply@imo.net");
+    $mailer = new Mail();
+    $response = $mailer->sendEmail([$email], "Password Reset", "Click the link to reset your password: $reset_link", "no-reply@imo.net");
 
-    if ($emailResponse === true) {
+    if ($response === true) {
         echo json_encode(["success" => true, "message" => "Password reset email sent"]);
     } else {
         echo json_encode(["success" => false, "message" => "Email sending failed"]);
     }
-
 } catch (PDOException $e) {
     echo json_encode(["success" => false, "message" => "Database error: " . $e->getMessage()]);
 }
-
-?>

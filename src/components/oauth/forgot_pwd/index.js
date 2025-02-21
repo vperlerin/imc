@@ -19,9 +19,14 @@ const ForgotPassword = () => {
 
     try {
       const response = await axios.post(`${process.env.REACT_APP_API_URL}/forgot_password.php`, { email });
-      setMessage(response.data.message);
+
+      if (response.data.success) {
+        setMessage(response.data.message || "Password reset email sent successfully.");
+      } else {
+        setError(response.data.message || "Something went wrong. Please try again.");
+      }
     } catch (err) {
-      setError("Error sending reset email. Please try again later.");
+      setError("Error sending reset email. Please check your connection and try again.");
     } finally {
       setIsLoading(false);
     }
@@ -33,7 +38,7 @@ const ForgotPassword = () => {
 
       <form onSubmit={handleSubmit} className={classNames(cssForm.xSmallW, "w-100 border p-3 rounded-2")}>
         {error && <div className="alert alert-danger fw-bolder">{error}</div>}
-        {message && <p className="text-success fw-bolder">{message}</p>}
+        {message && <div className="alert alert-success fw-bolder">{message}</div>}
 
         <div className="mb-3">
           <label htmlFor="emailInput" className="form-label">Enter your email</label>
@@ -53,7 +58,7 @@ const ForgotPassword = () => {
         </div>
 
         <button
-          disabled={isLoading || !email}
+          disabled={isLoading || !email.trim()}
           type="submit"
           className="btn btn-outline-primary fw-bolder"
         >
