@@ -16,7 +16,7 @@ const ExtrasForm = ({
 }) => {
   const [wantsTShirt, setWantsTShirt] = useState(null);
 
-  const tShirtSizes = conferenceData.costs.tshirts.models.flatMap((model) =>
+  const tshirt_sizes = conferenceData.costs.tshirts.models.flatMap((model) =>
     conferenceData.costs.tshirts.sizes.map((size) => `${model.charAt(0).toUpperCase() + model.slice(1)} ${size}`)
   );
 
@@ -32,8 +32,8 @@ const ExtrasForm = ({
 
   const fillTestData = () => {
     setValue("excursion", "yes");
-    setValue("buyTShirt", "yes");
-    setValue("tShirtSize", "Men L");
+    setValue("buy_tshirt", "yes");
+    setValue("tshirt_size", "Men L");
     //setValue("proceedings", "pdf_printed");
     setWantsTShirt(true);
     trigger();
@@ -82,9 +82,9 @@ const ExtrasForm = ({
                 <input
                   type="radio"
                   id={`tshirt-${option}`}
-                  className={classNames("form-check-input", { "is-invalid": errors.buyTShirt })}
+                  className={classNames("form-check-input", { "is-invalid": errors.buy_tshirt })}
                   value={option}
-                  {...register("buyTShirt", { required: "Please select an option" })}
+                  {...register("buy_tshirt", { required: "Please select an option" })}
                   onChange={(e) => setWantsTShirt(e.target.value === "yes")}
                 />
                 <label className="form-check-label" htmlFor={`tshirt-${option}`}>
@@ -93,22 +93,22 @@ const ExtrasForm = ({
               </div>
             ))}
           </div>
-          {errors.buyTShirt && <p className="text-danger"><small>{errors.buyTShirt.message}</small></p>}
+          {errors.buy_tshirt && <p className="text-danger"><small>{errors.buy_tshirt.message}</small></p>}
         </div>
 
         {wantsTShirt && (
           <div className="mb-4">
             <label className="fw-bold mb-2">Select your T-Shirt size</label>
             <select
-              className={classNames("form-select", { "is-invalid": errors.tShirtSize })}
-              {...register("tShirtSize", { required: "Please select a T-Shirt size" })}
+              className={classNames("form-select", { "is-invalid": errors.tshirt_size })}
+              {...register("tshirt_size", { required: "Please select a T-Shirt size" })}
             >
               <option value="">Select size</option>
-              {tShirtSizes.map((size) => (
+              {tshirt_sizes.map((size) => (
                 <option key={size} value={size}>{size}</option>
               ))}
             </select>
-            {errors.tShirtSize && <p className="text-danger"><small>{errors.tShirtSize.message}</small></p>}
+            {errors.tshirt_size && <p className="text-danger"><small>{errors.tshirt_size.message}</small></p>}
           </div>
         )}
 

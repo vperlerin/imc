@@ -107,8 +107,8 @@
       "date": "2025-09-17",
       "period": "09:30 to 17:00 CEST",
       "cost": 26.5,
-      "description": "including coffee break and lunch",
       "cost_online": 5,
+      "description": "including coffee break and lunch",
       "email_to": {
         "name": "Hervé Lamy",
         "email": "herve.lamy@aeronomie.be"

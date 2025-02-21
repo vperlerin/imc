@@ -21,12 +21,46 @@ try {
     $data = json_decode(file_get_contents("php://input"), true);
 
     // Required fields validation
-    $required_fields = ['title', 'firstName', 'lastName', 'gender', 'dobYear', 'dobMonth', 'dobDay', 'email', 'phone', 'address', 'postal_code', 'city', 'country'];
+    $required_fields = [
+        'title',
+        'firstName', 
+        'lastName', 
+        'gender', 
+        'dobYear', 
+        'dobMonth', 
+        'dobDay', 
+        'email', 
+        'phone', 
+        'address', 
+        'postal_code', 
+        'city', 
+        'country',
+        'is_early_bird',
+        'is_online'
+    ];
 
     foreach ($required_fields as $field) {
         if (empty($data[$field])) {
             throw new Exception("Missing required field: $field");
         }
+    }
+
+    // Validate email
+    if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+        throw new Exception("Invalid email format.");
+    }
+
+    // Validate guardian email if provided
+    if (!empty($data['guardian_email']) && !filter_var($data['guardian_email'], FILTER_VALIDATE_EMAIL)) {
+        throw new Exception("Invalid guardian email format.");
+    }
+
+    // Validate phone numbers
+    if (!preg_match('/^\+?[0-9\s\-]{7,20}$/', $data['phone'])) {
+        throw new Exception("Invalid phone number format.");
+    }
+    if (!empty($data['guardian_contact']) && !preg_match('/^\+?[0-9\s\-]{7,20}$/', $data['guardian_contact'])) {
+        throw new Exception("Invalid guardian contact number format.");
     }
 
     // Generate a random password
@@ -40,25 +74,36 @@ try {
     // Send email confirmation
     $subject = "IMC " . getenv("YEAR") . " Registration Confirmation";
     $message = "
-        Hello {$data['firstName']} {$data['lastName']},
+        <h2>Hello {$data['firstName']} {$data['lastName']},</h2>
+        <p>Thank you for registering for IMC " . getenv("YEAR") . ". Here is the information you provided:</p>
+        <ul>
+            <li><strong>Name:</strong> {$data['title']} {$data['firstName']} {$data['lastName']}</li>
+            <li><strong>Gender:</strong> {$data['gender']}</li>
+            <li><strong>Date of Birth:</strong> {$data['dobYear']}-{$data['dobMonth']}-{$data['dobDay']}</li>
+            <li><strong>Email:</strong> {$data['email']}</li>
+            <li><strong>Phone:</strong> {$data['phone']}</li>
+            <li><strong>Address:</strong> {$data['address']}, {$data['postal_code']}, {$data['city']}, {$data['country']}</li>
+            <li><strong>Organization:</strong> " . ($data['organization'] ?? "N/A") . "</li>
+        </ul>";
 
-        Thank you for registering for IMC " . getenv("YEAR") . ". Here is the information you provided:
+    if (!empty($data['comments'])) {
+        $message .= "<p><strong>Comments:</strong> {$data['comments']}</p>";
+    }
 
-        Name: {$data['title']} {$data['firstName']} {$data['lastName']}
-        Gender: {$data['gender']}
-        Date of Birth: {$data['dobYear']}-{$data['dobMonth']}-{$data['dobDay']}
-        Email: {$data['email']}
-        Phone: {$data['phone']}
-        Address: {$data['address']}, {$data['postal_code']}, {$data['city']}, {$data['country']}
-        Organization: " . ($data['organization'] ?? "N/A") . "
+    if (!empty($data['guardian_name'])) {
+        $message .= "
+        <h3>Guardian Information:</h3>
+        <ul>
+            <li><strong>Guardian Name:</strong> {$data['guardian_name']}</li>
+            <li><strong>Guardian Contact:</strong> {$data['guardian_contact']}</li>
+            <li><strong>Guardian Email:</strong> {$data['guardian_email']}</li>
+        </ul>";
+    }
 
-        You can use the following password to update your record:
-        Password: $plain_password
-
-        Please keep this password safe.
-
-        Best regards,
-        IMC " . getenv("YEAR") . " Team
+    $message .= "
+        <p><strong>Your registration password:</strong> <span style='font-weight:bold; color:#d9534f;'>$plain_password</span></p>
+        <p>You can use this password to update your record.</p>
+        <p>Best regards,<br>IMC " . getenv("YEAR") . " Team</p>
     ";
 
     // Send confirmation email using PHPMailer

@@ -35,12 +35,12 @@ const ArrivalForm = ({
   const availableDates = getDateRange(conferenceData.dates.start, conferenceData.dates.end);
 
   const fillTestData = () => {
-    setValue("arrivalDate", availableDates[0]);
-    setValue("arrivalHour", "14");
-    setValue("arrivalMinute", "30");
-    setValue("departureDate", availableDates[availableDates.length - 1]);
-    setValue("departureHour", "12");
-    setValue("departureMinute", "00");
+    setValue("arrival_date", availableDates[0]);
+    setValue("arrival_hour", "14");
+    setValue("arrival_minute", "30");
+    setValue("departure_date", availableDates[availableDates.length - 1]);
+    setValue("departure_hour", "12");
+    setValue("departure_minute", "00");
     setValue("travelling", "train");
     setValue("travelling_details", "I will be alone in my train.")
     trigger(); // Validate form
@@ -78,23 +78,23 @@ const ArrivalForm = ({
             <label className="col-sm-2 col-form-label fw-bold">Arrival</label>
             <div className="col-sm-3">
               <select
-                className={classNames("form-select", errors.arrivalDate && "is-invalid")}
-                {...register("arrivalDate", { required: "Arrival date is required" })}
-                onBlur={() => trigger("arrivalDate")}
+                className={classNames("form-select", errors.arrival_date && "is-invalid")}
+                {...register("arrival_date", { required: "Arrival date is required" })}
+                onBlur={() => trigger("arrival_date")}
               >
                 <option value="">Select Arrival Date</option>
                 {availableDates.map(date => (
                   <option key={date} value={date}>{date}</option>
                 ))}
               </select>
-              {errors.arrivalDate && <p className="text-danger mb-0"><small>{errors.arrivalDate.message}</small></p>}
+              {errors.arrival_date && <p className="text-danger mb-0"><small>{errors.arrival_date.message}</small></p>}
             </div>
 
             <div className="col-sm-2">
               <select
-                className={classNames("form-select", errors.arrivalHour && "is-invalid")}
-                {...register("arrivalHour", { required: "Hour is required" })}
-                onBlur={() => trigger("arrivalHour")}
+                className={classNames("form-select", errors.arrival_hour && "is-invalid")}
+                {...register("arrival_hour", { required: "Hour is required" })}
+                onBlur={() => trigger("arrival_hour")}
               >
                 <option value="">Hour</option>
                 {hours.map(hour => (
@@ -105,9 +105,9 @@ const ArrivalForm = ({
 
             <div className="col-sm-2">
               <select
-                className={classNames("form-select", errors.arrivalMinute && "is-invalid")}
-                {...register("arrivalMinute", { required: "Minute is required" })}
-                onBlur={() => trigger("arrivalMinute")}
+                className={classNames("form-select", errors.arrival_minute && "is-invalid")}
+                {...register("arrival_minute", { required: "Minute is required" })}
+                onBlur={() => trigger("arrival_minute")}
               >
                 <option value="">Min</option>
                 {minutes.map(min => (
@@ -122,23 +122,23 @@ const ArrivalForm = ({
             <label className="col-sm-2 col-form-label fw-bold">Departure</label>
             <div className="col-sm-3">
               <select
-                className={classNames("form-select", errors.departureDate && "is-invalid")}
-                {...register("departureDate", { required: "Departure date is required" })}
-                onBlur={() => trigger("departureDate")}
+                className={classNames("form-select", errors.departure_date && "is-invalid")}
+                {...register("departure_date", { required: "Departure date is required" })}
+                onBlur={() => trigger("departure_date")}
               >
                 <option value="">Select Departure Date</option>
                 {availableDates.map(date => (
                   <option key={date} value={date}>{date}</option>
                 ))}
               </select>
-              {errors.departureDate && <p className="text-danger mb-0"><small>{errors.departureDate.message}</small></p>}
+              {errors.departure_date && <p className="text-danger mb-0"><small>{errors.departure_date.message}</small></p>}
             </div>
 
             <div className="col-sm-2">
               <select
-                className={classNames("form-select", errors.departureHour && "is-invalid")}
-                {...register("departureHour", { required: "Hour is required" })}
-                onBlur={() => trigger("departureHour")}
+                className={classNames("form-select", errors.departure_hour && "is-invalid")}
+                {...register("departure_hour", { required: "Hour is required" })}
+                onBlur={() => trigger("departure_hour")}
               >
                 <option value="">Hour</option>
                 {hours.map(hour => (
@@ -149,9 +149,9 @@ const ArrivalForm = ({
 
             <div className="col-sm-2">
               <select
-                className={classNames("form-select", errors.departureMinute && "is-invalid")}
-                {...register("departureMinute", { required: "Minute is required" })}
-                onBlur={() => trigger("departureMinute")}
+                className={classNames("form-select", errors.departure_minute && "is-invalid")}
+                {...register("departure_minute", { required: "Minute is required" })}
+                onBlur={() => trigger("departure_minute")}
               >
                 <option value="">Min</option>
                 {minutes.map(min => (

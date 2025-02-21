@@ -35,8 +35,8 @@ const IdentityForm = ({
 
   const fillTestData = () => {
     setValue("title", "Dr.");
-    setValue("firstName", "Vincent");
-    setValue("lastName", "Perlerin");
+    setValue("first_name", "Vincent");
+    setValue("last_name", "Perlerin");
     setValue("gender", "Male");
     setValue("phone", "+33 686753212");
     setValue("email", "vperlerin@gmail.com");
@@ -90,15 +90,15 @@ const IdentityForm = ({
           <label className="col-sm-2 col-form-label fw-bold">First Name</label>
           <div className="col-sm-10">
             <input
-              className={classNames('form-control', errors.firstName && "is-invalid", cssForm.md50)}
+              className={classNames('form-control', errors.first_name && "is-invalid", cssForm.md50)}
               placeholder="First Name"
-              {...register("firstName", { required: "First name is required" })}
-              onBlur={() => trigger("firstName")}
+              {...register("first_name", { required: "First name is required" })}
+              onBlur={() => trigger("first_name")}
             />
             {!isOnline && (
               <div className="form-text">If you need a <b>visa invitation letter</b>, enter your <b>First Name exactly as on your Passport</b>.</div>
             )}
-            {errors.firstName && <p className="text-danger mb-0"><small>{errors.firstName.message}</small></p>}
+            {errors.first_name && <p className="text-danger mb-0"><small>{errors.first_name.message}</small></p>}
           </div>
         </div>
 
@@ -107,15 +107,15 @@ const IdentityForm = ({
           <label className="col-sm-2 col-form-label fw-bold">Last Name</label>
           <div className="col-sm-10">
             <input
-              className={classNames('form-control', errors.lastName && "is-invalid", cssForm.md50)}
+              className={classNames('form-control', errors.last_name && "is-invalid", cssForm.md50)}
               placeholder="Last Name"
-              {...register("lastName", { required: "Last name is required" })}
-              onBlur={() => trigger("lastName")}
+              {...register("last_name", { required: "Last name is required" })}
+              onBlur={() => trigger("last_name")}
             />
             {!isOnline && (
               <div className="form-text">If you need a <b>visa invitation letter</b>, enter your <b>Last Name exactly as on your Passport</b>.</div>
             )}
-            {errors.lastName && <p className="text-danger mb-0"><small>{errors.lastName.message}</small></p>}
+            {errors.last_name && <p className="text-danger mb-0"><small>{errors.last_name.message}</small></p>}
           </div>
         </div>
 

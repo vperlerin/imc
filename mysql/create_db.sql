@@ -45,9 +45,14 @@ CREATE TABLE IF NOT EXISTS participants (
     total_paid DECIMAL(10,2) UNSIGNED NOT NULL DEFAULT 0.00, 
     status ENUM('active', 'deleted') NOT NULL DEFAULT 'active',
     deleted_at TIMESTAMP NULL DEFAULT NULL,
+    comments TEXT DEFAULT NULL,  
+    guardian_name VARCHAR(100) DEFAULT NULL, 
+    guardian_contact VARCHAR(20) DEFAULT NULL,  
+    guardian_email VARCHAR(255) DEFAULT NULL, 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 
 -- Password reset
 CREATE TABLE IF NOT EXISTS password_resets (
@@ -72,10 +77,10 @@ INSERT IGNORE INTO payment_methods (method) VALUES ('Paypal'), ('Bank Transfer')
 CREATE TABLE IF NOT EXISTS payments (
     id INT AUTO_INCREMENT PRIMARY KEY,
     participant_id INT NOT NULL,
-    payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Date of payment
-    amount DECIMAL(10,2) UNSIGNED NOT NULL, -- Payment amount
-    payment_method_id INT NOT NULL, -- Link to payment method
-    admin_note TEXT DEFAULT NULL, -- Optional admin note
+    payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  
+    amount DECIMAL(10,2) UNSIGNED NOT NULL,  
+    payment_method_id INT NOT NULL,  
+    admin_note TEXT DEFAULT NULL, 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (participant_id) REFERENCES participants(id) ON DELETE CASCADE,
@@ -87,6 +92,7 @@ CREATE TABLE IF NOT EXISTS workshops (
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     price DECIMAL(10,2) UNSIGNED NOT NULL DEFAULT 0.00,
+    price_online DECIMAL(10,2) UNSIGNED NOT NULL DEFAULT 0.00,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -157,12 +163,10 @@ CREATE TABLE IF NOT EXISTS participant_accommodation (
     participant_id INT NOT NULL,
     registration_type_id INT NOT NULL,
     late_booking_fee DECIMAL(10,2) UNSIGNED NOT NULL DEFAULT 0.00,
-    payment_method_id INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (participant_id) REFERENCES participants(id) ON DELETE CASCADE,
     FOREIGN KEY (registration_type_id) REFERENCES registration_types(id) ON DELETE CASCADE,
-    FOREIGN KEY (payment_method_id) REFERENCES payment_methods(id) ON DELETE CASCADE
 ) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Extra Options Table

@@ -54,7 +54,7 @@ const MainForm = () => {
   const isUnder16 = age !== null && age < 16;
 
   const initialData = null; // replace with the API res
-  const isEarlyBird = initialData?.isEarlyBird || new Date() < new Date(cd.deadlines.early_birds);
+  const is_early_bird = initialData?.is_early_bird || new Date() < new Date(cd.deadlines.early_birds);
 
   const nextStep = async () => {
     const isValid = await trigger();
@@ -100,17 +100,17 @@ const MainForm = () => {
         )}
 
         <input
-          name="isEarlyBird"
+          name="is_early_bird"
           type="hidden"
-          value={isEarlyBird}
-          {...register("isEarlyBird")}
+          value={is_early_bird}
+          {...register("is_early_bird")}
         />
 
         <input
-          name="type"
+          name="is_online"
           type="hidden"
-          value="onsite"
-          {...register("type")}
+          value="false"
+          {...register("is_online")}
         />
 
         {step === 1 && (
@@ -125,9 +125,7 @@ const MainForm = () => {
             trigger={trigger}
           />
         )}
-
-
-
+  
         {step === 2 && cd?.workshops?.length > 0 && (
           <Workshops
             conferenceData={cd}
@@ -180,7 +178,7 @@ const MainForm = () => {
             register={register}
             isDebugMode={isDebugMode}
             initialData={initialData}
-            isEarlyBird={isEarlyBird}
+            isEarlyBird={is_early_bird}
             errors={errors}
             step={step}
             stepTotal={totalStep}
@@ -221,7 +219,7 @@ const MainForm = () => {
         {step === 8 && (
           <Summary
             getValues={getValues}
-            isEarlyBird={isEarlyBird}
+            isEarlyBird={is_early_bird}
             conferenceData={cd}
           />
         )}

@@ -61,11 +61,15 @@ if table_is_empty("imc_sessions"):
 # Insert `workshops` if the table is empty
 if table_is_empty("workshops"):
     for workshop in data.get("workshops", []):
+        cost = float(workshop["cost"])   
+        cost_online = float(workshop["cost_online"]) if "cost_online" in workshop else 0.00   
+        
         sql_statements.append(
-            "INSERT INTO workshops (title, price) VALUES ('%s', %.2f);" % (
-                workshop["title"].replace("'", "''"), float(workshop["cost"])
+            "INSERT INTO workshops (title, price, price_online) VALUES ('%s', %.2f, %.2f);" % (
+                workshop["title"].replace("'", "''"), cost, cost_online
             )
         )
+
 
 # Insert `registration_types` (rooms) if the table is empty
 if table_is_empty("registration_types"):
