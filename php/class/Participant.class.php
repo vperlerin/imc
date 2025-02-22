@@ -9,8 +9,20 @@ class ParticipantManager
         $this->pdo = $pdo;
     }
 
+
+    public function emailExists($email) {
+        $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM participants WHERE email = ?");
+        $stmt->execute([$email]);
+        return $stmt->fetchColumn() > 0;
+    }
+
     public function saveParticipant($data, $passwordHash)
     {
+        // Check if email is already in use
+        if ($this->emailExists($data['email'])) {
+            throw new Exception("The email address '{$data['email']}' is already registered. Please use a different email or log in.");
+        }
+
         $stmt = $this->pdo->prepare("
             INSERT INTO participants (
                 title, first_name, last_name, gender, dob, email, phone, address, postal_code, city, country, 
