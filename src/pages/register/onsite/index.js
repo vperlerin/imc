@@ -249,7 +249,7 @@ const MainForm = () => {
             getValues={getValues}
             isEarlyBird={is_early_bird}
             conferenceData={cd}
-            setTotalCost={setTotal}
+            setTotal={setTotal}
             setPaypalFee={setPaypalFee}
             initialData={initialData}
           />

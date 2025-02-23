@@ -28,12 +28,12 @@ class ParticipantManager
             INSERT INTO participants (
                 title, first_name, last_name, gender, dob, email, phone, address, postal_code, city, country, 
                 organization, admin_notes, is_online, is_early_bird, confirmation_sent, confirmation_date, 
-                password_hash, total_due, total_paid, status, deleted_at, comments, guardian_name, 
+                password_hash, paypal_fee, total_due, total_paid, status, deleted_at, comments, guardian_name, 
                 guardian_contact, guardian_email, created_at, updated_at
             ) VALUES (
                 :title, :first_name, :last_name, :gender, :dob, :email, :phone, :address, :postal_code, :city, :country, 
                 :organization, :admin_notes, :is_online, :is_early_bird, FALSE, NULL, 
-                :password_hash, 0.00, 0.00, 'active', NULL, :comments, :guardian_name, 
+                :password_hash, :paypal_fee, :total_due, 0.00, 'active', NULL, :comments, :guardian_name, 
                 :guardian_contact, :guardian_email, NOW(), NOW()
             )
         ");
@@ -52,6 +52,8 @@ class ParticipantManager
             ':country' => $data['country'],
             ':organization' => $data['organization'] ?? null,
             ':admin_notes' => null,
+            'paypal_fee' => $data['paypal_fee'],
+            'total_due' => $data['total_due'],
             ':is_online' => filter_var($data['is_online'], FILTER_VALIDATE_BOOLEAN),
             ':is_early_bird' => filter_var($data['is_early_bird'], FILTER_VALIDATE_BOOLEAN),
             ':password_hash' => $passwordHash,
@@ -96,6 +98,8 @@ class ParticipantManager
             p.email,
             p.confirmation_sent, 
             p.total_due, 
+            p.total_paid,
+            p.paypal_fee,
             pm.method AS payment_method
             FROM participants p
             LEFT JOIN payments pay ON p.id = pay.participant_id  -- Correct join with the payments table

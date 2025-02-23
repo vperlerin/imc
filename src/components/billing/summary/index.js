@@ -1,6 +1,6 @@
 import classNames from 'classnames';
 import css from './index.module.scss';
-import React from "react";
+import React, { useEffect } from "react";
 
 const getPaypalPrice = (price) => {
   return Math.round((price + (0.034 * price + 0.35) / 0.966) * 100) / 100;
@@ -13,11 +13,11 @@ const Summary = ({
   getValues,
   isEarlyBird,
   conferenceData,
-  setTotalCost,
-  setPaypalFee, 
+  setTotal,
+  setPaypalFee,
 }) => {
   const allValues = initialData || getValues();
- 
+
   // Registration & Accommodation Cost
   const registrationType = allValues.registrationType || "no"; // Default to "no"
   const selectedRoom = conferenceData.costs.rooms.find(room => room.type === registrationType);
@@ -60,17 +60,15 @@ const Summary = ({
   const onlinePaypalFee = paymentMethod.toLowerCase() === "paypal" ? getPaypalPrice(totalOnlineCost) - totalOnlineCost : 0;
   totalOnlineCost += onlinePaypalFee;
 
-
-
   useEffect(() => {
-    if(isOnline) {
-      setTotalCost(totalOnlineCost);
+    if (isOnline) {
+      setTotal(totalOnlineCost);
       setPaypalFee(onlinePaypalFee);
     } else {
-      setTotalCost(totalCost);
+      setTotal(totalCost);
       setPaypalFee(paypalFee);
     }
-  }, [isOnline, totalCost, totalOnlineCost, setTotalCost, onlinePaypalFee, paypalFee, setPaypalFee]);
+  }, [isOnline, totalCost, totalOnlineCost, setTotal, onlinePaypalFee, paypalFee, setPaypalFee]);
 
   return (
     <>
