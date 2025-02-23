@@ -18,7 +18,7 @@ require_once __DIR__ . "/../class/Participant.class.php";
 
 try {
     $participantManager = new ParticipantManager($pdo);
-    $participants = $participantManager->getOnlineParticipants();
+    $participants = $participantManager->getOnsiteParticipants();
 
     echo json_encode([
         "success" => true,
