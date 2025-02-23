@@ -10,7 +10,8 @@ class ParticipantManager
     }
 
 
-    public function emailExists($email) {
+    public function emailExists($email)
+    {
         $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM participants WHERE email = ?");
         $stmt->execute([$email]);
         return $stmt->fetchColumn() > 0;
@@ -80,24 +81,24 @@ class ParticipantManager
     }
 
 
-     /**
+    /**
      * Retrieve all on-site active participants with payment method.
      */
     public function getOnsiteParticipants()
     {
         $stmt = $this->pdo->prepare("
-            SELECT 
-                p.title, 
-                p.first_name, 
-                p.last_name, 
-                p.confirmation_sent, 
-                p.total_due, 
-                pm.method AS payment_method
+           SELECT 
+            p.title, 
+            p.first_name, 
+            p.last_name, 
+            p.confirmation_sent, 
+            p.total_due, 
+            pm.method AS payment_method
             FROM participants p
-            LEFT JOIN participant_accommodation pa ON p.id = pa.participant_id
-            LEFT JOIN payment_methods pm ON pa.payment_method_id = pm.id
+            LEFT JOIN payments pay ON p.id = pay.participant_id  -- Correct join with the payments table
+            LEFT JOIN payment_methods pm ON pay.payment_method_id = pm.id  -- Get payment method
             WHERE p.is_online = FALSE AND p.status = 'active'
-            ORDER BY p.last_name, p.first_name
+            ORDER BY p.last_name, p.first_name;
         ");
 
         $stmt->execute();
