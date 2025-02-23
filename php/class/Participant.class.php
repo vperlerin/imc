@@ -93,6 +93,7 @@ class ParticipantManager
             p.title, 
             p.first_name, 
             p.last_name, 
+            p.email,
             p.confirmation_sent, 
             p.total_due, 
             pm.method AS payment_method

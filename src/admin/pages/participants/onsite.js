@@ -41,12 +41,14 @@ const AdminParticipantsOnsite = () => {
     } else {
       const lowerQuery = searchQuery.toLowerCase();
       setFilteredParticipants(
-        participants.filter((participant) =>
-          participant[searchType].toLowerCase().includes(lowerQuery)
-        )
+        participants.filter((participant) => {
+          const fieldValue = participant[searchType] ? participant[searchType].toLowerCase() : "";
+          return fieldValue.includes(lowerQuery);
+        })
       );
     }
   }, [searchQuery, searchType, participants]);
+  
 
   // Calculate totals
   const totalParticipants = participants.length;
@@ -103,8 +105,8 @@ const AdminParticipantsOnsite = () => {
               </tr>
             </thead>
             <tbody>
-              {participants.length > 0 ? (
-                participants.map((participant) => (
+              {filteredParticipants.length > 0 ? (
+                filteredParticipants.map((participant) => (
                   <tr key={participant.id}>
                     <td>{participant.created_at}</td>
                     <td>{participant.title}</td>
