@@ -1,5 +1,4 @@
 import { CiSearch } from "react-icons/ci";
-//
 import PageContain from "@/admin/components/page-contain";
 import classNames from "classnames";
 import css from './index.module.scss';
@@ -14,6 +13,8 @@ const AdminParticipantsOnsite = () => {
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchType, setSearchType] = useState("last_name");
+  const [selectedParticipant, setSelectedParticipant] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   useEffect(() => {
     const fetchParticipants = async () => {
@@ -22,7 +23,7 @@ const AdminParticipantsOnsite = () => {
         if (response.data.success) {
           setParticipants(response.data.data);
         } else {
-          throw new Error(response.data.message || "Failed to fetch participants. Please reload the page and try again");
+          throw new Error(response.data.message || "Failed to fetch participants.");
         }
       } catch (err) {
         setError(err.message);
@@ -34,7 +35,7 @@ const AdminParticipantsOnsite = () => {
     fetchParticipants();
   }, []);
 
-  // Filter participants based on search query
+
   useEffect(() => {
     if (!searchQuery) {
       setFilteredParticipants(participants);
@@ -49,19 +50,47 @@ const AdminParticipantsOnsite = () => {
     }
   }, [searchQuery, searchType, participants]);
 
-
   // Calculate totals
   const totalParticipants = participants.length;
   const totalConfirmed = participants.filter((p) => p.confirmation_sent === true).length;
 
-  console.log(participants);
+  // Handle delete button click
+  const handleDeleteClick = (participant) => {
+    setSelectedParticipant(participant);
+    setShowDeleteModal(true);
+  };
+
+  // Perform deletion
+  const deleteParticipant = async (deleteType) => {
+    if (!selectedParticipant) return;
+
+    try {
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/admin/delete_participant.php`, {
+        id: selectedParticipant.id,
+        delete_type: deleteType // "hard" or "soft"
+      });
+
+      if (response.data.success) {
+        // Update UI by removing deleted participant
+        setParticipants(participants.filter(p => p.id !== selectedParticipant.id));
+        setFilteredParticipants(filteredParticipants.filter(p => p.id !== selectedParticipant.id));
+      } else {
+        throw new Error(response.data.message || "Failed to delete participant.");
+      }
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setShowDeleteModal(false);
+      setSelectedParticipant(null);
+    }
+  };
 
   return (
     <PageContain
       title="Onsite Participants"
       rightContent={
         <>
-          <strong> Confirmed:</strong> {totalConfirmed} / {totalParticipants}
+          <strong>Confirmed:</strong> {totalConfirmed} / {totalParticipants}
         </>
       }
     >
@@ -71,7 +100,6 @@ const AdminParticipantsOnsite = () => {
         <p className="alert alert-danger">{error}</p>
       ) : (
         <>
-
           <div className="d-flex gap-2 mb-3">
             <select
               className="form-select w-auto"
@@ -91,8 +119,8 @@ const AdminParticipantsOnsite = () => {
               />
               <CiSearch className="position-absolute top-50 end-0 translate-middle-y me-2" />
             </div>
-
           </div>
+
           <table className="table table-striped">
             <thead>
               <tr>
@@ -117,6 +145,12 @@ const AdminParticipantsOnsite = () => {
                       <div className="d-flex gap-2 justify-content-end">
                         <a href={`/admin/participants/onsite/${participant.id}/confirm`} className={classNames(css.action, "btn btn-sm btn-outline-success fw-bolder")}>Confirm</a>
                         <a href={`/admin/participants/onsite/${participant.id}`} className={classNames(css.action, "btn btn-sm btn-outline-primary fw-bolder")}>Edit</a>
+                        <button
+                          className={classNames(css.action, "btn btn-sm btn-outline-danger fw-bolder")}
+                          onClick={() => handleDeleteClick(participant)}
+                        >
+                          Delete
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -129,9 +163,34 @@ const AdminParticipantsOnsite = () => {
             </tbody>
           </table>
         </>
-
       )}
 
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && selectedParticipant && (
+        <div className="modal show d-block" tabIndex="-1">
+          <div className="modal-dialog">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Delete Participant</h5>
+                <button type="button" className="btn-close" onClick={() => setShowDeleteModal(false)}></button>
+              </div>
+              <div className="modal-body">
+                <p>Are you sure you want to delete {selectedParticipant.first_name} {selectedParticipant.last_name}?</p>
+                <p><strong>Choose:</strong></p>
+                <ul>
+                  <li><strong>Soft Delete:</strong> Mark as deleted but keep records so we can keep track of the reimbursements.</li>
+                  <li><strong>Hard Delete:</strong> PERMANENTLY remove from the database.</li>
+                </ul>
+              </div>
+              <div className="modal-footer">
+                <button className="btn btn-secondary" onClick={() => setShowDeleteModal(false)}>Cancel</button>
+                <button className="btn btn-warning" onClick={() => deleteParticipant("soft")}>Soft Delete</button>
+                <button className="btn btn-danger" onClick={() => deleteParticipant("hard")}>Hard Delete</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </PageContain>
   );
 };

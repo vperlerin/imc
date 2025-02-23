@@ -111,4 +111,25 @@ class ParticipantManager
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+
+    /**
+     * Hard delete a participant
+     */
+    public function deleteParticipant($participantId) {
+        $stmt = $this->pdo->prepare("DELETE FROM participants WHERE id = ?");
+        $stmt->execute([$participantId]);
+
+        return $stmt->rowCount() > 0;
+    }
+
+    /**
+     * Soft delete a participant
+     */
+    public function softDeleteParticipant($participantId) {
+        $stmt = $this->pdo->prepare("UPDATE participants SET status = 'deleted', deleted_at = NOW() WHERE id = ?");
+        $stmt->execute([$participantId]);
+
+        return $stmt->rowCount() > 0;
+    }
 }
