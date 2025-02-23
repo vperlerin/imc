@@ -88,6 +88,7 @@ class ParticipantManager
     {
         $stmt = $this->pdo->prepare("
            SELECT 
+            p.created_at,
             p.title, 
             p.first_name, 
             p.last_name, 

@@ -41,6 +41,7 @@ const AdminParticipantsOnsite = () => {
         <table className="table table-striped">
           <thead>
             <tr>
+              <th>Reg. Date</th>
               <th>Title</th>
               <th>First Name</th>
               <th>Last Name</th>
@@ -53,6 +54,7 @@ const AdminParticipantsOnsite = () => {
             {participants.length > 0 ? (
               participants.map((participant) => (
                 <tr key={participant.id}>
+                  <td>{participant.created_at}</td>
                   <td>{participant.title}</td>
                   <td>{participant.first_name}</td>
                   <td>{participant.last_name}</td>
