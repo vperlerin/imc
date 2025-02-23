@@ -22,7 +22,7 @@ const AdminParticipantsOnsite = () => {
         if (response.data.success) {
           setParticipants(response.data.data);
         } else {
-          throw new Error(response.data.message || "Failed to fetch participants.");
+          throw new Error(response.data.message || "Failed to fetch participants. Please reload the page and try again");
         }
       } catch (err) {
         setError(err.message);
@@ -48,11 +48,13 @@ const AdminParticipantsOnsite = () => {
       );
     }
   }, [searchQuery, searchType, participants]);
-  
+
 
   // Calculate totals
   const totalParticipants = participants.length;
   const totalConfirmed = participants.filter((p) => p.confirmation_sent === true).length;
+
+  console.log(participants);
 
   return (
     <PageContain
@@ -95,10 +97,8 @@ const AdminParticipantsOnsite = () => {
             <thead>
               <tr>
                 <th>Reg. Date</th>
-                <th>Title</th>
-                <th>First Name</th>
-                <th>Last Name</th>
-                <th>Total Due (€)</th>
+                <th>Name</th>
+                <th>Total Due</th>
                 <th>Payment Method</th>
                 <th>Confirmed</th>
                 <th></th>
@@ -108,10 +108,8 @@ const AdminParticipantsOnsite = () => {
               {filteredParticipants.length > 0 ? (
                 filteredParticipants.map((participant) => (
                   <tr key={participant.id}>
-                    <td>{participant.created_at}</td>
-                    <td>{participant.title}</td>
-                    <td>{participant.first_name}</td>
-                    <td>{participant.last_name}</td>
+                    <td>{participant.created_at.split(' ')[0]}</td>
+                    <td>{participant.title} {participant.first_name} {participant.last_name}</td>
                     <td>{participant.total_due} €</td>
                     <td>{participant.payment_method || "n/a"}</td>
                     <td>{participant.confirmation_sent === true ? "✅" : "❌"}</td>

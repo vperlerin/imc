@@ -12,12 +12,12 @@ const Summary = ({
   isForAdmin = false,
   getValues,
   isEarlyBird,
-  conferenceData
+  conferenceData,
+  setTotalCost,
+  setPaypalFee, 
 }) => {
   const allValues = initialData || getValues();
-
-  console.log("ALL VALUES ", allValues);
-
+ 
   // Registration & Accommodation Cost
   const registrationType = allValues.registrationType || "no"; // Default to "no"
   const selectedRoom = conferenceData.costs.rooms.find(room => room.type === registrationType);
@@ -59,6 +59,18 @@ const Summary = ({
   let totalOnlineCost = workshopOnlineCost + onlineConferenceCost;
   const onlinePaypalFee = paymentMethod.toLowerCase() === "paypal" ? getPaypalPrice(totalOnlineCost) - totalOnlineCost : 0;
   totalOnlineCost += onlinePaypalFee;
+
+
+
+  useEffect(() => {
+    if(isOnline) {
+      setTotalCost(totalOnlineCost);
+      setPaypalFee(onlinePaypalFee);
+    } else {
+      setTotalCost(totalCost);
+      setPaypalFee(paypalFee);
+    }
+  }, [isOnline, totalCost, totalOnlineCost, setTotalCost, onlinePaypalFee, paypalFee, setPaypalFee]);
 
   return (
     <>

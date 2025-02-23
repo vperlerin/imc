@@ -41,6 +41,7 @@ CREATE TABLE IF NOT EXISTS participants (
     confirmation_sent BOOLEAN NOT NULL DEFAULT FALSE,
     confirmation_date DATETIME DEFAULT NULL,
     password_hash VARCHAR(255) NOT NULL, 
+    paypal_fee DECIMAL(10,2) UNSIGNED NOT NULL DEFAULT 0.00,
     total_due DECIMAL(10,2) UNSIGNED NOT NULL DEFAULT 0.00,
     total_paid DECIMAL(10,2) UNSIGNED NOT NULL DEFAULT 0.00, 
     status ENUM('active', 'deleted') NOT NULL DEFAULT 'active',

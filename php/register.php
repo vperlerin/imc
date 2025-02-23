@@ -42,7 +42,9 @@ try {
         'city',
         'country',
         'is_early_bird',
-        'is_online'
+        'is_online',
+        'total',
+        'paypal_fee'
     ];
 
     foreach ($required_fields as $field) {

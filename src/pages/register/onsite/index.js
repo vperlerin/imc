@@ -39,6 +39,8 @@ const MainForm = () => {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState(null);
   const [successMsg, setSuccessMsg] = useState(null);
+  const [total, setTotal] = useState(0);  
+  const [paypalFee, setPaypalFee] = useState(0);  
   const location = useLocation();
   const isDebugMode = new URLSearchParams(location.search).get("debug") === "1";
 
@@ -85,10 +87,10 @@ const MainForm = () => {
         is_online: "false",
         talks: formData.talks || [],
         posters: formData.posters || [],
+        total_due: total.toFixed(2), 
+        paypal_fee: paypalFee.toFixed(2),
       };
-
-      console.log("Submitting Data:", formattedData);
-
+ 
       const response = await axios.post(apiUrl, formattedData, {
         headers: { "Content-Type": "application/json" },
       });
@@ -247,6 +249,9 @@ const MainForm = () => {
             getValues={getValues}
             isEarlyBird={is_early_bird}
             conferenceData={cd}
+            setTotalCost={setTotal}
+            setPaypalFee={setPaypalFee}
+            initialData={initialData}
           />
         )}
         <div className="mt-auto pt-3">
