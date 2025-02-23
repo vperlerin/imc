@@ -11,10 +11,12 @@ const AdminParticipantsOnsite = () => {
   const [filteredParticipants, setFilteredParticipants] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [errorDelete, setErrorDelete] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchType, setSearchType] = useState("last_name");
   const [selectedParticipant, setSelectedParticipant] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showHardDeleteConfirm, setShowHardDeleteConfirm] = useState(false);
 
   useEffect(() => {
     const fetchParticipants = async () => {
@@ -23,7 +25,7 @@ const AdminParticipantsOnsite = () => {
         if (response.data.success) {
           setParticipants(response.data.data);
         } else {
-          throw new Error(response.data.message || "Failed to fetch participants.");
+          throw new Error(response.data.message || "Failed to fetch participants. Please, refresh the page.");
         }
       } catch (err) {
         setError(err.message);
@@ -35,7 +37,6 @@ const AdminParticipantsOnsite = () => {
     fetchParticipants();
   }, []);
 
-
   useEffect(() => {
     if (!searchQuery) {
       setFilteredParticipants(participants);
@@ -43,7 +44,7 @@ const AdminParticipantsOnsite = () => {
       const lowerQuery = searchQuery.toLowerCase();
       setFilteredParticipants(
         participants.filter((participant) => {
-          const fieldValue = participant[searchType] ? participant[searchType].toLowerCase() : "";
+          const fieldValue = participant[searchType] ? String(participant[searchType]).toLowerCase() : "";
           return fieldValue.includes(lowerQuery);
         })
       );
@@ -67,19 +68,19 @@ const AdminParticipantsOnsite = () => {
     try {
       const response = await axios.post(`${process.env.REACT_APP_API_URL}/admin/delete_participant.php`, {
         id: selectedParticipant.id,
-        delete_type: deleteType // "hard" or "soft"
+        delete_type: deleteType,
       });
 
       if (response.data.success) {
-        // Update UI by removing deleted participant
         setParticipants(participants.filter(p => p.id !== selectedParticipant.id));
         setFilteredParticipants(filteredParticipants.filter(p => p.id !== selectedParticipant.id));
       } else {
         throw new Error(response.data.message || "Failed to delete participant.");
       }
     } catch (err) {
-      alert(err.message);
+      setErrorDelete(err.message);
     } finally {
+      setShowHardDeleteConfirm(false);
       setShowDeleteModal(false);
       setSelectedParticipant(null);
     }
@@ -100,6 +101,7 @@ const AdminParticipantsOnsite = () => {
         <p className="alert alert-danger">{error}</p>
       ) : (
         <>
+          {errorDelete && <p className="alert alert-danger">{errorDelete}</p>}
           <div className="d-flex gap-2 mb-3">
             <select
               className="form-select w-auto"
@@ -149,7 +151,7 @@ const AdminParticipantsOnsite = () => {
                           className={classNames(css.action, "btn btn-sm btn-outline-danger fw-bolder")}
                           onClick={() => handleDeleteClick(participant)}
                         >
-                          Delete
+                          Cancel Registration
                         </button>
                       </div>
                     </td>
@@ -165,27 +167,50 @@ const AdminParticipantsOnsite = () => {
         </>
       )}
 
+      {(showDeleteModal || showHardDeleteConfirm) && <div className="modal-backdrop fade show"></div>}
+
       {/* Delete Confirmation Modal */}
       {showDeleteModal && selectedParticipant && (
-        <div className="modal show d-block" tabIndex="-1">
+        <div className="modal show d-block">
           <div className="modal-dialog">
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title">Delete Participant</h5>
+                <h5 className="modal-title">Cancel Registration</h5>
                 <button type="button" className="btn-close" onClick={() => setShowDeleteModal(false)}></button>
               </div>
               <div className="modal-body">
-                <p>Are you sure you want to delete {selectedParticipant.first_name} {selectedParticipant.last_name}?</p>
+                <p>Are you sure you want to cancel <b>{selectedParticipant.first_name} {selectedParticipant.last_name}</b>'s registration?</p>
                 <p><strong>Choose:</strong></p>
                 <ul>
-                  <li><strong>Soft Delete:</strong> Mark as deleted but keep records so we can keep track of the reimbursements.</li>
-                  <li><strong>Hard Delete:</strong> PERMANENTLY remove from the database.</li>
+                  <li><strong className="text-warning">Soft Delete:</strong> Keeps record but marks as 'cancelled' - so we can keep track of the reimbursement.</li>
+                  <li><strong className="text-danger">Hard Delete:</strong> Permanently removes data.</li>
                 </ul>
               </div>
               <div className="modal-footer">
-                <button className="btn btn-secondary" onClick={() => setShowDeleteModal(false)}>Cancel</button>
-                <button className="btn btn-warning" onClick={() => deleteParticipant("soft")}>Soft Delete</button>
-                <button className="btn btn-danger" onClick={() => deleteParticipant("hard")}>Hard Delete</button>
+                <button className="btn btn-outline-secondary fw-bolder" onClick={() => setShowDeleteModal(false)}>Cancel</button>
+                <button className="btn btn-outline-warning fw-bolder" onClick={() => deleteParticipant("soft")}>Soft Delete</button>
+                <button className="btn btn-outline-danger fw-bolder ms-auto" onClick={() => { setShowDeleteModal(false); setShowHardDeleteConfirm(true); }}>Hard Delete</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Hard Delete Confirmation Modal */}
+      {showHardDeleteConfirm && (
+        <div className="modal show d-block">
+          <div className="modal-dialog">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Confirm Permanent Deletion</h5>
+                <button type="button" className="btn-close" onClick={() => setShowHardDeleteConfirm(false)}></button>
+              </div>
+              <div className="modal-body">
+                <p><strong>Are you absolutely sure?</strong> This action cannot be undone.</p>
+              </div>
+              <div className="modal-footer">
+                <button className="btn btn-outline-secondary fw-bolder" onClick={() => setShowHardDeleteConfirm(false)}>No</button>
+                <button className="btn btn-outline-danger  fw-bolder" onClick={() => deleteParticipant("hard")}>Yes, Delete</button>
               </div>
             </div>
           </div>
