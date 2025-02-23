@@ -9,6 +9,7 @@ import { conferenceData as cd } from '../../../data/conference-data';
 
 const PageContain = ({
   title = '',
+  rightContent,
   children,
 }) => {
   const pageTitle = title ? `${title} | ${cd.name_display} ${cd.year}` : `${cd.name_display} ${cd.year}`;
@@ -21,12 +22,14 @@ const PageContain = ({
       </Helmet>
 
       <div className={classnames(css.pageContain, 'position-relative')}>
-        <Header showRegBtn={false} />
-
+        <Header />
         <div className='d-flex flex-row'>
           <Menu cd={cd} />
           <div className="mx-md-4 my-3 h-100 flex-grow-1 d-flex flex-column px-3 px-md-0">
-            {title && <h2>{title}</h2>}
+            <div className="d-flex justify-content-between align-items-center">
+              {title && <h2>{title}</h2>}
+              {rightContent && <div>{rightContent}</div>}
+            </div>
             {children}
           </div>
         </div>
