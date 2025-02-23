@@ -43,7 +43,7 @@ try {
         'country',
         'is_early_bird',
         'is_online',
-        'total',
+        'total_due',
         'paypal_fee'
     ];
 
