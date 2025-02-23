@@ -1,0 +1,46 @@
+@use 'styles/index' as *;  
+
+.minWrap {
+  max-width: calc(100% - 3.5rem);
+}
+
+.header {
+  background-color: var(--imc-header-bg);
+  color: var(--imc-header);
+  height: $header-height;
+
+  // Small logo
+  img {
+    width: 2.5rem;
+    height: 2.5rem; 
+  } 
+
+  h1, h2 {
+    color: var(--imc-header);
+  }
+
+  @include media-breakpoint-up(md) {
+    height: $header-height-desktop;
+
+    img {
+      width: 3.5rem;
+      height: 3.5rem; 
+    } 
+
+    .title {
+      gap: 1rem !important;
+    }
+
+    h1 {
+      font-size: 1.75rem;
+    }
+
+    h2 {
+      font-weight: normal;
+      font-size: 1.25rem;
+    }
+  }
+  
+}
+
+ 

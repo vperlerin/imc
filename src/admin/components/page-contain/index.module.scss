@@ -1,0 +1,39 @@
+@use 'styles/index' as *; 
+
+.pageContain {
+  display: flex;
+  flex-flow: column;  
+  @include scrollY();
+  @include scrollStyledDark();
+  min-height: var(--app-height);
+  height: 100%;
+
+  h2 {
+    text-wrap: balance;
+  }
+}
+
+.illustration {
+  height: var(--imc-illus-mobile-max-height); 
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: 50% 50%;
+
+  @media(min-width: $max-width) {
+    border-radius: 1rem;
+    height: var(--imc-illus-desktop-max-height);
+  }
+
+  .logo {
+    max-height: $logo-main-illus-max-height;
+  }
+}
+
+.title { 
+  @include media-breakpoint-up(md) {
+    border-radius: 1rem;
+    max-width: calc(100% - 1rem);
+    margin: 0 auto;
+    width: 100%;
+  }
+}

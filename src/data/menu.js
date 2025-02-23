@@ -9,7 +9,7 @@ export const menuItems = [
     ]
    },
   {
-    title: 'Community & Activities', link: '/comunity',
+    title: 'Community & Activities', link: '/community',
     subLinks: [ 
       { title: 'Excursion', link: '/community/excursion' },
       { title: 'Scientific and Local Organizing Committee', link: '/community/soc' },

@@ -7,4 +7,8 @@
   min-height: var(--app-height);
   max-width: $max-width;
   margin: 0 auto;
+
+  &.is-admin {
+    max-width: inherit;
+  }
 }

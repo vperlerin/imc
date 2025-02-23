@@ -20,6 +20,9 @@ module.exports = (env, argv) => {
         },
         resolve: {
             extensions: ['.js', '.jsx', '.ts', '.tsx', '.css', '.scss'],
+            alias: {
+                "@": path.resolve(__dirname, 'src'), // Alias for src/
+            },
             modules: [
                 'node_modules',
                 path.resolve(__dirname, 'src'),

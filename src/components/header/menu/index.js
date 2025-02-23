@@ -165,8 +165,8 @@ const Menu = ({ cd }) => {
                     <Link
                       aria-label="Admin"
                       className="btn btn-outline-tertiary px-3 fw-bolder"
-                      to="/admin" 
-                      onClick={() => goTo('/admin')}
+                      to="/admin/dashboard" 
+                      onClick={() => goTo('/admin/dashboard')}
                       title="Admin"
                     >
                       Admin

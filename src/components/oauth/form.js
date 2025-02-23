@@ -41,7 +41,7 @@ const Login = () => {
       dispatch(authActions.setAuth({ oauth: response.data.oauth, user: response.data.user }));
 
       const user = response.data.user || {};
-      navigate(user.is_admin ? "/admin" : "/");
+      navigate(user.is_admin ? "/admin/dashboard" : "/");
 
     } catch (err) {
       setError(err.message);

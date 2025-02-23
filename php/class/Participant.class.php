@@ -78,4 +78,29 @@ class ParticipantManager
 
         return $stmt->rowCount() > 0;
     }
+
+
+     /**
+     * Retrieve all on-site active participants with payment method.
+     */
+    public function getOnsiteParticipants()
+    {
+        $stmt = $this->pdo->prepare("
+            SELECT 
+                p.title, 
+                p.first_name, 
+                p.last_name, 
+                p.confirmation_sent, 
+                p.total_due, 
+                pm.method AS payment_method
+            FROM participants p
+            LEFT JOIN participant_accommodation pa ON p.id = pa.participant_id
+            LEFT JOIN payment_methods pm ON pa.payment_method_id = pm.id
+            WHERE p.is_online = FALSE AND p.status = 'active'
+            ORDER BY p.last_name, p.first_name
+        ");
+
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }

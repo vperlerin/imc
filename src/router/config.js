@@ -3,6 +3,7 @@ import React, { Suspense, lazy } from "react";
 import { Routes, Route } from "react-router-dom";
 import { Link } from "react-router-dom";
 import Loader from "components/loader";
+import ProtectedRoute from "hooks/protected-route";
 
 // Lazy-load pages using relative paths (Webpack resolves them correctly)
 const lazyPages = {
@@ -32,6 +33,9 @@ const lazyPages = {
   Venue: lazy(() => import("pages/location/venue")),
   WorkshopRadio: lazy(() => import("pages/program/workshops/radio")),
   WorkshopSpectro: lazy(() => import("pages/program/workshops/spectro")),
+  // ADMIN
+  AdminDashboard: lazy(() => import("admin/pages/dashboard")),
+  AdminParticipantsOnsite: lazy(() => import("admin/pages/participants/onsite")),
 };
 
 // Placeholder component for 404
@@ -71,8 +75,13 @@ const routeConfig = [
   { path: "/reset-password", element: <lazyPages.ResetPassword /> },
   { path: "/submission/guidelines", element: <lazyPages.Guidelines /> },
   { path: "/submission/topics", element: <lazyPages.Topics /> },
+  // ADMIN (protected routes)
+  { path: "/admin/dashboard", element: <ProtectedRoute><lazyPages.AdminDashboard /></ProtectedRoute>},
+  { path: "/admin/participants/onsite", element: <ProtectedRoute><lazyPages.AdminParticipantsOnsite /></ProtectedRoute>},
+  // 404
   { path: "*", element: <Placeholder title="Oops! Looks like you’ve taken a wrong turn into the meteor shower. This page has burned up in the atmosphere!" /> },
 ];
+
 
 const AppRoutes = () => (
   <Suspense fallback={<Loader />}>

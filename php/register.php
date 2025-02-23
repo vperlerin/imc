@@ -60,7 +60,7 @@ try {
 
     // Check if email already exists
     if ($participantManager->emailExists($data['email'])) {
-        throw new Exception("The email address '{$data['email']}' is already in use. Please use a different email or log in.");
+        throw new Exception("The email address '{$data['email']}' is already in use. Please use a different email.");
     }
 
     $workshopManager = new WorkshopManager($pdo);
