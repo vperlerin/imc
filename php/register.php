@@ -26,39 +26,48 @@ require_once __DIR__ . "/class/Summary.class.php";
 
 function create_email(array $data, string $summary): string
 {
+    $year = getenv("YEAR");
+    $paymentLink = "https://imc{$year}.imo.net/payment";
 
-    $message = "Hello {$data['first_name']} {$data['last_name']},<br><br>";
-    $message .= "Thank you for registering for IMC " . getenv("YEAR");
-    $message .=  "Your registration is nearly complete; ";
+    $message = "
+        <p>Hello <strong>{$data['first_name']} {$data['last_name']}</strong>,</p>
 
+        <p>Thank you for registering for IMC <strong>{$year}</strong>. Your registration is nearly complete.</p>
+    ";
+
+    // Payment instructions
     if ($data['payment_method'] == 'paypal') {
-        $message .= "if you didn't pay already, ";
+        $message .= "<p>If you haven't paid already, ";
+    } else {
+        $message .= "<p>";
     }
 
-    $message .=  "all you need to do now is send the required payment of";
-    $message .=  "{$data['total_due']} €";
+    $message .= "all you need to do now is send the required payment of:</p>
+        <p><strong>{$data['total_due']} €</strong></p>";
 
     if ($data['payment_method'] == 'paypal') {
-        $message .=  " (Paypal feed of  {$data['payl_fee']} € INCLUDED)";
+        $message .= "<p>(Paypal fee of <strong>{$data['payl_fee']} €</strong> included)</p>";
     }
 
-    $message .=  "<br>The necessary instructions for making your payment can be found ";
-    $message .=  "<a href='https://imc" . getenv("YEAR") . ".imo.net/payment'>on this page</a><br><br>";
+    $message .= "
+        <p>The necessary instructions for making your payment can be found 
+        <a href='{$paymentLink}'>on this page</a>.</p>
 
+        <p>The registration fee should be sent to the IMO Treasurer 
+        <strong style='color:red'>IMMEDIATELY</strong>. Delaying payment will result in the 
+        <strong>cancellation of your registration</strong>.</p>
 
-    $message .=  "The registration fee should be sent to the IMO Treasurer <strong style='text:red'>IMMEDIATELY</strong>.";
-    $message .=  "Delaying payment will result in the <strong>cancellation of your registration</strong>.";
+        <p>Best regards,</p>
+        <p><strong>IMC {$year} Team</strong></p>
 
-    $message .=  "Best regards,<br><br>IMC " . getenv("YEAR") . " Team";
-
-
-    $message .= "<p><b>Billing Details</b></p>";
-
-    $message .= "<p><b>registration Details</b></p>";
-    $message .= "{$summary}";
+        <h3>Billing Details</h3>
+        <h3>Registration Details</h3>
+        {$summary}
+    ";
 
     return $message;
 }
+
 
 try {
     $data = json_decode(file_get_contents("php://input"), true);
@@ -104,7 +113,7 @@ try {
     // Generate a random password
     $plain_password = bin2hex(random_bytes(4)); // 8-character random password
     $password_hash = password_hash($plain_password, PASSWORD_DEFAULT);
-    $data['password'] = $password_hash; // For the summary
+    $data['password'] = $plain_password; // For the summary
 
     // Initialize managers
     $participantManager = new ParticipantManager($pdo);
