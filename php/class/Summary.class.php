@@ -49,9 +49,9 @@ class SummaryFormatter
 
         // ARRIVAL & DEPARTURE
         $content .= "
-            <b>Arrival & Departure</b><br>
+            <br><b>Arrival & Departure</b><br>
             <b>Arrival :</b> {$data['arrival_date']} {$data['arrival_hour']}:{$data['arrival_minute']}<br>
-            <b>Arrival :</b> {$data['departure_date']} {$data['departure_hour']}:{$data['departure_minute']}<br> 
+            <b>Departure :</b> {$data['departure_date']} {$data['departure_hour']}:{$data['departure_minute']}<br> 
             <b>Travel Method:</b> {$data['travelling']}<br>
         ";
 
@@ -61,14 +61,14 @@ class SummaryFormatter
 
         // REGISTRATION TYPE & PAYMENT METHOD
         $content .= "
-           <b>Registration & Payment</b><br>
+           <br><b>Registration & Payment</b><br>
            <b>Registration Type:</b> {$data['registration_type']}<br>
            <b>Payment Method:</b> {$data['payment_method']}<br>
         ";
 
         // TALKS
         if (!empty($data['talks'])) {
-            $content .= "<b>Talk Contributions</b><br>";
+            $content .= "<br><b>Talk Contributions</b><br>";
 
             foreach ($data['talks'] as $talk) {
                 $content .= "
@@ -83,7 +83,7 @@ class SummaryFormatter
 
         // POSTERS
         if (!empty($data['posters'])) {
-            $content .= "<h5>Poster Contributions</h5>";
+            $content .= "<br><b>Poster Contributions</b><br>";
 
             foreach ($data['posters'] as $poster) {
                 $content .= "
@@ -97,7 +97,7 @@ class SummaryFormatter
 
         // EXTRAS
         $content .= "
-            <b>Extras</b><br>
+            <br><b>Extras</b><br>
             <b>Excursion:</b> {$data['excursion']}<br>
             <b>T-shirt:</b> {$data['buy_tshirt']}<br>
         ";
