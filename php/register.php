@@ -26,6 +26,9 @@ require_once __DIR__ . "/class/Summary.class.php";
 
 try {
     $data = json_decode(file_get_contents("php://input"), true);
+
+    print_r($data);
+    exit;
  
     // Required fields validation
     $required_fields = [
@@ -99,7 +102,7 @@ try {
     $subject = "IMC " . getenv("YEAR") . " Registration Confirmation";
 
     // Summary for email
-    $emailContent = EmailFormatter::formatEmailContent($data,  true);
+    $emailContent = EmailFormatter::formatEmailContent($data, true);
 
     $message = "Hello {$data['first_name']} {$data['last_name']},\n\n";
     $message .= "Thank you for registering for IMC " . getenv("YEAR") . ". Below is the summary of your registration:\n\n";

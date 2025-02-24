@@ -16,8 +16,8 @@ const Summary = ({
   setTotal,
   setPaypalFee,
 }) => {
-  const allValues = initialData || getValues();
-
+  const allValues = initialData || getValues(); 
+  
   // Registration & Accommodation Cost
   const registration_type = allValues.registration_type || "no"; // Default to "no"
   const selectedRoom = conferenceData.costs.rooms.find(room => room.type === registration_type);
@@ -57,7 +57,7 @@ const Summary = ({
   const workshopOnlineCost = selectedWorkshops.reduce((sum, workshop) => sum + (workshop?.cost_online || 0), 0);
   const onlineConferenceCost = conferenceData.costs.online;
   let totalOnlineCost = workshopOnlineCost + onlineConferenceCost;
-  const onlinePaypalFee = payment_method.toLowerCase() === "paypal" ? getPaypalPrice(totalOnlineCost) - totalOnlineCost : 0;
+  const onlinePaypalFee = paymentMethod.toLowerCase() === "paypal" ? getPaypalPrice(totalOnlineCost) - totalOnlineCost : 0;
   totalOnlineCost += onlinePaypalFee;
 
   useEffect(() => {

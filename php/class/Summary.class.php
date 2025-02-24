@@ -4,7 +4,7 @@ require_once __DIR__ . "/../config.php";
 
 class EmailFormatter
 {
-  public static function formatEmailContent(array $data, boolean $widthPwd): string
+  public static function formatEmailContent(array $data, bool $widthPwd): string
   {
  
 
