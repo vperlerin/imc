@@ -129,19 +129,9 @@ const MainForm = () => {
 
           <p>The IMC fee is due without any delay.</p>
 
-          <Summary
-            getValues={getValues}
-            isEarlyBird={is_early_bird}
-            conferenceData={cd}
-            setTotal={setTotal}
-            setPaypalFee={setPaypalFee}
-            initialData={initialData}
-            showInfo={false}
-          />
-
           {finalData.payment_method.toLowerCase() === "paypal" ? (
             <>
-              <p class="text-center">Click the button below to pay immediately with Paypal.</p>
+              <p >Click the button below to pay immediately with Paypal.</p>
               <PayPalForm amount={total} year={cd.year} />
             </>
           ) : (
@@ -156,6 +146,16 @@ const MainForm = () => {
               </blockquote>
             </>
           )}
+
+          <Summary
+            getValues={getValues}
+            isEarlyBird={is_early_bird}
+            conferenceData={cd}
+            setTotal={setTotal}
+            setPaypalFee={setPaypalFee}
+            initialData={initialData}
+            showInfo={false}
+          /> 
         </>
       ) :
         (
