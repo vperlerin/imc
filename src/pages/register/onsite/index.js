@@ -139,7 +139,7 @@ const MainForm = () => {
             showInfo={false}
           />
 
-          {formData.payment_method.toLowerCase() === "paypal" ? (
+          {finalData.payment_method.toLowerCase() === "paypal" ? (
             <>
               <p class="text-center">Click the button below to pay immediately with Paypal.</p>
               <PayPalForm amount={total} year={cd.year} />
