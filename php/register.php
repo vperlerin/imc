@@ -22,6 +22,7 @@ require_once __DIR__ . "/class/Contribution.class.php";
 require_once __DIR__ . "/class/Accommodation.class.php";
 require_once __DIR__ . "/class/Payment.class.php";
 require_once __DIR__ . "/class/Extras.class.php";
+require_once __DIR__ . "/class/Summary.class.php";
 
 try {
     $data = json_decode(file_get_contents("php://input"), true);
@@ -96,88 +97,14 @@ try {
     // Prepare email body with all details
     $subject = "IMC " . getenv("YEAR") . " Registration Confirmation";
 
+    // Summary for email
+    $emailContent = EmailFormatter::formatEmailContent($data);
+
     $message = "
-    <h2>Hello {$data['first_name']} {$data['last_name']},</h2>
-    <p>Thank you for registering for IMC " . getenv("YEAR") . ". Below is the summary of your registration:</p>
-    
-    <h3>Personal Information</h3>
-    <ul>
-        <li><strong>Name:</strong> {$data['title']} {$data['first_name']} {$data['last_name']}</li>
-        <li><strong>Gender:</strong> {$data['gender']}</li>
-        <li><strong>Date of Birth:</strong> {$data['dobYear']}-{$data['dobMonth']}-{$data['dobDay']}</li>
-        <li><strong>Email:</strong> {$data['email']}</li>
-        <li><strong>Phone:</strong> {$data['phone']}</li>
-        <li><strong>Address:</strong> {$data['address']}, {$data['postal_code']}, {$data['city']}, {$data['country']}</li>
-        <li><strong>Organization:</strong> " . ($data['organization'] ?? "N/A") . "</li>
-    </ul>
-
-    <h3>Workshops</h3>
-    <ul>
-        <li><strong>Spectroscopy Workshop:</strong> " . ($data['Spectroscopy Workshop'] === "true" ? "Yes" : "No") . "</li>
-        <li><strong>Radio Workshop:</strong> " . ($data['Radio Workshop'] === "true" ? "Yes" : "No") . "</li>
-    </ul>
-
-    <h3>Arrival & Departure</h3>
-    <ul>
-        <li><strong>Arrival Date:</strong> {$data['arrival_date']}</li>
-        <li><strong>Arrival Time:</strong> {$data['arrival_hour']}:{$data['arrival_minute']}</li>
-        <li><strong>Departure Date:</strong> {$data['departure_date']}</li>
-        <li><strong>Departure Time:</strong> {$data['departure_hour']}:{$data['departure_minute']}</li>
-        <li><strong>Travel Method:</strong> {$data['travelling']}</li>
-        <li><strong>Travel Details:</strong> " . ($data['travelling_details'] ?? "N/A") . "</li>
-    </ul>";
-
-    if (!empty($data['talks'])) {
-        $message .= "<h3>Talk Contributions</h3><ul>";
-        foreach ($data['talks'] as $talk) {
-            $message .= "
-            <li><strong>Title:</strong> {$talk['title']}</li>
-            <li><strong>Authors:</strong> {$talk['authors']}</li>
-            <li><strong>Abstract:</strong> {$talk['abstract']}</li>
-            <li><strong>Session:</strong> {$talk['session']}</li>
-            <li><strong>Duration:</strong> {$talk['duration']}</li> 
-            <br>";
-        }
-        $message .= "</ul>";
-    }
-
-    if (!empty($data['posters'])) {
-        $message .= "<h3>Poster Contributions</h3><ul>";
-        foreach ($data['posters'] as $poster) {
-            $message .= "
-            <li><strong>Title:</strong> {$poster['title']}</li>
-            <li><strong>Authors:</strong> {$poster['authors']}</li>
-            <li><strong>Abstract:</strong> {$poster['abstract']}</li>
-            <li><strong>Session:</strong> {$poster['session']}</li> 
-            <br>";
-        }
-        $message .= "</ul>";
-    }
-
-    $message .= "
-    <h3>Accommodation & Payment</h3>
-    <ul>
-        <li><strong>Registration Type:</strong> {$data['registrationType']}</li>
-        <li><strong>Payment Method:</strong> {$data['paymentMethod']}</li>
-    </ul>
-
-    <h3>Extra Options</h3>
-    <ul>
-        <li><strong>Excursion:</strong> " . ($data['excursion'] === "yes" ? "Yes" : "No") . "</li>
-        <li><strong>Buy T-Shirt:</strong> " . ($data['buy_tshirt'] === "yes" ? "Yes" : "No") . "</li>
-        <li><strong>T-Shirt Size:</strong> " . ($data['tshirt_size'] ?? "N/A") . "</li>
-    </ul>";
-
-    if (!empty($data['comments'])) {
-        $message .= "<h3>Comments</h3><p>{$data['comments']}</p>";
-    }
-
-    $message .= "
-    <h3>Your Registration Password</h3>
-    <p><strong><span style='font-weight:bold; color:#d9534f;'>$plain_password</span></strong></p>
-    <p>You can use this password to update your registration details.</p>
-
-    <p>Best regards,<br>IMC " . getenv("YEAR") . " Team</p>";
+        Hello {$data['first_name']} {$data['last_name']},\n\n
+        Thank you for registering for IMC " . getenv("YEAR") . ". Below is the summary of your registration:\n\n
+        $emailContent\n\n 
+        <p>Best regards,<br>IMC " . getenv("YEAR") . " Team</p>";
 
     // Send confirmation email using PHPMailer
     $mail = new Mail();
