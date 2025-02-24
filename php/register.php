@@ -26,9 +26,7 @@ require_once __DIR__ . "/class/Summary.class.php";
 
 try {
     $data = json_decode(file_get_contents("php://input"), true);
-
-    print_r($data);
-
+ 
     // Required fields validation
     $required_fields = [
         'title',
@@ -107,7 +105,7 @@ try {
         Hello {$data['first_name']} {$data['last_name']},\n\n
         Thank you for registering for IMC " . getenv("YEAR") . ". Below is the summary of your registration:\n\n
         $emailContent\n\n 
-        <p>Best regards,<br>IMC " . getenv("YEAR") . " Team</p>";
+        Best regards,\nIMC " . getenv("YEAR") . " Team</p>";
 
     // Send confirmation email using PHPMailer
     $mail = new Mail();
