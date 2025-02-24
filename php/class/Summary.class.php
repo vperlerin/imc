@@ -4,15 +4,12 @@ require_once __DIR__ . "/../config.php";
 
 class EmailFormatter
 {
-  public static function formatEmailContent(array $data): string
+  public static function formatEmailContent(array $data, boolean $widthPwd): string
   {
-    $year = getenv("YEAR");
+ 
 
     // IDENTITY
-    $plainText = "Hello {$data['first_name']} {$data['last_name']},\n\n" .
-      "Thank you for registering for IMC $year. Below is the summary of your registration:\n\n" .
-      "Personal Information:\n" .
-      "Name: {$data['title']} {$data['first_name']} {$data['last_name']}\n";
+    $plainText = " Name: {$data['title']} {$data['first_name']} {$data['last_name']}\n";
 
     if (!empty($data['organization'])) {
       $plainText .= "Organization: {$data['organization']}\n";
@@ -85,9 +82,10 @@ class EmailFormatter
     if ($data['comments']) {
       $plainText .= "\nComments: {$data['comments']}\n";
     }
-
-
-    $plainText .= "\nYour Registration Password: {$data['password']}\n";
+ 
+    if($widthPwd) {
+      $plainText .= "\nYour Registration Password: {$data['password']}\n";
+    }
 
     return $plainText;
   }

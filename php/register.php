@@ -99,13 +99,12 @@ try {
     $subject = "IMC " . getenv("YEAR") . " Registration Confirmation";
 
     // Summary for email
-    $emailContent = EmailFormatter::formatEmailContent($data);
+    $emailContent = EmailFormatter::formatEmailContent($data,  true);
 
-    $message = "
-        Hello {$data['first_name']} {$data['last_name']},\n\n
-        Thank you for registering for IMC " . getenv("YEAR") . ". Below is the summary of your registration:\n\n
-        $emailContent\n\n 
-        Best regards,\nIMC " . getenv("YEAR") . " Team</p>";
+    $message = "Hello {$data['first_name']} {$data['last_name']},\n\n";
+    $message .= "Thank you for registering for IMC " . getenv("YEAR") . ". Below is the summary of your registration:\n\n";
+    $message .= "{$emailContent}"; 
+    $message .=  "Best regards,\nIMC " . getenv("YEAR") . " Team</p>";
 
     // Send confirmation email using PHPMailer
     $mail = new Mail();
