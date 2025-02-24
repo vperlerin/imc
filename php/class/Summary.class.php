@@ -6,71 +6,77 @@ class SummaryFormatter
 {
     public static function formatEmailContent(array $data, bool $withPwd): string
     {
-        $content = "<h4>Registration Summary</h4>";
+        $content = "";
+
+        // PASSWORD (If applicable)
+        if ($withPwd) {
+            $year = getenv("YEAR");
+            $loginLink = "https://imc{$year}.imo.net/login";
+            $content .= "
+                 Your Registration Password</br>
+                <b>Password:</b> {$data['password']}<br>
+                 Use this password to update your record (travel details and/or contributions): <a href='{$loginLink}'>on this page</a><br><br>
+        ";
+        }
 
         // IDENTITY
-        $content .= "<p><strong>Name:</strong> {$data['title']} {$data['first_name']} {$data['last_name']}</p>";
+        $content .= "<b>Name:</b> {$data['title']} {$data['first_name']} {$data['last_name']}<br>";
 
         if (!empty($data['organization'])) {
-            $content .= "<p><strong>Organization:</strong> {$data['organization']}</p>";
+            $content .= "<b>Organization:</b> {$data['organization']}<br>";
         }
 
         $content .= "
-            <p><strong>Gender:</strong> {$data['gender']}</p>
-            <p><strong>Date of Birth:</strong> {$data['dobYear']}-{$data['dobMonth']}-{$data['dobDay']}</p>
-            <p><strong>Email:</strong> {$data['email']}</p>
-            <p><strong>Phone:</strong> {$data['phone']}</p>
-            <p><strong>Address:</strong> {$data['address']}, {$data['postal_code']}, {$data['city']}, {$data['country']}</p>
+            <b>Gender:</b> {$data['gender']}<br>
+            <b>Date of Birth:</b> {$data['dobYear']}-{$data['dobMonth']}-{$data['dobDay']}<br>
+            <b>Email:</b> {$data['email']}<br>
+            <b>Phone:</b> {$data['phone']}<br>
+            <b>Address:</b> {$data['address']}, {$data['postal_code']}, {$data['city']}, {$data['country']}<br>
         ";
 
         // WORKSHOPS
         if ($data['Spectroscopy Workshop'] === "true" || $data['Radio Workshop'] === "true") {
-            $content .= "<h5>Workshops</h5><ul>";
+
 
             if ($data['Spectroscopy Workshop'] === "true") {
-                $content .= "<li>Spectroscopy Workshop: Yes</li>";
+                $content .= "<b>Spectroscopy Workshop:</b> Yes<br>";
             }
 
             if ($data['Radio Workshop'] === "true") {
-                $content .= "<li>Radio Workshop: Yes</li>";
+                $content .= "<b>Radio Workshop: Yes</b><br>";
             }
-
-            $content .= "</ul>";
         }
 
         // ARRIVAL & DEPARTURE
         $content .= "
-            <h5>Arrival & Departure</h5>
-            <p><strong>Arrival Date:</strong> {$data['arrival_date']}</p>
-            <p><strong>Arrival Time:</strong> {$data['arrival_hour']}:{$data['arrival_minute']}</p>
-            <p><strong>Departure Date:</strong> {$data['departure_date']}</p>
-            <p><strong>Departure Time:</strong> {$data['departure_hour']}:{$data['departure_minute']}</p>
-            <p><strong>Travel Method:</strong> {$data['travelling']}</p>
+            <b>Arrival & Departure</b><br>
+            <b>Arrival :</b> {$data['arrival_date']} {$data['arrival_hour']}:{$data['arrival_minute']}<br>
+            <b>Arrival :</b> {$data['departure_date']} {$data['departure_hour']}:{$data['departure_minute']}<br> 
+            <b>Travel Method:</b> {$data['travelling']}<br>
         ";
 
         if (!empty($data['travelling_details'])) {
-            $content .= "<p><strong>Travel Details:</strong> {$data['travelling_details']}</p>";
+            $content .= "<b>Travel Details:</b> {$data['travelling_details']}<br>";
         }
 
         // REGISTRATION TYPE & PAYMENT METHOD
         $content .= "
-            <h5>Registration & Payment</h5>
-            <p><strong>Registration Type:</strong> {$data['registration_type']}</p>
-            <p><strong>Payment Method:</strong> {$data['payment_method']}</p>
+           <b>Registration & Payment</b><br>
+           <b>Registration Type:</b> {$data['registration_type']}<br>
+           <b>Payment Method:</b> {$data['payment_method']}<br>
         ";
 
         // TALKS
         if (!empty($data['talks'])) {
-            $content .= "<h5>Talk Contributions</h5>";
+            $content .= "<b>Talk Contributions</b><br>";
 
             foreach ($data['talks'] as $talk) {
                 $content .= "
-                    <p><strong>Title:</strong> {$talk['title']}</p>
-                    <p><strong>Authors:</strong> {$talk['authors']}</p>
-                    <p><strong>Abstract:</strong> {$talk['abstract']}</p>
-                    <p><strong>Session:</strong> {$talk['session']}</p>
-                    <p><strong>Duration:</strong> {$talk['duration']}</p>
-                    <hr>
+                    <b>Title:</b> {$talk['title']}<br>
+                    <b>Authors:</b> {$talk['authors']}<br>
+                    <b>Abstract:</b> {$talk['abstract']}<br>
+                    <b>Session:</b> {$talk['session']}<br>
+                    <b>Duration:</b> {$talk['duration']}<br><br> 
                 ";
             }
         }
@@ -81,41 +87,31 @@ class SummaryFormatter
 
             foreach ($data['posters'] as $poster) {
                 $content .= "
-                    <p><strong>Title:</strong> {$poster['title']}</p>
-                    <p><strong>Authors:</strong> {$poster['authors']}</p>
-                    <p><strong>Abstract:</strong> {$poster['abstract']}</p>
-                    <p><strong>Session:</strong> {$poster['session']}</p>
-                    <hr>
+                    <b>Title:</b> {$poster['title']}<br>
+                    <b>Authors:</b> {$poster['authors']}<br>
+                    <b>Abstract:</b> {$poster['abstract']}<br>
+                    <b>Session:</b> {$poster['session']}<br><br>  
                 ";
             }
         }
 
         // EXTRAS
         $content .= "
-            <h5>Extras</h5>
-            <p><strong>Excursion:</strong> {$data['excursion']}</p>
-            <p><strong>T-shirt:</strong> {$data['buy_tshirt']}</p>
+            <b>Extras</b><br>
+            <b>Excursion:</b> {$data['excursion']}<br>
+            <b>T-shirt:</b> {$data['buy_tshirt']}<br>
         ";
 
         if ($data['buy_tshirt'] === "yes") {
-            $content .= "<p><strong>T-shirt Size:</strong> {$data['tshirt_size']}</p>";
+            $content .= "<b>T-shirt Size:</b> {$data['tshirt_size']}<br>";
         }
 
         // COMMENTS
         if (!empty($data['comments'])) {
-            $content .= "<h5>Comments</h5><p>{$data['comments']}</p>";
+            $content .= "<br><b>Comments</b><br>{$data['comments']}<br>";
         }
 
-        // PASSWORD (If applicable)
-        if ($withPwd) {
-            $year = getenv("YEAR");
-            $loginLink = "https://imc{$year}.imo.net/login";
-            $content .= "
-                <h5>Your Registration Password</h5>
-                <p><strong>Password:</strong> {$data['password']}</p>
-                <p>Use this password to update your record (travel details and/or contributions): <a href='{$loginLink}'>on this page</a></p>
-            ";
-        }
+
 
         return $content;
     }

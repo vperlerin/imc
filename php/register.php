@@ -43,13 +43,9 @@ function create_email(array $data, string $summary): string
     }
 
     $message .= " you need to do now is send the required payment of:</p>
-        <p><strong>{$data['total_due']} €</strong>";
+        <p><strong>{$data['total_due']} €</strong></p>";
 
-    if (strtolower($data['payment_method']) == 'paypal') {
-        $message .= " (Paypal fee of <strong>{$data['paypal_fee']} €</strong> included)</p>";
-    } else {
-        $message .= "</p>";
-    }
+    
 
     $message .= "
         <p>The necessary instructions for making your payment can be found 
