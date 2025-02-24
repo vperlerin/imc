@@ -56,6 +56,8 @@ function create_email(array $data, string $summary): string
 
     $message .= "<p><b>registration Details</b></p>";
     $message .= "{$summary}";
+
+    return $message;
 }
 
 try {
