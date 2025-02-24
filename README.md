@@ -4,6 +4,7 @@ WARNING: NEVER PUSH FROM THE SERVER
 
 1- Update src/data/conference-data.json 
 2- Update /env/.env with DB user & password
+3- Make sure imc/env/.env is the same than /env/.env
 3- Create db running /mysql/run_create_db.sh
 4- Run python python/fill_db.py to fill the db with info from src/data/conference-data.json 
 5- Update all allowed_origins in php files

@@ -17,7 +17,7 @@ const Header = () => {
           <Link
             aria-label="Admin"
             className={classnames('d-flex align-items-center text-dark text-decoration-none gap-2', css.title)}
-            to={'/admin'}
+            to={'/admin/dashboard'}
             title="Admin"
           >
             <img src={smallLogo} alt={title} className="rounded-circle border border-2 p-1" />

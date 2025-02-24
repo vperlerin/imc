@@ -53,7 +53,7 @@ const Home = () => {
               Register before {formatFullDate(cd.deadlines.reg)}
             </Link>
             <b className="fw-bolder d-block text-md-start text-center">
-              Enjoy an early bird discount of {cd.costs.after_early_birds}€ by signing up before {formatFullDate(cd.deadlines.early_birds)}!
+              Enjoy an early bird discount of {cd.costs.after_early_birds}€ by signing up before <span className="text-info">{formatFullDate(cd.deadlines.early_birds)}</span>!
             </b>
           </div>
 

@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import cssForm from "styles/components/form.module.scss";
 import React, { useEffect } from "react";
-import StepDislay from "components/registration/stepDisplay";  
+import StepDislay from "components/registration/stepDisplay";
 import { formatFullDate } from 'utils/date';
 
 const getDateRange = (startDate, endDate) => {
@@ -59,7 +59,7 @@ const ArrivalForm = ({
   return (
     <>
       <h4 className="mb-3 border-bottom pb-2">
-       <StepDislay step={step} stepTotal={stepTotal} /> 
+        <StepDislay step={step} stepTotal={stepTotal} />
         Personal Details
       </h4>
       <div className={classNames(cssForm.smallW, 'mx-auto position-relative')}>
@@ -74,11 +74,11 @@ const ArrivalForm = ({
 
         <div className={cssForm.smallW}>
           {/* Arrival Date & Time */}
-          <div className="mb-3 row">
+          <div className="mb-3 row align-items-center">
             <label className="col-sm-2 col-form-label fw-bold">Arrival</label>
-            <div className="col-sm-3">
+            <div className="col-sm-6 d-flex align-items-center gap-1">
               <select
-                className={classNames("form-select", errors.arrival_date && "is-invalid")}
+                className={classNames("form-select me-2", errors.arrival_date && "is-invalid")}
                 {...register("arrival_date", { required: "Arrival date is required" })}
                 onBlur={() => trigger("arrival_date")}
               >
@@ -87,12 +87,9 @@ const ArrivalForm = ({
                   <option key={date} value={date}>{date}</option>
                 ))}
               </select>
-              {errors.arrival_date && <p className="text-danger mb-0"><small>{errors.arrival_date.message}</small></p>}
-            </div>
-
-            <div className="col-sm-2">
+             
               <select
-                className={classNames("form-select", errors.arrival_hour && "is-invalid")}
+                className={classNames("form-select w-auto", errors.arrival_hour && "is-invalid")}
                 {...register("arrival_hour", { required: "Hour is required" })}
                 onBlur={() => trigger("arrival_hour")}
               >
@@ -101,11 +98,9 @@ const ArrivalForm = ({
                   <option key={hour} value={hour}>{hour}</option>
                 ))}
               </select>
-            </div>
-
-            <div className="col-sm-2">
+              :
               <select
-                className={classNames("form-select", errors.arrival_minute && "is-invalid")}
+                className={classNames("form-select w-auto", errors.arrival_minute && "is-invalid")}
                 {...register("arrival_minute", { required: "Minute is required" })}
                 onBlur={() => trigger("arrival_minute")}
               >
@@ -113,16 +108,17 @@ const ArrivalForm = ({
                 {minutes.map(min => (
                   <option key={min} value={min}>{min}</option>
                 ))}
-              </select>
+              </select> 
             </div>
+            {errors.arrival_date && <p className="text-danger mb-0"><small>{errors.arrival_date.message}</small></p>}
           </div>
 
           {/* Departure Date & Time */}
-          <div className="mb-3 row">
+          <div className="mb-3 row align-items-center">
             <label className="col-sm-2 col-form-label fw-bold">Departure</label>
-            <div className="col-sm-3">
+            <div className="col-sm-6 d-flex align-items-center gap-1">
               <select
-                className={classNames("form-select", errors.departure_date && "is-invalid")}
+                className={classNames("form-select me-2", errors.departure_date && "is-invalid")}
                 {...register("departure_date", { required: "Departure date is required" })}
                 onBlur={() => trigger("departure_date")}
               >
@@ -131,12 +127,10 @@ const ArrivalForm = ({
                   <option key={date} value={date}>{date}</option>
                 ))}
               </select>
-              {errors.departure_date && <p className="text-danger mb-0"><small>{errors.departure_date.message}</small></p>}
-            </div>
-
-            <div className="col-sm-2">
+             
+            
               <select
-                className={classNames("form-select", errors.departure_hour && "is-invalid")}
+                className={classNames("form-select w-auto", errors.departure_hour && "is-invalid")}
                 {...register("departure_hour", { required: "Hour is required" })}
                 onBlur={() => trigger("departure_hour")}
               >
@@ -145,11 +139,9 @@ const ArrivalForm = ({
                   <option key={hour} value={hour}>{hour}</option>
                 ))}
               </select>
-            </div>
-
-            <div className="col-sm-2">
+              : 
               <select
-                className={classNames("form-select", errors.departure_minute && "is-invalid")}
+                className={classNames("form-select w-auto", errors.departure_minute && "is-invalid")}
                 {...register("departure_minute", { required: "Minute is required" })}
                 onBlur={() => trigger("departure_minute")}
               >
@@ -157,8 +149,9 @@ const ArrivalForm = ({
                 {minutes.map(min => (
                   <option key={min} value={min}>{min}</option>
                 ))}
-              </select>
+              </select> 
             </div>
+            {errors.departure_date && <p className="text-danger mb-0"><small>{errors.departure_date.message}</small></p>}
           </div>
 
           {/* Travelling by */}
@@ -196,7 +189,7 @@ const ArrivalForm = ({
             </div>
           </div>
         </div>
-      </div>
+      </div >
     </>
   );
 };

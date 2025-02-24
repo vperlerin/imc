@@ -1,3 +1,3 @@
-import conferenceDataJson from './conference-data.json';
+import conferenceData from './conference-data.json';
 
-export const conferenceData = conferenceDataJson;
+export { conferenceData };
