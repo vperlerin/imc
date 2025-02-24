@@ -27,6 +27,8 @@ require_once __DIR__ . "/class/Summary.class.php";
 try {
     $data = json_decode(file_get_contents("php://input"), true);
 
+    print_r($data);
+
     // Required fields validation
     $required_fields = [
         'title',
