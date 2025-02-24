@@ -36,6 +36,7 @@ const calculateAge = (dob) => {
 
 
 const MainForm = () => {
+  const [finalData, setFinalData] = useState(null);
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState(null);
@@ -97,6 +98,7 @@ const MainForm = () => {
       });
 
       if (response.data.success) {
+        setFinalData(formattedData);
         setSuccessMsg("Registration successful!");
       } else {
         setErrorMsg(response.data.message || "Something went wrong.");
