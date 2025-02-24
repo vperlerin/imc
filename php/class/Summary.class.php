@@ -35,9 +35,7 @@ class SummaryFormatter
         ";
 
         // WORKSHOPS
-        if ($data['Spectroscopy Workshop'] === "true" || $data['Radio Workshop'] === "true") {
-
-
+        if ($data['Spectroscopy Workshop'] === "true" || $data['Radio Workshop'] === "true") { 
             if ($data['Spectroscopy Workshop'] === "true") {
                 $content .= "<b>Spectroscopy Workshop:</b> Yes<br>";
             }
@@ -68,7 +66,7 @@ class SummaryFormatter
 
         // TALKS
         if (!empty($data['talks'])) {
-            $content .= "<br><b>Talk Contributions</b><br>";
+            $content .= "<br><b>Talk Contribution(s)</b><br>";
 
             foreach ($data['talks'] as $talk) {
                 $content .= "
@@ -76,21 +74,21 @@ class SummaryFormatter
                     <b>Authors:</b> {$talk['authors']}<br>
                     <b>Abstract:</b> {$talk['abstract']}<br>
                     <b>Session:</b> {$talk['session']}<br>
-                    <b>Duration:</b> {$talk['duration']}<br><br> 
+                    <b>Duration:</b> {$talk['duration']}<br>
                 ";
             }
         }
 
         // POSTERS
         if (!empty($data['posters'])) {
-            $content .= "<br><b>Poster Contributions</b><br>";
+            $content .= "<br><b>Poster Contribution(s)</b><br>";
 
             foreach ($data['posters'] as $poster) {
                 $content .= "
                     <b>Title:</b> {$poster['title']}<br>
                     <b>Authors:</b> {$poster['authors']}<br>
                     <b>Abstract:</b> {$poster['abstract']}<br>
-                    <b>Session:</b> {$poster['session']}<br><br>  
+                    <b>Session:</b> {$poster['session']}<br>
                 ";
             }
         }
@@ -110,9 +108,7 @@ class SummaryFormatter
         if (!empty($data['comments'])) {
             $content .= "<br><b>Comments</b><br>{$data['comments']}<br>";
         }
-
-
-
+ 
         return $content;
     }
 }
