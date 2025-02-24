@@ -16,7 +16,6 @@ const PayPalForm = ({ className, year, amount }) => {
       {!!amount && (
         <input type="hidden" name="amount" value={amount} />
       )}
- 
 
       <button type="submit" className={classNames('btn btn-default border rounded-2 d-flex align-items-center gap-2 fw-bolder pe-4', css.paypal, className)}>
         <img

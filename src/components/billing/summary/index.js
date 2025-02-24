@@ -13,6 +13,7 @@ const Summary = ({
   getValues,
   isEarlyBird,
   conferenceData,
+  showInfo = true,
   setTotal,
   setPaypalFee,
 }) => {
@@ -72,7 +73,7 @@ const Summary = ({
 
   return (
     <>
-      {!isForAdmin && ( 
+      {!isForAdmin &&  showInfo && ( 
           <p className="fw-bolder alert alert-info">
            Please review your registration details and total cost carefully before submitting. If any changes are needed, go back and update your selections. Once registered, you will receive a password that allows you to update only your travel details and contributions (talks & posters).
           </p> 

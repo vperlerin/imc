@@ -44,9 +44,7 @@ function create_email(array $data, string $summary): string
 
     $message .= " you need to do now is send the required payment of:</p>
         <p><strong>{$data['total_due']} €</strong></p>";
-
-    
-
+ 
     $message .= "
         <p>The necessary instructions for making your payment can be found 
         <a href='{$paymentLink}'>on this page</a>.</p>
