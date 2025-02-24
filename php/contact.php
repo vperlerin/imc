@@ -10,8 +10,8 @@ if (isset($_SERVER['HTTP_ORIGIN']) && in_array($_SERVER['HTTP_ORIGIN'], $allowed
 header("Content-Type: application/json");
 header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
- 
-require '../vendor/autoload.php'; 
+
+require '../vendor/autoload.php';
 require_once __DIR__ . "/config.php";
 require_once __DIR__ . "/class/Mail.class.php";
 
@@ -62,7 +62,7 @@ $emailMessage .= "Email: $email\n\n";
 $emailMessage .= "Message:\n$message";
 
 // Define the Reply-To address
-$to=getenv("SMTP_REPLY_TO");
+$to = getenv("CONTACT_EMAIL");
 $replyTo = getenv("SMTP_REPLY_TO");
 
 // Initialize Mail class and send email
