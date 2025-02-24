@@ -32,21 +32,23 @@ function create_email(array $data, string $summary): string
     $message = "
         <p>Hello <strong>{$data['first_name']} {$data['last_name']}</strong>,</p>
 
-        <p>Thank you for registering for IMC <strong>{$year}</strong>. Your registration is nearly complete.</p>
+        <p>Thank you for registering for IMC <strong>{$year}</strong>. Your registration is nearly complete. 
     ";
 
     // Payment instructions
-    if ($data['payment_method'] == 'paypal') {
-        $message .= "<p>If you haven't paid already, ";
+    if (strtolower($data['payment_method']) == 'paypal') {
+        $message .= " If you haven't paid already, all";
     } else {
-        $message .= "<p>";
+        $message .= " All";
     }
 
-    $message .= "all you need to do now is send the required payment of:</p>
-        <p><strong>{$data['total_due']} €</strong></p>";
+    $message .= " you need to do now is send the required payment of:</p>
+        <p><strong>{$data['total_due']} €</strong>";
 
-    if ($data['payment_method'] == 'paypal') {
-        $message .= "<p>(Paypal fee of <strong>{$data['payl_fee']} €</strong> included)</p>";
+    if (strtolower($data['payment_method']) == 'paypal') {
+        $message .= " (Paypal fee of <strong>{$data['payl_fee']} €</strong> included)</p>";
+    } else {
+        $message .= "</p>";
     }
 
     $message .= "

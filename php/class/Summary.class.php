@@ -6,7 +6,7 @@ class SummaryFormatter
 {
     public static function formatEmailContent(array $data, bool $withPwd): string
     {
-        $content = "<h2>Registration Summary</h2>";
+        $content = "<h4>Registration Summary</h4>";
 
         // IDENTITY
         $content .= "<p><strong>Name:</strong> {$data['title']} {$data['first_name']} {$data['last_name']}</p>";
@@ -25,7 +25,7 @@ class SummaryFormatter
 
         // WORKSHOPS
         if ($data['Spectroscopy Workshop'] === "true" || $data['Radio Workshop'] === "true") {
-            $content .= "<h3>Workshops</h3><ul>";
+            $content .= "<h5>Workshops</h5><ul>";
 
             if ($data['Spectroscopy Workshop'] === "true") {
                 $content .= "<li>Spectroscopy Workshop: Yes</li>";
@@ -40,7 +40,7 @@ class SummaryFormatter
 
         // ARRIVAL & DEPARTURE
         $content .= "
-            <h3>Arrival & Departure</h3>
+            <h5>Arrival & Departure</h5>
             <p><strong>Arrival Date:</strong> {$data['arrival_date']}</p>
             <p><strong>Arrival Time:</strong> {$data['arrival_hour']}:{$data['arrival_minute']}</p>
             <p><strong>Departure Date:</strong> {$data['departure_date']}</p>
@@ -54,14 +54,14 @@ class SummaryFormatter
 
         // REGISTRATION TYPE & PAYMENT METHOD
         $content .= "
-            <h3>Registration & Payment</h3>
+            <h5>Registration & Payment</h5>
             <p><strong>Registration Type:</strong> {$data['registration_type']}</p>
             <p><strong>Payment Method:</strong> {$data['payment_method']}</p>
         ";
 
         // TALKS
         if (!empty($data['talks'])) {
-            $content .= "<h3>Talk Contributions</h3>";
+            $content .= "<h5>Talk Contributions</h5>";
 
             foreach ($data['talks'] as $talk) {
                 $content .= "
@@ -77,7 +77,7 @@ class SummaryFormatter
 
         // POSTERS
         if (!empty($data['posters'])) {
-            $content .= "<h3>Poster Contributions</h3>";
+            $content .= "<h5>Poster Contributions</h5>";
 
             foreach ($data['posters'] as $poster) {
                 $content .= "
@@ -92,7 +92,7 @@ class SummaryFormatter
 
         // EXTRAS
         $content .= "
-            <h3>Extras</h3>
+            <h5>Extras</h5>
             <p><strong>Excursion:</strong> {$data['excursion']}</p>
             <p><strong>T-shirt:</strong> {$data['buy_tshirt']}</p>
         ";
@@ -103,7 +103,7 @@ class SummaryFormatter
 
         // COMMENTS
         if (!empty($data['comments'])) {
-            $content .= "<h3>Comments</h3><p>{$data['comments']}</p>";
+            $content .= "<h5>Comments</h5><p>{$data['comments']}</p>";
         }
 
         // PASSWORD (If applicable)
@@ -111,10 +111,9 @@ class SummaryFormatter
             $year = getenv("YEAR");
             $loginLink = "https://imc{$year}.imo.net/login";
             $content .= "
-                <h3>Your Registration Password</h3>
+                <h5>Your Registration Password</h5>
                 <p><strong>Password:</strong> {$data['password']}</p>
-                <p>Use this password to update your record (travel details and/or contributions): 
-                <a href='{$loginLink}'>on this page</a></p>
+                <p>Use this password to update your record (travel details and/or contributions): <a href='{$loginLink}'>on this page</a></p>
             ";
         }
 
