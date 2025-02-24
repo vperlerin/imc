@@ -16,8 +16,8 @@ const Summary = ({
   setTotal,
   setPaypalFee,
 }) => {
-  const allValues = initialData || getValues(); 
-  
+  const allValues = initialData || getValues();
+
   // Registration & Accommodation Cost
   const registration_type = allValues.registration_type || "no"; // Default to "no"
   const selectedRoom = conferenceData.costs.rooms.find(room => room.type === registration_type);
@@ -72,10 +72,10 @@ const Summary = ({
 
   return (
     <>
-      {!isForAdmin && (
-        <p className="fw-bolder">
-          Please review your registration details and total cost carefully before submitting. If anything needs to be changed, go back and update your selections
-        </p>
+      {!isForAdmin && ( 
+          <p className="fw-bolder alert alert-info">
+           Please review your registration details and total cost carefully before submitting. If any changes are needed, go back and update your selections. Once registered, you will receive a password that allows you to update only your travel details and contributions (talks & posters).
+          </p> 
       )}
 
       <div className={classNames(!isForAdmin && css.maxW, 'p-2 border rounded')}>

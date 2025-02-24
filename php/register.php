@@ -24,12 +24,43 @@ require_once __DIR__ . "/class/Payment.class.php";
 require_once __DIR__ . "/class/Extras.class.php";
 require_once __DIR__ . "/class/Summary.class.php";
 
+function create_email(array $data, string $summary): string
+{
+
+    $message = "Hello {$data['first_name']} {$data['last_name']},<br><br>";
+    $message .= "Thank you for registering for IMC " . getenv("YEAR");
+    $message .=  "Your registration is nearly complete; ";
+
+    if ($data['payment_method'] == 'paypal') {
+        $message .= "if you didn't pay already, ";
+    }
+
+    $message .=  "all you need to do now is send the required payment of";
+    $message .=  "{$data['total_due']} €";
+
+    if ($data['payment_method'] == 'paypal') {
+        $message .=  " (Paypal feed of  {$data['payl_fee']} € INCLUDED)";
+    }
+
+    $message .=  "<br>The necessary instructions for making your payment can be found ";
+    $message .=  "<a href='https://imc" . getenv("YEAR") . ".imo.net/payment'>on this page</a><br><br>";
+
+
+    $message .=  "The registration fee should be sent to the IMO Treasurer <strong style='text:red'>IMMEDIATELY</strong>.";
+    $message .=  "Delaying payment will result in the <strong>cancellation of your registration</strong>.";
+
+    $message .=  "Best regards,<br><br>IMC " . getenv("YEAR") . " Team";
+
+
+    $message .= "<p><b>Billing Details</b></p>";
+
+    $message .= "<p><b>registration Details</b></p>";
+    $message .= "{$summary}";
+}
+
 try {
     $data = json_decode(file_get_contents("php://input"), true);
 
-    print_r($data);
-    exit;
- 
     // Required fields validation
     $required_fields = [
         'title',
@@ -48,7 +79,18 @@ try {
         'is_early_bird',
         'is_online',
         'total_due',
-        'paypal_fee'
+        'paypal_fee',
+        'arrival_date',
+        'arrival_hour',
+        'arrival_minute',
+        'departure_date',
+        'departure_hour',
+        'departure_minute',
+        'travelling',
+        'registration_type',
+        'excursion',
+        'buy_tshirt',
+        'tshirt_size'
     ];
 
     foreach ($required_fields as $field) {
@@ -60,7 +102,7 @@ try {
     // Generate a random password
     $plain_password = bin2hex(random_bytes(4)); // 8-character random password
     $password_hash = password_hash($plain_password, PASSWORD_DEFAULT);
-    $data['password'] = $password_hash; 
+    $data['password'] = $password_hash; // For the summary
 
     // Initialize managers
     $participantManager = new ParticipantManager($pdo);
@@ -99,18 +141,15 @@ try {
     $extraOptionsManager->saveExtraOptions($participant_id, $data);
 
     // Prepare email body with all details
-    $subject = "IMC " . getenv("YEAR") . " Registration Confirmation";
+    $subject = "IMC " . getenv("YEAR") . " Registration";
 
     // Summary for email
-    $emailContent = EmailFormatter::formatEmailContent($data, true);
+    $summary = SummaryFormatter::formatEmailContent($data, true);
 
-    $message = "Hello {$data['first_name']} {$data['last_name']},\n\n";
-    $message .= "Thank you for registering for IMC " . getenv("YEAR") . ". Below is the summary of your registration:\n\n";
-    $message .= "{$emailContent}"; 
-    $message .=  "Best regards,\nIMC " . getenv("YEAR") . " Team</p>";
-
+ 
     // Send confirmation email using PHPMailer
     $mail = new Mail();
+    $message = create_email($data, $summary);	
     $emailResponse = $mail->sendEmail([$data['email']], $subject, $message);
 
     // Return success response with password

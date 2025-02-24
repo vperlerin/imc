@@ -5,17 +5,18 @@ import StepDislay from "components/registration/stepDisplay";
 import { formatFullDate } from 'utils/date';
 
 const getDateRange = (startDate, endDate) => {
-  const dates = [];
-  let currentDate = new Date(startDate);
-  const lastDate = new Date(endDate);
-
-  while (currentDate <= lastDate) {
-    dates.push(formatFullDate(currentDate.toISOString().split("T")[0], false, false));
-    currentDate.setDate(currentDate.getDate() + 1);
-  }
-  return dates;
+  return Array.from(
+    { length: (new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24) + 1 },
+    (_, i) => {
+      const rawDate = new Date(startDate);
+      rawDate.setDate(rawDate.getDate() + i);
+      return {
+        value: rawDate.toISOString().split("T")[0], // YYYY-MM-DD for MySQL
+        label: formatFullDate(rawDate.toISOString().split("T")[0], false, false), // Human-readable
+      };
+    }
+  );
 };
-
 
 const hours = Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, "0"));
 const minutes = Array.from({ length: 6 }, (_, i) => (i * 10).toString().padStart(2, "0"));
@@ -31,18 +32,17 @@ const ArrivalForm = ({
   setValue,
   initialData
 }) => {
-
   const availableDates = getDateRange(conferenceData.dates.start, conferenceData.dates.end);
 
   const fillTestData = () => {
-    setValue("arrival_date", availableDates[0]);
+    setValue("arrival_date", availableDates[0].value); // Store MySQL format (YYYY-MM-DD)
     setValue("arrival_hour", "14");
     setValue("arrival_minute", "30");
-    setValue("departure_date", availableDates[availableDates.length - 1]);
+    setValue("departure_date", availableDates[availableDates.length - 1].value);
     setValue("departure_hour", "12");
     setValue("departure_minute", "00");
     setValue("travelling", "train");
-    setValue("travelling_details", "I will be alone in my train.")
+    setValue("travelling_details", "I will be alone in my train.");
     trigger(); // Validate form
   };
 
@@ -60,7 +60,7 @@ const ArrivalForm = ({
     <>
       <h4 className="mb-3 border-bottom pb-2">
         <StepDislay step={step} stepTotal={stepTotal} />
-        Personal Details
+        Travel Details
       </h4>
       <div className={classNames(cssForm.smallW, 'mx-auto position-relative')}>
         {isDebugMode && (
@@ -69,25 +69,26 @@ const ArrivalForm = ({
           </button>
         )}
 
-        <p className="fw-bolder">If you plan to arrive before {availableDates[0]}, you must arrange your own accommodation.</p>
-
+        <p className="fw-bolder">
+          If you plan to arrive before {availableDates[0].label}, you must arrange your own accommodation.
+        </p>
 
         <div className={cssForm.smallW}>
           {/* Arrival Date & Time */}
           <div className="mb-3 row align-items-center">
-            <label className="col-sm-2 col-form-label fw-bold">Arrival</label>
-            <div className="col-sm-6 d-flex align-items-center gap-1">
+            <label className="col-sm-3 col-form-label fw-bold">Arrival</label>
+            <div className="col-sm-9 d-flex align-items-center gap-1">
               <select
                 className={classNames("form-select me-2", errors.arrival_date && "is-invalid")}
                 {...register("arrival_date", { required: "Arrival date is required" })}
                 onBlur={() => trigger("arrival_date")}
               >
                 <option value="">Select Arrival Date</option>
-                {availableDates.map(date => (
-                  <option key={date} value={date}>{date}</option>
+                {availableDates.map(({ value, label }) => (
+                  <option key={value} value={value}>{label}</option>
                 ))}
               </select>
-             
+
               <select
                 className={classNames("form-select w-auto", errors.arrival_hour && "is-invalid")}
                 {...register("arrival_hour", { required: "Hour is required" })}
@@ -108,27 +109,26 @@ const ArrivalForm = ({
                 {minutes.map(min => (
                   <option key={min} value={min}>{min}</option>
                 ))}
-              </select> 
+              </select>
             </div>
             {errors.arrival_date && <p className="text-danger mb-0"><small>{errors.arrival_date.message}</small></p>}
           </div>
 
           {/* Departure Date & Time */}
           <div className="mb-3 row align-items-center">
-            <label className="col-sm-2 col-form-label fw-bold">Departure</label>
-            <div className="col-sm-6 d-flex align-items-center gap-1">
+            <label className="col-sm-3 col-form-label fw-bold">Departure</label>
+            <div className="col-sm-9 d-flex align-items-center gap-1">
               <select
                 className={classNames("form-select me-2", errors.departure_date && "is-invalid")}
                 {...register("departure_date", { required: "Departure date is required" })}
                 onBlur={() => trigger("departure_date")}
               >
                 <option value="">Select Departure Date</option>
-                {availableDates.map(date => (
-                  <option key={date} value={date}>{date}</option>
+                {availableDates.map(({ value, label }) => (
+                  <option key={value} value={value}>{label}</option>
                 ))}
               </select>
-             
-            
+
               <select
                 className={classNames("form-select w-auto", errors.departure_hour && "is-invalid")}
                 {...register("departure_hour", { required: "Hour is required" })}
@@ -139,7 +139,7 @@ const ArrivalForm = ({
                   <option key={hour} value={hour}>{hour}</option>
                 ))}
               </select>
-              : 
+              :
               <select
                 className={classNames("form-select w-auto", errors.departure_minute && "is-invalid")}
                 {...register("departure_minute", { required: "Minute is required" })}
@@ -149,15 +149,15 @@ const ArrivalForm = ({
                 {minutes.map(min => (
                   <option key={min} value={min}>{min}</option>
                 ))}
-              </select> 
+              </select>
             </div>
             {errors.departure_date && <p className="text-danger mb-0"><small>{errors.departure_date.message}</small></p>}
           </div>
 
           {/* Travelling by */}
           <div className="mb-3 row">
-            <label className="col-sm-2 col-form-label fw-bold">Travelling by </label>
-            <div className="col-sm-10">
+            <label className="col-sm-3 col-form-label fw-bold">Travelling by </label>
+            <div className="col-sm-9">
               <select
                 className={classNames('form-select', errors.travelling && "is-invalid", cssForm.mdAuto)}
                 {...register("travelling", { required: "Mode of Transportation is required" })}
@@ -174,22 +174,8 @@ const ArrivalForm = ({
               {errors.travelling && <p className="text-danger mb-0"><small>{errors.travelling.message}</small></p>}
             </div>
           </div>
-
-
-          {/* Travelling details */}
-          <div className="mb-3 row">
-            <label className="col-sm-2 col-form-label fw-bold">Details</label>
-            <div className="col-sm-10">
-              <textarea className={classNames('form-control', errors.travelling_details && "is-invalid")} placeholder="Travelling Details..."
-                {...register("travelling_details")} onBlur={() => trigger("travelling_details")} />
-              <div className="form-text">
-                If you travel in group, indicate with whom you share your journey. If you travel by bus, plane or train indicate which bus, plane (date, flight number, airport) or train. Indicate this for both arrival and departure.
-              </div>
-              {errors.travelling_details && <p className="text-danger mb-0"><small>{errors.travelling_details.message}</small></p>}
-            </div>
-          </div>
         </div>
-      </div >
+      </div>
     </>
   );
 };

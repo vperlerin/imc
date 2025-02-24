@@ -19,4 +19,10 @@ class PaymentManager {
             null
         ]);
     }
+
+    public function getPaymentMethod($method) {
+        $stmt = $this->pdo->prepare("SELECT id FROM payment_methods WHERE method = ? LIMIT 1");
+        $stmt->execute([$method]);
+        return $stmt->fetchColumn();
+    } 
 }
