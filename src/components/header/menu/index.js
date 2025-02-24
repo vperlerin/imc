@@ -108,6 +108,7 @@ const Menu = ({ cd }) => {
             {menuItems.map((item) => {
               const isActive = location.pathname.startsWith(item.link) ||
                 (item.subLinks && item.subLinks.some(sub => location.pathname.startsWith(sub.link)));
+ 
 
               if (!item.hideFromMenu) {
                 return (

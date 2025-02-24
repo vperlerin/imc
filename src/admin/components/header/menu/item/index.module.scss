@@ -6,6 +6,10 @@
     cursor: pointer;
     text-decoration: none;
     transition: all 250ms;
+
+    &.active {
+      color: var(--imc-menu-item-active);
+    }
   }
 
     &:hover {

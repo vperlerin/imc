@@ -82,7 +82,7 @@ CREATE TABLE IF NOT EXISTS payments (
     id INT AUTO_INCREMENT PRIMARY KEY,
     participant_id INT NOT NULL,
     payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  
-    amount DECIMAL(10,2) UNSIGNED NOT NULL,  
+    amount DECIMAL(10,2) NOT NULL,
     payment_method_id INT NOT NULL,  
     admin_note TEXT DEFAULT NULL, 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

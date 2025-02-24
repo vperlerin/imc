@@ -13,7 +13,5 @@ if ($confirmed) {
 
 
 
---
-IS ACTIVE Doesne't work with standalone pages (like contact for instance)
-
+--  
 MAKE SURE total_reimbursed is in the DB!!
