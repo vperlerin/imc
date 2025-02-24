@@ -46,7 +46,7 @@ function create_email(array $data, string $summary): string
         <p><strong>{$data['total_due']} €</strong>";
 
     if (strtolower($data['payment_method']) == 'paypal') {
-        $message .= " (Paypal fee of <strong>{$data['payl_fee']} €</strong> included)</p>";
+        $message .= " (Paypal fee of <strong>{$data['paypal_fee']} €</strong> included)</p>";
     } else {
         $message .= "</p>";
     }
@@ -61,6 +61,8 @@ function create_email(array $data, string $summary): string
 
         <p>Best regards,</p>
         <p><strong>IMC {$year} Team</strong></p>
+
+        <hr>
 
         <h3>Billing Details</h3>
         <h3>Registration Details</h3>
