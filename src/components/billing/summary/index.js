@@ -19,8 +19,8 @@ const Summary = ({
   const allValues = initialData || getValues();
 
   // Registration & Accommodation Cost
-  const registrationType = allValues.registrationType || "no"; // Default to "no"
-  const selectedRoom = conferenceData.costs.rooms.find(room => room.type === registrationType);
+  const registration_type = allValues.registration_type || "no"; // Default to "no"
+  const selectedRoom = conferenceData.costs.rooms.find(room => room.type === registration_type);
   const roomCost = selectedRoom ? selectedRoom.price : 0;
   const lateFee = !isEarlyBird ? conferenceData.costs.after_early_birds : 0;
   const totalRoomCost = roomCost + lateFee;
@@ -48,7 +48,7 @@ const Summary = ({
   const proceedingsPrintedCost = allValues.proceedings === "pdf_printed" ? conferenceData.costs.printed_proceedings : 0;
 
   // Payment Method Fee (PayPal)
-  const paymentMethod = allValues.paymentMethod || "bank"; // Default to bank transfer
+  const paymentMethod = allValues.payment_method || "bank"; // Default to bank transfer
   let totalCost = totalRoomCost + workshopCost + tshirtCost + proceedingsPrintedCost + printedPostersCost;
   const paypalFee = paymentMethod.toLowerCase() === "paypal" ? getPaypalPrice(totalCost) - totalCost : 0;
   totalCost += paypalFee;
@@ -57,7 +57,7 @@ const Summary = ({
   const workshopOnlineCost = selectedWorkshops.reduce((sum, workshop) => sum + (workshop?.cost_online || 0), 0);
   const onlineConferenceCost = conferenceData.costs.online;
   let totalOnlineCost = workshopOnlineCost + onlineConferenceCost;
-  const onlinePaypalFee = paymentMethod.toLowerCase() === "paypal" ? getPaypalPrice(totalOnlineCost) - totalOnlineCost : 0;
+  const onlinePaypalFee = payment_method.toLowerCase() === "paypal" ? getPaypalPrice(totalOnlineCost) - totalOnlineCost : 0;
   totalOnlineCost += onlinePaypalFee;
 
   useEffect(() => {
@@ -92,9 +92,9 @@ const Summary = ({
             {!isOnline ? (
               <tr>
                 <td className="ps-3 text-muted">
-                  {registrationType !== "no" ? (
+                  {registration_type !== "no" ? (
                     <>
-                      Conference Registration and {registrationType.charAt(0).toUpperCase() + registrationType.slice(1)} Room
+                      Conference Registration and {registration_type.charAt(0).toUpperCase() + registration_type.slice(1)} Room
                     </>
                   ) : (
                     <>Conference Registration</>

@@ -59,6 +59,7 @@ try {
     // Generate a random password
     $plain_password = bin2hex(random_bytes(4)); // 8-character random password
     $password_hash = password_hash($plain_password, PASSWORD_DEFAULT);
+    $data['password'] = $password_hash; 
 
     // Initialize managers
     $participantManager = new ParticipantManager($pdo);

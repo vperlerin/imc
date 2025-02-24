@@ -15,7 +15,7 @@ class PaymentManager {
         $stmt->execute([
             $participantId,
             0.00,   
-            $data['paymentMethod'],
+            $data['payment_method'],
             null
         ]);
     }

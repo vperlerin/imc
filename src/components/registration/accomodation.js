@@ -28,8 +28,8 @@ const AccomodationForm = ({
   }, [initialData, setValue]);
 
   const fillTestData = () => {
-    setValue("registrationType", conferenceData.costs.rooms[1].type);
-    setValue("paymentMethod", "Paypal");
+    setValue("registration_type", conferenceData.costs.rooms[1].type);
+    setValue("payment_method", "Paypal");
     trigger();
   };
 
@@ -57,9 +57,9 @@ const AccomodationForm = ({
                   <input
                     type="radio"
                     id={`room-${index}`}
-                    className={classNames("form-check-input", { "is-invalid": errors.registrationType })}
+                    className={classNames("form-check-input", { "is-invalid": errors.registration_type })}
                     value={room.type}
-                    {...register("registrationType", { required: "Please select a registration type" })}
+                    {...register("registration_type", { required: "Please select a registration type" })}
                   />
                   <label className="form-check-label d-block" htmlFor={`room-${index}`}>
                     <strong>{isEarlyBird ? room.price : (room.price + conferenceData.costs.after_early_birds)}€</strong> - {room.description}
@@ -72,7 +72,7 @@ const AccomodationForm = ({
                 </div>
               ))}
             </div>
-            {errors.registrationType && <p className="text-danger"><small>{errors.registrationType.message}</small></p>}
+            {errors.registration_type && <p className="text-danger"><small>{errors.registration_type.message}</small></p>}
           </div>
         )}
 
@@ -103,9 +103,9 @@ const AccomodationForm = ({
                 <input
                   type="radio"
                   id={`payment-${method.type}`}
-                  className={classNames("form-check-input", { "is-invalid": errors.paymentMethod })}
+                  className={classNames("form-check-input", { "is-invalid": errors.payment_method })}
                   value={method.type}
-                  {...register("paymentMethod", { required: "Please select a payment method" })}
+                  {...register("payment_method", { required: "Please select a payment method" })}
                 />
                 <label className="form-check-label d-block" htmlFor={`payment-${method.type}`}>
                   {method.type}
@@ -117,7 +117,7 @@ const AccomodationForm = ({
               </div>
             ))}
           </div>
-          {errors.paymentMethod && <p className="text-danger"><small>{errors.paymentMethod.message}</small></p>}
+          {errors.payment_method && <p className="text-danger"><small>{errors.payment_method.message}</small></p>}
         </div>
       </div>
     </>
