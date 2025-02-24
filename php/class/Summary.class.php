@@ -100,8 +100,7 @@ class SummaryFormatter
             if($format === 'html') {
               $content .= "<a href='https://imc" . getenv("YEAR") . ".imo.net/login'>on this page</a>{$newline}";
             } else {
-              $content .= "on https://imc" . getenv("YEAR") . ".imo.net/login{$newline}";
-
+              $content .= "on https://imc" . getenv("YEAR") . ".imo.net/login{$newline}"; 
             }
         }
 

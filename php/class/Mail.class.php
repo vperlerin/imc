@@ -8,17 +8,20 @@ use League\OAuth2\Client\Provider\Google;
 require_once __DIR__ . '/../../vendor/autoload.php';
 require_once __DIR__ . "/../config.php";
 
-class Mail {
+class Mail
+{
     private $mailer;
     private $emailSender;
     private $emailSenderName;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->mailer = new PHPMailer(true);
         $this->configureSMTP();
     }
 
-    private function configureSMTP() {
+    private function configureSMTP()
+    {
         try {
             // Load SMTP credentials
             $clientId = getenv("SMTP_CLIENT_ID");
@@ -60,13 +63,13 @@ class Mail {
                 throw new Exception("Invalid sender email: {$this->emailSender}");
             }
             $this->mailer->setFrom($this->emailSender, $this->emailSenderName ?: "No Name");
-
         } catch (Exception $e) {
             error_log("Mailer Configuration Error: " . $e->getMessage());
         }
     }
 
-    public function sendEmail(array $recipients, string $subject, string $message, string $replyTo = null) {
+    public function sendEmail(array $recipients, string $subject, string $message, string $replyTo = null)
+    {
         try {
             // Validate recipients
             if (empty($recipients)) {
@@ -88,14 +91,17 @@ class Mail {
                 $this->mailer->addReplyTo($replyTo);
             }
 
+            // Enable HTML format
+            $this->mailer->isHTML(true);
+
             // Email content
             $this->mailer->Subject = $subject;
             $this->mailer->Body = $message;
+            $this->mailer->AltBody = strip_tags($message); // Fallback for non-HTML email clients
 
             // Send the email
             $this->mailer->send();
             return ["success" => true, "message" => "Message sent successfully"];
-
         } catch (Exception $e) {
             error_log("Mailer Error: " . $this->mailer->ErrorInfo);
             return ["success" => false, "message" => "Failed to send message. Check logs."];
