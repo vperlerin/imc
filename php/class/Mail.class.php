@@ -6,14 +6,13 @@ use PHPMailer\PHPMailer\OAuth;
 use League\OAuth2\Client\Provider\Google;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
-require_once __DIR__ . '/../config.php';
+require_once __DIR__ . "/../config.php";
 
 class Mail
 {
-    private PHPMailer $mailer;
-    private string $emailSender;
-    private string $emailSenderName;
-    private string $refreshTokenPath = __DIR__ . '/../refresh_token.json'; // Path to refresh token file
+    private $mailer;
+    private $emailSender; 
+    private $refreshTokenPath = __DIR__ . "/../refresh_token.json"; // Path to refresh token file
 
     public function __construct()
     {
@@ -24,26 +23,21 @@ class Mail
     private function configureSMTP()
     {
         try {
-            // Load SMTP credentials from environment variables
+            // Load SMTP credentials
             $clientId = getenv("SMTP_CLIENT_ID");
             $clientSecret = getenv("SMTP_CLIENT_SECRET");
             $email = getenv("SMTP_USER_EMAIL");
-            $this->emailSender = $email;
-            $this->emailSenderName = getenv("SMTP_USER_NAME") ?: "No Name";
+            $this->emailSender = getenv("SMTP_USER_EMAIL");
+            $this->emailSenderName = getenv("SMTP_USER_NAME");
 
-            // Validate required credentials
-            if (!$clientId || !$clientSecret || !$email) {
-                throw new Exception("SMTP credentials are missing in environment variables.");
-            }
-
-            // Load refresh token from file
+            // Load refresh token & access token from file
             if (!file_exists($this->refreshTokenPath) || !is_readable($this->refreshTokenPath)) {
                 throw new Exception("Refresh token file not found or unreadable: {$this->refreshTokenPath}");
             }
 
             $tokenData = json_decode(file_get_contents($this->refreshTokenPath), true);
             $refreshToken = $tokenData['refresh_token'] ?? null;
-
+             
             if (!$refreshToken) {
                 throw new Exception("Missing refresh token in `refresh_token.json`.");
             }
@@ -53,13 +47,13 @@ class Mail
                 'clientId'     => $clientId,
                 'clientSecret' => $clientSecret,
             ]);
-
-            // Configure OAuth2 authentication
+ 
+            // Configure OAuth2 authentication with the valid access token
             $this->mailer->setOAuth(new OAuth([
                 'provider'     => $provider,
                 'clientId'     => $clientId,
                 'clientSecret' => $clientSecret,
-                'refreshToken' => $refreshToken,
+                'refreshToken' => $refreshToken, 
                 'userName'     => $email,
             ]));
 
@@ -69,29 +63,38 @@ class Mail
             $this->mailer->SMTPAuth = true;
             $this->mailer->AuthType = 'XOAUTH2';
             $this->mailer->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
-            $this->mailer->Port = (int) getenv("SMTP_TLS_PORT");
+            $this->mailer->Port = getenv("SMTP_TLS_PORT");
 
             // Validate and set sender email
             if (!filter_var($this->emailSender, FILTER_VALIDATE_EMAIL)) {
-                throw new Exception("Invalid sender email: {$this->emailSender}");
+                throw new Exception("Invalid sender email: {$email}");
             }
+            $this->mailer->setFrom($email,  getenv("SMTP_USER_NAME") ?: "No Name");
 
-            $this->mailer->setFrom($this->emailSender, $this->emailSenderName);
         } catch (Exception $e) {
-            error_log("❌ Mailer Configuration Error: " . $e->getMessage());
+            error_log("Mailer Configuration Error: " . $e->getMessage());
         }
     }
- 
+
     /**
-     * Send an email
-     * @param array $recipients Array of recipients (['email' => ..., 'name' => ...] or string)
-     * @param string $subject Email subject
-     * @param string $message HTML email body
-     * @param string|null $replyTo Optional reply-to email
-     * @param array $bccRecipients Optional array of BCC recipients
-     * @return array Result status
+     * Store updated access & refresh tokens in `refresh_token.json`
      */
-    public function sendEmail(array $recipients, string $subject, string $message, ?string $replyTo = null, array $bccRecipients = []): array
+    private function storeTokens($refreshToken, $accessToken, $expiresAt)
+    {
+        $tokenData = json_encode([
+            "refresh_token" => $refreshToken,
+            "access_token"  => $accessToken,
+            "expires_in"    => $expiresAt
+        ], JSON_PRETTY_PRINT);
+
+    
+
+        if (file_put_contents($this->refreshTokenPath, $tokenData) === false) {
+            error_log("❌ Error: Unable to write to `refresh_token.json`. Check file permissions.");
+        }
+    }
+
+    public function sendEmail(array $recipients, string $subject, string $message, string $replyTo = null, array $bccRecipients = [])
     {
         try {
             // Validate recipients
@@ -117,11 +120,7 @@ class Mail
 
             // Add BCC recipients if provided
             foreach ($bccRecipients as $bccEmail) {
-                if (filter_var($bccEmail, FILTER_VALIDATE_EMAIL)) {
-                    $this->mailer->addBCC($bccEmail);
-                } else {
-                    throw new Exception("Invalid BCC email: $bccEmail");
-                }
+                $this->mailer->addBCC($bccEmail, '');
             }
 
             // Set Reply-To if provided
@@ -142,10 +141,9 @@ class Mail
 
             // Send the email
             $this->mailer->send();
-            return ["success" => true, "message" => "✅ Message sent successfully"];
-        } catch (Exception $e) {
-            error_log("❌ Mailer Error: " . $e->getMessage());
-            return ["success" => false, "message" => "❌ Failed to send message. " . $this->mailer->ErrorInfo];
+            return ["success" => true, "message" => "Message sent successfully"];
+        } catch (Exception $e) { 
+            return ["success" => false, "message" => "Failed to send message. Check logs." . $this->mailer->ErrorInfo];
         }
     }
 }
