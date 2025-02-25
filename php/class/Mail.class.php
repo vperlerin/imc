@@ -29,35 +29,43 @@ class Mail
             $clientSecret = getenv("SMTP_CLIENT_SECRET");
             $this->emailSender = getenv("SMTP_USER_EMAIL");
             $this->emailSenderName = getenv("SMTP_USER_NAME");
-
+    
             // Load refresh token from file
             if (!file_exists($this->refreshTokenPath)) {
                 throw new Exception("Refresh token file not found: {$this->refreshTokenPath}");
             }
-
+    
             $tokenData = json_decode(file_get_contents($this->refreshTokenPath), true);
             $refreshToken = $tokenData['refresh_token'] ?? null;
- 
+    
             // Validate required variables
             if (!$clientId || !$clientSecret || !$refreshToken || !$this->emailSender) {
                 throw new Exception("Missing SMTP environment variables or refresh token. Check .env and refresh_token.json.");
             }
-
+    
             // Set up OAuth2 Provider
             $provider = new Google([
                 'clientId'     => $clientId,
                 'clientSecret' => $clientSecret,
             ]);
-
-            // Configure OAuth2 authentication
+    
+            // Request a new access token using the refresh token
+            $newToken = $provider->getAccessToken('refresh_token', [
+                'refresh_token' => $refreshToken
+            ]);
+    
+            $accessToken = $newToken->getToken(); // New access token
+    
+            // Configure OAuth2 authentication with the new access token
             $this->mailer->setOAuth(new OAuth([
                 'provider'     => $provider,
                 'clientId'     => $clientId,
                 'clientSecret' => $clientSecret,
                 'refreshToken' => $refreshToken,
+                'accessToken'  => $accessToken,  
                 'userName'     => $this->emailSender,
             ]));
-
+    
             // SMTP Configuration
             $this->mailer->isSMTP();
             $this->mailer->Host = 'smtp.gmail.com';
@@ -65,16 +73,18 @@ class Mail
             $this->mailer->AuthType = 'XOAUTH2';
             $this->mailer->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
             $this->mailer->Port = 587;
-
+    
             // Validate and set sender email
             if (!filter_var($this->emailSender, FILTER_VALIDATE_EMAIL)) {
                 throw new Exception("Invalid sender email: {$this->emailSender}");
             }
             $this->mailer->setFrom($this->emailSender, $this->emailSenderName ?: "No Name");
+    
         } catch (Exception $e) {
             error_log("Mailer Configuration Error: " . $e->getMessage());
         }
     }
+    
 
     public function sendEmail(array $recipients, string $subject, string $message, string $replyTo = null, array $bccRecipients = [])
     {
