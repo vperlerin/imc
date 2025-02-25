@@ -15,7 +15,7 @@ OLD_ENV_FILE="$SCRIPT_DIR/env/.env"
 NEW_ENV_FILE="$SCRIPT_DIR/../env/.env"
 
 # Define target file
-TOKEN_FILE="/DATA/sites/imc2025.imo.net/php/refresh_token.json"
+TOKEN_FILE="/DATA/sites/imc2025.imo.net/imc/refresh_token.json"
 
 # Check if the file exists
 if [[ ! -f "$TOKEN_FILE" ]]; then
