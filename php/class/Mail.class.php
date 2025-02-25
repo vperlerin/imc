@@ -25,10 +25,8 @@ class Mail
     {
         try {
             // Load SMTP credentials
-            $accessToken = getenv("ACCESS_TOKEN");
             $clientId = getenv("SMTP_CLIENT_ID");
             $clientSecret = getenv("SMTP_CLIENT_SECRET");
-            $smtp_port = getenv("SMTP_TLS_PORT");
             $this->emailSender = getenv("SMTP_USER_EMAIL");
             $this->emailSenderName = getenv("SMTP_USER_NAME");
     
@@ -51,22 +49,20 @@ class Mail
                 'clientSecret' => $clientSecret,
             ]);
     
-            // Request a new access token using the refresh token
-            /*
+            // 🔹 Request a new access token using the refresh token
             $newToken = $provider->getAccessToken('refresh_token', [
                 'refresh_token' => $refreshToken
             ]);
     
-            $accessToken = $newToken->getToken(); // New access token
-            */
+            $accessToken = $newToken->getToken(); // Extract the access token
     
             // Configure OAuth2 authentication with the new access token
             $this->mailer->setOAuth(new OAuth([
                 'provider'     => $provider,
                 'clientId'     => $clientId,
                 'clientSecret' => $clientSecret,
-                'refreshToken' => $refreshToken,
-                'accessToken'  => $accessToken,  
+                'refreshToken' => $refreshToken, // Keep for future access token requests
+                'accessToken'  => $accessToken,  //  Pass the access token here!
                 'userName'     => $this->emailSender,
             ]));
     
@@ -76,13 +72,13 @@ class Mail
             $this->mailer->SMTPAuth = true;
             $this->mailer->AuthType = 'XOAUTH2';
             $this->mailer->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-            $this->mailer->Port = $smtp_port;
+            $this->mailer->Port = 587;
     
             // Validate and set sender email
             if (!filter_var($this->emailSender, FILTER_VALIDATE_EMAIL)) {
                 throw new Exception("Invalid sender email: {$this->emailSender}");
             }
-            $this->mailer->setFrom($this->emailSender, $this->emailSenderName ?: "IMC");
+            $this->mailer->setFrom($this->emailSender, $this->emailSenderName ?: "No Name");
     
         } catch (Exception $e) {
             error_log("Mailer Configuration Error: " . $e->getMessage());
@@ -139,7 +135,7 @@ class Mail
             $this->mailer->send();
             return ["success" => true, "message" => "Message sent successfully"];
         } catch (Exception $e) { 
-            return ["success" => false, "message" => "Failed to send message: ". $this->mailer->ErrorInfo];
+            return ["success" => false, "message" => "Failed to send message. Check logs.". $this->mailer->ErrorInfo];
         }
-    } 
+    }
 }
