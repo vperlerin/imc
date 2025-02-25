@@ -39,11 +39,12 @@ $provider = new Google([
     'clientId'     => getenv("SMTP_CLIENT_ID"),
     'clientSecret' => getenv("SMTP_CLIENT_SECRET"),
     'redirectUri'  => getenv("SMTP_REDIRECT_URL"),
-    'approvalPrompt' => 'force', // You can also force re-consent if needed
-    'accessType'   => 'offline',  // Request a refresh token
+    'approvalPrompt' => 'force',  
+    'accessType'   => 'offline',  
 ]);
 
 // 1️⃣ **Check if a refresh token exists**
+/*
 if (file_exists($refreshTokenPath)) {
     $storedToken = json_decode(file_get_contents($refreshTokenPath), true);
     if (!empty($storedToken['refresh_token'])) {
@@ -72,6 +73,7 @@ if (file_exists($refreshTokenPath)) {
         }
     }
 }
+    */
 
 // 2️⃣ **Handle First-Time Authorization**
 if (!empty($_GET['error'])) {
