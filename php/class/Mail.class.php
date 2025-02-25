@@ -40,6 +40,7 @@ class Mail
             }
   
             $this->emailSender = getenv("SMTP_USER_EMAIL"); 
+            $this->emailSenderName = getenv("SMTP_USER_NAME");
           
             // Set up OAuth2 Provider
             $provider = new Google([
@@ -58,13 +59,13 @@ class Mail
 
             // SMTP Configuration
             $this->mailer->isSMTP();
-            $this->mailer->SMTPDebug = 2;
+            $this->mailer->SMTPDebug = 4;
             $this->mailer->CharSet = PHPMailer::CHARSET_UTF8;
-            $this->mailer->Host = getenv("SMTP_HOST");
+            $this->mailer->Host = 'smtp.gmail.com';
             $this->mailer->SMTPAuth = true;
             $this->mailer->AuthType = 'XOAUTH2';
             $this->mailer->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-            $this->mailer->Port = getenv("SMTP_TLS_PORT");
+            $this->mailer->Port = 587;
 
             // Validate and set sender email
             if (!filter_var($this->emailSender, FILTER_VALIDATE_EMAIL)) {
