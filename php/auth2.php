@@ -43,6 +43,7 @@ $provider = new Google([
 ]);
 
 // 1️⃣ **Check if a refresh token exists**
+/*
 if (file_exists($refreshTokenPath)) {
     $storedToken = json_decode(file_get_contents($refreshTokenPath), true);
     if (!empty($storedToken['refresh_token'])) {
@@ -67,6 +68,7 @@ if (file_exists($refreshTokenPath)) {
         }
     }
 }
+    */
 
 // 2️⃣ **Handle First-Time Authorization**
 if (!empty($_GET['error'])) {
