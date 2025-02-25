@@ -92,7 +92,6 @@ if ($bcc) {
     }
 }
 
-
 // Initialize Mail class and send email
 $mailer = new Mail();
 $response = $mailer->sendEmail([$to], $subject, $emailMessage, $email, $bccRecipients);

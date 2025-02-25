@@ -93,17 +93,7 @@ class Mail
             }
 
             // Add BCC recipients if provided
-            foreach ($bccRecipients as $bcc) {
-                if (is_array($bcc) && isset($bcc['email'])) {
-                    $bccEmail = $bcc['email'];
-                } else {
-                    $bccEmail = $bcc;
-                }
-
-                if (!filter_var($bccEmail, FILTER_VALIDATE_EMAIL)) {
-                    throw new Exception("Invalid BCC email: $bccEmail");
-                }
-
+            foreach ($bccRecipients as $bccEmail) {
                 $this->mailer->addBCC($bccEmail);
             }
 
