@@ -92,7 +92,7 @@ if ($bcc) {
     }
 }
 
-echo $bccRecipients;
+print_r($bccRecipients);
 
 // Initialize Mail class and send email
 $mailer = new Mail();
