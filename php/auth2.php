@@ -46,29 +46,33 @@ if (!empty($_GET['error'])) {
 } elseif (empty($_GET['code'])) {
   // Request authorization if we don't have an access token
   $authUrl = $provider->getAuthorizationUrl([
-    'scope' => ['https://mail.google.com/']
+    'scope' => ['https://mail.google.com/'],
+    'approval_prompt' => 'force'
   ]);
+
 
   echo "Authorization URL: <a href='$authUrl'>$authUrl</a>";
   exit;
 } else {
   try {
-    // Get an access token for the first time
     $token = $provider->getAccessToken('authorization_code', [
       'code' => $_GET['code']
     ]);
 
-    // Save the refresh token for future use
-    if (!empty($token->getRefreshToken())) {
-      file_put_contents($refreshTokenPath, json_encode([
-        "refresh_token" => $token->getRefreshToken()
+    $refreshToken = $token->getRefreshToken();
+
+    if ($refreshToken) {
+      file_put_contents('refresh_token.json', json_encode([
+        "refresh_token" => $refreshToken
       ]));
+    } else {
+      echo "⚠️ Warning: No refresh token received. You may need to revoke access and try again.";
     }
 
     echo json_encode([
       "access_token"  => $token->getToken(),
       "expires_in"    => $token->getExpires(),
-      "refresh_token" => $token->getRefreshToken()
+      "refresh_token" => $refreshToken
     ]);
   } catch (Exception $e) {
     echo "Error obtaining access token: " . $e->getMessage();
