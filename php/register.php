@@ -13,7 +13,7 @@ header("Access-Control-Allow-Headers: Content-Type");
 session_start();
 
 require_once __DIR__ . "/config.php";
-require_once __DIR__ . "/class/Connect.class.php";
+require_once __DIR__ . "/class/Connect.class.php"; // Ensures $pdo is loaded
 require_once __DIR__ . "/class/ConferenceData.class.php";
 require_once __DIR__ . "/class/Mail.class.php";
 require_once __DIR__ . "/class/Participant.class.php";
@@ -35,7 +35,6 @@ function create_email(array $data, string $summary): string
         <p>Thank you for registering for IMC <b>{$year}</b>. Your registration is nearly complete.</p>
     ";
 
-    // Payment instructions
     if (strtolower($data['payment_method']) == 'paypal') {
         $message .= "<p>If you haven't paid already, all";
     } else {
@@ -68,7 +67,6 @@ function create_email(array $data, string $summary): string
 
 function create_email_workshop(array $data, string $workshopTitle, array $workshopDirector, ParticipantManager $participantManager): string
 {
-    // Get participant statistics for the workshop
     $workshopStats = $participantManager->getWorkshopParticipants($workshopTitle);
     $totalRegistered = $workshopStats['total_registered'] ?? 0;
     $confirmedParticipants = $workshopStats['confirmed_participants'] ?? 0;
@@ -93,7 +91,6 @@ function create_email_workshop(array $data, string $workshopTitle, array $worksh
         $message .= "<b>Organization:</b> {$data['organization']}<br>";
     }
 
-    // Add participant count details
     $message .= "
         <p><b>Current Workshop Registration Stats:</b></p>
         <ul>
@@ -104,14 +101,13 @@ function create_email_workshop(array $data, string $workshopTitle, array $worksh
     ";
 
     $message .= "<p>As soon as the participant pays their due fees, they will appear on <a href='https://imc" . getenv('YEAR') . ".imo.net/community/participants'>this page</a>.</p>";
- 
+
     return $message;
 }
 
 try {
     $data = json_decode(file_get_contents("php://input"), true);
 
-    // Validate required fields
     $required_fields = [
         'title',
         'first_name',
@@ -130,14 +126,13 @@ try {
     }
 
     // Generate a random password
-    $plain_password = bin2hex(random_bytes(4)); // 8-character random password
+    $plain_password = bin2hex(random_bytes(4)); 
     $password_hash = password_hash($plain_password, PASSWORD_DEFAULT);
-    $data['password'] = $plain_password; // For the summary
+    $data['password'] = $plain_password;
 
-    // Initialize managers
+    // Initialize ParticipantManager using existing $pdo from Connect.class.php
     $participantManager = new ParticipantManager($pdo);
 
-    // Check if email already exists
     if ($participantManager->emailExists($data['email'])) {
         throw new Exception("The email address '{$data['email']}' is already in use. Please use a different email.");
     }
@@ -145,10 +140,7 @@ try {
     // Save participant
     $participant_id = $participantManager->saveParticipant($data, $password_hash);
 
-    // Prepare email body with all details
     $subject = "IMC " . getenv("YEAR") . " Registration";
-
-    // Summary for email
     $summary = SummaryFormatter::formatEmailContent($data, true);
 
     // Send confirmation email
@@ -156,26 +148,25 @@ try {
     $message = create_email($data, $summary);
     $emailResponse = $mail->sendEmail([$data['email']], $subject, $message);
 
-    // Send workshop-specific emails if applicable
+    // Send workshop-specific emails
     foreach (["Spectroscopy Workshop", "Radio Workshop"] as $workshopTitle) {
         if (!empty($data[$workshopTitle]) && $data[$workshopTitle] === "true") {
             $workshopContact = ConferenceData::getWorkshopEmailTo($workshopTitle);
 
             if ($workshopContact && isset($workshopContact['email'])) {
-                $workshopMessage = create_email_workshop($data, $workshopTitle, $workshopContact);
+                $workshopMessage = create_email_workshop($data, $workshopTitle, $workshopContact, $participantManager);
                 $workshopMail = new Mail();
                 $workshopMail->sendEmail(
                     [$workshopContact['email']], 
                     "New {$workshopTitle} registration",
                     $workshopMessage, 
                     $workshopContact['email'], 
-                    getenv('BCC_ALL')
+                    is_array(getenv('BCC_ALL')) ? getenv('BCC_ALL') : explode(',', getenv('BCC_ALL'))
                 );
             }
         }
     }
 
-    // Return success response with password
     echo json_encode([
         "success" => true,
         "message" => "Registration successful",
