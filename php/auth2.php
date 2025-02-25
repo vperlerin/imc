@@ -9,73 +9,100 @@ ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
 
-$provider = new Google([
-  'clientId'     => getenv("SMTP_CLIENT_ID"),
-  'clientSecret' => getenv("SMTP_CLIENT_SECRET"),
-  'redirectUri'  => getenv("SMTP_REDIRECT_URL"),
-  'accessType'   => 'offline',  // Request long-lived access
-  //'prompt'       => 'consent'   // Force user to grant access again
-]);
-
-// Check if a refresh token exists
 $refreshTokenPath = 'refresh_token.json';
-if (file_exists($refreshTokenPath)) {
-  $storedToken = json_decode(file_get_contents($refreshTokenPath), true);
-  if (!empty($storedToken['refresh_token'])) {
-    try {
-      // Get a new access token using the refresh token
-      $newToken = $provider->getAccessToken('refresh_token', [
-        'refresh_token' => $storedToken['refresh_token']
-      ]);
 
-      echo "<pre>" . json_encode([
-        "access_token"  => $newToken->getToken(),
-        "expires_in"    => $newToken->getExpires(),
-        "refresh_token" => $storedToken['refresh_token']  // Keep using the same refresh token
-      ]) . "</pre>";
-      exit;
-    } catch (Exception $e) {
-      echo "Error refreshing access token: " . $e->getMessage();
-      exit;
+// Function to store tokens in the JSON file
+function storeTokens($refreshToken, $accessToken, $expiresIn)
+{
+    global $refreshTokenPath;
+
+    $data = [
+        "refresh_token" => $refreshToken,
+        "access_token"  => $accessToken,
+        "expires_in"    => time() + $expiresIn // Store expiry as a timestamp
+    ];
+
+    $jsonData = json_encode($data, JSON_PRETTY_PRINT);
+
+    // Ensure the file is writable
+    if (!is_writable($refreshTokenPath)) {
+        chmod($refreshTokenPath, 0666); // Set write permissions
     }
-  }
+
+    if (file_put_contents($refreshTokenPath, $jsonData) === false) {
+        die("❌ Error: Unable to write to `refresh_token.json`. Check file permissions.");
+    }
 }
 
-// If no refresh token is found, start authorization process
+// Create Google OAuth Provider
+$provider = new Google([
+    'clientId'     => getenv("SMTP_CLIENT_ID"),
+    'clientSecret' => getenv("SMTP_CLIENT_SECRET"),
+    'redirectUri'  => getenv("SMTP_REDIRECT_URL"),
+    'accessType'   => 'offline',  // Request long-lived access
+]);
+
+// 1️⃣ **Check if a refresh token exists**
+if (file_exists($refreshTokenPath)) {
+    $storedToken = json_decode(file_get_contents($refreshTokenPath), true);
+    if (!empty($storedToken['refresh_token'])) {
+        try {
+            // Request a new access token using the refresh token
+            $newToken = $provider->getAccessToken('refresh_token', [
+                'refresh_token' => $storedToken['refresh_token']
+            ]);
+
+            // Store updated tokens
+            storeTokens($storedToken['refresh_token'], $newToken->getToken(), $newToken->getExpires());
+
+            echo "<pre>" . json_encode([
+                "access_token"  => $newToken->getToken(),
+                "expires_in"    => $newToken->getExpires(),
+                "refresh_token" => $storedToken['refresh_token'] // Keep the same refresh token
+            ], JSON_PRETTY_PRINT) . "</pre>";
+            exit;
+
+        } catch (Exception $e) {
+            die("❌ Error refreshing access token: " . $e->getMessage());
+        }
+    }
+}
+
+// 2️⃣ **Handle First-Time Authorization**
 if (!empty($_GET['error'])) {
-  exit('Got error: ' . htmlspecialchars($_GET['error'], ENT_QUOTES, 'UTF-8'));
+    exit('❌ Got error: ' . htmlspecialchars($_GET['error'], ENT_QUOTES, 'UTF-8'));
 } elseif (empty($_GET['code'])) {
-  // Request authorization if we don't have an access token
-  $authUrl = $provider->getAuthorizationUrl([
-    'scope' => ['https://mail.google.com/'],
-    'approval_prompt' => 'force'
-  ]);
-
-
-  echo "Authorization URL: <a href='$authUrl'>$authUrl</a>";
-  exit;
-} else {
-  try {
-    $token = $provider->getAccessToken('authorization_code', [
-      'code' => $_GET['code']
+    // Request authorization if we don't have a refresh token
+    $authUrl = $provider->getAuthorizationUrl([
+        'scope' => ['https://mail.google.com/'],
+        'approval_prompt' => 'force'
     ]);
 
-    $refreshToken = $token->getRefreshToken();
+    echo "🔗 Authorization URL: <a href='$authUrl'>$authUrl</a>";
+    exit;
+}
 
+// 3️⃣ **Process Authorization Code and Store Tokens**
+try {
+    $token = $provider->getAccessToken('authorization_code', [
+        'code' => $_GET['code']
+    ]);
+
+    $refreshToken = $token->getRefreshToken() ?: null; // Google might not always return a new one
+
+    // Store both tokens
     if ($refreshToken) {
-      file_put_contents('refresh_token.json', json_encode([
-        "refresh_token" => $refreshToken
-      ]));
+        storeTokens($refreshToken, $token->getToken(), $token->getExpires());
     } else {
-      echo "⚠️ Warning: No refresh token received. You may need to revoke access and try again.";
+        echo "⚠️ Warning: No new refresh token received. Using the existing one.";
     }
 
     echo "<pre>" . json_encode([
-      "access_token"  => $token->getToken(),
-      "expires_in"    => $token->getExpires(),
-      "refresh_token" => $refreshToken
-    ]) . "</pre>";
-  } catch (Exception $e) {
-    echo "Error obtaining access token: " . $e->getMessage();
-  }
+        "access_token"  => $token->getToken(),
+        "expires_in"    => $token->getExpires(),
+        "refresh_token" => $refreshToken
+    ], JSON_PRETTY_PRINT) . "</pre>";
+
+} catch (Exception $e) {
+    die("❌ Error obtaining access token: " . $e->getMessage());
 }
