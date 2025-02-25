@@ -7,9 +7,12 @@ YELLOW='\e[33m'
 CYAN='\e[36m'
 RESET='\e[0m'
 
-# Check if /imc/env/.env exists and ask to copy it
-OLD_ENV_FILE="./imc/env/.env"
-NEW_ENV_FILE="./env/.env"
+# Get the script's directory (assumes it's inside /imc)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Set paths relative to /imc
+OLD_ENV_FILE="$SCRIPT_DIR/env/.env"
+NEW_ENV_FILE="$SCRIPT_DIR/../env/.env"
 
 if [ -f "$OLD_ENV_FILE" ]; then
     echo -e "${CYAN}Found .env file at $OLD_ENV_FILE.${RESET}"
