@@ -38,6 +38,8 @@ class Mail
             $tokenData = json_decode(file_get_contents($this->refreshTokenPath), true);
             $refreshToken = $tokenData['refresh_token'] ?? null;
 
+            echo "refreshToken " . $refreshToken;
+
             // Validate required variables
             if (!$clientId || !$clientSecret || !$refreshToken || !$this->emailSender) {
                 throw new Exception("Missing SMTP environment variables or refresh token. Check .env and refresh_token.json.");
