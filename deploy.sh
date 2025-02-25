@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Define color codes
 RED='\e[31m'
@@ -14,8 +14,30 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 OLD_ENV_FILE="$SCRIPT_DIR/env/.env"
 NEW_ENV_FILE="$SCRIPT_DIR/../env/.env"
 
-chmod 666 /DATA/sites/imc2025.imo.net/php/refresh_token.json
-chown www-data:www-data /DATA/sites/imc2025.imo.net/php/refresh_token.json
+# Define target file
+TOKEN_FILE="/DATA/sites/imc2025.imo.net/php/refresh_token.json"
+
+# Check if the file exists
+if [[ ! -f "$TOKEN_FILE" ]]; then
+    echo -e "${RED}❌ Error: File not found - $TOKEN_FILE${RESET}"
+    exit 1
+fi
+
+# Check if the script is run with sudo or as root (needed for chown)
+if [[ "$EUID" -ne 0 ]]; then
+    echo -e "${YELLOW}⚠️ Warning: This script may require sudo permissions.${RESET}"
+    echo -e "${CYAN}Try running: sudo $0${RESET}"
+    exit 1
+fi
+
+# Set correct permissions
+echo -e "${CYAN}🔧 Setting permissions for $TOKEN_FILE...${RESET}"
+chmod 666 "$TOKEN_FILE" && echo -e "${GREEN}✔ Permissions set to 666.${RESET}" || echo -e "${RED}❌ Failed to set permissions.${RESET}"
+
+# Change ownership to www-data
+echo -e "${CYAN}🔧 Changing ownership to www-data...${RESET}"
+chown www-data:www-data "$TOKEN_FILE" && echo -e "${GREEN}✔ Ownership changed to www-data.${RESET}" || echo -e "${RED}❌ Failed to change ownership.${RESET}"
+
  
 if [ -f "$OLD_ENV_FILE" ]; then
     echo -e "${CYAN}Found .env file at $OLD_ENV_FILE.${RESET}"
