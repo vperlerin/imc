@@ -27,6 +27,7 @@ class Mail
             // Load SMTP credentials
             $clientId = getenv("SMTP_CLIENT_ID");
             $clientSecret = getenv("SMTP_CLIENT_SECRET");
+            $email = getenv("SMTP_USER_EMAIL");
             $this->emailSender = getenv("SMTP_USER_EMAIL");
             $this->emailSenderName = getenv("SMTP_USER_NAME");
 
@@ -49,28 +50,14 @@ class Mail
                 'clientId'     => $clientId,
                 'clientSecret' => $clientSecret,
             ]);
-
-            // Refresh access token if expired
-            if (!$accessToken || time() >= $expiresAt) {
-                $newToken = $provider->getAccessToken('refresh_token', [
-                    'refresh_token' => $refreshToken
-                ]);
-
-                $accessToken = $newToken->getToken();
-                $expiresAt = time() + $newToken->getExpires(); // Store new expiry timestamp
-
-                // Update `refresh_token.json` with new access token
-                $this->storeTokens($refreshToken, $accessToken, $expiresAt);
-            }
-
+ 
             // Configure OAuth2 authentication with the valid access token
             $this->mailer->setOAuth(new OAuth([
                 'provider'     => $provider,
                 'clientId'     => $clientId,
                 'clientSecret' => $clientSecret,
-                'refreshToken' => $refreshToken,
-                'accessToken'  => $accessToken,  // 🔹 Pass the latest access token
-                'userName'     => $this->emailSender,
+                'refreshToken' => $refreshToken, 
+                'userName'     => $email,
             ]));
 
             // SMTP Configuration
@@ -83,9 +70,9 @@ class Mail
 
             // Validate and set sender email
             if (!filter_var($this->emailSender, FILTER_VALIDATE_EMAIL)) {
-                throw new Exception("Invalid sender email: {$this->emailSender}");
+                throw new Exception("Invalid sender email: {$email}");
             }
-            $this->mailer->setFrom($this->emailSender, $this->emailSenderName ?: "No Name");
+            $this->mailer->setFrom($email,  getenv("SMTP_USER_NAME") ?: "No Name");
 
         } catch (Exception $e) {
             error_log("Mailer Configuration Error: " . $e->getMessage());
