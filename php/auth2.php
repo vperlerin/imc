@@ -74,9 +74,10 @@ if (!empty($_GET['error'])) {
 } elseif (empty($_GET['code'])) {
     // Request authorization if we don't have a refresh token
     $authUrl = $provider->getAuthorizationUrl([
-        'scope' => ['https://mail.google.com/'],
-        'approval_prompt' => 'force'
-    ]);
+        'scope'  => ['https://mail.google.com/'],
+        'prompt' => 'consent',   
+      ]);
+      
 
     echo "🔗 Authorization URL: <a href='$authUrl'>$authUrl</a>";
     exit;
