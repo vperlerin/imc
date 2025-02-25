@@ -127,5 +127,5 @@ class Mail
         } catch (Exception $e) { 
             return ["success" => false, "message" => "Failed to send message: ". $this->mailer->ErrorInfo];
         }
-    }
+    } 
 }
