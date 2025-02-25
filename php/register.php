@@ -14,6 +14,7 @@ session_start();
 
 require_once __DIR__ . "/config.php";
 require_once __DIR__ . "/class/Connect.class.php";
+require_once __DIR__ . "/class/ConferenceData.class.php";
 require_once __DIR__ . "/class/Mail.class.php";
 require_once __DIR__ . "/class/Participant.class.php";
 require_once __DIR__ . "/class/Workshop.class.php";
@@ -30,31 +31,30 @@ function create_email(array $data, string $summary): string
     $paymentLink = "https://imc{$year}.imo.net/payment";
 
     $message = "
-        <p>Hello <strong>{$data['first_name']} {$data['last_name']}</strong>,</p>
-
-        <p>Thank you for registering for IMC <strong>{$year}</strong>. Your registration is nearly complete. 
+        <p>Hello <b>{$data['first_name']} {$data['last_name']}</b>,</p>
+        <p>Thank you for registering for IMC <b>{$year}</b>. Your registration is nearly complete.</p>
     ";
 
     // Payment instructions
     if (strtolower($data['payment_method']) == 'paypal') {
-        $message .= " If you haven't paid already, all";
+        $message .= "<p>If you haven't paid already, all";
     } else {
-        $message .= " All";
+        $message .= "<p>All";
     }
 
     $message .= " you need to do now is send the required payment of:</p>
-        <p><strong>{$data['total_due']} €</strong></p>";
- 
+        <p><b>{$data['total_due']} €</b></p>";
+
     $message .= "
         <p>The necessary instructions for making your payment can be found 
         <a href='{$paymentLink}'>on this page</a>.</p>
 
         <p>The registration fee should be sent to the IMO Treasurer 
-        <strong style='color:red'>IMMEDIATELY</strong>. Delaying payment will result in the 
-        <strong>cancellation of your registration</strong>.</p>
+        <b style='color:red'>IMMEDIATELY</b>. Delaying payment will result in the 
+        <b>cancellation of your registration</b>.</p>
 
         <p>Best regards,</p>
-        <p><strong>IMC {$year} Team</strong></p>
+        <p><b>IMC {$year} Team</b></p>
 
         <hr>
 
@@ -65,40 +65,62 @@ function create_email(array $data, string $summary): string
 
     return $message;
 }
+
+function create_email_workshop(array $data, string $workshopTitle, array $workshopDirector, ParticipantManager $participantManager): string
+{
+    // Get participant statistics for the workshop
+    $workshopStats = $participantManager->getWorkshopParticipants($workshopTitle);
+    $totalRegistered = $workshopStats['total_registered'] ?? 0;
+    $confirmedParticipants = $workshopStats['confirmed_participants'] ?? 0;
+    $unconfirmedParticipants = $workshopStats['unconfirmed_participants'] ?? 0;
+
+    $message = "
+        <p>Hey <b>{$workshopDirector['name']}</b>,</p>
+        <p>We are pleased to announce that a new user just registered for the <b>{$workshopTitle}</b> 
+    ";
+
+    if ($data['is_online']) {
+        $message .= " ONLINE EDITION.</p>";
+    } else {
+        $message .= " ONSITE EDITION.</p>";
+    }
+
+    $message .= "<p>Here are the participant details:</p>";
+    $message .= "<b>Name:</b> {$data['title']} {$data['first_name']} {$data['last_name']}<br>";
+    $message .= "<b>Email:</b> {$data['email']}<br>";
+
+    if (!empty($data['organization'])) {
+        $message .= "<b>Organization:</b> {$data['organization']}<br>";
+    }
+
+    // Add participant count details
+    $message .= "
+        <p><b>Current Workshop Registration Stats:</b></p>
+        <ul>
+            <li><b>Total Registered:</b> {$totalRegistered}</li>
+            <li><b>Confirmed Participants:</b> {$confirmedParticipants}</li>
+            <li><b>Unconfirmed Participants:</b> {$unconfirmedParticipants}</li>
+        </ul>
+    ";
+
+    $message .= "<p>As soon as the participant pays their due fees, they will appear on <a href='https://imc" . getenv('YEAR') . ".imo.net/community/participants'>this page</a>.</p>";
  
+    return $message;
+}
+
 try {
     $data = json_decode(file_get_contents("php://input"), true);
 
-    // Required fields validation
+    // Validate required fields
     $required_fields = [
         'title',
         'first_name',
         'last_name',
-        'gender',
-        'dobYear',
-        'dobMonth',
-        'dobDay',
         'email',
-        'phone',
-        'address',
-        'postal_code',
-        'city',
-        'country',
-        'is_early_bird',
-        'is_online',
         'total_due',
         'paypal_fee',
-        'arrival_date',
-        'arrival_hour',
-        'arrival_minute',
-        'departure_date',
-        'departure_hour',
-        'departure_minute',
-        'travelling',
         'registration_type',
-        'excursion',
-        'buy_tshirt',
-        'tshirt_size'
+        'is_online'
     ];
 
     foreach ($required_fields as $field) {
@@ -120,33 +142,8 @@ try {
         throw new Exception("The email address '{$data['email']}' is already in use. Please use a different email.");
     }
 
-    $workshopManager = new WorkshopManager($pdo);
-    $arrivalManager = new ArrivalManager($pdo);
-    $contributionManager = new ContributionManager($pdo);
-    $accommodationManager = new AccommodationManager($pdo);
-    $paymentManager = new PaymentManager($pdo);
-    $extraOptionsManager = new ExtraOptionsManager($pdo);
-
     // Save participant
     $participant_id = $participantManager->saveParticipant($data, $password_hash);
-
-    // Save workshops
-    $workshopManager->saveWorkshops($participant_id, $data);
-
-    // Save arrival details
-    $arrivalManager->saveArrivalDetails($participant_id, $data);
-
-    // Save contributions (talks & posters)
-    if (!empty($data['talks']) || !empty($data['posters'])) {
-        $contributionManager->saveContributions($participant_id, $data['talks'], $data['posters']);
-    }
-
-    // Save accommodation and payment details
-    $accommodationManager->saveAccommodation($participant_id, $data);
-    $paymentManager->savePayment($participant_id, $data);
-
-    // Save extra options
-    $extraOptionsManager->saveExtraOptions($participant_id, $data);
 
     // Prepare email body with all details
     $subject = "IMC " . getenv("YEAR") . " Registration";
@@ -154,11 +151,29 @@ try {
     // Summary for email
     $summary = SummaryFormatter::formatEmailContent($data, true);
 
- 
-    // Send confirmation email using PHPMailer
+    // Send confirmation email
     $mail = new Mail();
-    $message = create_email($data, $summary);	
+    $message = create_email($data, $summary);
     $emailResponse = $mail->sendEmail([$data['email']], $subject, $message);
+
+    // Send workshop-specific emails if applicable
+    foreach (["Spectroscopy Workshop", "Radio Workshop"] as $workshopTitle) {
+        if (!empty($data[$workshopTitle]) && $data[$workshopTitle] === "true") {
+            $workshopContact = ConferenceData::getWorkshopEmailTo($workshopTitle);
+
+            if ($workshopContact && isset($workshopContact['email'])) {
+                $workshopMessage = create_email_workshop($data, $workshopTitle, $workshopContact);
+                $workshopMail = new Mail();
+                $workshopMail->sendEmail(
+                    [$workshopContact['email']], 
+                    "New {$workshopTitle} registration",
+                    $workshopMessage, 
+                    $workshopContact['email'], 
+                    getenv('BCC_ALL')
+                );
+            }
+        }
+    }
 
     // Return success response with password
     echo json_encode([

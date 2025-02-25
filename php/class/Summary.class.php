@@ -26,6 +26,7 @@ class SummaryFormatter
             $content .= "<b>Organization:</b> {$data['organization']}<br>";
         }
 
+        // TODO: NO ADDRESS FOR ONLINE 
         $content .= "
             <b>Gender:</b> {$data['gender']}<br>
             <b>Date of Birth:</b> {$data['dobYear']}-{$data['dobMonth']}-{$data['dobDay']}<br>

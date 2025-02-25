@@ -94,7 +94,7 @@ class Mail
 
             // Add BCC recipients if provided
             foreach ($bccRecipients as $bccEmail) {
-                $this->mailer->addBCC($bccEmail);
+                $this->mailer->addBCC($bccEmail, '');
             }
 
             // Set Reply-To if provided

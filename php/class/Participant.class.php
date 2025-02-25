@@ -9,7 +9,6 @@ class ParticipantManager
         $this->pdo = $pdo;
     }
 
-
     public function emailExists($email)
     {
         $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM participants WHERE email = ?");
@@ -19,7 +18,6 @@ class ParticipantManager
 
     public function saveParticipant($data, $passwordHash)
     {
-        // Check if email is already in use
         if ($this->emailExists($data['email'])) {
             throw new Exception("The email address '{$data['email']}' is already registered. Please use a different email or log in.");
         }
@@ -67,6 +65,37 @@ class ParticipantManager
     }
 
     /**
+     * Retrieve the number of participants registered for a given workshop 
+     * and their payment confirmation status.
+     */
+    public function getWorkshopParticipants($workshopTitle)
+    {
+        $stmt = $this->pdo->prepare("
+        SELECT 
+            w.title AS workshop_title,
+            COUNT(pw.participant_id) AS total_registered,
+            SUM(CASE 
+                    WHEN p.confirmation_sent = 1 THEN 1 
+                    ELSE 0 
+                END) AS confirmed_participants,
+            SUM(CASE 
+                    WHEN p.confirmation_sent = 0 THEN 1 
+                    ELSE 0 
+                END) AS unconfirmed_participants
+        FROM workshops w
+        LEFT JOIN participant_workshops pw ON w.id = pw.workshop_id
+        LEFT JOIN participants p ON pw.participant_id = p.id
+        WHERE w.title = :workshopTitle
+        GROUP BY w.id;
+    ");
+    
+
+        $stmt->bindParam(':workshopTitle', $workshopTitle, PDO::PARAM_STR);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    /**
      * Marks confirmation_sent as TRUE and sets confirmation_date to current timestamp.
      */
     public function markConfirmationSent($participantId)
@@ -81,7 +110,6 @@ class ParticipantManager
 
         return $stmt->rowCount() > 0;
     }
-
 
     /**
      * Retrieve all on-site active participants with payment method.
@@ -102,8 +130,8 @@ class ParticipantManager
             p.paypal_fee,
             pm.method AS payment_method
             FROM participants p
-            LEFT JOIN payments pay ON p.id = pay.participant_id  -- Correct join with the payments table
-            LEFT JOIN payment_methods pm ON pay.payment_method_id = pm.id  -- Get payment method
+            LEFT JOIN payments pay ON p.id = pay.participant_id  
+            LEFT JOIN payment_methods pm ON pay.payment_method_id = pm.id  
             WHERE p.is_online = FALSE AND p.status = 'active'
             ORDER BY p.last_name, p.first_name;
         ");
@@ -112,11 +140,11 @@ class ParticipantManager
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-
     /**
      * Hard delete a participant
      */
-    public function deleteParticipant($participantId) {
+    public function deleteParticipant($participantId)
+    {
         $stmt = $this->pdo->prepare("DELETE FROM participants WHERE id = ?");
         $stmt->execute([$participantId]);
 
@@ -126,7 +154,8 @@ class ParticipantManager
     /**
      * Soft delete a participant
      */
-    public function softDeleteParticipant($participantId) {
+    public function softDeleteParticipant($participantId)
+    {
         $stmt = $this->pdo->prepare("UPDATE participants SET status = 'deleted', deleted_at = NOW() WHERE id = ?");
         $stmt->execute([$participantId]);
 
