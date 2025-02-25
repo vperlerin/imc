@@ -67,13 +67,28 @@ if [ ! -f "$ENV_FILE" ]; then
     echo -e "${RED}Error: .env file not found at $ENV_FILE!${RESET}"
     exit 1
 fi
-
-# Load .env file safely (handles spaces and quotes)
-while IFS='=' read -r key value; do
-    if [[ ! "$key" =~ ^# && -n "$key" ]]; then
-        export "$key"="$(echo "$value" | sed 's/^"\|"$//g')"  # Strip quotes if present
+ 
+# Load .env file safely, ignoring empty lines and invalid entries
+while IFS='=' read -r key value || [[ -n "$key" ]]; do
+    # Skip comments and empty lines
+    if [[ -z "$key" || "$key" =~ ^# ]]; then
+        continue
     fi
+
+    # Trim whitespace from key and value
+    key=$(echo "$key" | xargs)
+    value=$(echo "$value" | xargs)
+
+    # Ensure key is a valid identifier
+    if [[ ! "$key" =~ ^[a-zA-Z_][a-zA-Z0-9_]*$ ]]; then
+        echo -e "${YELLOW}⚠️ Warning: Invalid environment variable '$key' in .env file. Skipping...${RESET}"
+        continue
+    fi
+
+    # Export variable, removing surrounding quotes
+    export "$key"="${value//\"/}"
 done < "$ENV_FILE"
+
 
 # Ensure MYSQL_DATABASE is set
 if [ -z "$MYSQL_DATABASE" ]; then
