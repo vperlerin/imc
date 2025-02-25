@@ -38,9 +38,7 @@ class Mail
 
             $tokenData = json_decode(file_get_contents($this->refreshTokenPath), true);
             $refreshToken = $tokenData['refresh_token'] ?? null;
-            $accessToken = $tokenData['access_token'] ?? null;
-            $expiresAt = $tokenData['expires_in'] ?? 0; // Expiry time in UNIX timestamp
-
+             
             if (!$refreshToken) {
                 throw new Exception("Missing refresh token in `refresh_token.json`.");
             }
@@ -62,11 +60,11 @@ class Mail
 
             // SMTP Configuration
             $this->mailer->isSMTP();
-            $this->mailer->Host = 'smtp.gmail.com';
+            $this->mailer->Host = getenv("SMTP_HOST");
             $this->mailer->SMTPAuth = true;
             $this->mailer->AuthType = 'XOAUTH2';
-            $this->mailer->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-            $this->mailer->Port = 587;
+            $this->mailer->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+            $this->mailer->Port = getenv("SMTP_TLS_PORT");
 
             // Validate and set sender email
             if (!filter_var($this->emailSender, FILTER_VALIDATE_EMAIL)) {
