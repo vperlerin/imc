@@ -9,87 +9,102 @@ ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
 
-if (!isset($_GET['code']) && !isset($_GET['provider'])) {
-    ?>
-<html>
-<body>Select Provider:<br>
-<a href='?provider=Google'>Google</a><br>
-</body>
-</html>
-    <?php
+$refreshTokenPath = 'refresh_token.json';
+
+// Function to store tokens in the JSON file
+function storeTokens($refreshToken, $accessToken, $expiresIn)
+{
+    global $refreshTokenPath;
+
+    $data = [
+        "refresh_token" => $refreshToken,
+        "access_token"  => $accessToken,
+        "expires_in"    => time() + $expiresIn // Store expiry as a timestamp
+    ];
+
+    $jsonData = json_encode($data, JSON_PRETTY_PRINT);
+
+    // Ensure the file is writable
+    if (!is_writable($refreshTokenPath)) {
+        chmod($refreshTokenPath, 0666); // Set write permissions
+    }
+
+    if (file_put_contents($refreshTokenPath, $jsonData) === false) {
+        die("❌ Error: Unable to write to `refresh_token.json`. Check file permissions.");
+    }
+}
+
+// Create Google OAuth Provider
+$provider = new Google([
+    'clientId'     => getenv("SMTP_CLIENT_ID"),
+    'clientSecret' => getenv("SMTP_CLIENT_SECRET"),
+    'redirectUri'  => getenv("SMTP_REDIRECT_URL"),
+    'accessType'   => 'offline',  // Request long-lived access
+]);
+
+// 1️⃣ **Check if a refresh token exists** 
+if (file_exists($refreshTokenPath)) {
+    $storedToken = json_decode(file_get_contents($refreshTokenPath), true);
+    if (!empty($storedToken['refresh_token'])) {
+        try {
+            // Request a new access token using the refresh token
+            $newToken = $provider->getAccessToken('refresh_token', [
+                'refresh_token' => $storedToken['refresh_token']
+            ]);
+
+            // Store updated tokens
+            storeTokens($storedToken['refresh_token'], $newToken->getToken(), $newToken->getExpires());
+
+            echo "<pre>" . json_encode([
+                "access_token"  => $newToken->getToken(),
+                "expires_in"    => $newToken->getExpires(),
+                "refresh_token" => $storedToken['refresh_token'] // Keep the same refresh token
+            ], JSON_PRETTY_PRINT) . "</pre>";
+            exit;
+
+        } catch (Exception $e) {
+            die("❌ Error refreshing access token: " . $e->getMessage());
+        }
+    }
+}
+  
+
+// 2️⃣ **Handle First-Time Authorization**
+if (!empty($_GET['error'])) {
+    exit('❌ Got error: ' . htmlspecialchars($_GET['error'], ENT_QUOTES, 'UTF-8'));
+} elseif (empty($_GET['code'])) {
+    // Request authorization if we don't have a refresh token
+    $authUrl = $provider->getAuthorizationUrl([
+        'scope'  => ['https://mail.google.com/'],
+        'prompt' => 'consent',   
+      ]);
+      
+
+    echo "🔗 Authorization URL: <a href='$authUrl'>$authUrl</a>";
     exit;
 }
- 
-session_start();
 
-$providerName = '';
+// 3️⃣ **Process Authorization Code and Store Tokens**
+try {
+    $token = $provider->getAccessToken('authorization_code', [
+        'code' => $_GET['code']
+    ]);
 
-if (array_key_exists('provider', $_GET)) {
-    $providerName = $_GET['provider'];
-    $_SESSION['provider'] = $providerName;
-} elseif (array_key_exists('provider', $_SESSION)) {
-    $providerName = $_SESSION['provider'];
-}
-if (!in_array($providerName, ['Google', 'Microsoft', 'Yahoo'])) {
-    exit('Only Google, Microsoft and Yahoo OAuth2 providers are currently supported in this script.');
-}
+    $refreshToken = $token->getRefreshToken() ?: null; // Google might not always return a new one
 
-//These details are obtained by setting up an app in the Google developer console,
-//or whichever provider you're using.
-$clientId = getenv("SMTP_CLIENT_ID");
-$clientSecret = getenv("SMTP_CLIENT_SECRET");
+    // Store both tokens
+    if ($refreshToken) {
+        storeTokens($refreshToken, $token->getToken(), $token->getExpires());
+    } else {
+        echo "⚠️ Warning: No new refresh token received. Using the existing one.";
+    }
 
-//If this automatic URL doesn't work, set it yourself manually to the URL of this script
-$redirectUri = 'https://imc2025.imo.net/php/auth2.php'; 
+    echo "<pre>" . json_encode([
+        "access_token"  => $token->getToken(),
+        "expires_in"    => $token->getExpires(),
+        "refresh_token" => $refreshToken
+    ], JSON_PRETTY_PRINT) . "</pre>";
 
-
-
-$params = [
-    'clientId' => $clientId,
-    'clientSecret' => $clientSecret,
-    'redirectUri' => $redirectUri,
-    'accessType' => 'offline'
-];
-
-$options = [];
-$provider = null;
-
-switch ($providerName) {
-    case 'Google':
-        $provider = new Google($params);
-        $options = [
-            'scope' => [
-                'https://mail.google.com/'
-            ]
-        ];
-        break;
-}
-
-if (null === $provider) {
-    exit('Provider missing');
-}
-
-if (!isset($_GET['code'])) {
-    //If we don't have an authorization code then get one
-    $authUrl = $provider->getAuthorizationUrl($options);
-    $_SESSION['oauth2state'] = $provider->getState();
-    header('Location: ' . $authUrl);
-    exit;
-    //Check given state against previously stored one to mitigate CSRF attack
-} elseif (empty($_GET['state']) || ($_GET['state'] !== $_SESSION['oauth2state'])) {
-    unset($_SESSION['oauth2state']);
-    unset($_SESSION['provider']);
-    exit('Invalid state');
-} else {
-    unset($_SESSION['provider']);
-    //Try to get an access token (using the authorization code grant)
-    $token = $provider->getAccessToken(
-        'authorization_code',
-        [
-            'code' => $_GET['code']
-        ]
-    );
-    //Use this to interact with an API on the users behalf
-    //Use this to get a new access token if the old one expires
-    echo 'Refresh Token: ', $token->getRefreshToken();
+} catch (Exception $e) {
+    die("❌ Error obtaining access token: " . $e->getMessage());
 }
