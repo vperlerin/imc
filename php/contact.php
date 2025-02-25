@@ -68,20 +68,21 @@ if (!$email) {
 }
 
 // Prepare email content
-$emailMessage = "This message has been sent from the IMC2025 contact form\n\n";
-$emailMessage .= "Name: $name\n";
-$emailMessage .= "Email: $email\n\n";
-$emailMessage .= "Message:\n$message";
+$emailMessage = "This message has been sent from the IMC2025 contact form<br><br>";
+$emailMessage .= "Name: $name<br>";
+$emailMessage .= "Email: $email<br>";
+$emailMessage .= "Message:\n$message<br>";
 
 // Define the Reply-To address
 $to = ['email' => getenv("CONTACT_EMAIL"), 'name' => getenv("CONTACT_NAME")];
-$replyTo = getenv("SMTP_REPLY_TO");
 $bcc = getenv('BCC_ALL');
 
-// Convert BCC into an array if valid
+// Convert BCC into an array if valid 
 $bccRecipients = [];
+
 if ($bcc) {
     $bccArray = array_map('trim', explode(',', $bcc));
+    
     foreach ($bccArray as $bccEmail) {
         if (filter_var($bccEmail, FILTER_VALIDATE_EMAIL)) {
             $bccRecipients[] = $bccEmail;
@@ -91,9 +92,10 @@ if ($bcc) {
     }
 }
 
+
 // Initialize Mail class and send email
 $mailer = new Mail();
-$response = $mailer->sendEmail([$to], $subject, $emailMessage, $replyTo, $bccRecipients);
+$response = $mailer->sendEmail([$to], $subject, $emailMessage, $email, $bccRecipients);
 
 echo json_encode($response);
 ?>
