@@ -13,7 +13,8 @@ $provider = new Google([
   'clientId'     => getenv("SMTP_CLIENT_ID"),
   'clientSecret' => getenv("SMTP_CLIENT_SECRET"),
   'redirectUri'  => getenv("SMTP_REDIRECT_URL"),
-  'accessType'   => 'offline',
+  'accessType'   => 'offline',  // Request long-lived access
+  'prompt'       => 'consent'   // Force user to grant access again
 ]);
 
 // Check if a refresh token exists

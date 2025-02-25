@@ -13,6 +13,7 @@ class Mail
     private $mailer;
     private $emailSender;
     private $emailSenderName;
+    private $refreshTokenPath = __DIR__ . "/../refresh_token.json"; // Path to refresh token file
 
     public function __construct()
     {
@@ -26,13 +27,20 @@ class Mail
             // Load SMTP credentials
             $clientId = getenv("SMTP_CLIENT_ID");
             $clientSecret = getenv("SMTP_CLIENT_SECRET");
-            $refreshToken = getenv("SMTP_REFRESH_TOKEN");
             $this->emailSender = getenv("SMTP_USER_EMAIL");
             $this->emailSenderName = getenv("SMTP_USER_NAME");
 
+            // Load refresh token from file
+            if (!file_exists($this->refreshTokenPath)) {
+                throw new Exception("Refresh token file not found: {$this->refreshTokenPath}");
+            }
+
+            $tokenData = json_decode(file_get_contents($this->refreshTokenPath), true);
+            $refreshToken = $tokenData['refresh_token'] ?? null;
+
             // Validate required variables
             if (!$clientId || !$clientSecret || !$refreshToken || !$this->emailSender) {
-                throw new Exception("Missing SMTP environment variables. Check .env configuration.");
+                throw new Exception("Missing SMTP environment variables or refresh token. Check .env and refresh_token.json.");
             }
 
             // Set up OAuth2 Provider
@@ -84,11 +92,11 @@ class Mail
                     $email = $recipient;
                     $name = '';
                 }
-    
+
                 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
                     throw new Exception("Invalid recipient email: $email");
                 }
-                
+
                 $this->mailer->addAddress($email, $name);
             }
 
