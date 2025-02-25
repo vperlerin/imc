@@ -16,7 +16,7 @@ class Mail
 
     public function __construct()
     {
-        $this->mailer = new PHPMailer(true);
+        $this->mailer = new PHPMailer;
         $this->configureSMTP();
     }
 
@@ -27,21 +27,22 @@ class Mail
             $clientId = getenv("SMTP_CLIENT_ID");
             $clientSecret = getenv("SMTP_CLIENT_SECRET");
             $email = getenv("SMTP_USER_EMAIL");
-            $this->emailSender = getenv("SMTP_USER_EMAIL");
-            $this->emailSenderName = getenv("SMTP_USER_NAME");
-
+        
             // Load refresh token & access token from file
-            if (!file_exists($this->refreshTokenPath) || !is_readable($this->refreshTokenPath)) {
+              if (!file_exists($this->refreshTokenPath) || !is_readable($this->refreshTokenPath)) {
                 throw new Exception("Refresh token file not found or unreadable: {$this->refreshTokenPath}");
             }
 
             $tokenData = json_decode(file_get_contents($this->refreshTokenPath), true);
             $refreshToken = $tokenData['refresh_token'] ?? null;
-             
+
             if (!$refreshToken) {
                 throw new Exception("Missing refresh token in `refresh_token.json`.");
             }
-
+  
+            $this->emailSender = getenv("SMTP_USER_EMAIL");
+            $this->emailSenderName = getenv("SMTP_USER_NAME"); 
+          
             // Set up OAuth2 Provider
             $provider = new Google([
                 'clientId'     => $clientId,
@@ -59,6 +60,7 @@ class Mail
 
             // SMTP Configuration
             $this->mailer->isSMTP();
+            $this->mailer->CharSet = PHPMailer::CHARSET_UTF8;
             $this->mailer->Host = getenv("SMTP_HOST");
             $this->mailer->SMTPAuth = true;
             $this->mailer->AuthType = 'XOAUTH2';
@@ -69,31 +71,13 @@ class Mail
             if (!filter_var($this->emailSender, FILTER_VALIDATE_EMAIL)) {
                 throw new Exception("Invalid sender email: {$email}");
             }
-            $this->mailer->setFrom($email,  getenv("SMTP_USER_NAME") ?: "No Name");
+            $this->mailer->setFrom($this->emailSender,  getenv("SMTP_USER_NAME") ?: "No Name");
 
         } catch (Exception $e) {
             error_log("Mailer Configuration Error: " . $e->getMessage());
         }
     }
-
-    /**
-     * Store updated access & refresh tokens in `refresh_token.json`
-     */
-    private function storeTokens($refreshToken, $accessToken, $expiresAt)
-    {
-        $tokenData = json_encode([
-            "refresh_token" => $refreshToken,
-            "access_token"  => $accessToken,
-            "expires_in"    => $expiresAt
-        ], JSON_PRETTY_PRINT);
-
-    
-
-        if (file_put_contents($this->refreshTokenPath, $tokenData) === false) {
-            error_log("❌ Error: Unable to write to `refresh_token.json`. Check file permissions.");
-        }
-    }
-
+ 
     public function sendEmail(array $recipients, string $subject, string $message, string $replyTo = null, array $bccRecipients = [])
     {
         try {
