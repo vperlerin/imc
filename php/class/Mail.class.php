@@ -54,7 +54,7 @@ class Mail
                 'clientId'     => $clientId,
                 'clientSecret' => $clientSecret,
                 'refreshToken' => $refreshToken, 
-                'userName'     => $this->emailSender,
+                'userName'     => $this->emailSenderName,
             ]));
 
             // SMTP Configuration
