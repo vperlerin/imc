@@ -1,7 +1,0 @@
-
-
-- envoie des emails pour les workshops
-- ne pas creer de record dans payments dans register.php
-- update python fill for prices?
-- modify summary class for online user : no address!
-
