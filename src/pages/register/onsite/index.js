@@ -130,10 +130,10 @@ const MainForm = () => {
           <p>The IMC fee is due without any delay.</p>
 
           {finalData.payment_method.toLowerCase() === "paypal" ? (
-            <>
+            <div className="mb-3">
               <p >Click the button below to pay immediately with Paypal.</p>
               <PayPalForm amount={total} year={cd.year} />
-            </>
+            </div>
           ) : (
             <>
               <p><strong>  Please, transfer the total amount mentioned in order to confirm your registration immediately.</strong></p>

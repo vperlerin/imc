@@ -124,9 +124,8 @@ class Mail
             // Send the email
             $this->mailer->send();
             return ["success" => true, "message" => "Message sent successfully"];
-        } catch (Exception $e) {
-            error_log("Mailer Error: " . $this->mailer->ErrorInfo);
-            return ["success" => false, "message" => "Failed to send message. Check logs."];
+        } catch (Exception $e) { 
+            return ["success" => false, "message" => "Failed to send message: ". $this->mailer->ErrorInfo];
         }
     }
 }
