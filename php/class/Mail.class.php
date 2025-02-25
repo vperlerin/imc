@@ -29,46 +29,50 @@ class Mail
             $clientSecret = getenv("SMTP_CLIENT_SECRET");
             $this->emailSender = getenv("SMTP_USER_EMAIL");
             $this->emailSenderName = getenv("SMTP_USER_NAME");
-    
-            // Load refresh token from file
-            /*
-            if (!file_exists($this->refreshTokenPath)) {
-                throw new Exception("Refresh token file not found: {$this->refreshTokenPath}");
-            }
-    
-            //$tokenData = json_decode(file_get_contents($this->refreshTokenPath), true);
-            //$refreshToken = $tokenData['refresh_token'] ?? null;
-            */
 
-            $refreshToken = getenv("SMTP_REFRESH_TOKEN");
-
-            // Validate required variables
-            if (!$clientId || !$clientSecret || !$refreshToken || !$this->emailSender) {
-                throw new Exception("Missing SMTP environment variables or refresh token. Check .env and refresh_token.json.");
+            // Load refresh token & access token from file
+            if (!file_exists($this->refreshTokenPath) || !is_readable($this->refreshTokenPath)) {
+                throw new Exception("Refresh token file not found or unreadable: {$this->refreshTokenPath}");
             }
-    
+
+            $tokenData = json_decode(file_get_contents($this->refreshTokenPath), true);
+            $refreshToken = $tokenData['refresh_token'] ?? null;
+            $accessToken = $tokenData['access_token'] ?? null;
+            $expiresAt = $tokenData['expires_in'] ?? 0; // Expiry time in UNIX timestamp
+
+            if (!$refreshToken) {
+                throw new Exception("Missing refresh token in `refresh_token.json`.");
+            }
+
             // Set up OAuth2 Provider
             $provider = new Google([
                 'clientId'     => $clientId,
                 'clientSecret' => $clientSecret,
             ]);
-    
-            /*
-            //  Request a new access token using the refresh token
-            $newToken = $provider->getAccessToken('refresh_token', [
-                'refresh_token' => $refreshToken
-            ]);
-           */
-    
-            // Configure OAuth2 authentication with the new access token
+
+            // Refresh access token if expired
+            if (!$accessToken || time() >= $expiresAt) {
+                $newToken = $provider->getAccessToken('refresh_token', [
+                    'refresh_token' => $refreshToken
+                ]);
+
+                $accessToken = $newToken->getToken();
+                $expiresAt = time() + $newToken->getExpires(); // Store new expiry timestamp
+
+                // Update `refresh_token.json` with new access token
+                $this->storeTokens($refreshToken, $accessToken, $expiresAt);
+            }
+
+            // Configure OAuth2 authentication with the valid access token
             $this->mailer->setOAuth(new OAuth([
                 'provider'     => $provider,
                 'clientId'     => $clientId,
                 'clientSecret' => $clientSecret,
-                'refreshToken' => $refreshToken, 
+                'refreshToken' => $refreshToken,
+                'accessToken'  => $accessToken,  // 🔹 Pass the latest access token
                 'userName'     => $this->emailSender,
             ]));
-    
+
             // SMTP Configuration
             $this->mailer->isSMTP();
             $this->mailer->Host = 'smtp.gmail.com';
@@ -76,18 +80,38 @@ class Mail
             $this->mailer->AuthType = 'XOAUTH2';
             $this->mailer->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
             $this->mailer->Port = 587;
-    
+
             // Validate and set sender email
             if (!filter_var($this->emailSender, FILTER_VALIDATE_EMAIL)) {
                 throw new Exception("Invalid sender email: {$this->emailSender}");
             }
             $this->mailer->setFrom($this->emailSender, $this->emailSenderName ?: "No Name");
-    
+
         } catch (Exception $e) {
             error_log("Mailer Configuration Error: " . $e->getMessage());
         }
     }
-    
+
+    /**
+     * Store updated access & refresh tokens in `refresh_token.json`
+     */
+    private function storeTokens($refreshToken, $accessToken, $expiresAt)
+    {
+        $tokenData = json_encode([
+            "refresh_token" => $refreshToken,
+            "access_token"  => $accessToken,
+            "expires_in"    => $expiresAt
+        ], JSON_PRETTY_PRINT);
+
+        // Ensure the file is writable
+        if (!is_writable($this->refreshTokenPath)) {
+            chmod($this->refreshTokenPath, 0666); // Set write permissions
+        }
+
+        if (file_put_contents($this->refreshTokenPath, $tokenData) === false) {
+            error_log("❌ Error: Unable to write to `refresh_token.json`. Check file permissions.");
+        }
+    }
 
     public function sendEmail(array $recipients, string $subject, string $message, string $replyTo = null, array $bccRecipients = [])
     {
@@ -138,7 +162,7 @@ class Mail
             $this->mailer->send();
             return ["success" => true, "message" => "Message sent successfully"];
         } catch (Exception $e) { 
-            return ["success" => false, "message" => "Failed to send message. Check logs.". $this->mailer->ErrorInfo];
+            return ["success" => false, "message" => "Failed to send message. Check logs." . $this->mailer->ErrorInfo];
         }
     }
 }

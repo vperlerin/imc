@@ -14,6 +14,9 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 OLD_ENV_FILE="$SCRIPT_DIR/env/.env"
 NEW_ENV_FILE="$SCRIPT_DIR/../env/.env"
 
+chmod 666 /DATA/sites/imc2025.imo.net/php/refresh_token.json
+chown www-data:www-data /DATA/sites/imc2025.imo.net/php/refresh_token.json
+ 
 if [ -f "$OLD_ENV_FILE" ]; then
     echo -e "${CYAN}Found .env file at $OLD_ENV_FILE.${RESET}"
     echo -e "${YELLOW}Would you like to copy it to $NEW_ENV_FILE?${RESET}"
