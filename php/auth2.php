@@ -14,7 +14,7 @@ $provider = new Google([
   'clientSecret' => getenv("SMTP_CLIENT_SECRET"),
   'redirectUri'  => getenv("SMTP_REDIRECT_URL"),
   'accessType'   => 'offline',  // Request long-lived access
-  'prompt'       => 'consent'   // Force user to grant access again
+  //'prompt'       => 'consent'   // Force user to grant access again
 ]);
 
 // Check if a refresh token exists
@@ -28,11 +28,11 @@ if (file_exists($refreshTokenPath)) {
         'refresh_token' => $storedToken['refresh_token']
       ]);
 
-      echo json_encode([
+      echo "<pre>" . json_encode([
         "access_token"  => $newToken->getToken(),
         "expires_in"    => $newToken->getExpires(),
         "refresh_token" => $storedToken['refresh_token']  // Keep using the same refresh token
-      ]);
+      ]) . "</pre>";
       exit;
     } catch (Exception $e) {
       echo "Error refreshing access token: " . $e->getMessage();
@@ -70,11 +70,11 @@ if (!empty($_GET['error'])) {
       echo "⚠️ Warning: No refresh token received. You may need to revoke access and try again.";
     }
 
-    echo json_encode([
+    echo "<pre>" . json_encode([
       "access_token"  => $token->getToken(),
       "expires_in"    => $token->getExpires(),
       "refresh_token" => $refreshToken
-    ]);
+    ]) . "</pre>";
   } catch (Exception $e) {
     echo "Error obtaining access token: " . $e->getMessage();
   }
