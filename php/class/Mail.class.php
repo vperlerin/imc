@@ -12,6 +12,7 @@ class Mail
 {
     private $mailer;
     private $emailSender; 
+    private $emailSenderName;
     private $refreshTokenPath = __DIR__ . "/../refresh_token.json"; // Path to refresh token file
 
     public function __construct()
@@ -71,7 +72,8 @@ class Mail
             if (!filter_var($this->emailSender, FILTER_VALIDATE_EMAIL)) {
                 throw new Exception("Invalid sender email: {$this->emailSender}");
             }
-            $this->mailer->setFrom($this->emailSender,   $this->emailSenderName ?: "No Name");
+
+            $this->mailer->setFrom($this->emailSender, $this->emailSenderName ?: "IMC " . getenv("YEAR"));
 
         } catch (Exception $e) {
             error_log("Mailer Configuration Error: " . $e->getMessage());
