@@ -103,10 +103,7 @@ class Mail
             "expires_in"    => $expiresAt
         ], JSON_PRETTY_PRINT);
 
-        // Ensure the file is writable
-        if (!is_writable($this->refreshTokenPath)) {
-            chmod($this->refreshTokenPath, 0666); // Set write permissions
-        }
+    
 
         if (file_put_contents($this->refreshTokenPath, $tokenData) === false) {
             error_log("❌ Error: Unable to write to `refresh_token.json`. Check file permissions.");
