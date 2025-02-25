@@ -68,7 +68,7 @@ class Mail
         }
     }
 
-    public function sendEmail(array $recipients, string $subject, string $message, string $replyTo = null)
+    public function sendEmail(array $recipients, string $subject, string $message, string $replyTo = null, array $bccRecipients = [])
     {
         try {
             // Validate recipients
@@ -77,10 +77,34 @@ class Mail
             }
 
             foreach ($recipients as $recipient) {
-                if (!filter_var($recipient, FILTER_VALIDATE_EMAIL)) {
-                    throw new Exception("Invalid recipient email: $recipient");
+                if (is_array($recipient) && isset($recipient['email'])) {
+                    $email = $recipient['email'];
+                    $name = $recipient['name'] ?? '';
+                } else {
+                    $email = $recipient;
+                    $name = '';
                 }
-                $this->mailer->addAddress($recipient);
+    
+                if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                    throw new Exception("Invalid recipient email: $email");
+                }
+                
+                $this->mailer->addAddress($email, $name);
+            }
+
+            // Add BCC recipients if provided
+            foreach ($bccRecipients as $bcc) {
+                if (is_array($bcc) && isset($bcc['email'])) {
+                    $bccEmail = $bcc['email'];
+                } else {
+                    $bccEmail = $bcc;
+                }
+
+                if (!filter_var($bccEmail, FILTER_VALIDATE_EMAIL)) {
+                    throw new Exception("Invalid BCC email: $bccEmail");
+                }
+
+                $this->mailer->addBCC($bccEmail);
             }
 
             // Set Reply-To if provided

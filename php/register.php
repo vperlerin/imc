@@ -65,7 +65,7 @@ function create_email(array $data, string $summary): string
 
     return $message;
 }
-
+ 
 
 try {
     $data = json_decode(file_get_contents("php://input"), true);
