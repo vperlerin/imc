@@ -25,8 +25,10 @@ class Mail
     {
         try {
             // Load SMTP credentials
+            $accessToken = getenv("ACCESS_TOKEN");
             $clientId = getenv("SMTP_CLIENT_ID");
             $clientSecret = getenv("SMTP_CLIENT_SECRET");
+            $smtp_port = getenv("SMTP_TLS_PORT");
             $this->emailSender = getenv("SMTP_USER_EMAIL");
             $this->emailSenderName = getenv("SMTP_USER_NAME");
     
@@ -50,11 +52,13 @@ class Mail
             ]);
     
             // Request a new access token using the refresh token
+            /*
             $newToken = $provider->getAccessToken('refresh_token', [
                 'refresh_token' => $refreshToken
             ]);
     
             $accessToken = $newToken->getToken(); // New access token
+            */
     
             // Configure OAuth2 authentication with the new access token
             $this->mailer->setOAuth(new OAuth([
@@ -72,13 +76,13 @@ class Mail
             $this->mailer->SMTPAuth = true;
             $this->mailer->AuthType = 'XOAUTH2';
             $this->mailer->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-            $this->mailer->Port = 587;
+            $this->mailer->Port = $smtp_port;
     
             // Validate and set sender email
             if (!filter_var($this->emailSender, FILTER_VALIDATE_EMAIL)) {
                 throw new Exception("Invalid sender email: {$this->emailSender}");
             }
-            $this->mailer->setFrom($this->emailSender, $this->emailSenderName ?: "No Name");
+            $this->mailer->setFrom($this->emailSender, $this->emailSenderName ?: "IMC");
     
         } catch (Exception $e) {
             error_log("Mailer Configuration Error: " . $e->getMessage());
