@@ -60,12 +60,12 @@ class Mail
 
             // SMTP Configuration
             $this->mailer->isSMTP();
-            $this->mailer->SMTPDebug = 4;
+            $this->mailer->SMTPDebug = 2;
             $this->mailer->CharSet = PHPMailer::CHARSET_UTF8;
             $this->mailer->Host = getenv("SMTP_HOST");
             $this->mailer->SMTPAuth = true;
             $this->mailer->AuthType = 'XOAUTH2';
-            $this->mailer->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+            $this->mailer->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
             $this->mailer->Port = getenv("SMTP_TLS_PORT");
 
             // Validate and set sender email
