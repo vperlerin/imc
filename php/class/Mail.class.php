@@ -60,6 +60,7 @@ class Mail
 
             // SMTP Configuration
             $this->mailer->isSMTP();
+            $this->mailer->SMTPDebug = 4;
             $this->mailer->CharSet = PHPMailer::CHARSET_UTF8;
             $this->mailer->Host = getenv("SMTP_HOST");
             $this->mailer->SMTPAuth = true;

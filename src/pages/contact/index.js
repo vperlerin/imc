@@ -35,15 +35,14 @@ const Contact = () => {
       });
 
       if (response.data.success) {
-        setResponseMessage("Your message has been sent successfully!");
+        setResponseMessage("Your message has been sent successfully. We will get back to you ASAP.");
         reset();
         recaptchaRef.current.reset();
       } else {
         setResponseMessage("Something went wrong. Please try again.");
       }
     } catch (error) {
-      console.error("Error sending contact form:", error);
-      setResponseMessage("An error occurred while sending your message.");
+      setResponseMessage("An error occurred while sending your message. Please, try again later.");
     }
 
     setLoading(false);
@@ -53,7 +52,7 @@ const Contact = () => {
     <PageContain title="Contact">
 
       {responseMessage && (
-        <p className={responseMessage.includes("successfully") ? "text-success fw-bolder text-center" : "text-danger fw-bolder text-center"}>{responseMessage}</p>
+        <div className={responseMessage.includes("successfully") ? " alert alert-success fw-bolder text-center" : "alert alert-danger fw-bolder text-center"}>{responseMessage}</div>
       )}
 
       <form onSubmit={handleSubmit(onSubmit)} className={classNames(css.form, 'mx-auto w-100 position-relative')}>
