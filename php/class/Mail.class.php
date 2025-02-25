@@ -31,13 +31,17 @@ class Mail
             $this->emailSenderName = getenv("SMTP_USER_NAME");
     
             // Load refresh token from file
+            /*
             if (!file_exists($this->refreshTokenPath)) {
                 throw new Exception("Refresh token file not found: {$this->refreshTokenPath}");
             }
     
-            $tokenData = json_decode(file_get_contents($this->refreshTokenPath), true);
-            $refreshToken = $tokenData['refresh_token'] ?? null;
-    
+            //$tokenData = json_decode(file_get_contents($this->refreshTokenPath), true);
+            //$refreshToken = $tokenData['refresh_token'] ?? null;
+            */
+
+            $refreshToken = getenv("SMTP_REFRESH_TOKEN");
+
             // Validate required variables
             if (!$clientId || !$clientSecret || !$refreshToken || !$this->emailSender) {
                 throw new Exception("Missing SMTP environment variables or refresh token. Check .env and refresh_token.json.");
@@ -49,20 +53,19 @@ class Mail
                 'clientSecret' => $clientSecret,
             ]);
     
-            // 🔹 Request a new access token using the refresh token
+            /*
+            //  Request a new access token using the refresh token
             $newToken = $provider->getAccessToken('refresh_token', [
                 'refresh_token' => $refreshToken
             ]);
-    
-            $accessToken = $newToken->getToken(); // Extract the access token
+           */
     
             // Configure OAuth2 authentication with the new access token
             $this->mailer->setOAuth(new OAuth([
                 'provider'     => $provider,
                 'clientId'     => $clientId,
                 'clientSecret' => $clientSecret,
-                'refreshToken' => $refreshToken, // Keep for future access token requests
-                'accessToken'  => $accessToken,  //  Pass the access token here!
+                'refreshToken' => $refreshToken, 
                 'userName'     => $this->emailSender,
             ]));
     
