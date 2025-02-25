@@ -26,8 +26,7 @@ class Mail
             // Load SMTP credentials
             $clientId = getenv("SMTP_CLIENT_ID");
             $clientSecret = getenv("SMTP_CLIENT_SECRET");
-            $email = getenv("SMTP_USER_EMAIL");
-        
+           
             // Load refresh token & access token from file
               if (!file_exists($this->refreshTokenPath) || !is_readable($this->refreshTokenPath)) {
                 throw new Exception("Refresh token file not found or unreadable: {$this->refreshTokenPath}");
@@ -70,9 +69,9 @@ class Mail
 
             // Validate and set sender email
             if (!filter_var($this->emailSender, FILTER_VALIDATE_EMAIL)) {
-                throw new Exception("Invalid sender email: {$email}");
+                throw new Exception("Invalid sender email: {$this->emailSender}");
             }
-            $this->mailer->setFrom($this->emailSender,  getenv("SMTP_USER_NAME") ?: "No Name");
+            $this->mailer->setFrom($this->emailSender,   $this->emailSenderName ?: "No Name");
 
         } catch (Exception $e) {
             error_log("Mailer Configuration Error: " . $e->getMessage());
