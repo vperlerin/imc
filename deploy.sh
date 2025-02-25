@@ -7,8 +7,33 @@ YELLOW='\e[33m'
 CYAN='\e[36m'
 RESET='\e[0m'
 
+# Check if /imc/env/.env exists and ask to copy it
+OLD_ENV_FILE="./imc/env/.env"
+NEW_ENV_FILE="./env/.env"
+
+if [ -f "$OLD_ENV_FILE" ]; then
+    echo -e "${CYAN}Found .env file at $OLD_ENV_FILE.${RESET}"
+    echo -e "${YELLOW}Would you like to copy it to $NEW_ENV_FILE?${RESET}"
+    read -p "Confirm copy? (y/N): " copy_confirm
+
+    # Convert input to lowercase
+    copy_confirm=${copy_confirm,,}
+
+    if [ "$copy_confirm" == "y" ]; then
+        # Ensure the destination directory exists
+        mkdir -p "$(dirname "$NEW_ENV_FILE")"
+
+        # Copy the file
+        cp "$OLD_ENV_FILE" "$NEW_ENV_FILE"
+
+        echo -e "${GREEN}.env file copied successfully!${RESET}"
+    else
+        echo -e "${YELLOW}Skipping copy of .env file.${RESET}"
+    fi
+fi
+
 # Load environment variables from .env
-ENV_FILE="./env/.env"
+ENV_FILE="$NEW_ENV_FILE"
 
 if [ ! -f "$ENV_FILE" ]; then
     echo -e "${RED}Error: .env file not found at $ENV_FILE!${RESET}"
@@ -49,8 +74,8 @@ if ! command -v rsync &> /dev/null; then
     exit 1
 fi
 
-# Function to move files and subdirectories while keeping structure
-move_files() {
+# Function to copy files and subdirectories while keeping structure
+copy_files() {
     local SRC=$1
     local DEST=$2
 
@@ -63,26 +88,23 @@ move_files() {
     # Ensure the destination directory exists
     mkdir -p "$DEST"
 
-    echo -e "${CYAN}Moving files and directories from $SRC to $DEST...${RESET}"
+    echo -e "${CYAN}Copying files and directories from $SRC to $DEST...${RESET}"
 
-    # Use rsync to move files, including subdirectories
-    rsync -a --remove-source-files "$SRC"/ "$DEST"/
+    # Use rsync to copy files, including subdirectories
+    rsync -a "$SRC"/ "$DEST"/
 
-    # Remove empty source directories after moving
-    find "$SRC" -type d -empty -delete
-
-    echo -e "${GREEN}Move completed: $SRC to $DEST${RESET}"
+    echo -e "${GREEN}Copy completed: $SRC to $DEST${RESET}"
     echo -e "${YELLOW}----------------------------------${RESET}"
 }
 
-# Move Python files
-move_files "$PYTHON_SRC" "$PYTHON_DEST"
+# Copy Python files
+copy_files "$PYTHON_SRC" "$PYTHON_DEST"
 
-# Move MySQL files
-move_files "$MYSQL_SRC" "$MYSQL_DEST"
+# Copy MySQL files
+copy_files "$MYSQL_SRC" "$MYSQL_DEST"
 
-# Move PHP files
-move_files "$PHP_SRC" "$PHP_DEST"
+# Copy PHP files
+copy_files "$PHP_SRC" "$PHP_DEST"
 
 # Ask for confirmation before deleting BUILD_DEST files
 if [ -d "$BUILD_DEST" ]; then
@@ -106,8 +128,8 @@ if [ -d "$BUILD_DEST" ]; then
     fi
 fi
 
-# Move Build files
-move_files "$BUILD_SRC" "$BUILD_DEST"
+# Copy Build files
+copy_files "$BUILD_SRC" "$BUILD_DEST"
 
 # Confirm completion
 echo -e "${GREEN}All operations completed successfully.${RESET}"
