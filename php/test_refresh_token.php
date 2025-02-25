@@ -43,3 +43,4 @@ try {
     ], JSON_PRETTY_PRINT);
 } catch (Exception $e) {
     die("❌ Error refreshing access token: " . $e->getMessage());
+}

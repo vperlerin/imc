@@ -39,8 +39,7 @@ class Mail
                 throw new Exception("Missing refresh token in `refresh_token.json`.");
             }
   
-            $this->emailSender = getenv("SMTP_USER_EMAIL");
-            $this->emailSenderName = getenv("SMTP_USER_NAME"); 
+            $this->emailSender = getenv("SMTP_USER_EMAIL"); 
           
             // Set up OAuth2 Provider
             $provider = new Google([
@@ -54,7 +53,7 @@ class Mail
                 'clientId'     => $clientId,
                 'clientSecret' => $clientSecret,
                 'refreshToken' => $refreshToken, 
-                'userName'     => $this->emailSenderName,
+                'userName'     => $this->emailSender,
             ]));
 
             // SMTP Configuration
