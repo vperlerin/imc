@@ -13,4 +13,4 @@ node_modules/
 .env.local
 *.txt
 build/report.html
- 
+./todo.txt 
