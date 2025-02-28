@@ -320,7 +320,7 @@ class ParticipantManager
                 w.date, 
                 w.period, 
                 w.price, 
-                w.price_online,  
+                w.price_online
             FROM participant_workshops pw
             INNER JOIN workshops w ON pw.workshop_id = w.id
             WHERE pw.participant_id = :participant_id
