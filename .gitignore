@@ -14,3 +14,4 @@ node_modules/
 *.txt
 build/report.html
 ./todo.txt 
+php/auth.php

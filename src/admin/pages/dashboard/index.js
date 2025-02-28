@@ -2,8 +2,7 @@ import PageContain from "@/admin/components/page-contain";
 
 const AdminDashboard = () => {
   return (
-    <PageContain title="Admin Dashboard"> 
-      
+    <PageContain title="Admin Dashboard">  
         dashboard TBD 
     </PageContain>
   );

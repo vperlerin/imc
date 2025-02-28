@@ -6,6 +6,7 @@ import Loader from "components/loader";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
+
 const AdminParticipantsOnsite = () => {
   const [participants, setParticipants] = useState([]);
   const [filteredParticipants, setFilteredParticipants] = useState([]);
@@ -17,7 +18,8 @@ const AdminParticipantsOnsite = () => {
   const [selectedParticipant, setSelectedParticipant] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showHardDeleteConfirm, setShowHardDeleteConfirm] = useState(false);
-
+ 
+  
   useEffect(() => {
     const fetchParticipants = async () => {
       try {

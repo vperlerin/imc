@@ -36,6 +36,7 @@ const lazyPages = {
   // ADMIN
   AdminDashboard: lazy(() => import("admin/pages/dashboard")),
   AdminParticipantsOnsite: lazy(() => import("admin/pages/participants/onsite")),
+  AdminParticipantsUser : lazy(() => import("admin/pages/participants/single")),
 };
 
 // Placeholder component for 404
@@ -78,6 +79,8 @@ const routeConfig = [
   // ADMIN (protected routes)
   { path: "/admin/dashboard", element: <ProtectedRoute><lazyPages.AdminDashboard /></ProtectedRoute>},
   { path: "/admin/participants/onsite", element: <ProtectedRoute><lazyPages.AdminParticipantsOnsite /></ProtectedRoute>},
+  { path: "/admin/participants/onsite/:participantId", element: (<ProtectedRoute><lazyPages.AdminParticipantsUser/></ProtectedRoute> ),
+  },
   // 404
   { path: "*", element: <Placeholder title="Oops! Looks like you’ve taken a wrong turn into the meteor shower. This page has burned up in the atmosphere!" /> },
 ];
