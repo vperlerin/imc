@@ -65,12 +65,12 @@ class ParticipantManager
             // Fetch all available workshops from the database
             $stmt = $this->pdo->query("SELECT id FROM workshops");
             $workshops = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            
+
             // Check if workshops exist in form data
             if (!empty($data['workshops']) && is_array($data['workshops'])) {
                 foreach ($workshops as $workshop) {
                     $workshopId = $workshop['id'];
-                    
+
                     // Check if the workshop is selected ("true")
                     if (!empty($data['workshops'][$workshopId]) && $data['workshops'][$workshopId] === "true") {
                         $stmt = $this->pdo->prepare("
@@ -84,7 +84,7 @@ class ParticipantManager
                     }
                 }
             }
-             
+
             // Insert arrival details
             $stmt = $this->pdo->prepare("
                 INSERT INTO arrival (participant_id, arrival_date, arrival_hour, arrival_minute, 
@@ -314,13 +314,20 @@ class ParticipantManager
 
         // 2. Fetch workshops the participant is registered for
         $stmt = $this->pdo->prepare("
-            SELECT w.*
+            SELECT 
+                w.id, 
+                w.title, 
+                w.date, 
+                w.period, 
+                w.price, 
+                w.price_online,  
             FROM participant_workshops pw
             INNER JOIN workshops w ON pw.workshop_id = w.id
             WHERE pw.participant_id = :participant_id
-        ");
+            ");
         $stmt->execute([':participant_id' => $participantId]);
         $workshops = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 
         // 3. Fetch payments by this participant
         //    (including payment method name via JOIN)

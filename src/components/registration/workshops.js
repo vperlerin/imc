@@ -21,6 +21,8 @@ const Workshops = ({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+ 
+
   useEffect(() => {
     const fetchWorkshops = async () => {
       try {
@@ -51,8 +53,7 @@ const Workshops = ({
 
   if (loading) return <><Loader /><p>Loading workshops...</p></>;
   if (error) return <p className="text-danger">{error}</p>;
-
-
+ 
   return (
     <div className="position-relative">
       {isDebugMode && (
@@ -80,8 +81,7 @@ const Workshops = ({
           const workshopId = workshop.id.toString();
           const selectedWorkshop = watch(`workshops.${workshopId}`) || "false";
 
-
-
+ 
           // Ensure the date is a valid string before parsing
           const rawDate = workshop.date ? workshop.date.trim() : null;
           const formattedDate = rawDate
