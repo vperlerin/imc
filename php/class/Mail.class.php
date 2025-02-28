@@ -30,15 +30,12 @@ class Mail
 
             $this->emailSender = getenv("SMTP_USER_EMAIL");
             $this->emailSenderName = getenv("SMTP_USER_NAME");
-
-
-            echo(var_dump($refreshToken));
-
+ 
             // Set up OAuth2 Provider
             $provider = new Google([
                 'clientId'     => $clientId,
                 'clientSecret' => $clientSecret,
-                //'redirectUri'  => getenv("SMTP_REDIRECT_URL")
+                'redirectUri'  => getenv("SMTP_REDIRECT_URL")
             ]);
   
             // Configure OAuth2 authentication with the valid access token
@@ -53,7 +50,7 @@ class Mail
             // SMTP Configuration
             $this->mailer->isSMTP();
             $this->mailer->SMTPDebug = 4;
-            $this->mailer->Host = 'smtp.gmail.com';
+            $this->mailer->Host = getenv("SMTP_HOST");
             $this->mailer->CharSet = PHPMailer::CHARSET_UTF8;
             $this->mailer->SMTPAuth = true;
             $this->mailer->AuthType = 'XOAUTH2';
