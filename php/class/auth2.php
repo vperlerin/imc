@@ -13,49 +13,47 @@ $provider = new Google([
     'redirectUri'   => 'https://imc2025.imo.net/php/auth2.php', // Must match "Authorized redirect URI" in Google Cloud Console
     'accessType'    => 'offline', // Ensures we get a refresh token
 ]);
+ 
+ 
 
-// 2. If we do not have an authorization code, get one
+// If we don't have a code from Google yet, fetch one
 if (!isset($_GET['code'])) {
-    // Optional: force re-consent to ensure we get a refresh token every time
-    $options = [
-        'scope'         => ['https://mail.google.com/'], // or narrower scope if you only need email sending
-        'prompt'        => 'consent', // forces the re-consent screen, ensuring refresh token is returned
-    ];
+    // Generate auth URL with special parameters
+    $authUrl = $provider->getAuthorizationUrl([
+        'scope'       => ['https://mail.google.com/'],
+        'prompt'      => 'consent',     // force re-consent
+        'access_type' => 'offline',     // get refresh token
+    ]);
 
-    $authUrl = $provider->getAuthorizationUrl($options);
-    
-    // Store the state in session to verify in the callback
+    // Save state in session (for CSRF protection)
     $_SESSION['oauth2state'] = $provider->getState();
-
-    // Provide the user with a clickable link
-    echo '<a href="' . htmlspecialchars($authUrl) . '">Click here to authorize</a>';
+    echo '<a href="' . htmlspecialchars($authUrl) . '">Click here to authorize with Google</a>';
     exit;
-
-// 3. Check for state validity
-} elseif (empty($_GET['state']) || ($_GET['state'] !== $_SESSION['oauth2state'])) {
-    // State is invalid, possible CSRF attack
+    
+} elseif (empty($_GET['state']) || $_GET['state'] !== $_SESSION['oauth2state']) {
+    // State is invalid
     unset($_SESSION['oauth2state']);
-    exit('Invalid OAuth2 state');
-
-// 4. If we have the code and state, exchange it for an access token
+    exit('Invalid state, make sure HTTP sessions are working properly and try again.');
+    
 } else {
+    // We got the authorization code, let's trade it for tokens
     try {
-        // This will exchange the authorization code for an access token
         $token = $provider->getAccessToken('authorization_code', [
             'code' => $_GET['code']
         ]);
 
-        // 5. Now we have an access token and (hopefully) a refresh token
-        echo '<h2>Success!</h2>';
-        echo '<p><strong>Access Token:</strong> '  . $token->getToken() . '</p>';
-        echo '<p><strong>Refresh Token:</strong> ' . $token->getRefreshToken() . '</p>';
-        echo '<p><strong>Expires (timestamp):</strong> ' . $token->getExpires() . '</p>';
+        // Print out the tokens
+        echo '<h3>Access Token</h3>';
+        echo '<pre>' . $token->getToken() . '</pre>';
 
-        // You can store these tokens in your database or .env for future use.
-        // The refresh token is what's needed for continuous "offline" access.
-        // DO NOT just store them in a publicly visible place or commit to Git.
+        echo '<h3>Refresh Token</h3>';
+        $refreshToken = $token->getRefreshToken();
+        echo '<pre>' . ($refreshToken ?: 'No refresh token returned') . '</pre>';
+
+        echo '<h3>Expires</h3>';
+        echo '<pre>' . $token->getExpires() . '</pre>';
 
     } catch (Exception $e) {
-        exit('Failed to get access token: ' . $e->getMessage());
+        exit('Failed to get tokens: ' . $e->getMessage());
     }
 }
