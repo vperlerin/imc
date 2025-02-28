@@ -37,9 +37,25 @@ class Mail
                 'clientSecret' => $clientSecret,
                 'redirectUri'  => getenv("SMTP_REDIRECT_URL")
             ]);
+
+            echo(var_dump([
+                'clientId'     => $clientId,
+                'clientSecret' => $clientSecret,
+                'redirectUri'  => getenv("SMTP_REDIRECT_URL")
+            ]));
+
   
             // Configure OAuth2 authentication with the valid access token
             $this->mailer->setOAuth(new OAuth([
+                'provider'     => $provider,
+                'clientId'     => $clientId,
+                'clientSecret' => $clientSecret,
+                'refreshToken' => $refreshToken,
+                'userName'     => $this->emailSender,
+            ]));
+
+
+            echo(var_dump([
                 'provider'     => $provider,
                 'clientId'     => $clientId,
                 'clientSecret' => $clientSecret,
