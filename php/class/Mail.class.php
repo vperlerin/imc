@@ -26,7 +26,7 @@ class Mail
             // Load SMTP credentials
             $clientId = getenv("SMTP_CLIENT_ID");
             $clientSecret = getenv("SMTP_CLIENT_SECRET");
-            $refreshToken = getenv("SMTP_REFRESH_TOKEN");
+            $refreshToken = "1//05UIktT5WOgnXCgYIARAAGAUSNwF-L9Irnns5cLoQpdHsGJ6DZeD1OzIEE_bAv5uw0LBAzg8vUEI4sLBheLetBsL2Vrm8zn0uOrw";
 
             $this->emailSender = getenv("SMTP_USER_EMAIL");
             $this->emailSenderName = getenv("SMTP_USER_NAME");
