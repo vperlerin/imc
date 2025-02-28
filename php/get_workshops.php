@@ -13,11 +13,12 @@ header("Content-Type: application/json");
 
 // Load dependencies
 require_once __DIR__ . "/../config.php";
-require_once __DIR__ . "/../class/Connect.class.php";
+require_once __DIR__ . "/../class/Connect.class.php"; 
+require_once __DIR__ . "/class/Workshop.class.php";
 
 try {
-    $stmt = $pdo->query("SELECT id, title, price, price_online FROM workshops");
-    $workshops = $stmt->fetchAll(PDO::FETCH_ASSOC);
+  $workshopManager = new WorkshopManager($pdo);
+  $workshops = $workshopManager->getWorkshops();
 
     echo json_encode([
         "success" => true,
