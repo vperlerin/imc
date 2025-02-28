@@ -13,7 +13,7 @@ class ArrivalManager {
             : null;
 
         $stmt = $this->pdo->prepare("
-            INSERT INTO participant_arrival (
+            INSERT INTO arrival (
                 participant_id, arrival_date, arrival_hour, arrival_minute, 
                 departure_date, departure_hour, departure_minute, 
                 travelling, travelling_details, created_at, updated_at

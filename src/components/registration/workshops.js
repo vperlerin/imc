@@ -5,6 +5,7 @@ import StepDislay from "components/registration/stepDisplay";
 import axios from "axios";
 
 const Workshops = ({
+  isAdmin = false,
   initialData,
   isDebugMode = false,
   register,
@@ -26,7 +27,7 @@ const Workshops = ({
         if (response.data.success) {
           setWorkshops(response.data.data);
         } else {
-          throw new Error("Failed to fetch workshops.");
+          throw new Error(response.data.message || "Failed to fetch workshops.");
         }
       } catch (err) {
         setError(err.message);
@@ -65,10 +66,12 @@ const Workshops = ({
         </button>
       )}
 
-      <h4 className="mb-3 border-bottom pb-2">
-        <StepDislay step={step} stepTotal={stepTotal} />
-        Workshops
-      </h4>
+      {!isAdmin && (
+        <h4 className="mb-3 border-bottom pb-2">
+          <StepDislay step={step} stepTotal={stepTotal} />
+          Workshops
+        </h4>
+      )}
 
       <div className={classNames(cssForm.smallW, "mx-auto position-relative")}>
         {workshops.map((workshop) => {
@@ -78,7 +81,7 @@ const Workshops = ({
           return (
             <div className="mb-5 row" key={workshopId}>
               <label className={classNames("text-md-center", cssForm.balance)}>
-                Do you wish to attend the <b>{workshop.title}</b> for an extra price of {workshop.price.toFixed(2)}€?
+                Do you wish to attend the <b>{workshop.title}</b> for an extra price of {parseFloat(workshop.price).toFixed(2)}€?
               </label>
 
               <div className="text-center btn-group d-block mt-3" role="group">
@@ -90,7 +93,7 @@ const Workshops = ({
                   value="true"
                   {...register(`workshops.${workshopId}`, { required: "Please select an option" })}
                   onChange={() => setValue(`workshops.${workshopId}`, "true")}
-                  checked={selectedWorkshop === "true"} 
+                  checked={selectedWorkshop === "true"}
                 />
                 <label className="btn btn-outline-primary" htmlFor={`workshop-${workshopId}-yes`}>
                   Yes
@@ -104,7 +107,7 @@ const Workshops = ({
                   value="false"
                   {...register(`workshops.${workshopId}`, { required: "Please select an option" })}
                   onChange={() => setValue(`workshops.${workshopId}`, "false")}
-                  checked={selectedWorkshop === "false"} 
+                  checked={selectedWorkshop === "false"}
                 />
                 <label className="btn btn-outline-primary" htmlFor={`workshop-${workshopId}-no`}>
                   No
@@ -119,6 +122,13 @@ const Workshops = ({
             </div>
           );
         })}
+
+        {!isAdmin && (
+          <p>
+            Read more  about the <a href="/program/workshops/radio" target="_blank">Radio Workshop </a>
+            and the <a href="/program/workshops/specto" target="_blank">Spectography Workshop </a>
+          </p>
+        )}
       </div>
     </div>
   );

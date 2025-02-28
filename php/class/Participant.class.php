@@ -81,7 +81,7 @@ class ParticipantManager
 
             // Insert arrival details
             $stmt = $this->pdo->prepare("
-                INSERT INTO participant_arrival (participant_id, arrival_date, arrival_hour, arrival_minute, 
+                INSERT INTO arrival (participant_id, arrival_date, arrival_hour, arrival_minute, 
                     departure_date, departure_hour, departure_minute, travelling, travelling_details, created_at, updated_at)
                 VALUES (:participant_id, :arrival_date, :arrival_hour, :arrival_minute, 
                     :departure_date, :departure_hour, :departure_minute, :travelling, :travelling_details, NOW(), NOW())
@@ -100,7 +100,7 @@ class ParticipantManager
 
             // Insert accommodation details
             $stmt = $this->pdo->prepare("
-                INSERT INTO participant_accommodation (participant_id, registration_type_id, created_at, updated_at)
+                INSERT INTO accommodation (participant_id, registration_type_id, created_at, updated_at)
                 VALUES (:participant_id, (SELECT id FROM registration_types WHERE type = :registration_type), NOW(), NOW())
             ");
             $stmt->execute([
@@ -329,10 +329,10 @@ class ParticipantManager
         $payments = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         // 4. Fetch accommodation info
-        //    (combining both participant_accommodation and registration_types)
+        //    (combining both accommodation and registration_types)
         $stmt = $this->pdo->prepare("
             SELECT pa.*, rt.type AS registration_type, rt.price AS registration_price
-            FROM participant_accommodation pa
+            FROM accommodation pa
             INNER JOIN registration_types rt ON pa.registration_type_id = rt.id
             WHERE pa.participant_id = :participant_id
         ");
@@ -342,7 +342,7 @@ class ParticipantManager
         // 5. Fetch arrival/departure info
         $stmt = $this->pdo->prepare("
             SELECT *
-            FROM participant_arrival
+            FROM arrival
             WHERE participant_id = :participant_id
         ");
         $stmt->execute([':participant_id' => $participantId]);

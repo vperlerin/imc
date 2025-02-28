@@ -95,11 +95,16 @@ CREATE TABLE IF NOT EXISTS payments (
 CREATE TABLE IF NOT EXISTS workshops (
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
+    date DATE NOT NULL,
+    period VARCHAR(50) NOT NULL,
     price DECIMAL(10,2) UNSIGNED NOT NULL DEFAULT 0.00,
     price_online DECIMAL(10,2) UNSIGNED NOT NULL DEFAULT 0.00,
+    responsible_name VARCHAR(255) NOT NULL,
+    responsible_email VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 
 -- Participant-Workshops Relation Table
 CREATE TABLE IF NOT EXISTS participant_workshops (
@@ -112,7 +117,7 @@ CREATE TABLE IF NOT EXISTS participant_workshops (
 ) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Participant Arrival Table
-CREATE TABLE IF NOT EXISTS participant_arrival (
+CREATE TABLE IF NOT EXISTS arrival (
     id INT AUTO_INCREMENT PRIMARY KEY,
     participant_id INT NOT NULL,
     arrival_date DATE NOT NULL,
@@ -162,7 +167,7 @@ CREATE TABLE IF NOT EXISTS registration_types (
 ) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Participant Accommodation Table
-CREATE TABLE IF NOT EXISTS participant_accommodation (
+CREATE TABLE IF NOT EXISTS accommodation (
     id INT AUTO_INCREMENT PRIMARY KEY,
     participant_id INT NOT NULL,
     registration_type_id INT NOT NULL,
