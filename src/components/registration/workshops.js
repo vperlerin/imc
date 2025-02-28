@@ -22,7 +22,7 @@ const Workshops = ({
   useEffect(() => {
     const fetchWorkshops = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/workshops.php`);
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/php/get_workshops.php`);
         if (response.data.success) {
           setWorkshops(response.data.data);
         } else {
