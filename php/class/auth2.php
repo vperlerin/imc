@@ -14,8 +14,7 @@ $provider = new Google([
     'accessType'    => 'offline', // Ensures we get a refresh token
 ]);
  
- 
-
+  
 // If we don't have a code from Google yet, fetch one
 if (!isset($_GET['code'])) {
     // Generate auth URL with special parameters

@@ -35,25 +35,9 @@ class Mail
             $provider = new Google([
                 'clientId'     => $clientId,
                 'clientSecret' => $clientSecret,
-                'redirectUri'  => getenv("SMTP_REDIRECT_URL")
+                //'redirectUri'  => getenv("SMTP_REDIRECT_URL")
             ]);
-
-            /*
-            try {
-                // Attempt to get a fresh access token using the refresh token
-                $accessToken = $provider->getAccessToken('refresh_token', [
-                    'refresh_token' => $refreshToken,
-                ]);
-
-                // If successful, you can view/echo the current (short-lived) access token
-                echo "Access Token (freshly obtained): " . $accessToken->getToken() . "<br>\n";
-            } catch (Exception $e) {
-                // If this fails, the refresh token might be invalid, revoked, or mismatched with client credentials
-                echo "Refresh token is invalid: " . $e->getMessage();
-                exit;
-            }
-                */
-
+  
             // Configure OAuth2 authentication with the valid access token
             $this->mailer->setOAuth(new OAuth([
                 'provider'     => $provider,
