@@ -46,6 +46,11 @@ class Mail
                 'clientId'     => $clientId,
                 'clientSecret' => $clientSecret
             ]);
+
+            echo(var_dump(([
+                'clientId'     => $clientId,
+                'clientSecret' => $clientSecret
+            ])));
             
             // Configure OAuth2 authentication with the valid access token
             $this->mailer->setOAuth(new OAuth([
@@ -57,7 +62,6 @@ class Mail
             ]));
             
             echo(var_dump(([
-                'provider'     => $provider,
                 'clientId'     => $clientId,
                 'clientSecret' => $clientSecret,
                 'refreshToken' => $refreshToken,
