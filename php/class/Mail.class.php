@@ -32,7 +32,7 @@ class Mail
             $this->emailSenderName = getenv("SMTP_USER_NAME");
 
 
-            echo "***" . $refreshToken . "***";
+            echo(var_dump($refreshToken));
 
             // Set up OAuth2 Provider
             $provider = new Google([
