@@ -30,16 +30,23 @@ class Mail
 
             $this->emailSender = getenv("SMTP_USER_EMAIL");
             $this->emailSenderName = getenv("SMTP_USER_NAME");
- 
+
+            // SMTP Configuration
+            $this->mailer->isSMTP();
+            $this->mailer->SMTPDebug = 4;
+            $this->mailer->Host = getenv("SMTP_HOST");
+            $this->mailer->Port = 465;
+            $this->mailer->SMTPAuth = true;
+            $this->mailer->AuthType = 'XOAUTH2';
+            $this->mailer->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+            $this->mailer->CharSet = PHPMailer::CHARSET_UTF8;
+
             // Set up OAuth2 Provider
             $provider = new Google([
                 'clientId'     => $clientId,
-                'clientSecret' => $clientSecret,
-                'redirectUri'  => getenv("SMTP_REDIRECT_URL")
+                'clientSecret' => $clientSecret
             ]);
-
-           
-  
+            
             // Configure OAuth2 authentication with the valid access token
             $this->mailer->setOAuth(new OAuth([
                 'provider'     => $provider,
@@ -47,19 +54,16 @@ class Mail
                 'clientSecret' => $clientSecret,
                 'refreshToken' => $refreshToken,
                 'userName'     => $this->emailSender,
-                'scopes'       => ['https://mail.google.com/']
             ]));
+            
+            echo(var_dump(([
+                'provider'     => $provider,
+                'clientId'     => $clientId,
+                'clientSecret' => $clientSecret,
+                'refreshToken' => $refreshToken,
+                'userName'     => $this->emailSender,
+            ])));
  
-            // SMTP Configuration
-            $this->mailer->isSMTP();
-            $this->mailer->SMTPDebug = 4;
-            $this->mailer->Host = getenv("SMTP_HOST");
-            $this->mailer->CharSet = PHPMailer::CHARSET_UTF8;
-            $this->mailer->SMTPAuth = true;
-            $this->mailer->AuthType = 'XOAUTH2';
-            $this->mailer->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-            $this->mailer->Port = 587;
-
             // Validate and set sender email
             if (!filter_var($this->emailSender, FILTER_VALIDATE_EMAIL)) {
                 throw new Exception("Invalid sender email: {$this->emailSender}");
