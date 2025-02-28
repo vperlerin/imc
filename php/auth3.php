@@ -63,6 +63,6 @@ if (isset($_GET['code']) && !empty($_GET['code'])) {
     }
 
     // Add PHPMailer code here
-
+    echo "TEST";
 }
 ?>
