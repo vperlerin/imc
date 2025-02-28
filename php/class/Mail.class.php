@@ -38,6 +38,7 @@ class Mail
                 'redirectUri'  => getenv("SMTP_REDIRECT_URL")
             ]);
 
+            /*
             try {
                 // Attempt to get a fresh access token using the refresh token
                 $accessToken = $provider->getAccessToken('refresh_token', [
@@ -51,6 +52,7 @@ class Mail
                 echo "Refresh token is invalid: " . $e->getMessage();
                 exit;
             }
+                */
 
             // Configure OAuth2 authentication with the valid access token
             $this->mailer->setOAuth(new OAuth([
