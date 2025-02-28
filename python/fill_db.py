@@ -4,6 +4,11 @@ import json
 import os
 import bcrypt
 import MySQLdb  # Python 2 compatible MySQL library
+import sys
+
+# Ensure Python 2 uses UTF-8 as default encoding
+reload(sys)
+sys.setdefaultencoding("utf-8")
 
 # Define paths
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -58,23 +63,29 @@ if table_is_empty("imc_sessions"):
             "INSERT INTO imc_sessions (name) VALUES ('%s');" % session.replace("'", "''")
         )
 
-# Insert `workshops` if the table is empty
+
+
 if table_is_empty("workshops"):
     for workshop in data.get("workshops", []):
-        title = workshop["title"].replace("'", "''").decode("utf-8")  # Escape single quotes and ensure UTF-8
-        date = workshop["date"]  # Workshop date
-        period = workshop["period"].replace("'", "''").decode("utf-8")  # Time range
+        # Ensure fields are properly encoded as Unicode
+        title = workshop["title"].replace("'", "''") if isinstance(workshop["title"], unicode) else unicode(workshop["title"], "utf-8").replace("'", "''")
+        date = workshop["date"]  # Workshop date (already a string)
+        period = workshop["period"].replace("'", "''") if isinstance(workshop["period"], unicode) else unicode(workshop["period"], "utf-8").replace("'", "''")
         cost = float(workshop["cost"])
         cost_online = float(workshop.get("cost_online", 0.00))  # Default to 0.00 if missing
-        responsible_name = workshop["email_to"]["name"].replace("'", "''").decode("utf-8")  # Responsible person's name
-        responsible_email = workshop["email_to"]["email"].replace("'", "''").decode("utf-8")  # Responsible person's email
 
+        # Ensure responsible person's name & email are properly encoded
+        responsible_name = workshop["email_to"]["name"].replace("'", "''") if isinstance(workshop["email_to"]["name"], unicode) else unicode(workshop["email_to"]["name"], "utf-8").replace("'", "''")
+        responsible_email = workshop["email_to"]["email"].replace("'", "''") if isinstance(workshop["email_to"]["email"], unicode) else unicode(workshop["email_to"]["email"], "utf-8").replace("'", "''")
+
+        # Append SQL statement ensuring Unicode compatibility
         sql_statements.append(
             u"INSERT INTO workshops (title, date, period, price, price_online, responsible_name, responsible_email) "
             u"VALUES ('%s', '%s', '%s', %.2f, %.2f, '%s', '%s');" % (
                 title, date, period, cost, cost_online, responsible_name, responsible_email
             )
         )
+
 
 
 # Insert `registration_types` (rooms) if the table is empty
