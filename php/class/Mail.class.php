@@ -31,6 +31,9 @@ class Mail
             $this->emailSender = getenv("SMTP_USER_EMAIL");
             $this->emailSenderName = getenv("SMTP_USER_NAME");
 
+
+            echo "***" . $refreshToken . "***";
+
             // Set up OAuth2 Provider
             $provider = new Google([
                 'clientId'     => $clientId,
@@ -54,8 +57,8 @@ class Mail
             $this->mailer->CharSet = PHPMailer::CHARSET_UTF8;
             $this->mailer->SMTPAuth = true;
             $this->mailer->AuthType = 'XOAUTH2';
-            $this->mailer->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;             
-            $this->mailer->Port       = 465;   
+            $this->mailer->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $this->mailer->Port = 587;
 
             // Validate and set sender email
             if (!filter_var($this->emailSender, FILTER_VALIDATE_EMAIL)) {
