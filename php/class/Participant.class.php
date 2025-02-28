@@ -20,12 +20,12 @@ class ParticipantManager
     {
         try {
             $this->pdo->beginTransaction();
-    
+
             // Check if email exists
             if ($this->emailExists($data['email'])) {
                 throw new Exception("The email address '{$data['email']}' is already registered. Please use a different email or log in.");
             }
-    
+
             // Insert participant
             $stmt = $this->pdo->prepare("
                 INSERT INTO participants (
@@ -38,7 +38,7 @@ class ParticipantManager
                     :password_hash, :paypal_fee, :total_due, 0.00, 'active', NULL, :comments, NOW(), NOW()
                 )
             ");
-    
+
             $stmt->execute([
                 ':title' => $data['title'],
                 ':first_name' => $data['first_name'],
@@ -59,27 +59,26 @@ class ParticipantManager
                 ':total_due' => $data['total_due'],
                 ':comments' => $data['comments'] ?? null
             ]);
-    
+
             $participantId = $this->pdo->lastInsertId();
-    
+
             // Insert workshops if selected
-            $workshops = [
-                "Spectroscopy Workshop" => 1,  // Workshop IDs need to be mapped properly
-                "Radio Workshop" => 2
-            ];
-            foreach ($workshops as $workshopName => $workshopId) {
-                if (filter_var($data[$workshopName], FILTER_VALIDATE_BOOLEAN)) {
+            $stmt = $this->pdo->query("SELECT id, title FROM workshops");
+            $workshops = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            foreach ($workshops as $workshop) {
+                if (!empty($data[$workshop['title']]) && $data[$workshop['title']] === "true") {
                     $stmt = $this->pdo->prepare("
                         INSERT INTO participant_workshops (participant_id, workshop_id, attending) 
                         VALUES (:participant_id, :workshop_id, TRUE)
                     ");
                     $stmt->execute([
                         ':participant_id' => $participantId,
-                        ':workshop_id' => $workshopId
+                        ':workshop_id' => $workshop['id']
                     ]);
                 }
             }
-    
+
             // Insert arrival details
             $stmt = $this->pdo->prepare("
                 INSERT INTO participant_arrival (participant_id, arrival_date, arrival_hour, arrival_minute, 
@@ -98,7 +97,7 @@ class ParticipantManager
                 ':travelling' => $data['travelling'],
                 ':travelling_details' => $data['travelling_details'] ?? null
             ]);
-    
+
             // Insert accommodation details
             $stmt = $this->pdo->prepare("
                 INSERT INTO participant_accommodation (participant_id, registration_type_id, created_at, updated_at)
@@ -108,7 +107,7 @@ class ParticipantManager
                 ':participant_id' => $participantId,
                 ':registration_type' => $data['registration_type']
             ]);
-    
+
             // Insert payment details
             $stmt = $this->pdo->prepare("
                 INSERT INTO payments (participant_id, payment_date, amount, payment_method_id, created_at, updated_at)
@@ -119,7 +118,7 @@ class ParticipantManager
                 ':amount' => $data['total_due'],
                 ':payment_method' => $data['payment_method']
             ]);
-    
+
             // Insert extra options
             $stmt = $this->pdo->prepare("
                 INSERT INTO extra_options (participant_id, excursion, buy_tshirt, tshirt_size, proceedings, created_at, updated_at)
@@ -132,13 +131,13 @@ class ParticipantManager
                 ':tshirt_size' => $data['tshirt_size'] ?? null,
                 ':proceedings' => $data['posters'][0]['printOnSite'] === "true" ? "pdf_printed" : "pdf"
             ]);
-    
+
             // Insert talks and posters
             $stmt = $this->pdo->prepare("
                 INSERT INTO contributions (participant_id, type, title, authors, abstract, session_id, duration, paper_submission, created_at, updated_at)
                 VALUES (:participant_id, :type, :title, :authors, :abstract, (SELECT id FROM imc_sessions WHERE name = :session), :duration, :paper_submission, NOW(), NOW())
             ");
-    
+
             foreach ($data['talks'] as $talk) {
                 $stmt->execute([
                     ':participant_id' => $participantId,
@@ -151,7 +150,7 @@ class ParticipantManager
                     ':paper_submission' => $talk['paperDate']
                 ]);
             }
-    
+
             foreach ($data['posters'] as $poster) {
                 $stmt->execute([
                     ':participant_id' => $participantId,
@@ -164,7 +163,7 @@ class ParticipantManager
                     ':paper_submission' => $poster['paperDate']
                 ]);
             }
-    
+
             $this->pdo->commit();
             return $participantId;
         } catch (Exception $e) {
@@ -172,38 +171,54 @@ class ParticipantManager
             throw new Exception("Error saving participant: " . $e->getMessage());
         }
     }
-    
-    
+
+
 
     /**
-     * Retrieve the number of participants registered for a given workshop 
-     * and their payment confirmation status.
+     * Retrieve participant statistics for a given workshop or all workshops.
      */
-    public function getWorkshopParticipants($workshopTitle)
+    public function getWorkshopParticipants($workshopTitle = null)
     {
-        $stmt = $this->pdo->prepare("
-            SELECT 
-                w.title AS workshop_title,
-                COUNT(pw.participant_id) AS total_registered,
-                SUM(CASE 
-                        WHEN p.confirmation_sent = 1 THEN 1 
-                        ELSE 0 
-                    END) AS confirmed_participants,
-                SUM(CASE 
-                        WHEN p.confirmation_sent = 0 THEN 1 
-                        ELSE 0 
-                    END) AS unconfirmed_participants
-            FROM workshops w
-            LEFT JOIN participant_workshops pw ON w.id = pw.workshop_id
-            LEFT JOIN participants p ON pw.participant_id = p.id
-            WHERE w.title = :workshopTitle
-            GROUP BY w.id;
-        ");
+        // Base SQL query
+        $query = "
+        SELECT 
+            w.id AS workshop_id,
+            w.title AS workshop_title,
+            COUNT(pw.participant_id) AS total_registered,
+            SUM(CASE WHEN p.confirmation_sent = 1 THEN 1 ELSE 0 END) AS confirmed_participants,
+            SUM(CASE WHEN p.confirmation_sent = 0 THEN 1 ELSE 0 END) AS unconfirmed_participants,
+            SUM(CASE WHEN p.is_online = 1 THEN 1 ELSE 0 END) AS online_participants,
+            SUM(CASE WHEN p.is_online = 0 THEN 1 ELSE 0 END) AS onsite_participants
+        FROM workshops w
+        LEFT JOIN participant_workshops pw ON w.id = pw.workshop_id
+        LEFT JOIN participants p ON pw.participant_id = p.id
+    ";
 
-        $stmt->bindParam(':workshopTitle', $workshopTitle, PDO::PARAM_STR);
+        // Filter by specific workshop title if provided
+        if ($workshopTitle) {
+            $query .= " WHERE w.title = :workshopTitle";
+        }
+
+        $query .= " GROUP BY w.id";
+
+        $stmt = $this->pdo->prepare($query);
+
+        // Bind parameter if filtering by specific workshop
+        if ($workshopTitle) {
+            $stmt->bindParam(':workshopTitle', $workshopTitle, PDO::PARAM_STR);
+        }
+
         $stmt->execute();
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+
+        // If fetching stats for a single workshop, return a single row
+        if ($workshopTitle) {
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        }
+
+        // Otherwise, return all workshops' statistics
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
 
     /**
      * Marks confirmation_sent as TRUE and sets confirmation_date to current timestamp.

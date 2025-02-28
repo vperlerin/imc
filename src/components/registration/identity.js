@@ -11,7 +11,8 @@ const months = [
 ];
 const days = Array.from({ length: 31 }, (_, i) => i + 1);
 
-const IdentityForm = ({ 
+const IdentityForm = ({
+  isAdmin = false,
   register,
   errors,
   isDebugMode = false,
@@ -22,7 +23,7 @@ const IdentityForm = ({
   setValue,
   initialData
 }) => {
-
+  
   useEffect(() => {
     if (initialData) {
       Object.keys(initialData).forEach((key) => {
@@ -30,6 +31,16 @@ const IdentityForm = ({
           setValue(key, initialData[key]);
         }
       });
+
+
+      if (initialData.dob) {
+        const dobParts = initialData.dob.split("-");
+        if (dobParts.length === 3) {
+          setValue("dobYear", dobParts[0]);
+          setValue("dobMonth", parseInt(dobParts[1], 10));
+          setValue("dobDay", parseInt(dobParts[2], 10));
+        }
+      }
     }
   }, [initialData, setValue]);
 
@@ -53,10 +64,13 @@ const IdentityForm = ({
 
   return (
     <>
-      <h4 className="mb-3 border-bottom pb-2">
-        <StepDislay step={step} stepTotal={stepTotal} />
-        Personal Details
-      </h4>
+      {!isAdmin && (
+        <h4 className="mb-3 border-bottom pb-2">
+          <StepDislay step={step} stepTotal={stepTotal} />
+          Personal Details
+        </h4>
+      )}
+
       <div className={classNames(cssForm.smallW, 'mx-auto position-relative w-100')}>
 
         {isDebugMode &&
@@ -95,7 +109,7 @@ const IdentityForm = ({
               {...register("first_name", { required: "First name is required" })}
               onBlur={() => trigger("first_name")}
             />
-            {!isOnline && (
+            {!isOnline && !isAdmin && (
               <div className="form-text">If you need a <b>visa invitation letter</b>, enter your <b>First Name exactly as on your Passport</b>.</div>
             )}
             {errors.first_name && <p className="text-danger mb-0"><small>{errors.first_name.message}</small></p>}
@@ -112,7 +126,7 @@ const IdentityForm = ({
               {...register("last_name", { required: "Last name is required" })}
               onBlur={() => trigger("last_name")}
             />
-            {!isOnline && (
+            {!isOnline && !isAdmin && (
               <div className="form-text">If you need a <b>visa invitation letter</b>, enter your <b>Last Name exactly as on your Passport</b>.</div>
             )}
             {errors.last_name && <p className="text-danger mb-0"><small>{errors.last_name.message}</small></p>}
@@ -167,7 +181,7 @@ const IdentityForm = ({
               onBlur={() => trigger("email")}
             />
             {errors.email && <p className="text-danger mb-0"><small>{errors.email.message}</small></p>}
-            {isOnline && (
+            {isOnline && !isAdmin &&(
               <div className="form-text">We will use this email to send you the access details for the online conference.</div>
             )}
           </div>
@@ -180,7 +194,9 @@ const IdentityForm = ({
             <div className="col-sm-10">
               <input className={classNames('form-control', errors.address && "is-invalid")} placeholder="Address" {...register("address", { required: "Address is required" })} onBlur={() => trigger("address")} />
               {errors.address && <p className="text-danger mb-0"><small>{errors.address.message}</small></p>}
-              <div className="form-text">If you need a <b>visa invitation letter</b>, the address above should be your <b>official legal domicile or your professional contact address at your institute</b>.</div>
+              {!isAdmin && (
+                <div className="form-text">If you need a <b>visa invitation letter</b>, the address above should be your <b>official legal domicile or your professional contact address at your institute</b>.</div>
+              )}
             </div>
           </div>
         )}
@@ -275,7 +291,7 @@ const IdentityForm = ({
               </select>
             </div>
 
-            {!isOnline && (
+            {!isOnline && !isAdmin &&  (
               <div className="form-text">
                 <b>Underaged IMC participants</b> must be accompanied and have the <b>legalized documents for travelling abroad without parents</b>.
               </div>
