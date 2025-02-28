@@ -57,7 +57,8 @@ $params = [
     'clientId' => $clientId,
     'clientSecret' => $clientSecret,
     'redirectUri' => $redirectUri,
-    'accessType' => 'offline' // Ensures refresh tokens are obtained
+    'accessType' => 'offline',
+    'prompt' => 'consent',   
 ];
 
 $options = [];

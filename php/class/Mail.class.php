@@ -11,9 +11,9 @@ require_once __DIR__ . "/../config.php";
 class Mail
 {
     private $mailer;
-    private $emailSender; 
+    private $emailSender;
     private $emailSenderName;
- 
+
     public function __construct()
     {
         $this->mailer = new PHPMailer;
@@ -25,32 +25,47 @@ class Mail
         try {
             // Load SMTP credentials
             $clientId = getenv("SMTP_CLIENT_ID");
-            $clientSecret = getenv("SMTP_CLIENT_SECRET"); 
-            $refreshToken = getenv("SMTP_REFRESH_TOKEN"); 
-  
-            $this->emailSender = getenv("SMTP_USER_EMAIL"); 
+            $clientSecret = getenv("SMTP_CLIENT_SECRET");
+            $refreshToken = getenv("SMTP_REFRESH_TOKEN");
+
+            $this->emailSender = getenv("SMTP_USER_EMAIL");
             $this->emailSenderName = getenv("SMTP_USER_NAME");
-          
+
             // Set up OAuth2 Provider
             $provider = new Google([
                 'clientId'     => $clientId,
                 'clientSecret' => $clientSecret,
+                'redirectUri'  => getenv("SMTP_REDIRECT_URL")
             ]);
- 
+
+            try {
+                // Attempt to get a fresh access token using the refresh token
+                $accessToken = $provider->getAccessToken('refresh_token', [
+                    'refresh_token' => $refreshToken,
+                ]);
+
+                // If successful, you can view/echo the current (short-lived) access token
+                echo "Access Token (freshly obtained): " . $accessToken->getToken() . "<br>\n";
+            } catch (Exception $e) {
+                // If this fails, the refresh token might be invalid, revoked, or mismatched with client credentials
+                echo "Refresh token is invalid: " . $e->getMessage();
+                exit;
+            }
+
             // Configure OAuth2 authentication with the valid access token
             $this->mailer->setOAuth(new OAuth([
                 'provider'     => $provider,
                 'clientId'     => $clientId,
                 'clientSecret' => $clientSecret,
-                'refreshToken' => $refreshToken, 
+                'refreshToken' => $refreshToken,
                 'userName'     => $this->emailSender,
             ]));
 
             // SMTP Configuration
             $this->mailer->isSMTP();
             $this->mailer->SMTPDebug = 4;
-            $this->mailer->Host = 'smtp.gmail.com'; 
-            $this->mailer->CharSet = PHPMailer::CHARSET_UTF8; 
+            $this->mailer->Host = 'smtp.gmail.com';
+            $this->mailer->CharSet = PHPMailer::CHARSET_UTF8;
             $this->mailer->SMTPAuth = true;
             $this->mailer->AuthType = 'XOAUTH2';
             $this->mailer->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
@@ -62,12 +77,11 @@ class Mail
             }
 
             $this->mailer->setFrom($this->emailSender, $this->emailSenderName ?: "IMC " . getenv("YEAR"));
-
         } catch (Exception $e) {
             error_log("Mailer Configuration Error: " . $e->getMessage());
         }
     }
- 
+
     public function sendEmail(array $recipients, string $subject, string $message, string $replyTo = null, array $bccRecipients = [])
     {
         try {
@@ -116,7 +130,7 @@ class Mail
             // Send the email
             $this->mailer->send();
             return ["success" => true, "message" => "Message sent successfully"];
-        } catch (Exception $e) { 
+        } catch (Exception $e) {
             return ["success" => false, "message" => "Failed to send message. Check logs." . $this->mailer->ErrorInfo];
         }
     }
