@@ -13,8 +13,7 @@ class Mail
     private $mailer;
     private $emailSender; 
     private $emailSenderName;
-    private $refreshTokenPath = __DIR__ . "/../refresh_token.json"; // Path to refresh token file
-
+ 
     public function __construct()
     {
         $this->mailer = new PHPMailer;
@@ -26,19 +25,8 @@ class Mail
         try {
             // Load SMTP credentials
             $clientId = getenv("SMTP_CLIENT_ID");
-            $clientSecret = getenv("SMTP_CLIENT_SECRET");
-           
-            // Load refresh token & access token from file
-              if (!file_exists($this->refreshTokenPath) || !is_readable($this->refreshTokenPath)) {
-                throw new Exception("Refresh token file not found or unreadable: {$this->refreshTokenPath}");
-            }
-
-            $tokenData = json_decode(file_get_contents($this->refreshTokenPath), true);
-            $refreshToken = $tokenData['refresh_token'] ?? null;
-
-            if (!$refreshToken) {
-                throw new Exception("Missing refresh token in `refresh_token.json`.");
-            }
+            $clientSecret = getenv("SMTP_CLIENT_SECRET"); 
+            $refreshToken = getenv("SMTP_REFRESH_TOKEN"); 
   
             $this->emailSender = getenv("SMTP_USER_EMAIL"); 
             $this->emailSenderName = getenv("SMTP_USER_NAME");
