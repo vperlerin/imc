@@ -3,6 +3,7 @@ import Loader from "components/loader";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
+import Identitity from "components/registration/identity.js";
 
 const AdminParticipantsUser = () => {
   const [participant, setParticipant] = useState(null);
@@ -38,22 +39,19 @@ const AdminParticipantsUser = () => {
     fetchParticipant();
   }, [participantId]);
 
-  if (loading) return <Loader />;
-  if (error) return <div className="text-red-500 text-center">{error}</div>;
-  if (!participant) return <div className="text-gray-500 text-center">No participant data available.</div>;
+
 
   return (
-    <PageContain title={`Participant: ${participant.first_name} ${participant.last_name}`}>
-      <div className="p-4 border rounded shadow-md bg-white">
-        <h2 className="text-xl font-semibold mb-2">{participant.first_name} {participant.last_name}</h2>
-        <p><strong>Email:</strong> {participant.email}</p>
-        <p><strong>Phone:</strong> {participant.phone}</p>
-        <p><strong>Country:</strong> {participant.country}</p>
-        <p><strong>Confirmation Sent:</strong> {participant.confirmation_sent ? "Yes" : "No"}</p>
-        <p><strong>Total Due:</strong> ${participant.total_due}</p>
-        <p><strong>Total Paid:</strong> ${participant.total_paid}</p>
-        <p><strong>Payment Method:</strong> {participant.payments?.map(p => p.payment_method).join(", ") || "N/A"}</p>
+    <PageContain title={loading ? 'Loading…' : `Participant: ${participant?.participant.first_name} ${participant?.participant.last_name}`}>
+      <div className="position-relative">
+        {!!loading && <Loader />}
+        {!!error && !loading && <div className="alert alert-danger">{error}</div>}
+        {!participant && !loading && <div className="alert alert-danger">No participant data available.</div>}
+
       </div>
+
+     
+
     </PageContain>
   );
 };
