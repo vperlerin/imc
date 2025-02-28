@@ -16,7 +16,7 @@ class WorkshopManager
      */
     public function getWorkshops()
     {
-        $stmt = $this->pdo->query("SELECT id, title, price, price_online, created_at, updated_at FROM workshops");
+        $stmt = $this->pdo->query("SELECT * FROM workshops");
         $workshops = $stmt->fetchAll(PDO::FETCH_ASSOC); 
         return $workshops;
     }

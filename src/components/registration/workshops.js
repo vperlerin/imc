@@ -2,6 +2,7 @@ import classNames from "classnames";
 import cssForm from "styles/components/form.module.scss";
 import React, { useEffect, useState } from "react";
 import StepDislay from "components/registration/stepDisplay";
+import Loader from "components/loader";
 import axios from "axios";
 
 const Workshops = ({
@@ -48,8 +49,10 @@ const Workshops = ({
     }
   }, [initialData, setValue, workshops]);
 
-  if (loading) return <p>Loading workshops...</p>;
+  if (loading) return <><Loader /><p>Loading workshops...</p></>;
   if (error) return <p className="text-danger">{error}</p>;
+
+  console.log("workshops", workshops);
 
   return (
     <div className="position-relative">
@@ -78,13 +81,18 @@ const Workshops = ({
           const workshopId = workshop.id.toString();
           const selectedWorkshop = watch(`workshops.${workshopId}`) || "false";
 
-          // Format date for readability
-          const formattedDate = new Date(workshop.date).toLocaleDateString("en-GB", {
-            weekday: "long",
-            day: "numeric",
-            month: "long",
-            year: "numeric",
-          });
+  
+
+          // Ensure the date is a valid string before parsing
+          const rawDate = workshop.date ? workshop.date.trim() : null;
+          const formattedDate = rawDate
+            ? new Date(rawDate + "T00:00:00Z").toLocaleDateString("en-GB", {
+              weekday: "long",
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+            })
+            : "Date not available"; // Fallback if date is invalid
 
           return (
             <div className="mb-5 row" key={workshopId}>
@@ -123,7 +131,6 @@ const Workshops = ({
                 </label>
               </div>
 
-         
               {errors.workshops?.[workshopId] && (
                 <p className="text-danger fw-bold text-center">
                   <small>{errors.workshops[workshopId].message}</small>
@@ -134,7 +141,7 @@ const Workshops = ({
         })}
 
         {!isAdmin && (
-          <p>
+          <p className="text-center">
             Read more about the <a href="/program/workshops/radio" target="_blank">Radio Workshop</a>
             and the <a href="/program/workshops/specto" target="_blank">Spectroscopy Workshop</a>.
           </p>
