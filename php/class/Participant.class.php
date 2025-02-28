@@ -62,23 +62,29 @@ class ParticipantManager
 
             $participantId = $this->pdo->lastInsertId();
 
-            // Insert workshops if selected
-            $stmt = $this->pdo->query("SELECT id, title FROM workshops");
+            // Fetch all available workshops from the database
+            $stmt = $this->pdo->query("SELECT id FROM workshops");
             $workshops = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            foreach ($workshops as $workshop) {
-                if (!empty($data[$workshop['title']]) && $data[$workshop['title']] === "true") {
-                    $stmt = $this->pdo->prepare("
-                        INSERT INTO participant_workshops (participant_id, workshop_id, attending) 
-                        VALUES (:participant_id, :workshop_id, TRUE)
-                    ");
-                    $stmt->execute([
-                        ':participant_id' => $participantId,
-                        ':workshop_id' => $workshop['id']
-                    ]);
+            
+            // Check if workshops exist in form data
+            if (!empty($data['workshops']) && is_array($data['workshops'])) {
+                foreach ($workshops as $workshop) {
+                    $workshopId = $workshop['id'];
+                    
+                    // Check if the workshop is selected ("true")
+                    if (!empty($data['workshops'][$workshopId]) && $data['workshops'][$workshopId] === "true") {
+                        $stmt = $this->pdo->prepare("
+                            INSERT INTO participant_workshops (participant_id, workshop_id, attending) 
+                            VALUES (:participant_id, :workshop_id, TRUE)
+                        ");
+                        $stmt->execute([
+                            ':participant_id' => $participantId,
+                            ':workshop_id' => $workshopId
+                        ]);
+                    }
                 }
             }
-
+             
             // Insert arrival details
             $stmt = $this->pdo->prepare("
                 INSERT INTO arrival (participant_id, arrival_date, arrival_hour, arrival_minute, 

@@ -52,7 +52,6 @@ const Workshops = ({
   if (loading) return <><Loader /><p>Loading workshops...</p></>;
   if (error) return <p className="text-danger">{error}</p>;
 
-  console.log("workshops", workshops);
 
   return (
     <div className="position-relative">
@@ -81,7 +80,7 @@ const Workshops = ({
           const workshopId = workshop.id.toString();
           const selectedWorkshop = watch(`workshops.${workshopId}`) || "false";
 
-  
+
 
           // Ensure the date is a valid string before parsing
           const rawDate = workshop.date ? workshop.date.trim() : null;
@@ -142,8 +141,7 @@ const Workshops = ({
 
         {!isAdmin && (
           <p className="text-center">
-            Read more about the <a href="/program/workshops/radio" target="_blank">Radio Workshop</a>
-            and the <a href="/program/workshops/specto" target="_blank">Spectroscopy Workshop</a>.
+            Read more about the <a href="/program/workshops/radio" target="_blank">Radio Workshop</a> and the <a href="/program/workshops/specto" target="_blank">Spectroscopy Workshop</a>.
           </p>
         )}
       </div>

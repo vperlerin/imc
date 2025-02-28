@@ -82,6 +82,7 @@ const AdminParticipantsUser = () => {
   };
  
 
+
   return (
     <PageContain title={loading ? '' : `Edit Participant: ${participant?.participant.first_name} ${participant?.participant.last_name}`}>
       <div className="position-relative">
@@ -97,29 +98,46 @@ const AdminParticipantsUser = () => {
           {/* Bootstrap Nav Tabs */}
           <ul className="nav nav-tabs mb-3">
             <li className="nav-item">
-              <button className={`nav-link ${activeTab === "identity" ? "active" : ""}`} onClick={() => setActiveTab("identity")}>Identity</button>
+              <button className={`nav-link ${activeTab === "identity" ? "active" : ""}`} onClick={(e) => { e.preventDefault(); setActiveTab("identity"); }}>
+                Identity
+              </button>
             </li>
             <li className="nav-item">
-              <button className={`nav-link ${activeTab === "workshops" ? "active" : ""}`} onClick={() => setActiveTab("workshops")}>Workshops</button>
+              <button className={`nav-link ${activeTab === "workshops" ? "active" : ""}`} onClick={(e) => { e.preventDefault(); setActiveTab("workshops"); }}>
+                Workshops
+              </button>
             </li>
             <li className="nav-item">
-              <button className={`nav-link ${activeTab === "arrival" ? "active" : ""}`} onClick={() => setActiveTab("arrival")}>Arrival</button>
+              <button className={`nav-link ${activeTab === "arrival" ? "active" : ""}`} onClick={(e) => { e.preventDefault(); setActiveTab("arrival"); }}>
+                Arrival
+              </button>
             </li>
             <li className="nav-item">
-              <button className={`nav-link ${activeTab === "contribution" ? "active" : ""}`} onClick={() => setActiveTab("contribution")}>Contribution</button>
+              <button className={`nav-link ${activeTab === "contribution" ? "active" : ""}`} onClick={(e) => { e.preventDefault(); setActiveTab("contribution"); }}>
+                Contribution
+              </button>
             </li>
             <li className="nav-item">
-              <button className={`nav-link ${activeTab === "accommodation" ? "active" : ""}`} onClick={() => setActiveTab("accommodation")}>Accommodation</button>
+              <button className={`nav-link ${activeTab === "accommodation" ? "active" : ""}`} onClick={(e) => { e.preventDefault(); setActiveTab("accommodation"); }}>
+                Accommodation
+              </button>
             </li>
             <li className="nav-item">
-              <button className={`nav-link ${activeTab === "extras" ? "active" : ""}`} onClick={() => setActiveTab("extras")}>Extras</button>
+              <button className={`nav-link ${activeTab === "extras" ? "active" : ""}`} onClick={(e) => { e.preventDefault(); setActiveTab("extras"); }}>
+                Extras
+              </button>
             </li>
             <li className="nav-item">
-              <button className={`nav-link ${activeTab === "comments" ? "active" : ""}`} onClick={() => setActiveTab("comments")}>Comments</button>
+              <button className={`nav-link ${activeTab === "comments" ? "active" : ""}`} onClick={(e) => { e.preventDefault(); setActiveTab("comments"); }}>
+                Comments
+              </button>
             </li>
             <li className="nav-item">
-              <button className={`nav-link ${activeTab === "summary" ? "active" : ""}`} onClick={() => setActiveTab("summary")}>Summary</button>
+              <button className={`nav-link ${activeTab === "summary" ? "active" : ""}`} onClick={(e) => { e.preventDefault(); setActiveTab("summary"); }}>
+                Summary
+              </button>
             </li>
+
           </ul>
 
           {/* Tab Content */}
