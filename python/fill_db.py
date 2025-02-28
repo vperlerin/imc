@@ -61,17 +61,17 @@ if table_is_empty("imc_sessions"):
 # Insert `workshops` if the table is empty
 if table_is_empty("workshops"):
     for workshop in data.get("workshops", []):
-        title = workshop["title"].replace("'", "''")  # Escape single quotes
+        title = workshop["title"].replace("'", "''").decode("utf-8")  # Escape single quotes and ensure UTF-8
         date = workshop["date"]  # Workshop date
-        period = workshop["period"].replace("'", "''")  # Time range
+        period = workshop["period"].replace("'", "''").decode("utf-8")  # Time range
         cost = float(workshop["cost"])
         cost_online = float(workshop.get("cost_online", 0.00))  # Default to 0.00 if missing
-        responsible_name = workshop["email_to"]["name"].replace("'", "''")  # Responsible person's name
-        responsible_email = workshop["email_to"]["email"].replace("'", "''")  # Responsible person's email
+        responsible_name = workshop["email_to"]["name"].replace("'", "''").decode("utf-8")  # Responsible person's name
+        responsible_email = workshop["email_to"]["email"].replace("'", "''").decode("utf-8")  # Responsible person's email
 
         sql_statements.append(
-            "INSERT INTO workshops (title, date, period, price, price_online, responsible_name, responsible_email) "
-            "VALUES ('%s', '%s', '%s', %.2f, %.2f, '%s', '%s');" % (
+            u"INSERT INTO workshops (title, date, period, price, price_online, responsible_name, responsible_email) "
+            u"VALUES ('%s', '%s', '%s', %.2f, %.2f, '%s', '%s');" % (
                 title, date, period, cost, cost_online, responsible_name, responsible_email
             )
         )
