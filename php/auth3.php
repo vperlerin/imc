@@ -12,11 +12,12 @@ session_start();
 
 // Load Composer's autoloader
 require '../vendor/autoload.php'; 
+require_once "config.php";
 
 
 // Gmail API credentials
-$clientId = '628758835735-ftis2b20v5ivd8qc894dcn4s1vkuskfd.apps.googleusercontent.com';
-$clientSecret = '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';
+$clientId = getenv("SMTP_CLIENT_ID");
+$clientSecret = getenv("SMTP_CLIENT_SECRET");
 $redirectUri = 'https://imc2025.imo.net/php/auth3.php';
 
 // Create a new Google OAuth 2.0 provider
