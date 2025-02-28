@@ -54,7 +54,7 @@ class Mail
             $this->mailer->CharSet = PHPMailer::CHARSET_UTF8;
             $this->mailer->SMTPAuth = true;
             $this->mailer->AuthType = 'XOAUTH2';
-            $this->mailer->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $this->mailer->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
             $this->mailer->Port = 587;
 
             // Validate and set sender email
