@@ -64,14 +64,16 @@ if table_is_empty("workshops"):
         title = workshop["title"].replace("'", "''")  # Escape single quotes
         date = workshop["date"]  # Workshop date
         period = workshop["period"].replace("'", "''")  # Time range
-        cost = float(workshop["cost"])   
+        cost = float(workshop["cost"])
         cost_online = float(workshop.get("cost_online", 0.00))  # Default to 0.00 if missing
         responsible_name = workshop["email_to"]["name"].replace("'", "''")  # Responsible person's name
         responsible_email = workshop["email_to"]["email"].replace("'", "''")  # Responsible person's email
 
         sql_statements.append(
-            f"INSERT INTO workshops (title, date, period, price, price_online, responsible_name, responsible_email) "
-            f"VALUES ('{title}', '{date}', '{period}', {cost:.2f}, {cost_online:.2f}, '{responsible_name}', '{responsible_email}');"
+            "INSERT INTO workshops (title, date, period, price, price_online, responsible_name, responsible_email) "
+            "VALUES ('%s', '%s', '%s', %.2f, %.2f, '%s', '%s');" % (
+                title, date, period, cost, cost_online, responsible_name, responsible_email
+            )
         )
 
 

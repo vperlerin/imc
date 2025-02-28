@@ -78,10 +78,19 @@ const Workshops = ({
           const workshopId = workshop.id.toString();
           const selectedWorkshop = watch(`workshops.${workshopId}`) || "false";
 
+          // Format date for readability
+          const formattedDate = new Date(workshop.date).toLocaleDateString("en-GB", {
+            weekday: "long",
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+          });
+
           return (
             <div className="mb-5 row" key={workshopId}>
               <label className={classNames("text-md-center", cssForm.balance)}>
-                Do you wish to attend the <b>{workshop.title}</b> for an extra price of {parseFloat(workshop.price).toFixed(2)}€?
+                <b>{workshop.title}</b> will be held on <b>{formattedDate}</b> from <b>{workshop.period}</b>.<br />
+                Do you wish to attend for an extra price of {parseFloat(workshop.price).toFixed(2)}€?
               </label>
 
               <div className="text-center btn-group d-block mt-3" role="group">
@@ -114,6 +123,7 @@ const Workshops = ({
                 </label>
               </div>
 
+         
               {errors.workshops?.[workshopId] && (
                 <p className="text-danger fw-bold text-center">
                   <small>{errors.workshops[workshopId].message}</small>
@@ -125,8 +135,8 @@ const Workshops = ({
 
         {!isAdmin && (
           <p>
-            Read more  about the <a href="/program/workshops/radio" target="_blank">Radio Workshop </a>
-            and the <a href="/program/workshops/specto" target="_blank">Spectography Workshop </a>
+            Read more about the <a href="/program/workshops/radio" target="_blank">Radio Workshop</a>
+            and the <a href="/program/workshops/specto" target="_blank">Spectroscopy Workshop</a>.
           </p>
         )}
       </div>
