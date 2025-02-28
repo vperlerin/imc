@@ -2,25 +2,30 @@
 
 require_once __DIR__ . "/../config.php";
 
-class WorkshopManager {
+class WorkshopManager
+{
     private $pdo;
 
-    public function __construct(PDO $pdo) {
+    public function __construct(PDO $pdo)
+    {
         $this->pdo = $pdo;
     }
 
     /**
      * Get All Existing workshops
      */
-    public function getWorkshops() {
-        $stmt = $this->pdo->prepare("SELECT id, title, price, price_online FROM workshops");
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }    
- 
+    public function getWorkshops()
+    {
+        $stmt = $this->pdo->query("SELECT id, title, price, price_online, created_at, updated_at FROM workshops");
+        $workshops = $stmt->fetchAll(PDO::FETCH_ASSOC); 
+        return $workshops;
+    }
+
     /**
      * Save participant workshops based on submitted data
      */
-    public function saveWorkshops($participantId, $data) {
+    public function saveWorkshops($participantId, $data)
+    {
         // Get all available workshops
         $stmt = $this->pdo->query("SELECT id, title FROM workshops");
         $workshops = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -45,7 +50,8 @@ class WorkshopManager {
     /**
      * Get participant workshops
      */
-    public function getParticipantWorkshops($participantId) {
+    public function getParticipantWorkshops($participantId)
+    {
         $stmt = $this->pdo->prepare("
             SELECT w.id, w.title, w.price, w.price_online
             FROM participant_workshops pw
