@@ -80,11 +80,10 @@ const AdminParticipantsUser = () => {
       setSaving(false);
     }
   };
-
-  console.log("participant? ", participant);
+ 
 
   return (
-    <PageContain title={loading ? 'Loading…' : `Edit Participant: ${participant?.participant.first_name} ${participant?.participant.last_name}`}>
+    <PageContain title={loading ? '' : `Edit Participant: ${participant?.participant.first_name} ${participant?.participant.last_name}`}>
       <div className="position-relative">
         {loading && <Loader />}
         {error && !loading && <div className="alert alert-danger">{error}</div>}
