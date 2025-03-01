@@ -19,28 +19,29 @@ const getRegInfo = (id, registrationTypes) => {
   };
 };
 
-const getSelectedWorkshops = (selectedWorkshopIds, workshops, isOnline) => {
+const getSelectedWorkshops = (selectedWorkshopIds = [], workshops = [], isOnline) => {
+  if (!Array.isArray(selectedWorkshopIds)) {
+    selectedWorkshopIds = [];
+  }
+
   const selected = workshops
-    .filter(workshop => selectedWorkshopIds.includes(workshop.id))  
+    .filter(workshop => selectedWorkshopIds.includes(String(workshop.id)))  
     .map(workshop => ({
       title: workshop.title,
       price: isOnline ? parseFloat(workshop.price_online) : parseFloat(workshop.price)
-    })); 
+    }));
 
   const totalPrice = selected.reduce((sum, workshop) => sum + workshop.price, 0);
- 
-  return {
-    selectedWorkshops:  selected, 
-    workshopCost:  totalPrice 
-  };
+
+  return { selected, totalPrice };
 };
+
   
 const getPaymentMethodById = (paymentMethodId, paymentMethods) => {
   const method = paymentMethods.find(pm => pm.id === paymentMethodId);
   return method ? method.method : "Payment method not found";
 };
-  
-
+   
 const Summary = ({
   isOnline = false,
   isAdmin = false,
@@ -53,23 +54,26 @@ const Summary = ({
   workshops,
   registrationTypes, 
   paymentMethods,
+  watch,
 }) => {
-  const allValues = getValues();  
+  const allValues = getValues();   
+ 
 
   // Registration & Accommodation Cost
   const registration_type = allValues.registration_type_id; 
   const { description: registration_description, price: registration_price } = getRegInfo(registration_type, registrationTypes);
   const lateFee = !isEarlyBird ? conferenceData.costs.after_early_birds : 0;
   const totalRoomCost = registration_price + lateFee;
-
-  // Workshops Costs  
-  const { selectedWorkshops, workshopCost } = getSelectedWorkshops(allValues.workshops, workshops, isOnline); 
-  
+ 
+  // Workshops Costs   
+  const selectedWorkshopIds = watch("workshops") || [];
+  const { selected: selectedWorkshops, totalPrice: workshopCost } = getSelectedWorkshops(selectedWorkshopIds, workshops, isOnline);
+ 
   // T-shirt Cost 
-  const tshirtCost = allValues.buy_tshirt ? parseFloat(conferenceData.costs.tshirts.price) : 0;
+  const tshirtCost = allValues.buy_tshirt === "1" ||  allValues.buy_tshirt === "true" ? parseFloat(conferenceData.costs.tshirts.price) : 0;
 
   // Printed Posters Cost
-  const printedPosters = allValues.posters ? allValues.posters.filter(poster => poster.print === "true") : [];
+  const printedPosters = allValues.posters ? allValues.posters.filter(poster => poster.print === "true" || poster.print === "1") : [];
 
   const numberOfPrintedPosters = printedPosters.length;
   const printedPostersCost = numberOfPrintedPosters * conferenceData.poster_print.price;
@@ -96,8 +100,10 @@ const Summary = ({
       setTotal(totalCost);
       setPaypalFee(paypalFee);
     }
-  }, [isOnline, totalCost, totalOnlineCost, setTotal, onlinePaypalFee, paypalFee, setPaypalFee]);
+  }, [isOnline, totalCost, totalOnlineCost, setTotal, onlinePaypalFee, paypalFee, setPaypalFee, allValues.buy_tshirt, allValues.tshirt_size]);
 
+ 
+  
   return (
     <>
       {!isAdmin && showInfo && (

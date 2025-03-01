@@ -72,7 +72,7 @@ const Workshops = ({
                   checked={isSelected}
                   onChange={() => toggleWorkshop(workshopId)}
                 />
-                <label className="btn btn-outline-primary" htmlFor={`workshop-${workshopId}`}>
+                <label className="btn btn-outline-primary fw-bolder" htmlFor={`workshop-${workshopId}`}>
                   {isSelected ? "YES!" : "No :("}
                 </label>
               </div>

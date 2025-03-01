@@ -27,13 +27,13 @@ const AdminParticipantsUser = () => {
   const [errorGettingDataFromDB, setErrorGettingDataFromDB] = useState(null);
   const [successMsg, setSuccessMsg] = useState(null);
   const [paymentMethods, setPaymentMethods] = useState([]);
-  const [workshops, setWorkshops] = useState([]); 
-  const [registrationTypes, setRegistrationTypes] = useState([]); 
+  const [workshops, setWorkshops] = useState([]);
+  const [registrationTypes, setRegistrationTypes] = useState([]);
   const [unsavedChanges, setUnsavedChanges] = useState(false);
   const [total, setTotal] = useState(0);
-  const [paypalFee, setPaypalFee] = useState(0); 
+  const [paypalFee, setPaypalFee] = useState(0);
   const activeTab = tab || "identity";
-  const hasFetcheData = useRef(false); 
+  const hasFetchedData = useRef(false);
   const navigate = useNavigate();
 
   const { control, register, handleSubmit, getValues, setValue, formState: { errors }, reset, trigger, watch } = useForm();
@@ -55,14 +55,13 @@ const AdminParticipantsUser = () => {
     }
   }, [tab, participantId, navigate]);
 
-
   // Fetch available workshops, payment_methods & registration_types from API
   useEffect(() => {
-    if (hasFetcheData.current) {
+    if (hasFetchedData.current) {
       return;
     }
 
-    hasFetcheData.current = true;
+    hasFetchedData.current = true;
     setLoading(true);
 
     const fetchData = async () => {
@@ -119,8 +118,7 @@ const AdminParticipantsUser = () => {
   }, [participantId, reset]);
 
 
-  // Create all the values for the forms
-
+  // Create all the values for the forms 
   useEffect(() => {
     if (!participant) {
       return;
@@ -132,67 +130,42 @@ const AdminParticipantsUser = () => {
         setValue(key, participant.participant[key]);
       }
     });
-
-
-    if (participant.participant.dob) {
-      const dobParts = participant.participant.dob.split("-");
-      if (dobParts.length === 3) {
-        setValue("dobYear", dobParts[0]);
-        setValue("dobMonth", parseInt(dobParts[1], 10));
-        setValue("dobDay", parseInt(dobParts[2], 10));
-      }
-    }
-
+ 
     // Workshops
-    const participantWorkshops = participant.workshops || [];
-    participantWorkshops.forEach(workshop => {
-      const isAttending = participantWorkshops.some(selected => String(selected.id) === String(workshop.id));
-      setValue(`workshops.${workshop.id}`, isAttending ? "true" : "false"); // Set individually
-    });
+    const participantWorkshops = participant.workshops?.map(workshop => String(workshop.id)) || [];
+    setValue("workshops", participantWorkshops);
 
     // Arrival  
-    const participantArrival = participant.arrival || [];
-    for (const [key, val] of Object.entries(participantArrival)) {
-      if (val != null) {
-        if (
-          key === "arrival_hour" ||
-          key === "departure_hour" ||
-          key === "arrival_minute" ||
-          key === "departure_minute"
-        ) {
-          setValue(key, val.toString().padStart(2, "0"));
-        } else {
-          setValue(key, val);
-        }
+    const participantArrival = participant.arrival || {};
+    Object.keys(participantArrival).forEach((key) => {
+      if (participantArrival[key] !== null) {
+        setValue(key, key.includes("hour") || key.includes("minute")
+          ? participantArrival[key].toString().padStart(2, "0")
+          : participantArrival[key]
+        );
       }
-    }
+    });
 
     // Contribution
     const contributions = participant.contributions || [];
     const talks = contributions.filter(c => c.type === "talk");
     const posters = contributions.filter(c => c.type === "poster");
-    if (talks.length > 0 || posters.length > 0) {
-      if (talks.length !== 0) {
-        setValue('talks', talks);
-      }
+    if (talks.length > 0) setValue('talks', talks);
+    if (posters.length > 0) setValue('posters', posters);
 
-      if (posters.length !== 0) {
-        setValue('posters', posters);
-      }
+    // Accommodation
+    if (participant.accommodation?.registration_type_id) {
+      setValue("registration_type_id", String(participant.accommodation.registration_type_id));
     }
 
-    // Accomodation
-    const accomodation = participant.accomodation || [];
-    Object.keys(accomodation).forEach((key) => {
-      if (accomodation[key]) {
-        setValue(key, accomodation[key]);
-      }
-    });
-
-
+    // Extras
+    if (participant.extra_options) {
+      setValue("excursion", participant.extra_options.excursion ? "1" : "0");
+      setValue("buy_tshirt", participant.extra_options.buy_tshirt ? "1" : "0");
+      setValue("tshirt_size", participant.extra_options.tshirt_size || ""); 
+    }
   }, [participant]);
-
-
+  
   const onSubmit = async (formData) => {
     setSaving(true);
     setError(null);
@@ -234,11 +207,17 @@ const AdminParticipantsUser = () => {
     }
   ];
 
+  const isSummaryReady = (
+    participant &&
+    paymentMethods.length > 0 &&
+    workshops.length > 0 &&
+    registrationTypes.length > 0
+  );
+
   if (errorGettingDataFromDB) {
     return <div className="alert alert-danger fw-bolder">{errorGettingDataFromDB}</div>
   }
-
-
+ 
   return (
     <PageContain
       breadcrumb={breadcrumb}
@@ -250,8 +229,8 @@ const AdminParticipantsUser = () => {
         {!participant && !loading && <div className="alert alert-danger">No participant data available.</div>}
         {successMsg && <div className="alert alert-success">{successMsg}</div>}
       </div>
-
-      {!loading && participant && (
+        
+      {!loading && participant && isSummaryReady && (
         <form onSubmit={handleSubmit(onSubmit)}>
           <ul className={classNames('nav nav-tabs mb-3 mt-2', cssTabs.tab)}>
             {[
@@ -296,9 +275,9 @@ const AdminParticipantsUser = () => {
                 register={register}
                 errors={errors}
                 setValue={setValue}
+                trigger={trigger}
                 watch={watch}
                 workshops={workshops}
-                trigger={trigger}
               />
             )}
             {tab === "arrival" && (
@@ -332,7 +311,8 @@ const AdminParticipantsUser = () => {
                 register={register}
                 errors={errors}
                 paymentMethods={paymentMethods}
-                setValue={setValue}
+                setValue={setValue}  
+                registrationTypes={registrationTypes}
                 trigger={trigger}
               />
             )}
@@ -342,9 +322,9 @@ const AdminParticipantsUser = () => {
                 conferenceData={cd}
                 register={register}
                 errors={errors}
-                initialData={participant.extra_options}
                 setValue={setValue}
                 trigger={trigger}
+                watch={watch}
               />
             )}
             {tab === "comments" && (
@@ -352,20 +332,22 @@ const AdminParticipantsUser = () => {
                 isAdmin
                 register={register}
                 errors={errors}
-                initialData={participant.participant}
                 setValue={setValue}
                 trigger={trigger}
               />
             )}
-            {tab === "summary" && (
+            {tab === "summary" && isSummaryReady && (
               <Summary
                 isAdmin
                 conferenceData={cd}
                 getValues={getValues}
-                setValue={setValue}
-                workshops={workshops}
+                setValue={setValue} 
                 setTotal={setTotal}
                 setPaypalFee={setPaypalFee}
+                workshops={workshops}
+                registrationTypes={registrationTypes}
+                paymentMethods={paymentMethods}
+                watch={watch}
               />
             )}
 

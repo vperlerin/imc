@@ -13,37 +13,47 @@ const ExtrasForm = ({
   stepTotal,
   trigger,
   setValue,
-  initialData
+  watch,
 }) => {
-  // State to track whether the user wants a T-shirt
-  const [wantsTShirt, setWantsTShirt] = useState(null);
- 
+  // Watch form values
+  const buyTShirt = watch("buy_tshirt");
+  const tshirtSize = watch("tshirt_size");
+
+  // State for T-Shirt selection
+  const [wantsTShirt, setWantsTShirt] = useState(false);
+
   const tshirt_sizes = conferenceData.costs.tshirts.models.flatMap((model) =>
     conferenceData.costs.tshirts.sizes.map((size) => `${model.charAt(0).toUpperCase() + model.slice(1)} ${size}`)
   );
 
+  // Ensure T-Shirt selection persists & Summary updates
   useEffect(() => {
-    if (initialData) {
-      Object.keys(initialData).forEach((key) => {
-        if (initialData[key] !== undefined && initialData[key] !== null) {
-          setValue(key, initialData[key]);
-        }
-      });
-
-      // Set the state based on initialData
-      if (initialData.buy_tshirt === "1") {
-        setWantsTShirt(true);
-      } else {
-        setWantsTShirt(false);
-      }
+    if (buyTShirt === "1") {
+      setWantsTShirt(true);
+    } else {
+      setWantsTShirt(false);
+      setValue("tshirt_size", ""); // Reset size if T-shirt is unselected
     }
-  }, [initialData, setValue]);
+    trigger(); // Ensure Summary updates
+  }, [buyTShirt, setValue, trigger]);
+
+  // Ensure Summary updates when size changes
+  useEffect(() => {
+    trigger();
+  }, [tshirtSize, trigger]);
+
+  const handleTShirtSelection = (value) => {
+    setValue("buy_tshirt", value, { shouldDirty: true, shouldTouch: true, shouldValidate: true });
+  };
+
+  const handleTShirtSizeSelection = (value) => {
+    setValue("tshirt_size", value, { shouldDirty: true, shouldTouch: true, shouldValidate: true });
+  };
 
   const fillTestData = () => {
     setValue("excursion", "1");
     setValue("buy_tshirt", "1");
     setValue("tshirt_size", "Men L");
-    setWantsTShirt(true);
     trigger();
   };
 
@@ -96,9 +106,9 @@ const ExtrasForm = ({
                   id={`tshirt-${option}`}
                   className={classNames("form-check-input", { "is-invalid": errors.buy_tshirt })}
                   value={option}
-                  {...register("buy_tshirt", { required: "Please select a payment method" })}
-                  onChange={(e) => setWantsTShirt(e.target.value === "1")}
-                  checked={wantsTShirt === (option === "1")}
+                  {...register("buy_tshirt", { required: "Please select an option" })}
+                  onChange={(e) => handleTShirtSelection(e.target.value)}
+                  checked={buyTShirt === option}
                 />
                 <label className="form-check-label" htmlFor={`tshirt-${option}`}>
                   {option === "1" ? "Yes" : "No"}
@@ -116,6 +126,8 @@ const ExtrasForm = ({
             <select
               className={classNames("form-select", { "is-invalid": errors.tshirt_size })}
               {...register("tshirt_size", { required: "Please select a T-Shirt size" })}
+              onChange={(e) => handleTShirtSizeSelection(e.target.value)}
+              value={tshirtSize || ""}
             >
               <option value="">Select size</option>
               {tshirt_sizes.map((size) => (

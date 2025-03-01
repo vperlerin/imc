@@ -64,10 +64,8 @@ const MainForm = () => {
   // Watch the dob field
   const dob = watch("dob");
   const age = calculateAge(dob);
-  const isUnder16 = age !== null && age < 16;
-
-  const initialData = null;
-  const is_early_bird = initialData?.is_early_bird || new Date() < new Date(cd.deadlines.early_birds);
+  const isUnder16 = age !== null && age < 16; 
+  const is_early_bird =  new Date() < new Date(cd.deadlines.early_birds);
 
   // Fetch available workshops, payment_methods & registration_types from API
   useEffect(() => {
@@ -196,12 +194,12 @@ const MainForm = () => {
             isEarlyBird={is_early_bird}
             conferenceData={cd}
             setTotal={setTotal}
-            setPaypalFee={setPaypalFee}
-            initialData={initialData}
+            setPaypalFee={setPaypalFee} 
             showInfo
             workshops={workshops}
             registrationTypes={registrationTypes}
             paymentMethods={paymentMethods}
+            watch={watch}
           />
         </>
       ) :
@@ -234,8 +232,7 @@ const MainForm = () => {
               <Identitity
                 register={register}
                 errors={errors}
-                isDebugMode={isDebugMode}
-                initialData={initialData}
+                isDebugMode={isDebugMode} 
                 step={step}
                 stepTotal={totalStep}
                 setValue={setValue}
@@ -248,8 +245,7 @@ const MainForm = () => {
                 conferenceData={cd}
                 register={register}
                 errors={errors}
-                isDebugMode={isDebugMode}
-                initialData={initialData}
+                isDebugMode={isDebugMode} 
                 step={step}
                 stepTotal={totalStep}
                 setValue={setValue}
@@ -263,8 +259,7 @@ const MainForm = () => {
                 conferenceData={cd}
                 register={register}
                 errors={errors}
-                isDebugMode={isDebugMode}
-                initialData={initialData}
+                isDebugMode={isDebugMode} 
                 step={step}
                 stepTotal={totalStep}
                 setValue={setValue}
@@ -283,11 +278,7 @@ const MainForm = () => {
                 getValues={getValues}
                 setValue={setValue}
                 trigger={trigger}
-                watch={watch}
-                initialData={{
-                  talks: initialData?.talks || getValues("talks") || [],
-                  posters: initialData?.posters || getValues("posters") || [],
-                }}
+                watch={watch} 
               />
             }
             {step === 5 &&
@@ -295,8 +286,7 @@ const MainForm = () => {
                 conferenceData={cd}
                 control={control}
                 register={register}
-                isDebugMode={isDebugMode}
-                initialData={initialData}
+                isDebugMode={isDebugMode} 
                 isEarlyBird={is_early_bird}
                 paymentMethods={paymentMethods}
                 errors={errors}
@@ -313,12 +303,12 @@ const MainForm = () => {
                 conferenceData={cd}
                 register={register}
                 errors={errors}
-                isDebugMode={isDebugMode}
-                initialData={initialData}
+                isDebugMode={isDebugMode} 
                 step={step}
                 stepTotal={totalStep}
                 setValue={setValue}
                 trigger={trigger}
+                watch={watch}
               />
             )}
 
@@ -326,8 +316,7 @@ const MainForm = () => {
               <Comments
                 register={register}
                 errors={errors}
-                isDebugMode={isDebugMode}
-                initialData={initialData}
+                isDebugMode={isDebugMode} 
                 isUnder16={isUnder16}
                 showGdpr={true}
                 step={step}
@@ -344,12 +333,12 @@ const MainForm = () => {
                 isEarlyBird={is_early_bird}
                 conferenceData={cd}
                 setTotal={setTotal}
-                setPaypalFee={setPaypalFee}
-                initialData={initialData}
+                setPaypalFee={setPaypalFee} 
                 showInfo={!successMsg}
                 workshops={workshops}
                 registrationTypes={registrationTypes}
                 paymentMethods={paymentMethods}
+                watch={watch}
               />
             )}
 

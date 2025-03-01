@@ -125,9 +125,7 @@ try {
             throw new Exception("Missing required field: $field");
         }
     }
-
  
-
     // Generate a random password
     $plain_password = bin2hex(random_bytes(4));
     $password_hash = password_hash($plain_password, PASSWORD_DEFAULT);
