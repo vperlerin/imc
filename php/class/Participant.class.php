@@ -60,6 +60,9 @@ class ParticipantManager
                 ':comments' => $data['comments'] ?? null
             ]);
 
+            
+            $participantId = $this->pdo->lastInsertId();
+
             // Fetch all available workshops from the database
             $stmt = $this->pdo->query("SELECT id FROM workshops");
             $workshops = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -102,7 +105,6 @@ class ParticipantManager
                 ':travelling_details' => $data['travelling_details'] ?? null
             ]);
 
-            $participantId = $this->pdo->lastInsertId();
 
             // Insert accommodation details
             $stmt = $this->pdo->prepare("
