@@ -19,6 +19,7 @@ const AccomodationForm = ({
 }) => {
 
   console.log("ACCOMODATION INITAL DATA ", initialData);
+  console.log("conferenceData ", conferenceData);
 
   useEffect(() => {
     if (initialData) {

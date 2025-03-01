@@ -107,8 +107,7 @@ const AdminParticipantsUser = () => {
     fetchParticipant();
   }, [participantId, reset]);
 
-
-
+ 
   const onSubmit = async (formData) => {
     setSaving(true);
     setError(null);
@@ -150,7 +149,6 @@ const AdminParticipantsUser = () => {
         ${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}`
     }
   ];
-
 
   return (
     <PageContain

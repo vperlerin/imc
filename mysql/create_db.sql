@@ -42,6 +42,7 @@ CREATE TABLE IF NOT EXISTS participants (
     confirmation_date DATETIME DEFAULT NULL,
     password_hash VARCHAR(255) NOT NULL, 
     paypal_fee DECIMAL(10,2) UNSIGNED NOT NULL DEFAULT 0.00,
+    payment_method_id INT NOT NULL,  
     total_due DECIMAL(10,2) UNSIGNED NOT NULL DEFAULT 0.00,
     total_paid DECIMAL(10,2) UNSIGNED NOT NULL DEFAULT 0.00, 
     total_reimbursed DECIMAL(10,2) UNSIGNED NOT NULL DEFAULT 0.00, 
