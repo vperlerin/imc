@@ -128,11 +128,11 @@ class ParticipantManager
             // Insert accommodation details
             $stmt = $this->pdo->prepare("
                 INSERT INTO accommodation (participant_id, registration_type_id, created_at, updated_at)
-                VALUES (:participant_id, (SELECT id FROM registration_types WHERE type = :registration_type), NOW(), NOW())
+                VALUES (:participant_id, :registration_type_id, NOW(), NOW())
             ");
             $stmt->execute([
                 ':participant_id' => $participantId,
-                ':registration_type' => $data['registration_type']
+                ':registration_type' => $data['registration_type_id']
             ]);
 
             // Insert extra options

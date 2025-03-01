@@ -14,16 +14,18 @@ const AccomodationForm = ({
   step,
   stepTotal,
   trigger,
-  setValue, 
+  setValue,
   paymentMethods,
+  registrationTypes,
 }) => {
- 
+
   const fillTestData = () => {
-    setValue("registration_type", conferenceData.costs.rooms[1]?.type || ""); 
-    setValue("payment_method_id", paymentMethods.length > 0 ? paymentMethods[0].id : ""); 
+    setValue("registration_type_id", registrationTypes.length > 1 ? registrationTypes[1].id : ""); 
+    setValue("payment_method_id", paymentMethods.length > 0 ? paymentMethods[paymentMethods.length - 1].id : ""); 
     trigger();
   };
-   
+  
+
   return (
     <>
       {!isAdmin && (
@@ -45,27 +47,32 @@ const AccomodationForm = ({
           <div className="mb-4 mt-2">
             <label className="fw-bold mb-2">Registration Type</label>
             <div className="d-flex flex-column gap-2">
-              {conferenceData.costs.rooms.map((room, index) => (
-                <div key={index} className="form-check">
+              {registrationTypes.map((registration, index) => (
+                <div key={registration.id} className="form-check">
                   <input
                     type="radio"
-                    id={`room-${index}`}
-                    className={classNames("form-check-input", { "is-invalid": errors.registration_type })}
-                    value={room.type}
-                    {...register("registration_type", { required: "Please select a registration type" })}
+                    id={`registration-${registration.id}`}
+                    className={classNames("form-check-input", { "is-invalid": !!errors.registration_type_id })}
+                    value={registration.id} // Now using ID instead of type
+                    {...register("registration_type_id", { required: "Please select a registration type" })}
                   />
-                  <label className="form-check-label d-block" htmlFor={`room-${index}`}>
-                    <strong>{isEarlyBird ? room.price : (room.price + conferenceData.costs.after_early_birds)}€</strong> - {room.description}
+                  <label className="form-check-label d-block" htmlFor={`registration-${registration.id}`}>
+                    <strong>
+                      {isEarlyBird
+                        ? parseFloat(registration.price).toFixed(2)
+                        : (parseFloat(registration.price) + conferenceData.costs.after_early_birds).toFixed(2)}€
+                    </strong>
+                    - {registration.description}
                     <small className="text-muted d-block">
-                      {room.number
-                        ? `Standard accommodation in a ${room.type} room for 3 nights (only) with full board + participation in the conference, conference materials, coffee breaks, and excursion (price per person).`
+                      {registration.type !== "no"
+                        ? `Standard accommodation in a ${registration.type} room for 3 nights (only) with full board + participation in the conference, conference materials, coffee breaks, and excursion (price per person).`
                         : `All meals except breakfasts + participation in the conference, conference materials, coffee breaks, and excursion (price per person).`}
                     </small>
                   </label>
                 </div>
               ))}
             </div>
-            {errors.registration_type && <p className="text-danger"><small>{errors.registration_type.message}</small></p>}
+            {errors.registration_type_id && <p className="text-danger"><small>{errors.registration_type_id.message}</small></p>}
           </div>
         )}
 
@@ -86,7 +93,7 @@ const AccomodationForm = ({
                     type="radio"
                     id={`payment-${method.id}`}
                     className={classNames("form-check-input", { "is-invalid": errors.payment_method_id })}
-                    value={method.id} // Now using payment_method_id as value
+                    value={method.id} // Using ID for payment method
                     {...register("payment_method_id", { required: "Please select a payment method" })}
                   />
                   <label className="form-check-label d-block" htmlFor={`payment-${method.id}`}>

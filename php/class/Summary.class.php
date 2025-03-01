@@ -65,6 +65,8 @@ class SummaryFormatter
             ? $paymentMethods[$data['payment_method_id']]
             : "Unknown";
  
+
+        // TODO registration_type_id!!!!
         $content .= "
             <br><b>Registration & Payment</b><br>
             <b>Registration Type:</b> {$data['registration_type']}<br>

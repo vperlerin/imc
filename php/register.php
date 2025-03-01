@@ -115,7 +115,7 @@ try {
         'email',
         'total_due',
         'paypal_fee',
-        'registration_type',
+        'registration_type_id',
         'is_online'
     ];
 

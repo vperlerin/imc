@@ -10,7 +10,7 @@ class AccommodationManager {
     public function saveAccommodation($participantId, $data) {
         $stmt = $this->pdo->prepare("
             INSERT INTO accommodation (participant_id, registration_type_id, created_at, updated_at)
-            VALUES (?, (SELECT id FROM registration_types WHERE type = ? LIMIT 1), NOW(), NOW())
+            VALUES (?, ?, NOW(), NOW())
         ");
         $stmt->execute([$participantId, $data['registration_type']]);
     }

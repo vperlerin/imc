@@ -6,7 +6,42 @@ const getPaypalPrice = (price) => {
   return Math.round((price + (0.034 * price + 0.35) / 0.966) * 100) / 100;
 };
 
-const Summary = ({ 
+const getRegInfo = (id, registrationTypes) => {
+  const registration = registrationTypes.find(item => item.id === id);
+  
+  if (!registration) return "Description not found";
+
+  // Check if it's the last item in the array
+  const isLastItem = registrationTypes[registrationTypes.length - 1].id === id;
+  return {
+    description: isLastItem ? "(no accommodation)" : "+ " + registration.description, 
+    price: parseFloat(registration.price)
+  };
+};
+
+const getSelectedWorkshops = (selectedWorkshopIds, workshops, isOnline) => {
+  const selected = workshops
+    .filter(workshop => selectedWorkshopIds.includes(workshop.id))  
+    .map(workshop => ({
+      title: workshop.title,
+      price: isOnline ? parseFloat(workshop.price_online) : parseFloat(workshop.price)
+    })); 
+
+  const totalPrice = selected.reduce((sum, workshop) => sum + workshop.price, 0);
+ 
+  return {
+    selectedWorkshops:  selected, 
+    workshopCost:  totalPrice 
+  };
+};
+  
+const getPaymentMethodById = (paymentMethodId, paymentMethods) => {
+  const method = paymentMethods.find(pm => pm.id === paymentMethodId);
+  return method ? method.method : "Payment method not found";
+};
+  
+
+const Summary = ({
   isOnline = false,
   isAdmin = false,
   getValues,
@@ -15,53 +50,44 @@ const Summary = ({
   showInfo = true,
   setTotal,
   setPaypalFee,
-  workshops,  
+  workshops,
+  registrationTypes, 
+  paymentMethods,
 }) => {
-  const allValues =  getValues(); 
-  
-  console.log("ALL VALUES ", allValues);
- 
+  const allValues = getValues();  
+
   // Registration & Accommodation Cost
-  const registration_type = allValues.registration_type || "no"; // Default to "no"
-  const selectedRoom = conferenceData.costs.rooms.find(room => room.type === registration_type);
-  const roomCost = selectedRoom ? selectedRoom.price : 0;
+  const registration_type = allValues.registration_type_id; 
+  const { description: registration_description, price: registration_price } = getRegInfo(registration_type, registrationTypes);
   const lateFee = !isEarlyBird ? conferenceData.costs.after_early_birds : 0;
-  const totalRoomCost = roomCost + lateFee;
+  const totalRoomCost = registration_price + lateFee;
 
-  // Workshops Cost (Using Passed `workshops` Prop)
-  const selectedWorkshops = Object.entries(allValues)
-    .filter(([key, value]) => workshops.some(w => w.title === key) && value === "true")
-    .map(([key]) => workshops.find(w => w.title === key));
-
-  const workshopCost = selectedWorkshops.reduce((sum, workshop) => sum + (workshop?.cost || 0), 0);
-
-  // T-shirt Cost
-  const tshirtCost = allValues.buyTShirt ? conferenceData.costs.tshirts.price : 0;
+  // Workshops Costs  
+  const { selectedWorkshops, workshopCost } = getSelectedWorkshops(allValues.workshops, workshops, isOnline); 
+  
+  // T-shirt Cost 
+  const tshirtCost = allValues.buy_tshirt ? parseFloat(conferenceData.costs.tshirts.price) : 0;
 
   // Printed Posters Cost
-  const printedPosters = allValues.posters
-    ? allValues.posters.filter(poster => poster.printOnSite === "true")
-    : [];
+  const printedPosters = allValues.posters ? allValues.posters.filter(poster => poster.print === "true") : [];
 
   const numberOfPrintedPosters = printedPosters.length;
   const printedPostersCost = numberOfPrintedPosters * conferenceData.poster_print.price;
-
-  // Printed Proceedings Cost
-  const proceedingsPrintedCost = allValues.proceedings === "pdf_printed" ? conferenceData.costs.printed_proceedings : 0;
-
-  // Payment Method Fee (PayPal)
-  const paymentMethod = allValues.payment_method || "bank"; // Default to bank transfer
-  let totalCost = totalRoomCost + workshopCost + tshirtCost + proceedingsPrintedCost + printedPostersCost;
-  const paypalFee = paymentMethod.toLowerCase() === "paypal" ? getPaypalPrice(totalCost) - totalCost : 0;
+  
+  // Payment Method
+  const paymentMethodName = getPaymentMethodById(allValues.payment_method_id, paymentMethods); 
+  const isPaypal  = paymentMethodName === 'Paypal';
+ 
+  let totalCost = totalRoomCost + workshopCost + tshirtCost  + printedPostersCost;
+  const paypalFee = isPaypal  ? getPaypalPrice(totalCost) - totalCost : 0;
   totalCost += paypalFee;
 
-  // Online conference cost calculation
-  const workshopOnlineCost = selectedWorkshops.reduce((sum, workshop) => sum + (workshop?.cost_online || 0), 0);
+  // Online conference cost calculation 
   const onlineConferenceCost = conferenceData.costs.online;
-  let totalOnlineCost = workshopOnlineCost + onlineConferenceCost;
-  const onlinePaypalFee = paymentMethod.toLowerCase() === "paypal" ? getPaypalPrice(totalOnlineCost) - totalOnlineCost : 0;
+  let totalOnlineCost = workshopCost + onlineConferenceCost;
+  const onlinePaypalFee = isPaypal ? getPaypalPrice(totalOnlineCost) - totalOnlineCost : 0;
   totalOnlineCost += onlinePaypalFee;
-
+ 
   useEffect(() => {
     if (isOnline) {
       setTotal(totalOnlineCost);
@@ -94,13 +120,7 @@ const Summary = ({
             {!isOnline ? (
               <tr>
                 <td className="ps-3 text-muted">
-                  {registration_type !== "no" ? (
-                    <>
-                      Conference Registration and {registration_type.charAt(0).toUpperCase() + registration_type.slice(1)} Room
-                    </>
-                  ) : (
-                    <>Conference Registration</>
-                  )}
+                  Conference registration {' '} {registration_description}
                 </td>
                 <td className="text-end">{totalRoomCost.toFixed(2)}€</td>
               </tr>
@@ -117,7 +137,7 @@ const Summary = ({
                 <tr key={index}>
                   <td className="ps-3 text-muted">{workshop.title}</td>
                   <td className="text-end">
-                    {!isOnline ? workshop.cost.toFixed(2) : workshop.cost_online.toFixed(2)}€
+                    {workshop.price.toFixed(2)}€
                   </td>
                 </tr>
               ))}
@@ -133,24 +153,16 @@ const Summary = ({
             )}
 
             {/* T-shirt */}
-            {allValues.buyTShirt && (
+            {tshirtCost > 0  && (
               <tr>
                 <td className="ps-3 text-muted">T-Shirt</td>
                 <td className="text-end">{tshirtCost.toFixed(2)}€</td>
               </tr>
             )}
 
-            {/* Proceedings (Printed) 
-            {allValues.proceedings === "pdf_printed" && (
-              <tr>
-                <td className="ps-3 text-muted">Proceedings (Printed)</td>
-                <td className="text-end">{proceedingsPrintedCost.toFixed(2)}€</td>
-              </tr>
-            )}
-              */}
-
+             
             {/* PayPal Fee */}
-            {paymentMethod.toLowerCase() === "paypal" && (
+            {isPaypal && (
               <tr>
                 <td className="ps-3 text-muted">PayPal Fee (3.4% + 0.35€)</td>
                 <td className="text-end">

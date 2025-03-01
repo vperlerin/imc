@@ -1,14 +1,12 @@
 import classNames from "classnames";
 import cssForm from "styles/components/form.module.scss";
-import React, { useEffect, useState } from "react";
-import StepDislay from "components/registration/stepDisplay";
-import Loader from "components/loader"; 
+import React from "react";
+import StepDislay from "components/registration/stepDisplay"; 
 import { formatFullDate } from 'utils/date';
 
 const Workshops = ({
   isAdmin = false, 
-  isDebugMode = false,
-  register,
+  isDebugMode = false, 
   errors,
   step,
   stepTotal,
@@ -17,7 +15,19 @@ const Workshops = ({
   watch,
   workshops,
 }) => { 
-   
+ 
+  // Watch selected workshop IDs
+  const selectedWorkshops = watch("workshops") || [];
+
+  // Function to toggle selection
+  const toggleWorkshop = (workshopId) => {
+    const updatedWorkshops = selectedWorkshops.includes(workshopId)
+      ? selectedWorkshops.filter(id => id !== workshopId) // Remove if already selected
+      : [...selectedWorkshops, workshopId]; // Add if not selected
+
+    setValue("workshops", updatedWorkshops, { shouldDirty: true, shouldTouch: true, shouldValidate: true });
+  };
+
   return (
     <div className="position-relative">
       {isDebugMode && (
@@ -25,7 +35,8 @@ const Workshops = ({
           type="button"
           className="position-absolute top-0 end-0 btn btn-secondary"
           onClick={() => {
-            workshops.forEach(workshop => setValue(`workshops.${workshop.id}`, "true"));
+            const allWorkshopIds = workshops.map(workshop => workshop.id);
+            setValue("workshops", allWorkshopIds, { shouldDirty: true, shouldTouch: true, shouldValidate: true });
             trigger();
           }}
         >
@@ -43,8 +54,8 @@ const Workshops = ({
       <div className={classNames(cssForm.smallW, "mx-auto position-relative")}>
         {workshops.map((workshop) => {
           const workshopId = workshop.id.toString();
-          const selectedWorkshop = watch(`workshops.${workshopId}`) || "false";
- 
+          const isSelected = selectedWorkshops.includes(workshopId);
+
           return (
             <div className="mb-5 row" key={workshopId}>
               <label className={classNames("text-md-center", cssForm.balance)}>
@@ -52,39 +63,23 @@ const Workshops = ({
                 Do you wish to attend for an extra price of {parseFloat(workshop.price).toFixed(2)}€?
               </label>
 
-              <div className="text-center btn-group d-block mt-3" role="group">
-                {/* Yes Button */}
+              <div className="text-center d-block mt-3">
+                {/* Checkbox for selecting multiple workshops */}
                 <input
-                  type="radio"
+                  type="checkbox"
                   className="btn-check"
-                  id={`workshop-${workshopId}-yes`}
-                  value="true"
-                  {...register(`workshops.${workshopId}`, { required: "Please select an option" })}
-                  onChange={() => setValue(`workshops.${workshopId}`, "true")}
-                  checked={selectedWorkshop === "true"}
+                  id={`workshop-${workshopId}`}
+                  checked={isSelected}
+                  onChange={() => toggleWorkshop(workshopId)}
                 />
-                <label className="btn btn-outline-primary" htmlFor={`workshop-${workshopId}-yes`}>
-                  Yes
-                </label>
-
-                {/* No Button */}
-                <input
-                  type="radio"
-                  className="btn-check"
-                  id={`workshop-${workshopId}-no`}
-                  value="false"
-                  {...register(`workshops.${workshopId}`, { required: "Please select an option" })}
-                  onChange={() => setValue(`workshops.${workshopId}`, "false")}
-                  checked={selectedWorkshop === "false"}
-                />
-                <label className="btn btn-outline-primary" htmlFor={`workshop-${workshopId}-no`}>
-                  No
+                <label className="btn btn-outline-primary" htmlFor={`workshop-${workshopId}`}>
+                  {isSelected ? "YES!" : "No :("}
                 </label>
               </div>
 
-              {errors.workshops?.[workshopId] && (
+              {errors.workshops?.includes(workshopId) && (
                 <p className="text-danger fw-bold text-center">
-                  <small>{errors.workshops[workshopId].message}</small>
+                  <small>{errors.workshops.message}</small>
                 </p>
               )}
             </div>
