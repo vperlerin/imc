@@ -24,6 +24,7 @@ require_once __DIR__ . "/class/Accommodation.class.php";
 require_once __DIR__ . "/class/Payment.class.php";
 require_once __DIR__ . "/class/Extras.class.php";
 require_once __DIR__ . "/class/Summary.class.php";
+require_once __DIR__ . "/class/Registrationtype.class.php";
 
 function create_email(array $data, string $summary): string
 {
@@ -150,8 +151,12 @@ try {
     $paymentManager = new PaymentManager($pdo);
     $payment_methods = $paymentManager->getPaymentMethods(); // Fetch all workshops dynamically
 
+    // Get all registration from the database
+    $registrationTypeManager = new RegistrationtypeManager($pdo);
+    $registrations_types = $registrationTypeManager->getRegistrationTypes(); 
+
     $subject = "IMC " . getenv("YEAR") . " Registration";
-    $summary = SummaryFormatter::formatEmailContent($data, $workshops, $payment_methods, true);
+    $summary = SummaryFormatter::formatEmailContent($data, $workshops, $payment_methods, $registrations_types, true);
 
     // Send confirmation email
     $mail = new Mail();

@@ -14,4 +14,5 @@ class AccommodationManager {
         ");
         $stmt->execute([$participantId, $data['registration_type']]);
     }
+ 
 }

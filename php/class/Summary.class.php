@@ -4,7 +4,7 @@ require_once __DIR__ . "/../config.php";
 
 class SummaryFormatter
 {
-    public static function formatEmailContent(array $data, array $workshops, array $paymentMethods, bool $withPwd): string
+    public static function formatEmailContent(array $data, array $workshops, array $paymentMethods, array $registrations_types, bool $withPwd): string
     {
         $content = "";
 
@@ -38,7 +38,7 @@ class SummaryFormatter
         // WORKSHOPS (Dynamically fetched from DB)
         $workshopList = [];
         foreach ($workshops as $workshop) {
-            $workshopTitle = $workshop['title']; // Assuming each workshop has a 'title' column
+            $workshopTitle = $workshop['title']; 
             if (!empty($data['workshops'][$workshopTitle]) && $data['workshops'][$workshopTitle] === "true") {
                 $workshopList[] = "<b>{$workshopTitle}:</b> Yes";
             }
@@ -65,13 +65,17 @@ class SummaryFormatter
             ? $paymentMethods[$data['payment_method_id']]
             : "Unknown";
  
+            echo "REGISTRATION TYPES \n";
+            var_dump($registrations_types);
+            var_dump($data['registration_type_id']);        
 
-        // TODO registration_type_id!!!!
+        /*
         $content .= "
             <br><b>Registration & Payment</b><br>
-            <b>Registration Type:</b> {$data['registration_type']}<br>
+            <b>Registration Type:</b> {$registration}<br>
             <b>Payment Method:</b> {$paymentMethodName['method']}<br>
         ";
+        */
 
 
         // TALKS
