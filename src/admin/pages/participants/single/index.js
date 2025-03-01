@@ -6,7 +6,7 @@ import Loader from "components/loader";
 import React, { useEffect, useRef, useState } from "react";
 import { useBlockNavigation } from "hooks/block-navigation.js";
 import { useParams, useNavigate } from "react-router-dom";
-import { useForm } from "react-hook-form";
+import { get, useForm } from "react-hook-form";
 import { conferenceData as cd } from "data/conference-data";
 import Identitity from "components/registration/identity";
 import Workshops from "components/registration/workshops";
@@ -24,14 +24,20 @@ const AdminParticipantsUser = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
+  const [errorGettingDataFromDB, setErrorGettingDataFromDB] = useState(null);
   const [successMsg, setSuccessMsg] = useState(null);
+  const [paymentMethods, setPaymentMethods] = useState([]);
   const [workshops, setWorkshops] = useState([]);
   const [unsavedChanges, setUnsavedChanges] = useState(false);
+  const [total, setTotal] = useState(0);
+  const [paypalFee, setPaypalFee] = useState(0);
   const activeTab = tab || "identity";
   const hasFetchedWorkshops = useRef(false);
+
+  const hasFetchedPaymentMethods = useRef(false);
   const navigate = useNavigate();
 
-  const { control, register, handleSubmit, setValue, formState: { errors, isDirty }, reset, trigger, watch } = useForm();
+  const { control, register, handleSubmit, getValues, setValue, formState: { errors }, reset, trigger, watch } = useForm();
 
   useBlockNavigation(unsavedChanges);
 
@@ -50,6 +56,7 @@ const AdminParticipantsUser = () => {
     }
   }, [tab, participantId, navigate]);
 
+  // Get workshops 
   useEffect(() => {
     if (hasFetchedWorkshops.current) {
       return;
@@ -68,7 +75,7 @@ const AdminParticipantsUser = () => {
           throw new Error(response.data.message || "Failed to fetch workshops - please try again later.");
         }
       } catch (err) {
-        setError(err.message || "An error occurred while fetching workshops.");
+        setErrorGettingDataFromDB(err.message || "An error occurred while fetching workshops.");
       } finally {
         setLoading(false);
       }
@@ -77,7 +84,35 @@ const AdminParticipantsUser = () => {
     fetchWorkshops();
   }, []);
 
+  // Fetch available payment methods from API
+  useEffect(() => {
+    if (hasFetchedPaymentMethods.current) {
+      return;
+    }
 
+    hasFetchedPaymentMethods.current = true;
+    setLoading(true);
+
+    const fetchPaymentMethods = async () => {
+      try {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/get_payment_methods.php`);
+
+        if (response.data.success && Array.isArray(response.data.data)) {
+          setPaymentMethods(response.data.data);
+        } else {
+          throw new Error(response.data.message || "Failed to fetch payment methods - please try again later.");
+        }
+      } catch (err) {
+        setErrorGettingDataFromDB(err.message || "An error occurred while payment methods.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPaymentMethods();
+  }, []);
+
+  // Get participant data
   useEffect(() => {
     const fetchParticipant = async () => {
       if (!participantId) {
@@ -107,7 +142,83 @@ const AdminParticipantsUser = () => {
     fetchParticipant();
   }, [participantId, reset]);
 
+
+  // Create all the values for the forms
+
+  useEffect(() => {
+    if (!participant) {
+      return;
+    }
+
+    // Identity
+    Object.keys(participant.participant).forEach((key) => {
+      if (participant.participant[key]) {
+        setValue(key, participant.participant[key]);
+      }
+    });
+
+
+    if (participant.participant.dob) {
+      const dobParts = participant.participant.dob.split("-");
+      if (dobParts.length === 3) {
+        setValue("dobYear", dobParts[0]);
+        setValue("dobMonth", parseInt(dobParts[1], 10));
+        setValue("dobDay", parseInt(dobParts[2], 10));
+      }
+    }
+
+    // Workshops
+    const participantWorkshops = participant.workshops || [];
+    participantWorkshops.forEach(workshop => {
+      const isAttending = participantWorkshops.some(selected => String(selected.id) === String(workshop.id));
+      setValue(`workshops.${workshop.id}`, isAttending ? "true" : "false"); // Set individually
+    });
+
+    // Arrival  
+    const participantArrival = participant.arrival || [];
+    for (const [key, val] of Object.entries(participantArrival)) {
+      if (val != null) {
+        if (
+          key === "arrival_hour" ||
+          key === "departure_hour" ||
+          key === "arrival_minute" ||
+          key === "departure_minute"
+        ) {
+          setValue(key, val.toString().padStart(2, "0"));
+        } else {
+          setValue(key, val);
+        }
+      }
+    }
+
+    // Contribution
+    const contributions = participant.contributions || [];
+    const talks   = contributions.filter(c => c.type === "talk");
+    const posters = contributions.filter(c => c.type === "poster");
+    if(talks.length > 0 || posters.length > 0) { 
+      if (talks.length !== 0) {
+        setValue('talks', talks);
+      }
+
+      if (posters.length !== 0) {
+        setValue('posters', posters);
+      }
+    } 
+
+    // Accomodation
+    const accomodation = participant.accomodation || [];
+    Object.keys(accomodation).forEach((key) => {
+      if (accomodation[key]) {
+        setValue(key, accomodation[key]);
+      }
+    });
  
+  
+  }, [participant]);
+
+  console.log("PARTICIPANT", participant);
+  console.log("ALL VALUES? ", getValues());
+
   const onSubmit = async (formData) => {
     setSaving(true);
     setError(null);
@@ -133,9 +244,6 @@ const AdminParticipantsUser = () => {
     }
   };
 
-  console.log("Participant?  ", participant);
-
-
   const isOnline = participant?.participant?.is_online === "1";
   const breadcrumb = [
     {
@@ -152,10 +260,14 @@ const AdminParticipantsUser = () => {
     }
   ];
 
+  if (errorGettingDataFromDB) {
+    return <div className="alert alert-danger fw-bolder">{errorGettingDataFromDB}</div>
+  }
+ 
+
   return (
     <PageContain
-      breadcrumb={breadcrumb}
-      title={loading ? '' : `Edit Participant: ${participant?.participant.first_name} ${participant?.participant.last_name}`}
+      breadcrumb={breadcrumb} 
     >
       {loading || (error && !loading) || (!participant && !loading) || successMsg}
       <div className="position-relative">
@@ -199,7 +311,6 @@ const AdminParticipantsUser = () => {
                 isAdmin
                 register={register}
                 errors={errors}
-                initialData={participant.participant}
                 setValue={setValue}
                 trigger={trigger}
               />
@@ -210,7 +321,6 @@ const AdminParticipantsUser = () => {
                 conferenceData={cd}
                 register={register}
                 errors={errors}
-                initialData={participant.workshops}
                 setValue={setValue}
                 watch={watch}
                 workshops={workshops}
@@ -222,8 +332,7 @@ const AdminParticipantsUser = () => {
                 isAdmin
                 conferenceData={cd}
                 register={register}
-                errors={errors}
-                initialData={participant.arrival}
+                errors={errors} 
                 setValue={setValue}
                 trigger={trigger}
               />
@@ -234,11 +343,8 @@ const AdminParticipantsUser = () => {
                 conferenceData={cd}
                 control={control}
                 register={register}
-                errors={errors}
-                initialData={{
-                  talks: participant.contributions.filter(c => c.type === "talk") || [],
-                  posters: participant.contributions.filter(c => c.type === "poster") || [],
-                }}
+                errors={errors} 
+                getValues={getValues}
                 setValue={setValue}
                 watch={watch}
                 trigger={trigger}
@@ -250,14 +356,16 @@ const AdminParticipantsUser = () => {
                 conferenceData={cd}
                 control={control}
                 register={register}
-                errors={errors}
-                initialData={participant.accommodation}
+                errors={errors} 
+                paymentMethods={paymentMethods}
                 setValue={setValue}
                 trigger={trigger}
               />
             )}
             {tab === "extras" && (
               <Extras
+                isAdmin
+                conferenceData={cd}
                 register={register}
                 errors={errors}
                 initialData={participant.extra_options}
@@ -267,6 +375,7 @@ const AdminParticipantsUser = () => {
             )}
             {tab === "comments" && (
               <Comments
+                isAdmin
                 register={register}
                 errors={errors}
                 initialData={participant.participant}
@@ -276,8 +385,13 @@ const AdminParticipantsUser = () => {
             )}
             {tab === "summary" && (
               <Summary
-                getValues={() => participant}
+                isAdmin
+                conferenceData={cd}
+                getValues={getValues}
                 setValue={setValue}
+                workshops={workshops}
+                setTotal={setTotal}
+                setPaypalFee={setPaypalFee}
               />
             )}
 

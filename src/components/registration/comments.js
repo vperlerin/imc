@@ -1,10 +1,23 @@
 import classNames from "classnames";
 import cssForm from "styles/components/form.module.scss";
 import StepDislay from "components/registration/stepDisplay";
-import React, { useEffect } from "react"; 
+import React, { useEffect, useState } from "react";
 import { gdpr } from 'data/gdpr';
 
+const calculateAge = (dob) => {
+  if (!dob) return null;
+  const birthDate = new Date(dob);
+  const today = new Date();
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDiff = today.getMonth() - birthDate.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+    age--;
+  }
+  return age;
+};
+
 const Comments = ({
+  isAdmin = false,
   register,
   errors,
   isDebugMode = false,
@@ -16,6 +29,8 @@ const Comments = ({
   setValue,
   initialData
 }) => {
+  const [isCurUnder16, setIsCurUnder16] = useState(isUnder16 || false);
+
 
   useEffect(() => {
     if (initialData) {
@@ -25,16 +40,22 @@ const Comments = ({
         }
       });
 
+      // Set service agreement default value
       setValue("service_agreement", initialData.service_agreement ?? false);
 
-      if (isUnder16) {
+      // Check if the participant is under 16
+      const age = calculateAge(initialData.dob);
+      if (age !== null && age < 16) {
+        setIsCurUnder16(true);
         setValue("guardian_name", initialData.guardian_name ?? "");
         setValue("guardian_contact", initialData.guardian_contact ?? "");
         setValue("guardian_email", initialData.guardian_email ?? "");
         setValue("parental_consent", initialData.parental_consent ?? false);
+      } else {
+        setIsCurUnder16(false);
       }
     }
-  }, [initialData, setValue, isUnder16]);
+  }, [initialData, setValue]);
 
 
   const fillTestData = () => {
@@ -54,16 +75,20 @@ const Comments = ({
 
   return (
     <div className="position-relative">
+
       {isDebugMode && (
         <button type="button" className="position-absolute top-0 end-0 btn btn-secondary" onClick={fillTestData}>
           Fill Test Data
         </button>
       )}
 
-      <h4 className="mb-3 border-bottom pb-2">
-        <StepDislay step={step} stepTotal={stepTotal} />
-        Comments, Data Protection and Service Agreement
-      </h4>
+      {!isAdmin && (
+        <h4 className="mb-3 border-bottom pb-2">
+          <StepDislay step={step} stepTotal={stepTotal} />
+          Comments, Data Protection and Service Agreement
+        </h4>
+      )}
+
       <div className="mx-md-3 mb-3">
         <div className="mb-4">
           <label className="form-label fw-bold pb-0">Comments or specific instructions</label>
@@ -85,7 +110,7 @@ const Comments = ({
               {gdpr}
             </div>
 
-            {isUnder16 && (
+            {isCurUnder16 && (
               <>
                 <label className="form-label fw-bold pb-0 mt-3">
                   Since you are not yet 16 years of age, the consent we seek must be given by someone holding the parental responsibility over you.

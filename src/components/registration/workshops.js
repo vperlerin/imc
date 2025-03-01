@@ -6,8 +6,7 @@ import Loader from "components/loader";
 import { formatFullDate } from 'utils/date';
 
 const Workshops = ({
-  isAdmin = false,
-  initialData = [],  
+  isAdmin = false, 
   isDebugMode = false,
   register,
   errors,
@@ -18,20 +17,7 @@ const Workshops = ({
   watch,
   workshops,
 }) => { 
-  
    
-  // Pre-fill form values based on participant's registered workshops (initialData)
-  useEffect(() => {
-    if (initialData?.length > 0 && workshops.length > 0) {
-      workshops.forEach(workshop => {
-        // Check if the participant is registered for this workshop
-        const isAttending = initialData.some(selected => String(selected.id) === String(workshop.id));
-        setValue(`workshops.${workshop.id}`, isAttending ? "true" : "false"); // Set individually
-      });
-    }
-  }, [initialData, workshops, setValue]);
- 
-
   return (
     <div className="position-relative">
       {isDebugMode && (

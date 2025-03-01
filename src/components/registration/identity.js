@@ -20,30 +20,9 @@ const IdentityForm = ({
   step,
   stepTotal,
   trigger,
-  setValue,
-  initialData
+  setValue, 
 }) => {
-  
-  useEffect(() => {
-    if (initialData) {
-      Object.keys(initialData).forEach((key) => {
-        if (initialData[key]) {
-          setValue(key, initialData[key]);
-        }
-      });
-
-
-      if (initialData.dob) {
-        const dobParts = initialData.dob.split("-");
-        if (dobParts.length === 3) {
-          setValue("dobYear", dobParts[0]);
-          setValue("dobMonth", parseInt(dobParts[1], 10));
-          setValue("dobDay", parseInt(dobParts[2], 10));
-        }
-      }
-    }
-  }, [initialData, setValue]);
-
+   
   const fillTestData = () => {
     setValue("title", "Dr.");
     setValue("first_name", "Vincent");

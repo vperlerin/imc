@@ -43,7 +43,7 @@ const MainForm = () => {
   const [successMsg, setSuccessMsg] = useState(null);
   const [total, setTotal] = useState(0);
   const [paypalFee, setPaypalFee] = useState(0);
-  const [paymentMethods,  setPaymentMethods] = useState([]);
+  const [paymentMethods, setPaymentMethods] = useState([]);
   const [workshops, setWorkshops] = useState([])
   const location = useLocation();
   const isDebugMode = new URLSearchParams(location.search).get("debug") === "1";
@@ -72,16 +72,16 @@ const MainForm = () => {
   // Fetch available workshops from API
   useEffect(() => {
     if (hasFetchedWorkshops.current) {
-      return; 
-    } 
-    
-    hasFetchedWorkshops.current = true;  
+      return;
+    }
+
+    hasFetchedWorkshops.current = true;
     setLoading(true);
-    
+
     const fetchWorkshops = async () => {
       try {
         const response = await axios.get(`${process.env.REACT_APP_API_URL}/get_workshops.php`);
-  
+
         if (response.data.success && Array.isArray(response.data.data)) {
           setWorkshops(response.data.data);
         } else {
@@ -93,38 +93,38 @@ const MainForm = () => {
         setLoading(false);
       }
     };
-  
-    fetchWorkshops();
-  }, []);  
-  
 
-    // Fetch available payment methods from API
-    useEffect(() => {
-      if (hasFetchedPaymentMethods.current) {
-        return; 
-      } 
-      
-      hasFetchedPaymentMethods.current = true;  
-      setLoading(true);
-      
-      const fetchPaymentMethods= async () => {
-        try {
-          const response = await axios.get(`${process.env.REACT_APP_API_URL}/get_payment_methods.php`);
-    
-          if (response.data.success && Array.isArray(response.data.data)) {
-            setPaymentMethods(response.data.data);
-          } else {
-            throw new Error(response.data.message || "Failed to fetch payment methods - please try again later.");
-          }
-        } catch (err) {
-          setErrorGettingDataFromDB(err.message || "An error occurred while payment methods.");
-        } finally {
-          setLoading(false);
+    fetchWorkshops();
+  }, []);
+
+
+  // Fetch available payment methods from API
+  useEffect(() => {
+    if (hasFetchedPaymentMethods.current) {
+      return;
+    }
+
+    hasFetchedPaymentMethods.current = true;
+    setLoading(true);
+
+    const fetchPaymentMethods = async () => {
+      try {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/get_payment_methods.php`);
+
+        if (response.data.success && Array.isArray(response.data.data)) {
+          setPaymentMethods(response.data.data);
+        } else {
+          throw new Error(response.data.message || "Failed to fetch payment methods - please try again later.");
         }
-      };
-    
-      fetchPaymentMethods();
-    }, []);  
+      } catch (err) {
+        setErrorGettingDataFromDB(err.message || "An error occurred while payment methods.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPaymentMethods();
+  }, []);
 
   const nextStep = async () => {
     const isValid = await trigger();
@@ -175,7 +175,7 @@ const MainForm = () => {
     return <PageContain title="Register Onsite">Come back soon…</PageContain>;
   }
 
-  if(errorGettingDataFromDB) {
+  if (errorGettingDataFromDB) {
     return <div className="alert alert-danger fw-bolder">{errorGettingDataFromDB}</div>
   }
 
@@ -183,7 +183,7 @@ const MainForm = () => {
     <PageContain title="Register Onsite">
       {errorMsg && <div className="alert alert-danger fw-bolder">{errorMsg}</div>}
       {successMsg && <div className="alert alert-success fw-bolder">{successMsg}</div>}
-      
+
 
 
       {step === 8 && successMsg ? (
@@ -317,7 +317,7 @@ const MainForm = () => {
                 register={register}
                 isDebugMode={isDebugMode}
                 initialData={initialData}
-                isEarlyBird={is_early_bird} 
+                isEarlyBird={is_early_bird}
                 paymentMethods={paymentMethods}
                 errors={errors}
                 step={step}

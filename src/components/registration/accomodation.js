@@ -14,29 +14,16 @@ const AccomodationForm = ({
   step,
   stepTotal,
   trigger,
-  setValue,
-  initialData,
+  setValue, 
   paymentMethods,
 }) => {
-
-
-  useEffect(() => {
-    if (initialData) {
-      Object.keys(initialData).forEach((key) => {
-        if (initialData[key]) {
-          setValue(key, initialData[key]);
-        }
-      });
-    }
-  }, [initialData, setValue]);
-
+ 
   const fillTestData = () => {
     setValue("registration_type", conferenceData.costs.rooms[1]?.type || ""); 
     setValue("payment_method_id", paymentMethods.length > 0 ? paymentMethods[0].id : ""); 
     trigger();
   };
-  
-
+   
   return (
     <>
       {!isAdmin && (

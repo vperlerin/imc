@@ -7,7 +7,8 @@
 
     &.active {
       background-color: transparent !important;
-      color: var(--imc-primary);
+      color: var(--imc-primary) !important;
+      border-bottom-color: var(--imc-bg) !important;
       font-weight: bolder;
     }
 

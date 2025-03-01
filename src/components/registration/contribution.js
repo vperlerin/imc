@@ -15,7 +15,6 @@ const ContributionForm = ({
   isAdmin = false,
   conferenceData,
   control,
-  initialData = [],
   isDebugMode = false,
   isOnline = false,
   register,
@@ -24,9 +23,9 @@ const ContributionForm = ({
   stepTotal,
   trigger,
   setValue,
+  getValues,
 }) => {
   const [wantsToContribute, setWantsToContribute] = useState(null);
-
  
   const imcSessions = conferenceData.sessions;
   const paperDeliveryOptions = [
@@ -36,41 +35,6 @@ const ContributionForm = ({
   ];
   const { fields: talks, append: addTalk, remove: removeTalk } = useFieldArray({ control, name: "talks" });
   const { fields: posters, append: addPoster, remove: removePoster } = useFieldArray({ control, name: "posters" });
-
-  useEffect(() => {
-    if (initialData) {
-      Object.keys(initialData).forEach((key) => {
-        if (initialData[key]) {
-          setValue(key, initialData[key]);
-        }
-      });
-
-      if (
-        (initialData.talks && initialData.talks.length > 0) ||
-        (!isOnline && initialData.posters && initialData.posters.length > 0)
-      ) {
-        setWantsToContribute(true);
-
-        if (talks.length === 0) {
-          initialData.talks?.forEach((talk) => addTalk({ 
-            ...talk, 
-            session: talk.session_name  // Ensure session_name is used instead of session_id
-          }));
-        }
-
-        if (!isOnline && posters.length === 0) { 
-          initialData.posters?.forEach((poster) =>
-            addPoster({
-              ...poster,
-              session: poster.session_name,  // Use session_name
-              print: poster.print === "1" ? "true" : "false"
-            })
-          );
-        }
-      }
-    }
-  }, [initialData, setValue, addTalk, addPoster, talks.length, posters.length, isOnline]);
-
 
   // Validate before adding new talk/poster
   const validateAndAdd = async (type) => {
@@ -105,10 +69,34 @@ const ContributionForm = ({
         abstract: "An overview of detecting meteors using radio waves.",
         session: "Radio meteor work",
         paperDate: "after_imc",
-        print: "true",  
+        print: "true",
       });
     }
   };
+
+  useEffect(() => {
+    const existingTalks = getValues("talks") || [];
+    const existingPosters = getValues("posters") || [];
+  
+    if (existingTalks.length > 0 || existingPosters.length > 0) {
+      setValue("wantsToContribute", "yes");
+      setWantsToContribute(true);
+    }
+  
+    // Populate talks if they exist
+    if (existingTalks.length > 0) {
+      removeTalk();  
+      existingTalks.forEach((talk) => addTalk(talk));
+    }
+  
+    // Populate posters if they exist
+    if (existingPosters.length > 0 && !isOnline) {
+      removePoster(); 
+      existingPosters.forEach((poster) => addPoster(poster));
+    }
+  }, [getValues, setValue, addTalk, addPoster, removeTalk, removePoster, isOnline]);
+
+
   return (
     <div className="position-relative">
       {isDebugMode && (
@@ -123,54 +111,51 @@ const ContributionForm = ({
           Contributions
         </h4>
       )}
+ 
+      <div className={classNames(cssForm.smallW, 'mx-auto position-relative')}>
+        <div className="mb-3 row">
+          <label className={classNames('text-center fw-bold', cssForm.balance)}>
+            Would you like to contribute a talk
+            {!isOnline && (<>{' '}or a poster</>)}  to the main IMC {conferenceData.year} conference?</label>
+          <div className="text-center btn-group d-block mt-3" role="group">
+            <input
+              type="radio"
+              className="btn-check"
+              id="contributeYes"
+              value="yes"
+              {...register("wantsToContribute", { required: "Please select an option" })}
+              onChange={() => setWantsToContribute(true)}
+            />
+            <label className="btn btn-outline-primary" htmlFor="contributeYes">Yes</label>
 
+            <input
+              type="radio"
+              className="btn-check"
+              id="contributeNo"
+              value="no"
+              {...register("wantsToContribute", { required: "Please select an option" })}
+              onChange={() => {
+                if (talks.length > 0 || posters.length > 0) {
+                  const confirmDelete = window.confirm(
+                    "Are you sure? All talks and posters you have entered will be deleted."
+                  );
 
-      {!isAdmin && (
-        <div className={classNames(cssForm.smallW, 'mx-auto position-relative')}>
-          <div className="mb-3 row">
-            <label className={classNames('text-center fw-bold', cssForm.balance)}>
-              Would you like to contribute a talk
-              {!isOnline && (<>{' '}or a poster</>)}  to the main IMC {conferenceData.year} conference?</label>
-            <div className="text-center btn-group d-block mt-3" role="group">
-              <input
-                type="radio"
-                className="btn-check"
-                id="contributeYes"
-                value="yes"
-                {...register("wantsToContribute", { required: "Please select an option" })}
-                onChange={() => setWantsToContribute(true)}
-              />
-              <label className="btn btn-outline-primary" htmlFor="contributeYes">Yes</label>
-
-              <input
-                type="radio"
-                className="btn-check"
-                id="contributeNo"
-                value="no"
-                {...register("wantsToContribute", { required: "Please select an option" })}
-                onChange={() => {
-                  if (talks.length > 0 || posters.length > 0) {
-                    const confirmDelete = window.confirm(
-                      "Are you sure? All talks and posters you have entered will be deleted."
-                    );
-
-                    if (!confirmDelete) {
-                      return;
-                    }
-
-                    removeTalk();
-                    removePoster();
+                  if (!confirmDelete) {
+                    return;
                   }
 
-                  setWantsToContribute(false);
-                }}
-              />
-              <label className="btn btn-outline-primary" htmlFor="contributeNo">No</label>
-            </div>
-            {errors.wantsToContribute && <p className="text-danger fw-bold text-center"><small>{errors.wantsToContribute.message}</small></p>}
+                  removeTalk();
+                  removePoster();
+                }
+
+                setWantsToContribute(false);
+              }}
+            />
+            <label className="btn btn-outline-primary" htmlFor="contributeNo">No</label>
           </div>
+          {errors.wantsToContribute && <p className="text-danger fw-bold text-center"><small>{errors.wantsToContribute.message}</small></p>}
         </div>
-      )}
+      </div>
 
 
       {/* Contribution Fields */}
@@ -189,10 +174,10 @@ const ContributionForm = ({
               </p>
             </div>
           )}
- 
+
           {/* Talks */}
           {talks.map((talk, index) => (
-            <TalkPosterForm 
+            <TalkPosterForm
               isAdmin={isAdmin}
               conferenceData={conferenceData}
               key={talk.id}
@@ -211,7 +196,7 @@ const ContributionForm = ({
           {/* Posters */}
           {!isOnline &&
             posters.map((poster, index) => (
-              <TalkPosterForm 
+              <TalkPosterForm
                 isAdmin={isAdmin}
                 conferenceData={conferenceData}
                 key={poster.id}

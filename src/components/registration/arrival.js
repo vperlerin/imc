@@ -38,8 +38,7 @@ const ArrivalForm = ({
   step,
   stepTotal,
   trigger,
-  setValue,
-  initialData
+  setValue 
 }) => {
   const availableDates = getDateRange(
     conferenceData.dates.start,
@@ -61,28 +60,6 @@ const ArrivalForm = ({
     trigger(); // Validate form
   };
 
-  /**
-   * Load initial data if available, ensuring hours and minutes are zero-padded
-   * so they match the select dropdown options (e.g. "0" -> "00").
-   */
-  useEffect(() => {
-    if (initialData) {
-      for (const [key, val] of Object.entries(initialData)) {
-        if (val != null) {
-          if (
-            key === "arrival_hour" ||
-            key === "departure_hour" ||
-            key === "arrival_minute" ||
-            key === "departure_minute"
-          ) {
-            setValue(key, val.toString().padStart(2, "0"));
-          } else {
-            setValue(key, val);
-          }
-        }
-      }
-    }
-  }, [initialData, setValue]);
 
   return (
     <>

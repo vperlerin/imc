@@ -6,21 +6,21 @@ const getPaypalPrice = (price) => {
   return Math.round((price + (0.034 * price + 0.35) / 0.966) * 100) / 100;
 };
 
-const Summary = ({
-  initialData,
+const Summary = ({ 
   isOnline = false,
-  isForAdmin = false,
+  isAdmin = false,
   getValues,
   isEarlyBird,
   conferenceData,
   showInfo = true,
   setTotal,
   setPaypalFee,
-  workshops,
+  workshops,  
 }) => {
-  const allValues = initialData || getValues();
+  const allValues =  getValues(); 
+  
+  console.log("ALL VALUES ", allValues);
  
-
   // Registration & Accommodation Cost
   const registration_type = allValues.registration_type || "no"; // Default to "no"
   const selectedRoom = conferenceData.costs.rooms.find(room => room.type === registration_type);
@@ -28,39 +28,35 @@ const Summary = ({
   const lateFee = !isEarlyBird ? conferenceData.costs.after_early_birds : 0;
   const totalRoomCost = roomCost + lateFee;
 
-  //  Process Workshops Correctly
-  const selectedWorkshops = workshops.filter(workshop => allValues.workshops?.[workshop.id] === "true");
+  // Workshops Cost (Using Passed `workshops` Prop)
+  const selectedWorkshops = Object.entries(allValues)
+    .filter(([key, value]) => workshops.some(w => w.title === key) && value === "true")
+    .map(([key]) => workshops.find(w => w.title === key));
 
-  //  Helper function to get workshop cost
-  const getWorkshopCost = (workshop, isOnline) => {   
-    const cost = isOnline ? workshop.price_online : workshop.price;   
-    return parseFloat(cost) || 0;  
-  };
-  //  Calculate workshop costs
-  const workshopCost = selectedWorkshops.reduce((sum, workshop) => sum + getWorkshopCost(workshop, false), 0);
-  const workshopOnlineCost = selectedWorkshops.reduce((sum, workshop) => sum + getWorkshopCost(workshop, true), 0);
+  const workshopCost = selectedWorkshops.reduce((sum, workshop) => sum + (workshop?.cost || 0), 0);
 
-  //  T-shirt Cost
+  // T-shirt Cost
   const tshirtCost = allValues.buyTShirt ? conferenceData.costs.tshirts.price : 0;
 
-  //  Printed Posters Cost
+  // Printed Posters Cost
   const printedPosters = allValues.posters
-    ? allValues.posters.filter(poster => poster.print === "true")
+    ? allValues.posters.filter(poster => poster.printOnSite === "true")
     : [];
 
   const numberOfPrintedPosters = printedPosters.length;
   const printedPostersCost = numberOfPrintedPosters * conferenceData.poster_print.price;
 
-  //  Printed Proceedings Cost
+  // Printed Proceedings Cost
   const proceedingsPrintedCost = allValues.proceedings === "pdf_printed" ? conferenceData.costs.printed_proceedings : 0;
 
-  //  Payment Method Fee (PayPal)
+  // Payment Method Fee (PayPal)
   const paymentMethod = allValues.payment_method || "bank"; // Default to bank transfer
   let totalCost = totalRoomCost + workshopCost + tshirtCost + proceedingsPrintedCost + printedPostersCost;
   const paypalFee = paymentMethod.toLowerCase() === "paypal" ? getPaypalPrice(totalCost) - totalCost : 0;
   totalCost += paypalFee;
 
-  //  Online conference total calculation
+  // Online conference cost calculation
+  const workshopOnlineCost = selectedWorkshops.reduce((sum, workshop) => sum + (workshop?.cost_online || 0), 0);
   const onlineConferenceCost = conferenceData.costs.online;
   let totalOnlineCost = workshopOnlineCost + onlineConferenceCost;
   const onlinePaypalFee = paymentMethod.toLowerCase() === "paypal" ? getPaypalPrice(totalOnlineCost) - totalOnlineCost : 0;
@@ -78,13 +74,13 @@ const Summary = ({
 
   return (
     <>
-      {!isForAdmin && showInfo && (
+      {!isAdmin && showInfo && (
         <p className="fw-bolder alert alert-info">
           Please review your registration details and total cost carefully before submitting. If any changes are needed, go back and update your selections. Once registered, you will receive a password that allows you to update only your travel details and contributions (talks & posters).
         </p>
       )}
 
-      <div className={classNames(!isForAdmin && css.maxW, "p-2 border rounded")}>
+      <div className={classNames(!isAdmin && css.maxW, "p-2 border rounded")}>
         <h4 className="mb-3">Billing Summary</h4>
         <table className="table table-striped table-hover">
           <thead>
@@ -99,7 +95,9 @@ const Summary = ({
               <tr>
                 <td className="ps-3 text-muted">
                   {registration_type !== "no" ? (
-                    <>Conference Registration and {registration_type.charAt(0).toUpperCase() + registration_type.slice(1)} Room</>
+                    <>
+                      Conference Registration and {registration_type.charAt(0).toUpperCase() + registration_type.slice(1)} Room
+                    </>
                   ) : (
                     <>Conference Registration</>
                   )}
@@ -114,20 +112,13 @@ const Summary = ({
             )}
 
             {/* Workshops */}
-            {selectedWorkshops.length > 0 && !isOnline &&
+            {selectedWorkshops.length > 0 &&
               selectedWorkshops.map((workshop, index) => (
                 <tr key={index}>
                   <td className="ps-3 text-muted">{workshop.title}</td>
-                  <td className="text-end">{getWorkshopCost(workshop, false).toFixed(2)}€</td>
-                </tr>
-              ))}
-
-            {/* Online Workshops */}
-            {selectedWorkshops.length > 0 && isOnline &&
-              selectedWorkshops.map((workshop, index) => (
-                <tr key={index}>
-                  <td className="ps-3 text-muted">{workshop.title}</td>
-                  <td className="text-end">{getWorkshopCost(workshop, true).toFixed(2)}€</td>
+                  <td className="text-end">
+                    {!isOnline ? workshop.cost.toFixed(2) : workshop.cost_online.toFixed(2)}€
+                  </td>
                 </tr>
               ))}
 
@@ -149,13 +140,14 @@ const Summary = ({
               </tr>
             )}
 
-            {/* Proceedings (Printed) */}
+            {/* Proceedings (Printed) 
             {allValues.proceedings === "pdf_printed" && (
               <tr>
                 <td className="ps-3 text-muted">Proceedings (Printed)</td>
                 <td className="text-end">{proceedingsPrintedCost.toFixed(2)}€</td>
               </tr>
             )}
+              */}
 
             {/* PayPal Fee */}
             {paymentMethod.toLowerCase() === "paypal" && (
@@ -169,7 +161,9 @@ const Summary = ({
 
             {/* Total */}
             <tr>
-              <td><strong>TOTAL</strong></td>
+              <td>
+                <strong>TOTAL</strong>
+              </td>
               <td className="text-end">
                 {!isOnline ? (
                   <strong>{totalCost.toFixed(2)}€</strong>
