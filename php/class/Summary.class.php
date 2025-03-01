@@ -4,6 +4,15 @@ require_once __DIR__ . "/../config.php";
 
 class SummaryFormatter
 {
+
+    public static function getRegistrationDescription($registrationTypes, $registrationTypeId) {
+        $filtered = array_filter($registrationTypes, function($type) use ($registrationTypeId) {
+            return $type['id'] == $registrationTypeId;
+        });
+    
+        return !empty($filtered) ? reset($filtered)['description'] : "Description not found";
+    }
+     
     public static function formatEmailContent(array $data, array $workshops, array $paymentMethods, array $registrations_types, bool $withPwd): string
     {
         $content = "";
@@ -60,22 +69,20 @@ class SummaryFormatter
             $content .= "<b>Travel Details:</b> {$data['travelling_details']}<br>";
         }
 
+         
+        $registrationDescription = self::getRegistrationDescription($registrations_types, $data['registration_type_id']);
+ 
         // Get the payment method name from the paymentMethods array using the ID
         $paymentMethodName = isset($paymentMethods[$data['payment_method_id']])
             ? $paymentMethods[$data['payment_method_id']]
             : "Unknown";
- 
-            echo "REGISTRATION TYPES \n";
-            var_dump($registrations_types);
-            var_dump($data['registration_type_id']);        
-
-        /*
+  
+        
         $content .= "
             <br><b>Registration & Payment</b><br>
-            <b>Registration Type:</b> {$registration}<br>
+            <b>Registration Type:</b> {$registrationDescription}<br>
             <b>Payment Method:</b> {$paymentMethodName['method']}<br>
-        ";
-        */
+        "; 
 
 
         // TALKS
@@ -122,6 +129,9 @@ class SummaryFormatter
         if (!empty($data['comments'])) {
             $content .= "<br><b>Comments</b><br>{$data['comments']}<br>";
         }
+
+
+        var_dump($content);
 
         return $content;
     }
