@@ -142,7 +142,7 @@ try {
 
     
     // Get all workshops from the database
-    $workshopManager = new WorkshopManager();
+    $workshopManager = new WorkshopManager($pdo);
     $workshops = $workshopManager->getWorkshops(); // Fetch all workshops dynamically
 
     var_dump($workshops);
