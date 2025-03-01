@@ -26,16 +26,29 @@ class ParticipantManager
                 throw new Exception("The email address '{$data['email']}' is already registered. Please use a different email or log in.");
             }
 
+            // Fetch the payment method ID
+            $stmt = $this->pdo->prepare("SELECT id FROM payment_methods WHERE method = :method");
+            $stmt->execute([':method' => $data['payment_method']]);
+            $paymentMethod = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$paymentMethod) {
+                throw new Exception("Invalid payment method: {$data['payment_method']}");
+            }
+
+            $paymentMethodId = $paymentMethod['id'];
+
             // Insert participant
             $stmt = $this->pdo->prepare("
                 INSERT INTO participants (
                     title, first_name, last_name, gender, dob, email, phone, address, postal_code, city, country, 
                     organization, admin_notes, is_online, is_early_bird, confirmation_sent, confirmation_date, 
-                    password_hash, paypal_fee, total_due, total_paid, status, deleted_at, comments, created_at, updated_at
+                    password_hash, paypal_fee, total_due, total_paid, total_reimbursed, status, deleted_at, 
+                    comments, guardian_name, guardian_contact, guardian_email, payment_method_id, created_at, updated_at
                 ) VALUES (
                     :title, :first_name, :last_name, :gender, :dob, :email, :phone, :address, :postal_code, :city, :country, 
                     :organization, NULL, :is_online, :is_early_bird, FALSE, NULL, 
-                    :password_hash, :paypal_fee, :total_due, 0.00, 'active', NULL, :comments, NOW(), NOW()
+                    :password_hash, :paypal_fee, :total_due, 0.00, 0.00, 'active', NULL, 
+                    :comments, :guardian_name, :guardian_contact, :guardian_email, :payment_method_id, NOW(), NOW()
                 )
             ");
 
@@ -57,7 +70,8 @@ class ParticipantManager
                 ':password_hash' => $passwordHash,
                 ':paypal_fee' => $data['paypal_fee'],
                 ':total_due' => $data['total_due'],
-                ':comments' => $data['comments'] ?? null
+                ':comments' => $data['comments'] ?? null,
+                ':payment_method_id' => $paymentMethodId,
             ]);
 
             $participantId = $this->pdo->lastInsertId();
@@ -95,7 +109,7 @@ class ParticipantManager
                 ':participant_id' => $participantId,
                 ':amount' => 0,
                 ':payment_method' => $data['payment_method']
-            ]); 
+            ]);
 
             // Insert arrival details
             $stmt = $this->pdo->prepare("
@@ -126,7 +140,7 @@ class ParticipantManager
                 ':participant_id' => $participantId,
                 ':registration_type' => $data['registration_type']
             ]);
- 
+
             // Insert extra options
             $stmt = $this->pdo->prepare("
                 INSERT INTO extra_options (participant_id, excursion, buy_tshirt, tshirt_size, proceedings, created_at, updated_at)
@@ -387,6 +401,9 @@ class ParticipantManager
         ");
         $stmt->execute([':participant_id' => $participantId]);
         $contributions = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // 8. Payments detail
+
 
         // Combine everything into a structured array
         $details = [
