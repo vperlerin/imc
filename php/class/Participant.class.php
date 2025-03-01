@@ -20,12 +20,12 @@ class ParticipantManager
     {
         try {
             $this->pdo->beginTransaction();
-
+    
             // Check if email exists
             if ($this->emailExists($data['email'])) {
                 throw new Exception("The email address '{$data['email']}' is already registered. Please use a different email or log in.");
             }
-
+    
             // Insert participant
             $stmt = $this->pdo->prepare("
                 INSERT INTO participants (
@@ -40,7 +40,7 @@ class ParticipantManager
                     :comments, :guardian_name, :guardian_contact, :guardian_email, :payment_method_id, NOW(), NOW()
                 )
             ");
-
+    
             $stmt->execute([
                 ':title' => $data['title'],
                 ':first_name' => $data['first_name'],
@@ -65,46 +65,35 @@ class ParticipantManager
                 ':guardian_email' => $data['guardian_email'] ?? null,
                 ':payment_method_id' => (int) ($data['payment_method_id'] ?? 0),
             ]);
-
-
+    
             $participantId = $this->pdo->lastInsertId();
-
-            // Fetch all available workshops from the database
-            $stmt = $this->pdo->query("SELECT id FROM workshops");
-            $workshops = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            // Check if workshops exist in form data
+    
+            // Insert workshops participation
             if (!empty($data['workshops']) && is_array($data['workshops'])) {
-                foreach ($workshops as $workshop) {
-                    $workshopId = $workshop['id'];
-
-                    // Check if the workshop is selected ("true")
-                    if (!empty($data['workshops'][$workshopId]) && $data['workshops'][$workshopId] === "true") {
-                        $stmt = $this->pdo->prepare("
-                            INSERT INTO participant_workshops (participant_id, workshop_id, attending) 
-                            VALUES (:participant_id, :workshop_id, TRUE)
-                        ");
-                        $stmt->execute([
-                            ':participant_id' => $participantId,
-                            ':workshop_id' => $workshopId
-                        ]);
-                    }
+                $stmt = $this->pdo->prepare("
+                    INSERT INTO participant_workshops (participant_id, workshop_id, attending) 
+                    VALUES (:participant_id, :workshop_id, TRUE)
+                ");
+    
+                foreach ($data['workshops'] as $workshopId) {
+                    $stmt->execute([
+                        ':participant_id' => $participantId,
+                        ':workshop_id' => (int) $workshopId
+                    ]);
                 }
             }
-
+    
             // **Insert payment details**
             $stmt = $this->pdo->prepare("
                 INSERT INTO payments (participant_id, payment_date, amount, payment_method_id, created_at, updated_at)
                 VALUES (:participant_id, NULL, :amount, :payment_method_id, NOW(), NOW())
             ");
-
             $stmt->execute([
                 ':participant_id' => $participantId,
                 ':amount' => 0,
                 ':payment_method_id' => (int) ($data['payment_method_id'] ?? 0)  
             ]);
-
-
+    
             // Insert arrival details
             $stmt = $this->pdo->prepare("
                 INSERT INTO arrival (participant_id, arrival_date, arrival_hour, arrival_minute, 
@@ -123,8 +112,7 @@ class ParticipantManager
                 ':travelling' => $data['travelling'],
                 ':travelling_details' => $data['travelling_details'] ?? null
             ]);
-
-
+    
             // Insert accommodation details
             $stmt = $this->pdo->prepare("
                 INSERT INTO accommodation (participant_id, registration_type_id, created_at, updated_at)
@@ -132,9 +120,9 @@ class ParticipantManager
             ");
             $stmt->execute([
                 ':participant_id' => $participantId,
-                ':registration_type' => $data['registration_type_id']
+                ':registration_type_id' => (int) $data['registration_type_id']
             ]);
-
+    
             // Insert extra options
             $stmt = $this->pdo->prepare("
                 INSERT INTO extra_options (participant_id, excursion, buy_tshirt, tshirt_size, proceedings, created_at, updated_at)
@@ -145,16 +133,15 @@ class ParticipantManager
                 ':excursion' => filter_var($data['excursion'], FILTER_VALIDATE_BOOLEAN),
                 ':buy_tshirt' => filter_var($data['buy_tshirt'], FILTER_VALIDATE_BOOLEAN),
                 ':tshirt_size' => $data['tshirt_size'] ?? null,
-                ':proceedings' => $data['posters'][0]['print'] === "true" ? "pdf_printed" : "pdf"
+                ':proceedings' => !empty($data['posters']) && $data['posters'][0]['print'] === "true" ? "pdf_printed" : "pdf"
             ]);
-
-
-            // Insert talks and posters with print flag
+    
+            // Insert contributions (talks & posters)
             $stmt = $this->pdo->prepare("
                 INSERT INTO contributions (participant_id, type, title, authors, abstract, session_id, duration, paper_submission, print, created_at, updated_at)
                 VALUES (:participant_id, :type, :title, :authors, :abstract, (SELECT id FROM imc_sessions WHERE name = :session), :duration, :paper_submission, :print, NOW(), NOW())
             ");
-
+    
             // Insert talks
             foreach ($data['talks'] as $talk) {
                 $stmt->execute([
@@ -169,7 +156,7 @@ class ParticipantManager
                     ':print' => FALSE
                 ]);
             }
-
+    
             // Insert posters with print option
             foreach ($data['posters'] as $poster) {
                 $stmt->execute([
@@ -184,15 +171,14 @@ class ParticipantManager
                     ':print' => filter_var($poster['print'], FILTER_VALIDATE_BOOLEAN)
                 ]);
             }
-
+    
             $this->pdo->commit();
             return $participantId;
         } catch (Exception $e) {
             $this->pdo->rollBack();
             throw new Exception("Error saving participant: " . $e->getMessage());
         }
-    }
-
+    } 
 
     /**
      * Retrieve participant statistics for a given workshop or all workshops.

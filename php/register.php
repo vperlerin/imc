@@ -125,7 +125,7 @@ try {
         }
     }
 
-    var_dump($data);
+ 
 
     // Generate a random password
     $plain_password = bin2hex(random_bytes(4));
