@@ -27,7 +27,7 @@ class PaymentManager {
     } 
 
     public function getPaymentMethods() {
-        $stmt = $pdo->query("SELECT id, method FROM payment_methods");
+        $stmt = $this->pdo->query("SELECT id, method FROM payment_methods");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     } 
     
