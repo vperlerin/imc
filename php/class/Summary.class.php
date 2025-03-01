@@ -64,13 +64,11 @@ class SummaryFormatter
         $paymentMethodName = isset($paymentMethods[$data['payment_method_id']])
             ? $paymentMethods[$data['payment_method_id']]
             : "Unknown";
-
-        var_dump($paymentMethodName);
-
+ 
         $content .= "
             <br><b>Registration & Payment</b><br>
             <b>Registration Type:</b> {$data['registration_type']}<br>
-            <b>Payment Method:</b> {$paymentMethodName}<br>
+            <b>Payment Method:</b> {$paymentMethodName['method']}<br>
         ";
 
 
