@@ -18,8 +18,8 @@ const AdminParticipantsOnsite = () => {
   const [selectedParticipant, setSelectedParticipant] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showHardDeleteConfirm, setShowHardDeleteConfirm] = useState(false);
- 
-  
+
+
   useEffect(() => {
     const fetchParticipants = async () => {
       try {
@@ -124,48 +124,49 @@ const AdminParticipantsOnsite = () => {
               <CiSearch className="position-absolute top-50 end-0 translate-middle-y me-2" />
             </div>
           </div>
-
-          <table className="table table-striped">
-            <thead>
-              <tr>
-                <th>Reg. Date</th>
-                <th>Name</th>
-                <th>Total Due</th>
-                <th>Payment Method</th>
-                <th>Confirmed</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredParticipants.length > 0 ? (
-                filteredParticipants.map((participant) => (
-                  <tr key={participant.id}>
-                    <td>{participant.created_at.split(' ')[0]}</td>
-                    <td>{participant.title} {participant.first_name} {participant.last_name}</td>
-                    <td>{participant.total_due} €</td>
-                    <td>{participant.payment_method || "n/a"}</td>
-                    <td>{participant.confirmation_sent === true ? "✅" : "❌"}</td>
-                    <td>
-                      <div className="d-flex gap-2 justify-content-end">
-                        <a href={`/admin/participants/onsite/${participant.id}/confirm`} className={classNames(css.action, "btn btn-sm btn-outline-success fw-bolder")}>Confirm</a>
-                        <a href={`/admin/participants/onsite/${participant.id}`} className={classNames(css.action, "btn btn-sm btn-outline-primary fw-bolder")}>Edit</a>
-                        <button
-                          className={classNames(css.action, "btn btn-sm btn-outline-danger fw-bolder")}
-                          onClick={() => handleDeleteClick(participant)}
-                        >
-                          Cancel Registration
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              ) : (
+          <div className="table-responsive">
+            <table className="table table-striped">
+              <thead>
                 <tr>
-                  <td colSpan="6" className="text-center">No onsite participants found.</td>
+                  <th>Reg. Date</th>
+                  <th>Name</th>
+                  <th>Total Due</th>
+                  <th>Payment Method</th>
+                  <th>Confirmed</th>
+                  <th></th>
                 </tr>
-              )}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {filteredParticipants.length > 0 ? (
+                  filteredParticipants.map((participant) => (
+                    <tr key={participant.id}>
+                      <td>{participant.created_at.split(' ')[0]}</td>
+                      <td>{participant.title} {participant.first_name} {participant.last_name}</td>
+                      <td>{participant.total_due} €</td>
+                      <td>{participant.payment_method || "n/a"}</td>
+                      <td>{participant.confirmation_sent === true ? "✅" : "❌"}</td>
+                      <td>
+                        <div className="d-flex gap-2 justify-content-end">
+                          <a href={`/admin/participants/onsite/${participant.id}/confirm`} className={classNames(css.action, "btn btn-sm btn-outline-success fw-bolder")}>Confirm</a>
+                          <a href={`/admin/participants/onsite/${participant.id}`} className={classNames(css.action, "btn btn-sm btn-outline-primary fw-bolder")}>Edit</a>
+                          <button
+                            className={classNames(css.action, "btn btn-sm btn-outline-danger fw-bolder")}
+                            onClick={() => handleDeleteClick(participant)}
+                          >
+                            Cancel Registration
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="6" className="text-center">No onsite participants found.</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </>
       )}
 

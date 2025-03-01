@@ -150,11 +150,13 @@ CREATE TABLE IF NOT EXISTS contributions (
     session_id INT NOT NULL,
     duration ENUM('10min', '15min', '20min', '25min', '30min') NULL,
     paper_submission ENUM('before_imc', 'during_imc', 'after_imc') NOT NULL,
+    print BOOLEAN NOT NULL DEFAULT FALSE, 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (participant_id) REFERENCES participants(id) ON DELETE CASCADE,
     FOREIGN KEY (session_id) REFERENCES imc_sessions(id) ON DELETE CASCADE
 ) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 
 -- Registration Types Table
 CREATE TABLE IF NOT EXISTS registration_types (

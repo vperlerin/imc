@@ -80,8 +80,6 @@ const AdminParticipantsUser = () => {
       setSaving(false);
     }
   };
- 
-
 
   return (
     <PageContain title={loading ? '' : `Edit Participant: ${participant?.participant.first_name} ${participant?.participant.last_name}`}>
@@ -149,10 +147,12 @@ const AdminParticipantsUser = () => {
               <Workshops isAdmin conferenceData={cd} register={register} errors={errors} initialData={participant.workshops} setValue={setValue} watch={watch} />
             )}
             {activeTab === "arrival" && (
-              <Arrival register={register} errors={errors} initialData={participant.arrival} setValue={setValue} />
+              <Arrival isAdmin conferenceData={cd} register={register} errors={errors} initialData={participant.arrival} setValue={setValue} />
             )}
             {activeTab === "contribution" && (
               <Contribution
+                isAdmin
+                conferenceData={cd}
                 control={control}
                 register={register}
                 errors={errors}
@@ -179,7 +179,7 @@ const AdminParticipantsUser = () => {
           </div>
 
           <div className="mt-4 d-flex justify-content-end">
-            <button type="submit" className="btn btn-primary" disabled={saving}>
+            <button type="submit" className="btn btn-outline-primary fw-bolder" disabled={saving}>
               {saving ? "Saving..." : "Save Changes"}
             </button>
           </div>

@@ -4,10 +4,11 @@ import React, { useEffect, useState } from "react";
 import StepDislay from "components/registration/stepDisplay";
 import Loader from "components/loader";
 import axios from "axios";
+import { formatFullDate } from 'utils/date';
 
 const Workshops = ({
   isAdmin = false,
-  initialData,
+  initialData = [], // Contains the workshops the participant is registered for
   isDebugMode = false,
   register,
   errors,
@@ -21,8 +22,9 @@ const Workshops = ({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
- 
+  console.log("INITIAL DATA (Participant Workshops):", initialData);
 
+  // Fetch available workshops from API
   useEffect(() => {
     const fetchWorkshops = async () => {
       try {
@@ -42,18 +44,20 @@ const Workshops = ({
     fetchWorkshops();
   }, []);
 
+  // Pre-fill form values based on participant's registered workshops (initialData)
   useEffect(() => {
-    if (initialData?.workshops && workshops.length > 0) {
+    if (initialData.length > 0 && workshops.length > 0) {
       workshops.forEach(workshop => {
-        const isAttending = initialData.workshops.some(selected => selected.id === workshop.id);
-        setValue(`workshops.${workshop.id}`, isAttending ? "true" : "false");
+        // Check if the participant is registered for this workshop
+        const isAttending = initialData.some(selected => String(selected.id) === String(workshop.id));
+        setValue(`workshops.${workshop.id}`, isAttending ? "true" : "false"); // Set individually
       });
     }
-  }, [initialData, setValue, workshops]);
+  }, [initialData, workshops, setValue]);
 
   if (loading) return <><Loader /><p>Loading workshops...</p></>;
   if (error) return <p className="text-danger">{error}</p>;
- 
+
   return (
     <div className="position-relative">
       {isDebugMode && (
@@ -80,23 +84,11 @@ const Workshops = ({
         {workshops.map((workshop) => {
           const workshopId = workshop.id.toString();
           const selectedWorkshop = watch(`workshops.${workshopId}`) || "false";
-
  
-          // Ensure the date is a valid string before parsing
-          const rawDate = workshop.date ? workshop.date.trim() : null;
-          const formattedDate = rawDate
-            ? new Date(rawDate + "T00:00:00Z").toLocaleDateString("en-GB", {
-              weekday: "long",
-              day: "numeric",
-              month: "long",
-              year: "numeric",
-            })
-            : "Date not available"; // Fallback if date is invalid
-
           return (
             <div className="mb-5 row" key={workshopId}>
               <label className={classNames("text-md-center", cssForm.balance)}>
-                <b>{workshop.title}</b> will be held on <b>{formattedDate}</b> from <b>{workshop.period}</b>.<br />
+                <b>{workshop.title}</b> will be held on <b>{formatFullDate(workshop.date)}</b> from <b>{workshop.period}</b>.<br /> 
                 Do you wish to attend for an extra price of {parseFloat(workshop.price).toFixed(2)}€?
               </label>
 

@@ -6,6 +6,7 @@ import React from "react";
 const TalkPosterForm = ({
   conferenceData,
   index,
+  isAdmin = false,
   register,
   remove,
   type,
@@ -114,7 +115,7 @@ const TalkPosterForm = ({
       {!isTalk && (
         <div className="mb-3 row">
           <label className="fw-bold pb-0">Do you want to have your poster printed on-site for {conferenceData.poster_print.price}€?</label>
-          <p className="form-text mt-0">{conferenceData.poster_print.desc}</p>
+          {!isAdmin && (<p className="form-text mt-0">{conferenceData.poster_print.desc}</p>)}
           <div className="text-center btn-group d-block" role="group">
             <input
               type="radio"

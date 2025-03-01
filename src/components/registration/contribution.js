@@ -12,6 +12,7 @@ import { useFieldArray } from "react-hook-form";
 const talkDurations = ["10min", "15min", "20min", "25min", "30min"];
 
 const ContributionForm = ({
+  isAdmin = false,
   conferenceData,
   control,
   initialData,
@@ -34,6 +35,8 @@ const ContributionForm = ({
   ];
   const { fields: talks, append: addTalk, remove: removeTalk } = useFieldArray({ control, name: "talks" });
   const { fields: posters, append: addPoster, remove: removePoster } = useFieldArray({ control, name: "posters" });
+
+  console.log("initialData? ", initialData);
 
   useEffect(() => {
     if (initialData) {
@@ -103,75 +106,85 @@ const ContributionForm = ({
           Fill Test Data
         </button>
       )}
-      <h4 className="mb-3 border-bottom pb-2">
-        <StepDislay step={step} stepTotal={stepTotal} />
-        Contributions
-      </h4>
 
-      <div className={classNames(cssForm.smallW, 'mx-auto position-relative')}>
-        <div className="mb-3 row">
-          <label className={classNames('text-center fw-bold', cssForm.balance)}>
-            Would you like to contribute a talk
-            {!isOnline && (<>{' '}or a poster</>)}  to the main IMC {conferenceData.year} conference?</label>
-          <div className="text-center btn-group d-block mt-3" role="group">
-            <input
-              type="radio"
-              className="btn-check"
-              id="contributeYes"
-              value="yes"
-              {...register("wantsToContribute", { required: "Please select an option" })}
-              onChange={() => setWantsToContribute(true)}
-            />
-            <label className="btn btn-outline-primary" htmlFor="contributeYes">Yes</label>
+      {!isAdmin && (
+        <h4 className="mb-3 border-bottom pb-2">
+          <StepDislay step={step} stepTotal={stepTotal} />
+          Contributions
+        </h4>
+      )}
 
-            <input
-              type="radio"
-              className="btn-check"
-              id="contributeNo"
-              value="no"
-              {...register("wantsToContribute", { required: "Please select an option" })}
-              onChange={() => {
-                if (talks.length > 0 || posters.length > 0) {
-                  const confirmDelete = window.confirm(
-                    "Are you sure? All talks and posters you have entered will be deleted."
-                  );
 
-                  if (!confirmDelete) {
-                    return;
+      {!isAdmin && (
+        <div className={classNames(cssForm.smallW, 'mx-auto position-relative')}>
+          <div className="mb-3 row">
+            <label className={classNames('text-center fw-bold', cssForm.balance)}>
+              Would you like to contribute a talk
+              {!isOnline && (<>{' '}or a poster</>)}  to the main IMC {conferenceData.year} conference?</label>
+            <div className="text-center btn-group d-block mt-3" role="group">
+              <input
+                type="radio"
+                className="btn-check"
+                id="contributeYes"
+                value="yes"
+                {...register("wantsToContribute", { required: "Please select an option" })}
+                onChange={() => setWantsToContribute(true)}
+              />
+              <label className="btn btn-outline-primary" htmlFor="contributeYes">Yes</label>
+
+              <input
+                type="radio"
+                className="btn-check"
+                id="contributeNo"
+                value="no"
+                {...register("wantsToContribute", { required: "Please select an option" })}
+                onChange={() => {
+                  if (talks.length > 0 || posters.length > 0) {
+                    const confirmDelete = window.confirm(
+                      "Are you sure? All talks and posters you have entered will be deleted."
+                    );
+
+                    if (!confirmDelete) {
+                      return;
+                    }
+
+                    removeTalk();
+                    removePoster();
                   }
 
-                  removeTalk();
-                  removePoster();
-                }
-
-                setWantsToContribute(false);
-              }}
-            />
-            <label className="btn btn-outline-primary" htmlFor="contributeNo">No</label>
+                  setWantsToContribute(false);
+                }}
+              />
+              <label className="btn btn-outline-primary" htmlFor="contributeNo">No</label>
+            </div>
+            {errors.wantsToContribute && <p className="text-danger fw-bold text-center"><small>{errors.wantsToContribute.message}</small></p>}
           </div>
-          {errors.wantsToContribute && <p className="text-danger fw-bold text-center"><small>{errors.wantsToContribute.message}</small></p>}
         </div>
-      </div>
+      )}
+
 
       {/* Contribution Fields */}
       {wantsToContribute && (
         <>
-          {/* Information Box */}
-          <div className="border border-2 p-3 rounded-2 bg-dark mb-3 mx-md-5">
-            <h6 className="fw-bolder gap-2 d-inline-flex"><FiInfo /> Do not register a lecture {!isOnline && (<>or poster</>)} without having a topic.</h6>
-            <p>
-              If you consider to present a lecture {!isOnline && (<>or a poster</>)} but have not yet decided on the topic, skip this item and for now just continue with your registration. You can add your talk {!isOnline && (<>or poster</>)} later. The absolute deadline for <b className="text-danger">submitting talks {!isOnline && (<>and posters</>)} is {formatFullDate(conferenceData.deadlines.reg)},</b> but if we cannot accommodate all presentations, priority may be given to those registered early.
-            </p>
+          {!isAdmin && (
+            <div className="border border-2 p-3 rounded-2 bg-dark mb-3 mx-md-5">
+              <h6 className="fw-bolder gap-2 d-inline-flex"><FiInfo /> Do not register a lecture {!isOnline && (<>or poster</>)} without having a topic.</h6>
+              <p>
+                If you consider to present a lecture {!isOnline && (<>or a poster</>)} but have not yet decided on the topic, skip this item and for now just continue with your registration. You can add your talk {!isOnline && (<>or poster</>)} later. The absolute deadline for <b className="text-danger">submitting talks {!isOnline && (<>and posters</>)} is {formatFullDate(conferenceData.deadlines.reg)},</b> but if we cannot accommodate all presentations, priority may be given to those registered early.
+              </p>
 
-            <h6 className="fw-bolder gap-2 d-inline-flex mt-2"><FiInfo />  For all lectures {!isOnline && (<>and posters</>)}, a paper for the IMC Proceedings is required.</h6>
-            <p>
-              Ideally, papers for the Proceedings should be submitted before the start of the conference. <b className="text-danger">The absolute deadline for Proceedings paper delivery is {formatFullDate(conferenceData.deadlines.paper)}</b>.
-            </p>
-          </div>
-
+              <h6 className="fw-bolder gap-2 d-inline-flex mt-2"><FiInfo />  For all lectures {!isOnline && (<>and posters</>)}, a paper for the IMC Proceedings is required.</h6>
+              <p>
+                Ideally, papers for the Proceedings should be submitted before the start of the conference. <b className="text-danger">The absolute deadline for Proceedings paper delivery is {formatFullDate(conferenceData.deadlines.paper)}</b>.
+              </p>
+            </div>
+          )}
+ 
           {/* Talks */}
           {talks.map((talk, index) => (
             <TalkPosterForm
+              
+              isAdmin={isAdmin}
               conferenceData={conferenceData}
               key={talk.id}
               index={index}
@@ -189,6 +202,7 @@ const ContributionForm = ({
           {!isOnline &&
             posters.map((poster, index) => (
               <TalkPosterForm 
+                isAdmin={isAdmin}
                 conferenceData={conferenceData}
                 key={poster.id}
                 index={index}
