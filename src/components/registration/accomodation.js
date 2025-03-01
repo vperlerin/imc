@@ -15,11 +15,10 @@ const AccomodationForm = ({
   stepTotal,
   trigger,
   setValue,
-  initialData
+  initialData,
+  paymentMethods,
 }) => {
 
-  console.log("ACCOMODATION INITAL DATA ", initialData);
-  console.log("conferenceData ", conferenceData);
 
   useEffect(() => {
     if (initialData) {
@@ -45,7 +44,7 @@ const AccomodationForm = ({
           {!isOnline && <>Accommodation &</>} Payment Method
         </h4>
       )}
- 
+
       <div className={classNames(cssForm.smallW, "mx-auto position-relative")}>
         {isDebugMode && (
           <button type="button" className="position-absolute top-0 end-0 btn btn-secondary" onClick={fillTestData}>
@@ -93,35 +92,31 @@ const AccomodationForm = ({
         <div className="mb-3">
           <label className="fw-bold mb-2">Method of Payment</label>
           <div className="d-flex flex-column gap-2">
-            {[{
-              type: "Paypal",
-              note: "Additional fees apply."
-            },
-            {
-              type: "Bank Transfer",
-              note: "Usually free from EU and EEA countries; costs are always at participants' expense."
-            },
-            {
-              type: "Other",
-              note: "Requires prior approval from the IMO Treasurer and statement of the agreed arrangement"
-            },].map((method, index) => (
-              <div key={index} className="form-check">
-                <input
-                  type="radio"
-                  id={`payment-${method.type}`}
-                  className={classNames("form-check-input", { "is-invalid": errors.payment_method })}
-                  value={method.type}
-                  {...register("payment_method", { required: "Please select a payment method" })}
-                />
-                <label className="form-check-label d-block" htmlFor={`payment-${method.type}`}>
-                  {method.type}
-                  <div className="form-text">
-                    {method.note}
-                  </div>
-                </label>
-
-              </div>
-            ))}
+            {paymentMethods.length > 0 ? (
+              paymentMethods.map((method) => (
+                <div key={method.id} className="form-check">
+                  <input
+                    type="radio"
+                    id={`payment-${method.method}`}
+                    className={classNames("form-check-input", { "is-invalid": errors.payment_method })}
+                    value={method.method}
+                    {...register("payment_method", { required: "Please select a payment method" })}
+                  />
+                  <label className="form-check-label d-block" htmlFor={`payment-${method.method}`}>
+                    {method.method}
+                    <div className="form-text">
+                      {method.method === "Paypal"
+                        ? "Additional fees apply."
+                        : method.method === "Bank Transfer"
+                          ? "Usually free from EU and EEA countries; costs are always at participants' expense."
+                          : "Requires prior approval from the IMO Treasurer and statement of the agreed arrangement"}
+                    </div>
+                  </label>
+                </div>
+              ))
+            ) : (
+              <p className="text-danger"><small>No payment methods available.</small></p>
+            )}
           </div>
           {errors.payment_method && <p className="text-danger"><small>{errors.payment_method.message}</small></p>}
         </div>

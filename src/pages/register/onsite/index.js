@@ -38,6 +38,7 @@ const MainForm = () => {
   const [finalData, setFinalData] = useState(null);
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [errorGettingDataFromDB, setErrorGettingDataFromDB] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
   const [successMsg, setSuccessMsg] = useState(null);
   const [total, setTotal] = useState(0);
@@ -45,7 +46,8 @@ const MainForm = () => {
   const [workshops, setWorkshops] = useState([])
   const location = useLocation();
   const isDebugMode = new URLSearchParams(location.search).get("debug") === "1";
-  const hasFetched = useRef(false);
+  const hasFetchedWorkshops = useRef(false);
+  const hasFetchedPaymentMethods = useRef(false);
 
   const {
     control,
@@ -68,11 +70,11 @@ const MainForm = () => {
 
   // Fetch available workshops from API
   useEffect(() => {
-    if (hasFetched.current) {
+    if (hasFetchedWorkshops.current) {
       return; 
     } 
     
-    hasFetched.current = true;  
+    hasFetchedWorkshops.current = true;  
     setLoading(true);
     
     const fetchWorkshops = async () => {
@@ -85,7 +87,7 @@ const MainForm = () => {
           throw new Error(response.data.message || "Failed to fetch workshops - please try again later.");
         }
       } catch (err) {
-        setError(err.message || "An error occurred while fetching workshops.");
+        setErrorGettingDataFromDB(err.message || "An error occurred while fetching workshops.");
       } finally {
         setLoading(false);
       }
@@ -93,7 +95,35 @@ const MainForm = () => {
   
     fetchWorkshops();
   }, []);  
-   
+  
+
+    // Fetch available payment methods from API
+    useEffect(() => {
+      if (hasFetchedPaymentMethods.current) {
+        return; 
+      } 
+      
+      hasFetchedPaymentMethods.current = true;  
+      setLoading(true);
+      
+      const fetchPaymentMethods= async () => {
+        try {
+          const response = await axios.get(`${process.env.REACT_APP_API_URL}/get_payment_methods.php`);
+    
+          if (response.data.success && Array.isArray(response.data.data)) {
+            setPaymentMethods(response.data.data);
+          } else {
+            throw new Error(response.data.message || "Failed to fetch payment methods - please try again later.");
+          }
+        } catch (err) {
+          setErrorGettingDataFromDB(err.message || "An error occurred while payment methods.");
+        } finally {
+          setLoading(false);
+        }
+      };
+    
+      fetchPaymentMethods();
+    }, []);  
 
   const nextStep = async () => {
     const isValid = await trigger();
@@ -144,11 +174,17 @@ const MainForm = () => {
     return <PageContain title="Register Onsite">Come back soon…</PageContain>;
   }
 
+  if(errorGettingDataFromDB) {
+    return <div className="alert alert-danger fw-bolder">{errorGettingDataFromDB}</div>
+  }
+
   return (
     <PageContain title="Register Onsite">
       {errorMsg && <div className="alert alert-danger fw-bolder">{errorMsg}</div>}
       {successMsg && <div className="alert alert-success fw-bolder">{successMsg}</div>}
       
+
+
       {step === 8 && successMsg ? (
         <>
           <h2>{cd.thank_you}</h2>
@@ -281,6 +317,7 @@ const MainForm = () => {
                 isDebugMode={isDebugMode}
                 initialData={initialData}
                 isEarlyBird={is_early_bird}
+                hasFetchedPaymentMethods={hasFetchedPaymentMethods}
                 errors={errors}
                 step={step}
                 stepTotal={totalStep}

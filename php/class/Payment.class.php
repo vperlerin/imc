@@ -6,7 +6,7 @@ class PaymentManager {
     public function __construct(PDO $pdo) {
         $this->pdo = $pdo;
     }
-
+  
     public function savePayment($participantId, $data) {
         $stmt = $this->pdo->prepare("
             INSERT INTO payments (participant_id, amount, payment_method_id, admin_note, created_at, updated_at)
@@ -25,4 +25,10 @@ class PaymentManager {
         $stmt->execute([$method]);
         return $stmt->fetchColumn();
     } 
+
+    public function getPaymentMethods() {
+        $stmt = $pdo->query("SELECT id, method FROM payment_methods");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } 
+    
 }
