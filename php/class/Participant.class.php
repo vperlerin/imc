@@ -372,6 +372,9 @@ class ParticipantManager
         $stmt->execute([':participant_id' => $participantId]);
         $accommodation = $stmt->fetch(PDO::FETCH_ASSOC);
 
+        // Add payment_method_id to accomodation since we deal with it on the accomodation page
+        $accommodation['payment_method_id'] = $participant['payment_method_id'];
+
         // 5. Fetch arrival/departure info
         $stmt = $this->pdo->prepare("
             SELECT *

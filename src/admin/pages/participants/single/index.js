@@ -133,6 +133,8 @@ const AdminParticipantsUser = () => {
     }
   };
 
+  console.log("Participant?  ", participant);
+
 
   const isOnline = participant?.participant?.is_online === "1";
   const breadcrumb = [
