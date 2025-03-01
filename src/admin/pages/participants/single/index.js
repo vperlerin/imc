@@ -27,14 +27,13 @@ const AdminParticipantsUser = () => {
   const [errorGettingDataFromDB, setErrorGettingDataFromDB] = useState(null);
   const [successMsg, setSuccessMsg] = useState(null);
   const [paymentMethods, setPaymentMethods] = useState([]);
-  const [workshops, setWorkshops] = useState([]);
+  const [workshops, setWorkshops] = useState([]); 
+  const [registrationTypes, setRegistrationTypes] = useState([]); 
   const [unsavedChanges, setUnsavedChanges] = useState(false);
   const [total, setTotal] = useState(0);
-  const [paypalFee, setPaypalFee] = useState(0);
+  const [paypalFee, setPaypalFee] = useState(0); 
   const activeTab = tab || "identity";
-  const hasFetchedWorkshops = useRef(false);
-
-  const hasFetchedPaymentMethods = useRef(false);
+  const hasFetcheData = useRef(false); 
   const navigate = useNavigate();
 
   const { control, register, handleSubmit, getValues, setValue, formState: { errors }, reset, trigger, watch } = useForm();
@@ -56,60 +55,37 @@ const AdminParticipantsUser = () => {
     }
   }, [tab, participantId, navigate]);
 
-  // Get workshops 
+
+  // Fetch available workshops, payment_methods & registration_types from API
   useEffect(() => {
-    if (hasFetchedWorkshops.current) {
+    if (hasFetcheData.current) {
       return;
     }
 
-    hasFetchedWorkshops.current = true;
+    hasFetcheData.current = true;
     setLoading(true);
 
-    const fetchWorkshops = async () => {
+    const fetchData = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/get_workshops.php`);
-
-        if (response.data.success && Array.isArray(response.data.data)) {
-          setWorkshops(response.data.data);
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/get_specific_data.php`);
+        if (response.data.success
+          && response.data.data.workshops
+          && response.data.data.payment_methods
+          && response.data.data.registration_types) {
+          setWorkshops(response.data.data.workshops);
+          setPaymentMethods(response.data.data.payment_methods);
+          setRegistrationTypes(response.data.data.registration_types);
         } else {
-          throw new Error(response.data.message || "Failed to fetch workshops - please try again later.");
+          throw new Error(response.data.message || "Failed to fetch data - please try again later.");
         }
       } catch (err) {
-        setErrorGettingDataFromDB(err.message || "An error occurred while fetching workshops.");
+        setErrorGettingDataFromDB(err.message || "An error occurred while fetching data.");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchWorkshops();
-  }, []);
-
-  // Fetch available payment methods from API
-  useEffect(() => {
-    if (hasFetchedPaymentMethods.current) {
-      return;
-    }
-
-    hasFetchedPaymentMethods.current = true;
-    setLoading(true);
-
-    const fetchPaymentMethods = async () => {
-      try {
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/get_payment_methods.php`);
-
-        if (response.data.success && Array.isArray(response.data.data)) {
-          setPaymentMethods(response.data.data);
-        } else {
-          throw new Error(response.data.message || "Failed to fetch payment methods - please try again later.");
-        }
-      } catch (err) {
-        setErrorGettingDataFromDB(err.message || "An error occurred while payment methods.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPaymentMethods();
+    fetchData();
   }, []);
 
   // Get participant data
@@ -193,9 +169,9 @@ const AdminParticipantsUser = () => {
 
     // Contribution
     const contributions = participant.contributions || [];
-    const talks   = contributions.filter(c => c.type === "talk");
+    const talks = contributions.filter(c => c.type === "talk");
     const posters = contributions.filter(c => c.type === "poster");
-    if(talks.length > 0 || posters.length > 0) { 
+    if (talks.length > 0 || posters.length > 0) {
       if (talks.length !== 0) {
         setValue('talks', talks);
       }
@@ -203,7 +179,7 @@ const AdminParticipantsUser = () => {
       if (posters.length !== 0) {
         setValue('posters', posters);
       }
-    } 
+    }
 
     // Accomodation
     const accomodation = participant.accomodation || [];
@@ -212,12 +188,10 @@ const AdminParticipantsUser = () => {
         setValue(key, accomodation[key]);
       }
     });
- 
-  
+
+
   }, [participant]);
 
-  console.log("PARTICIPANT", participant);
-  console.log("ALL VALUES? ", getValues());
 
   const onSubmit = async (formData) => {
     setSaving(true);
@@ -263,11 +237,11 @@ const AdminParticipantsUser = () => {
   if (errorGettingDataFromDB) {
     return <div className="alert alert-danger fw-bolder">{errorGettingDataFromDB}</div>
   }
- 
+
 
   return (
     <PageContain
-      breadcrumb={breadcrumb} 
+      breadcrumb={breadcrumb}
     >
       {loading || (error && !loading) || (!participant && !loading) || successMsg}
       <div className="position-relative">
@@ -332,7 +306,7 @@ const AdminParticipantsUser = () => {
                 isAdmin
                 conferenceData={cd}
                 register={register}
-                errors={errors} 
+                errors={errors}
                 setValue={setValue}
                 trigger={trigger}
               />
@@ -343,7 +317,7 @@ const AdminParticipantsUser = () => {
                 conferenceData={cd}
                 control={control}
                 register={register}
-                errors={errors} 
+                errors={errors}
                 getValues={getValues}
                 setValue={setValue}
                 watch={watch}
@@ -356,7 +330,7 @@ const AdminParticipantsUser = () => {
                 conferenceData={cd}
                 control={control}
                 register={register}
-                errors={errors} 
+                errors={errors}
                 paymentMethods={paymentMethods}
                 setValue={setValue}
                 trigger={trigger}

@@ -130,9 +130,7 @@ class SummaryFormatter
             $content .= "<br><b>Comments</b><br>{$data['comments']}<br>";
         }
 
-
-        var_dump($content);
-
+ 
         return $content;
     }
 }
