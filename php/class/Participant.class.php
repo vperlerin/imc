@@ -60,8 +60,12 @@ class ParticipantManager
                 ':paypal_fee' => $data['paypal_fee'],
                 ':total_due' => $data['total_due'],
                 ':comments' => $data['comments'] ?? null,
-                ':payment_method_id' => $data['payment_method_id'] ?? 0,
+                ':guardian_name' => $data['guardian_name'] ?? null,
+                ':guardian_contact' => $data['guardian_contact'] ?? null,
+                ':guardian_email' => $data['guardian_email'] ?? null,
+                ':payment_method_id' => (int) ($data['payment_method_id'] ?? 0),
             ]);
+
 
             $participantId = $this->pdo->lastInsertId();
 
