@@ -26,17 +26,6 @@ class ParticipantManager
                 throw new Exception("The email address '{$data['email']}' is already registered. Please use a different email or log in.");
             }
 
-            // Fetch the payment method ID
-            $stmt = $this->pdo->prepare("SELECT id FROM payment_methods WHERE method = :method");
-            $stmt->execute([':method' => $data['payment_method']]);
-            $paymentMethod = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            if (!$paymentMethod) {
-                throw new Exception("Invalid payment method: {$data['payment_method']}");
-            }
-
-            $paymentMethodId = $paymentMethod['id'];
-
             // Insert participant
             $stmt = $this->pdo->prepare("
                 INSERT INTO participants (
@@ -71,7 +60,7 @@ class ParticipantManager
                 ':paypal_fee' => $data['paypal_fee'],
                 ':total_due' => $data['total_due'],
                 ':comments' => $data['comments'] ?? null,
-                ':payment_method_id' => $paymentMethodId,
+                ':payment_method_id' => $data['payment_method_id'] ?? 0,
             ]);
 
             $participantId = $this->pdo->lastInsertId();

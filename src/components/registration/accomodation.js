@@ -31,10 +31,11 @@ const AccomodationForm = ({
   }, [initialData, setValue]);
 
   const fillTestData = () => {
-    setValue("registration_type", conferenceData.costs.rooms[1].type);
-    setValue("payment_method", "Paypal");
+    setValue("registration_type", conferenceData.costs.rooms[1]?.type || ""); 
+    setValue("payment_method_id", paymentMethods.length > 0 ? paymentMethods[0].id : ""); 
     trigger();
   };
+  
 
   return (
     <>
@@ -87,7 +88,6 @@ const AccomodationForm = ({
           </p>
         )}
 
-
         {/* Payment Method */}
         <div className="mb-3">
           <label className="fw-bold mb-2">Method of Payment</label>
@@ -97,12 +97,12 @@ const AccomodationForm = ({
                 <div key={method.id} className="form-check">
                   <input
                     type="radio"
-                    id={`payment-${method.method}`}
-                    className={classNames("form-check-input", { "is-invalid": errors.payment_method })}
-                    value={method.method}
-                    {...register("payment_method", { required: "Please select a payment method" })}
+                    id={`payment-${method.id}`}
+                    className={classNames("form-check-input", { "is-invalid": errors.payment_method_id })}
+                    value={method.id} // Now using payment_method_id as value
+                    {...register("payment_method_id", { required: "Please select a payment method" })}
                   />
-                  <label className="form-check-label d-block" htmlFor={`payment-${method.method}`}>
+                  <label className="form-check-label d-block" htmlFor={`payment-${method.id}`}>
                     {method.method}
                     <div className="form-text">
                       {method.method === "Paypal"
@@ -118,7 +118,7 @@ const AccomodationForm = ({
               <p className="text-danger"><small>No payment methods available.</small></p>
             )}
           </div>
-          {errors.payment_method && <p className="text-danger"><small>{errors.payment_method.message}</small></p>}
+          {errors.payment_method_id && <p className="text-danger"><small>{errors.payment_method_id.message}</small></p>}
         </div>
       </div>
     </>

@@ -43,6 +43,7 @@ const MainForm = () => {
   const [successMsg, setSuccessMsg] = useState(null);
   const [total, setTotal] = useState(0);
   const [paypalFee, setPaypalFee] = useState(0);
+  const [paymentMethods,  setPaymentMethods] = useState([]);
   const [workshops, setWorkshops] = useState([])
   const location = useLocation();
   const isDebugMode = new URLSearchParams(location.search).get("debug") === "1";
@@ -316,8 +317,8 @@ const MainForm = () => {
                 register={register}
                 isDebugMode={isDebugMode}
                 initialData={initialData}
-                isEarlyBird={is_early_bird}
-                hasFetchedPaymentMethods={hasFetchedPaymentMethods}
+                isEarlyBird={is_early_bird} 
+                paymentMethods={paymentMethods}
                 errors={errors}
                 step={step}
                 stepTotal={totalStep}
