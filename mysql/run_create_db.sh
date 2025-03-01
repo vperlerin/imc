@@ -7,8 +7,25 @@ if [ ! -f "$ENV_FILE" ]; then
     exit 1
 fi
 
-# Load .env file safely, preserving spaces in values
-export $(grep -v '^#' "$ENV_FILE" | xargs -d '\n')
+# Load .env file safely
+while IFS='=' read -r key value || [[ -n "$key" ]]; do
+    # Trim leading/trailing spaces
+    key=$(echo "$key" | xargs)
+    value=$(echo "$value" | xargs)
+
+    # Ignore comments and empty keys
+    if [[ -z "$key" || "$key" =~ ^# ]]; then
+        continue
+    fi
+
+    # Ensure key starts with a letter or underscore (valid for env vars)
+    if [[ "$key" =~ ^[a-zA-Z_][a-zA-Z0-9_]*$ ]]; then
+        export "$key=$value"
+    else
+        echo "Warning: Invalid environment variable key '$key' in $ENV_FILE. Skipping..."
+    fi
+done < "$ENV_FILE"
+
  
 TEMP_SQL="temp_create_db.sql"
 
