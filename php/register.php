@@ -145,8 +145,6 @@ try {
     $workshopManager = new WorkshopManager($pdo);
     $workshops = $workshopManager->getWorkshops(); // Fetch all workshops dynamically
 
-    var_dump($workshops);
-
     $subject = "IMC " . getenv("YEAR") . " Registration";
     $summary = SummaryFormatter::formatEmailContent($data, $workshops, true);
 

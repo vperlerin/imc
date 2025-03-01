@@ -1,0 +1,22 @@
+@use 'styles/index' as *; 
+
+
+.tab {
+  a {
+    color: var(--imc-text-muted);
+
+    &.active {
+      background-color: transparent !important;
+      color: var(--imc-primary);
+      font-weight: bolder;
+    }
+
+    &:hover {
+      text-decoration: none;
+    }
+  }
+}
+
+.contentMxw {
+  max-width: $max-width;
+}

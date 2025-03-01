@@ -1,31 +1,82 @@
+import classNames from 'classnames';
+import cssTabs from 'styles/components/tabs.module.scss';
+import axios from "axios";
 import PageContain from "@/admin/components/page-contain";
 import Loader from "components/loader";
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import { useParams } from "react-router-dom";
+import React, { useEffect, useRef, useState } from "react";
+import { useBlockNavigation } from "hooks/block-navigation.js";
+import { useParams, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { conferenceData as cd } from "data/conference-data";
-
-// Import all form components
 import Identitity from "components/registration/identity";
 import Workshops from "components/registration/workshops";
 import Arrival from "components/registration/arrival";
 import Contribution from "components/registration/contribution";
-import Accomodation from "components/registration/accomodation";
+import Accommodation from "components/registration/accomodation";
 import Extras from "components/registration/extras";
 import Comments from "components/registration/comments";
 import Summary from "components/billing/summary";
 
 const AdminParticipantsUser = () => {
+  const { participantId, tab } = useParams();
+  //
   const [participant, setParticipant] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
   const [successMsg, setSuccessMsg] = useState(null);
-  const [activeTab, setActiveTab] = useState("identity"); // Default tab
-  const { participantId } = useParams();
+  const [workshops, setWorkshops] = useState([]);
+  const [unsavedChanges, setUnsavedChanges] = useState(false);
+  const activeTab = tab || "identity";
+  const hasFetchedWorkshops = useRef(false);
+  const navigate = useNavigate();
 
-  const { control, register, handleSubmit, setValue, formState: { errors }, reset, watch } = useForm();
+  const { control, register, handleSubmit, setValue, formState: { errors, isDirty }, reset, trigger, watch } = useForm();
+
+  useBlockNavigation(unsavedChanges);
+
+  // Detect form changes
+  useEffect(() => {
+    const subscription = watch(() => {
+      setUnsavedChanges(true);
+    });
+    return () => subscription.unsubscribe();
+  }, [watch]);
+
+  // Redirect to default tab if none is provided
+  useEffect(() => {
+    if (!tab) {
+      navigate(`/admin/participants/onsite/${participantId}/identity`, { replace: true });
+    }
+  }, [tab, participantId, navigate]);
+
+  useEffect(() => {
+    if (hasFetchedWorkshops.current) {
+      return;
+    }
+
+    hasFetchedWorkshops.current = true;
+    setLoading(true);
+
+    const fetchWorkshops = async () => {
+      try {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/get_workshops.php`);
+
+        if (response.data.success && Array.isArray(response.data.data)) {
+          setWorkshops(response.data.data);
+        } else {
+          throw new Error(response.data.message || "Failed to fetch workshops - please try again later.");
+        }
+      } catch (err) {
+        setError(err.message || "An error occurred while fetching workshops.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchWorkshops();
+  }, []);
+
 
   useEffect(() => {
     const fetchParticipant = async () => {
@@ -57,6 +108,7 @@ const AdminParticipantsUser = () => {
   }, [participantId, reset]);
 
 
+
   const onSubmit = async (formData) => {
     setSaving(true);
     setError(null);
@@ -71,6 +123,7 @@ const AdminParticipantsUser = () => {
 
       if (response.data.success) {
         setSuccessMsg("Participant details updated successfully!");
+        setUnsavedChanges(false);
       } else {
         throw new Error(response.data.message || "Failed to update participant.");
       }
@@ -81,8 +134,30 @@ const AdminParticipantsUser = () => {
     }
   };
 
+
+  const isOnline = participant?.participant?.is_online === "1";
+  const breadcrumb = [
+    {
+      url: `/admin/participants/${isOnline ? 'online' : 'onsite'}`,
+      name: isOnline ? "Online Participants" : "Onsite Participants"
+    },
+    {
+      url: `/admin/participants/${isOnline ? 'online' : 'onsite'}/${participantId}/${activeTab}`,
+      name: `${participant?.participant?.first_name ?
+        participant.participant.first_name.charAt(0).toUpperCase() + participant.participant.first_name.slice(1)
+        : "Participant"} 
+        ${participant?.participant?.last_name || ""} - 
+        ${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}`
+    }
+  ];
+
+
   return (
-    <PageContain title={loading ? '' : `Edit Participant: ${participant?.participant.first_name} ${participant?.participant.last_name}`}>
+    <PageContain
+      breadcrumb={breadcrumb}
+      title={loading ? '' : `Edit Participant: ${participant?.participant.first_name} ${participant?.participant.last_name}`}
+    >
+      {loading || (error && !loading) || (!participant && !loading) || successMsg}
       <div className="position-relative">
         {loading && <Loader />}
         {error && !loading && <div className="alert alert-danger">{error}</div>}
@@ -92,64 +167,68 @@ const AdminParticipantsUser = () => {
 
       {!loading && participant && (
         <form onSubmit={handleSubmit(onSubmit)}>
-
-          {/* Bootstrap Nav Tabs */}
-          <ul className="nav nav-tabs mb-3">
-            <li className="nav-item">
-              <button className={`nav-link ${activeTab === "identity" ? "active" : ""}`} onClick={(e) => { e.preventDefault(); setActiveTab("identity"); }}>
-                Identity
-              </button>
-            </li>
-            <li className="nav-item">
-              <button className={`nav-link ${activeTab === "workshops" ? "active" : ""}`} onClick={(e) => { e.preventDefault(); setActiveTab("workshops"); }}>
-                Workshops
-              </button>
-            </li>
-            <li className="nav-item">
-              <button className={`nav-link ${activeTab === "arrival" ? "active" : ""}`} onClick={(e) => { e.preventDefault(); setActiveTab("arrival"); }}>
-                Arrival
-              </button>
-            </li>
-            <li className="nav-item">
-              <button className={`nav-link ${activeTab === "contribution" ? "active" : ""}`} onClick={(e) => { e.preventDefault(); setActiveTab("contribution"); }}>
-                Contribution
-              </button>
-            </li>
-            <li className="nav-item">
-              <button className={`nav-link ${activeTab === "accommodation" ? "active" : ""}`} onClick={(e) => { e.preventDefault(); setActiveTab("accommodation"); }}>
-                Accommodation
-              </button>
-            </li>
-            <li className="nav-item">
-              <button className={`nav-link ${activeTab === "extras" ? "active" : ""}`} onClick={(e) => { e.preventDefault(); setActiveTab("extras"); }}>
-                Extras
-              </button>
-            </li>
-            <li className="nav-item">
-              <button className={`nav-link ${activeTab === "comments" ? "active" : ""}`} onClick={(e) => { e.preventDefault(); setActiveTab("comments"); }}>
-                Comments
-              </button>
-            </li>
-            <li className="nav-item">
-              <button className={`nav-link ${activeTab === "summary" ? "active" : ""}`} onClick={(e) => { e.preventDefault(); setActiveTab("summary"); }}>
-                Summary
-              </button>
-            </li>
-
+          <ul className={classNames('nav nav-tabs mb-3 mt-2', cssTabs.tab)}>
+            {[
+              { key: "identity", label: "Identity" },
+              { key: "workshops", label: "Workshops" },
+              { key: "arrival", label: "Arrival" },
+              { key: "contribution", label: "Contribution" },
+              { key: "accommodation", label: "Accommodation" },
+              { key: "extras", label: "Extras" },
+              { key: "comments", label: "Comments" },
+              { key: "summary", label: "Summary" }
+            ].map(({ key, label }) => (
+              <li className="nav-item" key={key}>
+                <a
+                  className={`nav-link ${activeTab === key ? `active ${cssTabs.active}` : ""}`}
+                  href={`/admin/participants/onsite/${participantId}/${key}`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    navigate(`/admin/participants/onsite/${participantId}/${key}`);
+                  }}
+                >
+                  {label}
+                </a>
+              </li>
+            ))}
           </ul>
-
           {/* Tab Content */}
-          <div className="tab-content">
-            {activeTab === "identity" && (
-              <Identitity isAdmin register={register} errors={errors} initialData={participant.participant} setValue={setValue} />
+          <div className={classNames('tab-content mx-auto', cssTabs.contentMxw)}>
+            {tab === "identity" && (
+              <Identitity
+                isAdmin
+                register={register}
+                errors={errors}
+                initialData={participant.participant}
+                setValue={setValue} 
+                trigger={trigger}
+              />
             )}
-            {activeTab === "workshops" && (
-              <Workshops isAdmin conferenceData={cd} register={register} errors={errors} initialData={participant.workshops} setValue={setValue} watch={watch} />
+            {tab === "workshops" && (
+              <Workshops
+                isAdmin
+                conferenceData={cd}
+                register={register}
+                errors={errors}
+                initialData={participant.workshops}
+                setValue={setValue}
+                watch={watch}
+                workshops={workshops}
+                trigger={trigger}
+              />
             )}
-            {activeTab === "arrival" && (
-              <Arrival isAdmin conferenceData={cd} register={register} errors={errors} initialData={participant.arrival} setValue={setValue} />
+            {tab === "arrival" && (
+              <Arrival 
+                isAdmin 
+                conferenceData={cd} 
+                register={register} 
+                errors={errors} 
+                initialData={participant.arrival} 
+                setValue={setValue}  
+                trigger={trigger}
+              />
             )}
-            {activeTab === "contribution" && (
+            {tab === "contribution" && (
               <Contribution
                 isAdmin
                 conferenceData={cd}
@@ -157,31 +236,52 @@ const AdminParticipantsUser = () => {
                 register={register}
                 errors={errors}
                 initialData={{
-                  talks: participant.contributions.filter(c => c.type === 'talk') || [],
-                  posters: participant.contributions.filter(c => c.type === 'poster') || [],
+                  talks: participant.contributions.filter(c => c.type === "talk") || [],
+                  posters: participant.contributions.filter(c => c.type === "poster") || [],
                 }}
                 setValue={setValue}
-                watch={watch}
+                watch={watch} 
+                trigger={trigger}
               />
             )}
-            {activeTab === "accommodation" && (
-              <Accomodation control={control} register={register} errors={errors} initialData={participant.accommodation} setValue={setValue} />
+            {tab === "accommodation" && (
+              <Accommodation 
+                control={control} 
+                register={register} 
+                errors={errors} 
+                initialData={participant.accommodation} 
+                setValue={setValue} 
+                trigger={trigger}
+              />
             )}
-            {activeTab === "extras" && (
-              <Extras register={register} errors={errors} initialData={participant.extra_options} setValue={setValue} />
+            {tab === "extras" && (
+              <Extras 
+                register={register} 
+                errors={errors} 
+                initialData={participant.extra_options} 
+                setValue={setValue}  
+                trigger={trigger}
+              />
             )}
-            {activeTab === "comments" && (
-              <Comments register={register} errors={errors} initialData={participant.participant} setValue={setValue} />
+            {tab === "comments" && (
+              <Comments 
+                register={register} 
+                errors={errors} 
+                initialData={participant.participant} 
+                setValue={setValue}  
+                trigger={trigger}
+              />
             )}
-            {activeTab === "summary" && (
-              <Summary getValues={() => participant} setValue={setValue} />
+            {tab === "summary" && (
+              <Summary 
+                getValues={() => participant} 
+                setValue={setValue} 
+              />
             )}
-          </div>
 
-          <div className="mt-4 d-flex justify-content-end">
-            <button type="submit" className="btn btn-outline-primary fw-bolder" disabled={saving}>
-              {saving ? "Saving..." : "Save Changes"}
-            </button>
+            <div className="mt-4 d-flex justify-content-end">
+              <button type="submit" className="btn btn-outline-primary fw-bolder" disabled={saving}>{saving ? "Saving..." : "Save Changes"}</button>
+            </div>
           </div>
         </form>
       )}

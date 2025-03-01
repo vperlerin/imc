@@ -65,7 +65,7 @@ const ContributionForm = ({
             addPoster({
               ...poster,
               session: poster.session_name,  // Use session_name
-              printOnSite: poster.print === "1" ? "true" : "false"
+              print: poster.print === "1" ? "true" : "false"
             })
           );
         }
@@ -79,7 +79,7 @@ const ContributionForm = ({
     const isValid = await trigger();
     if (isValid) {
       if (type === "talk") addTalk({});
-      else if (!isOnline) addPoster({ printOnSite: false }); // Default printOnSite to false
+      else if (!isOnline) addPoster({ print: false }); // Default print to false
     }
   };
 
@@ -107,7 +107,7 @@ const ContributionForm = ({
         abstract: "An overview of detecting meteors using radio waves.",
         session: "Radio meteor work",
         paperDate: "after_imc",
-        printOnSite: "true",  
+        print: "true",  
       });
     }
   };

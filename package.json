@@ -12,6 +12,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@loadable/component": "^5.16.4",
     "@popperjs/core": "^2.11.8",
     "@react-spring/web": "9.6.1",
     "@reduxjs/toolkit": "^2.2.1",

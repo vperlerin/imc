@@ -137,7 +137,7 @@ class ParticipantManager
                 ':excursion' => filter_var($data['excursion'], FILTER_VALIDATE_BOOLEAN),
                 ':buy_tshirt' => filter_var($data['buy_tshirt'], FILTER_VALIDATE_BOOLEAN),
                 ':tshirt_size' => $data['tshirt_size'] ?? null,
-                ':proceedings' => $data['posters'][0]['printOnSite'] === "true" ? "pdf_printed" : "pdf"
+                ':proceedings' => $data['posters'][0]['print'] === "true" ? "pdf_printed" : "pdf"
             ]);
 
     
@@ -175,7 +175,7 @@ class ParticipantManager
                     ':session' => $poster['session'],
                     ':duration' => null,
                     ':paper_submission' => $poster['paperDate'],
-                    ':print' => filter_var($poster['printOnSite'], FILTER_VALIDATE_BOOLEAN)  
+                    ':print' => filter_var($poster['print'], FILTER_VALIDATE_BOOLEAN)  
                 ]);
             }
     

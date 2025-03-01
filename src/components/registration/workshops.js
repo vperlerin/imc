@@ -2,8 +2,7 @@ import classNames from "classnames";
 import cssForm from "styles/components/form.module.scss";
 import React, { useEffect, useState } from "react";
 import StepDislay from "components/registration/stepDisplay";
-import Loader from "components/loader";
-import axios from "axios";
+import Loader from "components/loader"; 
 import { formatFullDate } from 'utils/date';
 
 const Workshops = ({
@@ -16,34 +15,11 @@ const Workshops = ({
   stepTotal,
   trigger,
   setValue,
-  watch
-}) => {
-  const [workshops, setWorkshops] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  console.log("INITIAL DATA (Participant Workshops):", initialData);
-
-  // Fetch available workshops from API
-  useEffect(() => {
-    const fetchWorkshops = async () => {
-      try {
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/get_workshops.php`);
-        if (response.data.success) {
-          setWorkshops(response.data.data);
-        } else {
-          throw new Error(response.data.message || "Failed to fetch workshops.");
-        }
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchWorkshops();
-  }, []);
-
+  watch,
+  workshops,
+}) => { 
+  
+   
   // Pre-fill form values based on participant's registered workshops (initialData)
   useEffect(() => {
     if (initialData?.length > 0 && workshops.length > 0) {
@@ -54,9 +30,7 @@ const Workshops = ({
       });
     }
   }, [initialData, workshops, setValue]);
-
-  if (loading) return <><Loader /><p>Loading workshops...</p></>;
-  if (error) return <p className="text-danger">{error}</p>;
+ 
 
   return (
     <div className="position-relative">

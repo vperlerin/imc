@@ -1,5 +1,11 @@
-import { SlArrowLeft, SlArrowRight } from "react-icons/sl";
 import { CiWarning } from "react-icons/ci";
+import { SlArrowLeft, SlArrowRight } from "react-icons/sl";
+import axios from "axios";
+import React, { useEffect, useRef, useState } from "react";
+import { useForm } from "react-hook-form";
+import { useLocation } from "react-router-dom";
+import { conferenceData as cd } from "data/conference-data";
+import { formatFullDate } from "utils/date";
 import css from "./index.module.scss";
 import Accomodation from "components/registration/accomodation.js";
 import Arrival from "components/registration/arrival.js";
@@ -9,15 +15,9 @@ import Extras from "components/registration/extras.js";
 import Identitity from "components/registration/identity.js";
 import Loader from "components/loader";
 import PageContain from "components/page-contain";
-import PayPalForm from 'components/paypal';
-import React, { useState } from "react";
+import PayPalForm from "components/paypal";
 import Summary from "components/billing/summary/";
 import Workshops from "components/registration/workshops";
-import { conferenceData as cd } from "data/conference-data";
-import { formatFullDate } from 'utils/date';
-import { useForm } from "react-hook-form";
-import { useLocation } from "react-router-dom";
-import axios from "axios";
 
 const totalStep = 8;
 
@@ -34,7 +34,6 @@ const calculateAge = (dob) => {
   return age;
 };
 
-
 const MainForm = () => {
   const [finalData, setFinalData] = useState(null);
   const [step, setStep] = useState(1);
@@ -43,8 +42,10 @@ const MainForm = () => {
   const [successMsg, setSuccessMsg] = useState(null);
   const [total, setTotal] = useState(0);
   const [paypalFee, setPaypalFee] = useState(0);
+  const [workshops, setWorkshops] = useState([])
   const location = useLocation();
   const isDebugMode = new URLSearchParams(location.search).get("debug") === "1";
+  const hasFetched = useRef(false);
 
   const {
     control,
@@ -64,6 +65,35 @@ const MainForm = () => {
 
   const initialData = null;
   const is_early_bird = initialData?.is_early_bird || new Date() < new Date(cd.deadlines.early_birds);
+
+  // Fetch available workshops from API
+  useEffect(() => {
+    if (hasFetched.current) {
+      return; 
+    } 
+    
+    hasFetched.current = true;  
+    setLoading(true);
+    
+    const fetchWorkshops = async () => {
+      try {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/get_workshops.php`);
+  
+        if (response.data.success && Array.isArray(response.data.data)) {
+          setWorkshops(response.data.data);
+        } else {
+          throw new Error(response.data.message || "Failed to fetch workshops - please try again later.");
+        }
+      } catch (err) {
+        setError(err.message || "An error occurred while fetching workshops.");
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    fetchWorkshops();
+  }, []);  
+   
 
   const nextStep = async () => {
     const isValid = await trigger();
@@ -118,7 +148,7 @@ const MainForm = () => {
     <PageContain title="Register Onsite">
       {errorMsg && <div className="alert alert-danger fw-bolder">{errorMsg}</div>}
       {successMsg && <div className="alert alert-success fw-bolder">{successMsg}</div>}
-
+      
       {step === 8 && successMsg ? (
         <>
           <h2>{cd.thank_you}</h2>
@@ -154,8 +184,9 @@ const MainForm = () => {
             setTotal={setTotal}
             setPaypalFee={setPaypalFee}
             initialData={initialData}
-            showInfo={false}
-          /> 
+            showInfo
+            workshops={workshops}
+          />
         </>
       ) :
         (
@@ -208,6 +239,7 @@ const MainForm = () => {
                 setValue={setValue}
                 trigger={trigger}
                 watch={watch}
+                workshops={workshops}
               />
             )}
             {step === 3 &&
@@ -295,6 +327,7 @@ const MainForm = () => {
                 setPaypalFee={setPaypalFee}
                 initialData={initialData}
                 showInfo={!successMsg}
+                workshops={workshops}
               />
             )}
 

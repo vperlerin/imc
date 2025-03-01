@@ -19,7 +19,6 @@ const AdminParticipantsOnsite = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showHardDeleteConfirm, setShowHardDeleteConfirm] = useState(false);
 
-
   useEffect(() => {
     const fetchParticipants = async () => {
       try {
@@ -88,8 +87,13 @@ const AdminParticipantsOnsite = () => {
     }
   };
 
+  const breadcrumb = [
+    { url: "/admin/participants/onsite", name: "Onsite Participants" },
+  ];
+
   return (
     <PageContain
+      breadcrumb={breadcrumb}
       title="Onsite Participants"
       rightContent={
         <>

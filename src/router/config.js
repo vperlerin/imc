@@ -79,8 +79,7 @@ const routeConfig = [
   // ADMIN (protected routes)
   { path: "/admin/dashboard", element: <ProtectedRoute><lazyPages.AdminDashboard /></ProtectedRoute>},
   { path: "/admin/participants/onsite", element: <ProtectedRoute><lazyPages.AdminParticipantsOnsite /></ProtectedRoute>},
-  { path: "/admin/participants/onsite/:participantId", element: (<ProtectedRoute><lazyPages.AdminParticipantsUser/></ProtectedRoute> ),
-  },
+  { path: "/admin/participants/onsite/:participantId/:tab?", element: (<ProtectedRoute><lazyPages.AdminParticipantsUser/></ProtectedRoute>) },
   // 404
   { path: "*", element: <Placeholder title="Oops! Looks like you’ve taken a wrong turn into the meteor shower. This page has burned up in the atmosphere!" /> },
 ];

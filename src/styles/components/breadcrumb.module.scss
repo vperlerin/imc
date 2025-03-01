@@ -1,0 +1,14 @@
+.nav {
+  align-items: center;
+
+  li a {
+    display: flex;
+    align-items: center;
+  }
+
+  li svg {
+    vertical-align: middle;
+    width: 1.3em;
+    height: 1.3em;
+  }
+}

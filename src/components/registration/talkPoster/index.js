@@ -17,6 +17,8 @@ const TalkPosterForm = ({
 }) => {
   const isTalk = type === "talk"; 
 
+  console.log("INIT VALUES FOR TALK/POSTER ", initialValues);
+
   return (
     <div className="border rounded-2 p-3 mb-3 mx-md-5">
       <h5 className="fw-bold d-flex justify-content-between align-items-start mb-3 border-bottom pb-2">
@@ -126,24 +128,24 @@ const TalkPosterForm = ({
             <input
               type="radio"
               className="btn-check"
-              id={`printOnSiteYes${index}`}
+              id={`printYes${index}`}
               value="true"
-              {...register(`${type}s.${index}.printOnSite`, { required: "Please select an option" })}
+              {...register(`${type}s.${index}.print`, { required: "Please select an option" })}
               defaultChecked={initialValues.print === "true"}
             />
-            <label className="btn btn-outline-neutral" htmlFor={`printOnSiteYes${index}`}>
+            <label className="btn btn-outline-neutral" htmlFor={`printYes${index}`}>
               Yes
             </label>
 
             <input
               type="radio"
               className="btn-check"
-              id={`printOnSiteNo${index}`}
+              id={`printNo${index}`}
               value="false"
-              {...register(`${type}s.${index}.printOnSite`, { required: "Please select an option" })}
+              {...register(`${type}s.${index}.print`, { required: "Please select an option" })}
               defaultChecked={initialValues.print === "false"}
             />
-            <label className="btn btn-outline-neutral" htmlFor={`printOnSiteNo${index}`}>
+            <label className="btn btn-outline-neutral" htmlFor={`printNo${index}`}>
               No
             </label>
           </div>
