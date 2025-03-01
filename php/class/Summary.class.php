@@ -4,7 +4,7 @@ require_once __DIR__ . "/../config.php";
 
 class SummaryFormatter
 {
-    public static function formatEmailContent(array $data, bool $withPwd): string
+    public static function formatEmailContent(array $data, array $workshops, bool $withPwd): string
     {
         $content = "";
 
@@ -35,15 +35,17 @@ class SummaryFormatter
             <b>Address:</b> {$data['address']}, {$data['postal_code']}, {$data['city']}, {$data['country']}<br>
         ";
 
-        // WORKSHOPS
-        if ($data['Spectroscopy Workshop'] === "true" || $data['Radio Workshop'] === "true") { 
-            if ($data['Spectroscopy Workshop'] === "true") {
-                $content .= "<b>Spectroscopy Workshop:</b> Yes<br>";
+        // WORKSHOPS (Dynamically fetched from DB)
+        $workshopList = [];
+        foreach ($workshops as $workshop) {
+            $workshopTitle = $workshop['title']; // Assuming each workshop has a 'title' column
+            if (!empty($data['workshops'][$workshopTitle]) && $data['workshops'][$workshopTitle] === "true") {
+                $workshopList[] = "<b>{$workshopTitle}:</b> Yes";
             }
+        }
 
-            if ($data['Radio Workshop'] === "true") {
-                $content .= "<b>Radio Workshop: Yes</b><br>";
-            }
+        if (!empty($workshopList)) {
+            $content .= "<br><b>Workshops</b><br>" . implode("<br>", $workshopList) . "<br>";
         }
 
         // ARRIVAL & DEPARTURE
@@ -109,7 +111,7 @@ class SummaryFormatter
         if (!empty($data['comments'])) {
             $content .= "<br><b>Comments</b><br>{$data['comments']}<br>";
         }
- 
+
         return $content;
     }
 }

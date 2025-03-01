@@ -137,35 +137,41 @@ try {
         throw new Exception("The email address '{$data['email']}' is already in use. Please use a different email.");
     }
 
-    // Save participant
-    $participant_id = $participantManager->saveParticipant($data, $password_hash);
+// Save participant
+$participant_id = $participantManager->saveParticipant($data, $password_hash);
 
-    $subject = "IMC " . getenv("YEAR") . " Registration";
-    $summary = SummaryFormatter::formatEmailContent($data, true);
+$subject = "IMC " . getenv("YEAR") . " Registration";
+$summary = SummaryFormatter::formatEmailContent($data, true);
 
-    // Send confirmation email
-    $mail = new Mail();
-    $message = create_email($data, $summary);
-    $emailResponse = $mail->sendEmail([$data['email']], $subject, $message);
+// Send confirmation email
+$mail = new Mail();
+$message = create_email($data, $summary);
+$emailResponse = $mail->sendEmail([$data['email']], $subject, $message);
 
-    // Send workshop-specific emails
-    foreach (["Spectroscopy Workshop", "Radio Workshop"] as $workshopTitle) {
-        if (!empty($data[$workshopTitle]) && $data[$workshopTitle] === "true") {
-            $workshopContact = ConferenceData::getWorkshopEmailTo($workshopTitle);
+// Get all workshops from the database
+$workshopManager = new WorkshopManager();
+$workshops = $workshopManager->getWorkshops(); // Fetch all workshops dynamically
 
-            if ($workshopContact && isset($workshopContact['email'])) {
-                $workshopMessage = create_email_workshop($data, $workshopTitle, $workshopContact, $participantManager);
-                $workshopMail = new Mail();
-                $workshopMail->sendEmail(
-                    [$workshopContact['email']], 
-                    "New {$workshopTitle} registration",
-                    $workshopMessage, 
-                    $workshopContact['email'], 
-                    is_array(getenv('BCC_ALL')) ? getenv('BCC_ALL') : explode(',', getenv('BCC_ALL'))
-                );
-            }
+// Send workshop-specific emails
+foreach ($workshops as $workshop) {
+    $workshopTitle = $workshop['title']; // Assuming the table has a 'title' column
+
+    if (!empty($data['workshops'][$workshopTitle]) && $data['workshops'][$workshopTitle] === "true") {
+        $workshopContact = ConferenceData::getWorkshopEmailTo($workshopTitle);
+
+        if ($workshopContact && isset($workshopContact['email'])) {
+            $workshopMessage = create_email_workshop($data, $workshopTitle, $workshopContact, $participantManager);
+            $workshopMail = new Mail();
+            $workshopMail->sendEmail(
+                [$workshopContact['email']], 
+                "New {$workshopTitle} registration",
+                $workshopMessage, 
+                $workshopContact['email'], 
+                is_array(getenv('BCC_ALL')) ? getenv('BCC_ALL') : explode(',', getenv('BCC_ALL'))
+            );
         }
     }
+}
 
     echo json_encode([
         "success" => true,
