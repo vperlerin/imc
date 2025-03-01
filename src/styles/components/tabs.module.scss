@@ -6,11 +6,19 @@
     color: var(--imc-text-muted);
 
     &.active {
-      background-color: transparent !important;
+      border-color: var(--bs-nav-tabs-link-active-border-color) !important;
       color: var(--imc-primary) !important;
-      border-bottom-color: var(--imc-bg) !important;
       font-weight: bolder;
+      border-radius: var(--bs-nav-tabs-border-radius) !important;
+
+      @include media-breakpoint-up(md) {
+        background-color: transparent !important; 
+        border-bottom-color: var(--imc-bg) !important;
+        
+      }
     }
+
+   
 
     &:hover {
       text-decoration: none;

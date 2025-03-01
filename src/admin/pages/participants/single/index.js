@@ -232,7 +232,7 @@ const AdminParticipantsUser = () => {
         
       {!loading && participant && isSummaryReady && (
         <form onSubmit={handleSubmit(onSubmit)}>
-          <ul className={classNames('nav nav-tabs mb-3 mt-2', cssTabs.tab)}>
+          <ul className={classNames('nav nav-tabs mb-3 mt-2', cssTabs.tab, 'flex-column flex-sm-row')}>
             {[
               { key: "identity", label: "Identity" },
               { key: "workshops", label: "Workshops" },
