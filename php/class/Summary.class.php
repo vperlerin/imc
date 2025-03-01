@@ -4,7 +4,7 @@ require_once __DIR__ . "/../config.php";
 
 class SummaryFormatter
 {
-    public static function formatEmailContent(array $data, array $workshops, bool $withPwd): string
+    public static function formatEmailContent(array $data, array $workshops, array $paymentMethods, bool $withPwd): string
     {
         $content = "";
 
@@ -60,12 +60,17 @@ class SummaryFormatter
             $content .= "<b>Travel Details:</b> {$data['travelling_details']}<br>";
         }
 
-        // REGISTRATION TYPE & PAYMENT METHOD
+        // Get the payment method name from the paymentMethods array using the ID
+        $paymentMethodName = isset($paymentMethods[$data['payment_method_id']])
+            ? $paymentMethods[$data['payment_method_id']]
+            : "Unknown";
+
         $content .= "
-           <br><b>Registration & Payment</b><br>
-           <b>Registration Type:</b> {$data['registration_type']}<br>
-           <b>Payment Method:</b> {$data['payment_method']}<br>
+            <br><b>Registration & Payment</b><br>
+            <b>Registration Type:</b> {$data['registration_type']}<br>
+            <b>Payment Method:</b> {$paymentMethodName}<br>
         ";
+
 
         // TALKS
         if (!empty($data['talks'])) {
