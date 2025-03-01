@@ -126,18 +126,7 @@ class ParticipantManager
                 ':participant_id' => $participantId,
                 ':registration_type' => $data['registration_type']
             ]);
-
-            // Insert payment details
-            $stmt = $this->pdo->prepare("
-                INSERT INTO payments (participant_id, payment_date, amount, payment_method_id, created_at, updated_at)
-                VALUES (:participant_id, NOW(), :amount, (SELECT id FROM payment_methods WHERE method = :payment_method), NOW(), NOW())
-            ");
-            $stmt->execute([
-                ':participant_id' => $participantId,
-                ':amount' => $data['total_due'],
-                ':payment_method' => $data['payment_method']
-            ]);
-
+ 
             // Insert extra options
             $stmt = $this->pdo->prepare("
                 INSERT INTO extra_options (participant_id, excursion, buy_tshirt, tshirt_size, proceedings, created_at, updated_at)

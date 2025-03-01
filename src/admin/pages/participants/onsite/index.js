@@ -38,6 +38,7 @@ const AdminParticipantsOnsite = () => {
     fetchParticipants();
   }, []);
 
+  
   useEffect(() => {
     if (!searchQuery) {
       setFilteredParticipants(participants);
