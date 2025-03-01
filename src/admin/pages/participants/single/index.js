@@ -200,7 +200,7 @@ const AdminParticipantsUser = () => {
                 register={register}
                 errors={errors}
                 initialData={participant.participant}
-                setValue={setValue} 
+                setValue={setValue}
                 trigger={trigger}
               />
             )}
@@ -218,13 +218,13 @@ const AdminParticipantsUser = () => {
               />
             )}
             {tab === "arrival" && (
-              <Arrival 
-                isAdmin 
-                conferenceData={cd} 
-                register={register} 
-                errors={errors} 
-                initialData={participant.arrival} 
-                setValue={setValue}  
+              <Arrival
+                isAdmin
+                conferenceData={cd}
+                register={register}
+                errors={errors}
+                initialData={participant.arrival}
+                setValue={setValue}
                 trigger={trigger}
               />
             )}
@@ -240,42 +240,44 @@ const AdminParticipantsUser = () => {
                   posters: participant.contributions.filter(c => c.type === "poster") || [],
                 }}
                 setValue={setValue}
-                watch={watch} 
+                watch={watch}
                 trigger={trigger}
               />
             )}
             {tab === "accommodation" && (
-              <Accommodation 
-                control={control} 
-                register={register} 
-                errors={errors} 
-                initialData={participant.accommodation} 
-                setValue={setValue} 
+              <Accommodation
+                isAdmin
+                conferenceData={cd}
+                control={control}
+                register={register}
+                errors={errors}
+                initialData={participant.accommodation}
+                setValue={setValue}
                 trigger={trigger}
               />
             )}
             {tab === "extras" && (
-              <Extras 
-                register={register} 
-                errors={errors} 
-                initialData={participant.extra_options} 
-                setValue={setValue}  
+              <Extras
+                register={register}
+                errors={errors}
+                initialData={participant.extra_options}
+                setValue={setValue}
                 trigger={trigger}
               />
             )}
             {tab === "comments" && (
-              <Comments 
-                register={register} 
-                errors={errors} 
-                initialData={participant.participant} 
-                setValue={setValue}  
+              <Comments
+                register={register}
+                errors={errors}
+                initialData={participant.participant}
+                setValue={setValue}
                 trigger={trigger}
               />
             )}
             {tab === "summary" && (
-              <Summary 
-                getValues={() => participant} 
-                setValue={setValue} 
+              <Summary
+                getValues={() => participant}
+                setValue={setValue}
               />
             )}
 

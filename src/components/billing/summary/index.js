@@ -19,9 +19,7 @@ const Summary = ({
   workshops,
 }) => {
   const allValues = initialData || getValues();
-
-  console.log("allValues ", allValues);
-  console.log("workshops ", workshops);
+ 
 
   // Registration & Accommodation Cost
   const registration_type = allValues.registration_type || "no"; // Default to "no"
@@ -34,13 +32,8 @@ const Summary = ({
   const selectedWorkshops = workshops.filter(workshop => allValues.workshops?.[workshop.id] === "true");
 
   //  Helper function to get workshop cost
-  const getWorkshopCost = (workshop, isOnline) => {  
-    console.log("WORKSHOP ", workshop);
-    console.log("COST ", workshop.price);
-
-
-    const cost = isOnline ? workshop.price_online : workshop.price;  
-    console.log("COMP c", cost);
+  const getWorkshopCost = (workshop, isOnline) => {   
+    const cost = isOnline ? workshop.price_online : workshop.price;   
     return parseFloat(cost) || 0;  
   };
   //  Calculate workshop costs

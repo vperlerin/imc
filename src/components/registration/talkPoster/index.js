@@ -15,9 +15,7 @@ const TalkPosterForm = ({
   talkDurations = [],
   initialValues = {},
 }) => {
-  const isTalk = type === "talk"; 
-
-  console.log("INIT VALUES FOR TALK/POSTER ", initialValues);
+  const isTalk = type === "talk";  
 
   return (
     <div className="border rounded-2 p-3 mb-3 mx-md-5">
@@ -131,7 +129,7 @@ const TalkPosterForm = ({
               id={`printYes${index}`}
               value="true"
               {...register(`${type}s.${index}.print`, { required: "Please select an option" })}
-              defaultChecked={initialValues.print === "true"}
+              defaultChecked={initialValues.print === "true" || initialValues.print === "1" }
             />
             <label className="btn btn-outline-neutral" htmlFor={`printYes${index}`}>
               Yes
@@ -143,7 +141,7 @@ const TalkPosterForm = ({
               id={`printNo${index}`}
               value="false"
               {...register(`${type}s.${index}.print`, { required: "Please select an option" })}
-              defaultChecked={initialValues.print === "false"}
+              defaultChecked={initialValues.print === "false" || initialValues.print === "0"}
             />
             <label className="btn btn-outline-neutral" htmlFor={`printNo${index}`}>
               No

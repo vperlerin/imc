@@ -20,12 +20,12 @@ class ParticipantManager
     {
         try {
             $this->pdo->beginTransaction();
-    
+
             // Check if email exists
             if ($this->emailExists($data['email'])) {
                 throw new Exception("The email address '{$data['email']}' is already registered. Please use a different email or log in.");
             }
-    
+
             // Insert participant
             $stmt = $this->pdo->prepare("
                 INSERT INTO participants (
@@ -38,7 +38,7 @@ class ParticipantManager
                     :password_hash, :paypal_fee, :total_due, 0.00, 'active', NULL, :comments, NOW(), NOW()
                 )
             ");
-    
+
             $stmt->execute([
                 ':title' => $data['title'],
                 ':first_name' => $data['first_name'],
@@ -60,7 +60,6 @@ class ParticipantManager
                 ':comments' => $data['comments'] ?? null
             ]);
 
-            
             $participantId = $this->pdo->lastInsertId();
 
             // Fetch all available workshops from the database
@@ -85,6 +84,18 @@ class ParticipantManager
                     }
                 }
             }
+
+            // **Insert payment details**
+            $stmt = $this->pdo->prepare("
+                INSERT INTO payments (participant_id, payment_date, amount, payment_method_id, created_at, updated_at)
+                VALUES (:participant_id, NOW(), :amount, (SELECT id FROM payment_methods WHERE method = :payment_method LIMIT 1), NOW(), NOW())
+            ");
+
+            $stmt->execute([
+                ':participant_id' => $participantId,
+                ':amount' => 0,
+                ':payment_method' => $data['payment_method']
+            ]); 
 
             // Insert arrival details
             $stmt = $this->pdo->prepare("
@@ -140,15 +151,13 @@ class ParticipantManager
                 ':proceedings' => $data['posters'][0]['print'] === "true" ? "pdf_printed" : "pdf"
             ]);
 
-    
 
-    
             // Insert talks and posters with print flag
             $stmt = $this->pdo->prepare("
                 INSERT INTO contributions (participant_id, type, title, authors, abstract, session_id, duration, paper_submission, print, created_at, updated_at)
                 VALUES (:participant_id, :type, :title, :authors, :abstract, (SELECT id FROM imc_sessions WHERE name = :session), :duration, :paper_submission, :print, NOW(), NOW())
             ");
-    
+
             // Insert talks
             foreach ($data['talks'] as $talk) {
                 $stmt->execute([
@@ -160,10 +169,10 @@ class ParticipantManager
                     ':session' => $talk['session'],
                     ':duration' => $talk['duration'],
                     ':paper_submission' => $talk['paperDate'],
-                    ':print' => FALSE  
+                    ':print' => FALSE
                 ]);
             }
-    
+
             // Insert posters with print option
             foreach ($data['posters'] as $poster) {
                 $stmt->execute([
@@ -175,10 +184,10 @@ class ParticipantManager
                     ':session' => $poster['session'],
                     ':duration' => null,
                     ':paper_submission' => $poster['paperDate'],
-                    ':print' => filter_var($poster['print'], FILTER_VALIDATE_BOOLEAN)  
+                    ':print' => filter_var($poster['print'], FILTER_VALIDATE_BOOLEAN)
                 ]);
             }
-    
+
             $this->pdo->commit();
             return $participantId;
         } catch (Exception $e) {
@@ -186,8 +195,8 @@ class ParticipantManager
             throw new Exception("Error saving participant: " . $e->getMessage());
         }
     }
-    
- 
+
+
     /**
      * Retrieve participant statistics for a given workshop or all workshops.
      */

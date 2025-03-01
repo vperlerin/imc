@@ -139,8 +139,7 @@ try {
 
     // Save participant
     $participant_id = $participantManager->saveParticipant($data, $password_hash);
-
-    
+ 
     // Get all workshops from the database
     $workshopManager = new WorkshopManager($pdo);
     $workshops = $workshopManager->getWorkshops(); // Fetch all workshops dynamically

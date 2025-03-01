@@ -27,8 +27,7 @@ const ContributionForm = ({
 }) => {
   const [wantsToContribute, setWantsToContribute] = useState(null);
 
-  console.log("initialData? ", initialData);
-
+ 
   const imcSessions = conferenceData.sessions;
   const paperDeliveryOptions = [
     { label: "Before the IMC", value: "before_imc" },
@@ -59,8 +58,7 @@ const ContributionForm = ({
           }));
         }
 
-        if (!isOnline && posters.length === 0) {
-          console.log("POSTERS? ", posters);
+        if (!isOnline && posters.length === 0) { 
           initialData.posters?.forEach((poster) =>
             addPoster({
               ...poster,

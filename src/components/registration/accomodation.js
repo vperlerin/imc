@@ -4,6 +4,7 @@ import React, { useEffect } from "react";
 import StepDislay from "components/registration/stepDisplay";
 
 const AccomodationForm = ({
+  isAdmin = false,
   conferenceData,
   register,
   errors,
@@ -16,6 +17,8 @@ const AccomodationForm = ({
   setValue,
   initialData
 }) => {
+
+  console.log("ACCOMODATION INITAL DATA ", initialData);
 
   useEffect(() => {
     if (initialData) {
@@ -35,11 +38,13 @@ const AccomodationForm = ({
 
   return (
     <>
-      <h4 className="mb-3 border-bottom pb-2">
-        <StepDislay step={step} stepTotal={stepTotal} />
-        {!isOnline && <>Accommodation &</>} Payment Method
-      </h4>
-
+      {!isAdmin && (
+        <h4 className="mb-3 border-bottom pb-2">
+          <StepDislay step={step} stepTotal={stepTotal} />
+          {!isOnline && <>Accommodation &</>} Payment Method
+        </h4>
+      )}
+ 
       <div className={classNames(cssForm.smallW, "mx-auto position-relative")}>
         {isDebugMode && (
           <button type="button" className="position-absolute top-0 end-0 btn btn-secondary" onClick={fillTestData}>
@@ -110,10 +115,10 @@ const AccomodationForm = ({
                 <label className="form-check-label d-block" htmlFor={`payment-${method.type}`}>
                   {method.type}
                   <div className="form-text">
-                  {method.note}
-                </div>
+                    {method.note}
+                  </div>
                 </label>
-               
+
               </div>
             ))}
           </div>
