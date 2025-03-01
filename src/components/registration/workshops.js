@@ -8,7 +8,7 @@ import { formatFullDate } from 'utils/date';
 
 const Workshops = ({
   isAdmin = false,
-  initialData = [], // Contains the workshops the participant is registered for
+  initialData = [],  
   isDebugMode = false,
   register,
   errors,

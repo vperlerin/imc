@@ -13,9 +13,10 @@ const TalkPosterForm = ({
   errors,
   imcSessions,
   talkDurations = [],
-  initialValues = {}
+  initialValues = {},
 }) => {
   const isTalk = type === "talk";
+  const printOnSite = initialValues?.print === "1";
 
   return (
     <div className="border rounded-2 p-3 mb-3 mx-md-5">
@@ -24,7 +25,7 @@ const TalkPosterForm = ({
         <button
           title={`Delete ${isTalk ? "Talk" : "Poster"} #${index + 1}`}
           type="button"
-          className={classNames('btn btn-sm btn-danger', cssForm.deleteBtn)}
+          className={classNames("btn btn-sm btn-danger", cssForm.deleteBtn)}
           onClick={remove}
         >
           <FiTrash2 />
@@ -79,12 +80,14 @@ const TalkPosterForm = ({
         <div className="col-sm-10">
           <select
             className={classNames("form-select", errors?.[`${type}s`]?.[index]?.session && "is-invalid", cssForm.mdAuto)}
-            defaultValue={initialValues.session || ""}
+            defaultValue={initialValues.session_name || ""}
             {...register(`${type}s.${index}.session`, { required: "Session is required" })}
           >
             <option value="">Select a session</option>
             {imcSessions.map((session) => (
-              <option key={session} value={session}>{session}</option>
+              <option key={session} value={session}>
+                {session}
+              </option>
             ))}
           </select>
           {errors?.[`${type}s`]?.[index]?.session && <p className="text-danger"><small>{errors[`${type}s`][index].session.message}</small></p>}
@@ -103,7 +106,9 @@ const TalkPosterForm = ({
             >
               <option value="">Select duration</option>
               {talkDurations.map((duration) => (
-                <option key={duration} value={duration}>{duration}</option>
+                <option key={duration} value={duration}>
+                  {duration}
+                </option>
               ))}
             </select>
             {errors?.[`${type}s`]?.[index]?.duration && <p className="text-danger"><small>{errors[`${type}s`][index].duration.message}</small></p>}
@@ -111,11 +116,13 @@ const TalkPosterForm = ({
         </div>
       )}
 
-      {/* Printing */}
+      {/* Printing (Only for Posters) */}
       {!isTalk && (
         <div className="mb-3 row">
-          <label className="fw-bold pb-0">Do you want to have your poster printed on-site for {conferenceData.poster_print.price}€?</label>
-          {!isAdmin && (<p className="form-text mt-0">{conferenceData.poster_print.desc}</p>)}
+          <label className="fw-bold pb-0">
+            Do you want to have your poster printed on-site for {conferenceData.poster_print.price}€?
+          </label>
+          {!isAdmin && <p className="form-text mt-0">{conferenceData.poster_print.desc}</p>}
           <div className="text-center btn-group d-block" role="group">
             <input
               type="radio"
@@ -123,9 +130,11 @@ const TalkPosterForm = ({
               id={`printOnSiteYes${index}`}
               value="true"
               {...register(`${type}s.${index}.printOnSite`, { required: "Please select an option" })}
-              defaultChecked={initialValues.printOnSite === "true"}
+              defaultChecked={!printOnSite}
             />
-            <label className="btn btn-outline-neutral" htmlFor={`printOnSiteYes${index}`}>Yes</label>
+            <label className="btn btn-outline-neutral" htmlFor={`printOnSiteYes${index}`}>
+              Yes
+            </label>
 
             <input
               type="radio"
@@ -133,13 +142,14 @@ const TalkPosterForm = ({
               id={`printOnSiteNo${index}`}
               value="false"
               {...register(`${type}s.${index}.printOnSite`, { required: "Please select an option" })}
-              defaultChecked={initialValues.printOnSite === "false"}
+              defaultChecked={!printOnSite}
             />
-            <label className="btn btn-outline-neutral" htmlFor={`printOnSiteNo${index}`}>No</label>
+            <label className="btn btn-outline-neutral" htmlFor={`printOnSiteNo${index}`}>
+              No
+            </label>
           </div>
-         
         </div>
-      )} 
+      )}
     </div>
   );
 };

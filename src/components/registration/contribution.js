@@ -15,7 +15,7 @@ const ContributionForm = ({
   isAdmin = false,
   conferenceData,
   control,
-  initialData,
+  initialData = [],
   isDebugMode = false,
   isOnline = false,
   register,
@@ -27,6 +27,8 @@ const ContributionForm = ({
 }) => {
   const [wantsToContribute, setWantsToContribute] = useState(null);
 
+  console.log("initialData? ", initialData);
+
   const imcSessions = conferenceData.sessions;
   const paperDeliveryOptions = [
     { label: "Before the IMC", value: "before_imc" },
@@ -36,8 +38,6 @@ const ContributionForm = ({
   const { fields: talks, append: addTalk, remove: removeTalk } = useFieldArray({ control, name: "talks" });
   const { fields: posters, append: addPoster, remove: removePoster } = useFieldArray({ control, name: "posters" });
 
-  console.log("initialData? ", initialData);
-
   useEffect(() => {
     if (initialData) {
       Object.keys(initialData).forEach((key) => {
@@ -46,26 +46,39 @@ const ContributionForm = ({
         }
       });
 
-      if ((initialData.talks && initialData.talks.length > 0) || (!isOnline && initialData.posters && initialData.posters.length > 0)) {
+      if (
+        (initialData.talks && initialData.talks.length > 0) ||
+        (!isOnline && initialData.posters && initialData.posters.length > 0)
+      ) {
         setWantsToContribute(true);
 
         if (talks.length === 0) {
-          initialData.talks?.forEach((talk) => addTalk(talk));
+          initialData.talks?.forEach((talk) => addTalk({ 
+            ...talk, 
+            session: talk.session_name  // Ensure session_name is used instead of session_id
+          }));
         }
 
         if (!isOnline && posters.length === 0) {
-          initialData.posters?.forEach((poster) => addPoster(poster));
+          initialData.posters?.forEach((poster) =>
+            addPoster({
+              ...poster,
+              session: poster.session_name,  // Use session_name
+              printOnSite: poster.print === "1" // Convert print from "1"/"0" to boolean
+            })
+          );
         }
       }
     }
   }, [initialData, setValue, addTalk, addPoster, talks.length, posters.length, isOnline]);
+
 
   // Validate before adding new talk/poster
   const validateAndAdd = async (type) => {
     const isValid = await trigger();
     if (isValid) {
       if (type === "talk") addTalk({});
-      else if (!isOnline) addPoster({}); // Prevent adding posters if online
+      else if (!isOnline) addPoster({ printOnSite: false }); // Default printOnSite to false
     }
   };
 
@@ -83,7 +96,7 @@ const ContributionForm = ({
       abstract: "A study on advanced meteor observation methods.",
       session: "Meteor physics and dynamics",
       duration: "15min",
-      paperDate: "before_imc"
+      paperDate: "before_imc",
     });
 
     if (!isOnline) {
@@ -93,12 +106,10 @@ const ContributionForm = ({
         abstract: "An overview of detecting meteors using radio waves.",
         session: "Radio meteor work",
         paperDate: "after_imc",
-        printOnSite: "true"
+        printOnSite: "true",  
       });
     }
-
   };
-
   return (
     <div className="position-relative">
       {isDebugMode && (
@@ -182,8 +193,7 @@ const ContributionForm = ({
  
           {/* Talks */}
           {talks.map((talk, index) => (
-            <TalkPosterForm
-              
+            <TalkPosterForm 
               isAdmin={isAdmin}
               conferenceData={conferenceData}
               key={talk.id}
@@ -195,6 +205,7 @@ const ContributionForm = ({
               imcSessions={imcSessions}
               talkDurations={talkDurations}
               paperDeliveryOptions={paperDeliveryOptions}
+              initialValues={talk}
             />
           ))}
 
@@ -212,6 +223,7 @@ const ContributionForm = ({
                 errors={errors}
                 imcSessions={imcSessions}
                 paperDeliveryOptions={paperDeliveryOptions}
+                initialValues={poster}
               />
             ))}
 
