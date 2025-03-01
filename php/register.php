@@ -139,13 +139,17 @@ try {
 
     // Save participant
     $participant_id = $participantManager->saveParticipant($data, $password_hash);
- 
+
     // Get all workshops from the database
     $workshopManager = new WorkshopManager($pdo);
     $workshops = $workshopManager->getWorkshops(); // Fetch all workshops dynamically
 
+    // Get all payment metehods from the database
+    $paymentManager = new PaymentManager($pdo);
+    $payment_methods = $paymentManager->getPaymentMethods(); // Fetch all workshops dynamically
+
     $subject = "IMC " . getenv("YEAR") . " Registration";
-    $summary = SummaryFormatter::formatEmailContent($data, $workshops, true);
+    $summary = SummaryFormatter::formatEmailContent($data, $workshops, $payment_methods, true);
 
     // Send confirmation email
     $mail = new Mail();
