@@ -95,14 +95,15 @@ class ParticipantManager
             // **Insert payment details**
             $stmt = $this->pdo->prepare("
                 INSERT INTO payments (participant_id, payment_date, amount, payment_method_id, created_at, updated_at)
-                VALUES (:participant_id, NOW(), :amount, (SELECT id FROM payment_methods WHERE method = :payment_method LIMIT 1), NOW(), NOW())
+                VALUES (:participant_id, NULL, :amount, :payment_method_id, NOW(), NOW())
             ");
 
             $stmt->execute([
                 ':participant_id' => $participantId,
                 ':amount' => 0,
-                ':payment_method' => $data['payment_method']
+                ':payment_method_id' => (int) ($data['payment_method_id'] ?? 0)  
             ]);
+
 
             // Insert arrival details
             $stmt = $this->pdo->prepare("

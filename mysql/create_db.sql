@@ -82,7 +82,7 @@ INSERT IGNORE INTO payment_methods (method) VALUES ('Other');
 CREATE TABLE IF NOT EXISTS payments (
     id INT AUTO_INCREMENT PRIMARY KEY,
     participant_id INT NOT NULL,
-    payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  
+    payment_date TIMESTAMP NULL DEFAULT NULL,   
     amount DECIMAL(10,2) NOT NULL,
     payment_method_id INT NOT NULL,  
     admin_note TEXT DEFAULT NULL, 
@@ -91,6 +91,7 @@ CREATE TABLE IF NOT EXISTS payments (
     FOREIGN KEY (participant_id) REFERENCES participants(id) ON DELETE CASCADE,
     FOREIGN KEY (payment_method_id) REFERENCES payment_methods(id) ON DELETE CASCADE
 ) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 
 -- Workshops Table
 CREATE TABLE IF NOT EXISTS workshops (
