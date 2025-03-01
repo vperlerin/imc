@@ -60,11 +60,12 @@ const ContributionForm = ({
         }
 
         if (!isOnline && posters.length === 0) {
+          console.log("POSTERS? ", posters);
           initialData.posters?.forEach((poster) =>
             addPoster({
               ...poster,
               session: poster.session_name,  // Use session_name
-              printOnSite: poster.print === "1" // Convert print from "1"/"0" to boolean
+              printOnSite: poster.print === "1" ? "true" : "false"
             })
           );
         }

@@ -15,7 +15,6 @@ require_once __DIR__ . "/../config.php";
 require_once __DIR__ . "/../class/Connect.class.php";
 require_once __DIR__ . "/../class/Participant.class.php";
  
-
 try {
     $data = json_decode(file_get_contents("php://input"), true);
 
