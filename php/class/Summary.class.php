@@ -65,7 +65,7 @@ class SummaryFormatter
             ? $paymentMethods[$data['payment_method_id']]
             : "Unknown";
 
-        echo "*****"  . $paymentMethodName ;: 
+        echo "*****"  . $paymentMethodName ;
 
         $content .= "
             <br><b>Registration & Payment</b><br>
