@@ -46,7 +46,7 @@ const Workshops = ({
 
   // Pre-fill form values based on participant's registered workshops (initialData)
   useEffect(() => {
-    if (initialData.length > 0 && workshops.length > 0) {
+    if (initialData?.length > 0 && workshops.length > 0) {
       workshops.forEach(workshop => {
         // Check if the participant is registered for this workshop
         const isAttending = initialData.some(selected => String(selected.id) === String(workshop.id));
