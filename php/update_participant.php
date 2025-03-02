@@ -25,24 +25,29 @@ require_once __DIR__ . "/class/Connect.class.php";
 require_once __DIR__ . "/class/Participant.class.php";   
 
 try {
-    // Read JSON input
+    // Ensure participant ID is provided via query parameter
+    if (!isset($_GET['id']) || empty($_GET['id'])) {
+        throw new Exception("Invalid request. Participant ID is required.");
+    }
+
+    $participantId = $_GET['id'];
     $data = json_decode(file_get_contents("php://input"), true);
 
-    if (!isset($data['id']) || !isset($data['data'])) {
-        throw new Exception("Invalid request. Participant ID and data are required.");
+    if (empty($data)) {
+        throw new Exception("No data provided for update.");
     }
 
     // Initialize ParticipantManager using $pdo
     $participantManager = new ParticipantManager($pdo);
 
     // Attempt to update participant
-    $updateSuccess = $participantManager->updateParticipant($data['id'], $data['data']);
+    $updateSuccess = $participantManager->updateParticipant($participantId, $data);
 
     if ($updateSuccess) {
         echo json_encode([
             "success" => true,
             "message" => "Participant updated successfully",
-            "participant_id" => $data['id']
+            "participant_id" => $participantId
         ]);
     } else {
         throw new Exception("Failed to update participant.");
