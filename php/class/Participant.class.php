@@ -157,7 +157,7 @@ class ParticipantManager
                     ':title' => $talk['title'],
                     ':authors' => $talk['authors'],
                     ':abstract' => $talk['abstract'],
-                    ':session_id' => $talk['session'],
+                    ':session_id' => (int) $talk['session'],
                     ':duration' => $talk['duration'],
                     ':print' => FALSE
                 ]);
