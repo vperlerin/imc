@@ -73,6 +73,8 @@ class ParticipantManager
 
             $participantId = $this->pdo->lastInsertId();
 
+            var_dump("PART ID ? ", $participantId);
+
             // Insert workshops participation
             if (!empty($data['workshops']) && is_array($data['workshops'])) {
                 $stmt = $this->pdo->prepare("
@@ -86,6 +88,8 @@ class ParticipantManager
                         ':workshop_id' => (int) $workshopId
                     ]);
                 }
+
+                var_dump("WORKSHOpS OK");
             }
 
             // **Insert payment details**
@@ -99,6 +103,8 @@ class ParticipantManager
                 ':payment_method_id' => (int) ($data['payment_method_id'] ?? 0)
             ]);
 
+
+            var_dump("payments OK");
 
             // Insert arrival details
             $stmt = $this->pdo->prepare("
@@ -119,6 +125,8 @@ class ParticipantManager
                 ':travelling_details' => $data['travelling_details'] ?? null
             ]);
 
+            var_dump("arrival OK");
+
             // Insert accommodation details
             $stmt = $this->pdo->prepare("
                 INSERT INTO accommodation (participant_id, registration_type_id, created_at, updated_at)
@@ -128,6 +136,9 @@ class ParticipantManager
                 ':participant_id' => $participantId,
                 ':registration_type_id' => (int) $data['registration_type_id']
             ]);
+
+
+            var_dump("accommodation OK");
 
             // Insert extra options
             $stmt = $this->pdo->prepare("
@@ -140,6 +151,8 @@ class ParticipantManager
                 ':buy_tshirt' => filter_var($data['buy_tshirt'], FILTER_VALIDATE_BOOLEAN),
                 ':tshirt_size' => $data['tshirt_size'] ?? null,
             ]);
+
+            var_dump("extra_options OK");
 
             // Insert contributions (talks & posters)
             $stmt = $this->pdo->prepare("
