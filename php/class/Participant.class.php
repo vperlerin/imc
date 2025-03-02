@@ -237,7 +237,7 @@ class ParticipantManager
                     VALUES (:participant_id, :workshop_id, TRUE)
                 ");
 
-                var($data['workshops']);
+                var_dump($data['workshops']);
                 foreach ($data['workshops'] as $workshop) {
                     $stmt->execute([
                         ':participant_id' => $participantId,
