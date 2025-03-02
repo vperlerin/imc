@@ -47,25 +47,30 @@ const ContributionForm = ({
     if (!isOnline) {
       removePoster();
     }
-
+  
+    // Find session IDs based on session names
+    const meteorPhysicsSession = sessions.find(s => s.name === "Meteor physics and dynamics")?.id || sessions[0]?.id;
+    const radioMeteorSession = sessions.find(s => s.name === "Radio meteor work")?.id || sessions[0]?.id;
+  
     addTalk({
       title: "Meteor Observation Techniques",
       authors: "John Doe, Jane Smith",
       abstract: "A study on advanced meteor observation methods.",
-      session: "Meteor physics and dynamics",
+      session: meteorPhysicsSession,  
       duration: "15min",
     });
-
+  
     if (!isOnline) {
       addPoster({
         title: "Radio Meteor Detection",
         authors: "Alice Brown, Bob White",
         abstract: "An overview of detecting meteors using radio waves.",
-        session: "Radio meteor work",
+        session: radioMeteorSession,  
         print: "true",
       });
     }
   };
+  
 
   useEffect(() => {
     const existingTalks = getValues("talks") || [];

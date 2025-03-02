@@ -144,18 +144,20 @@ class ParticipantManager
             // Insert contributions (talks & posters)
             $stmt = $this->pdo->prepare("
                 INSERT INTO contributions (participant_id, type, title, authors, abstract, session_id, duration,  print, created_at, updated_at)
-                VALUES (:participant_id, :type, :title, :authors, :abstract, (SELECT id FROM imc_sessions WHERE name = :session), :duration, , :print, NOW(), NOW())
+                VALUES (:participant_id, :type, :title, :authors, :abstract, :session_id, :duration, , :print, NOW(), NOW())
             ");
 
             // Insert talks
             foreach ($data['talks'] as $talk) {
+                var_dump($talk);
+
                 $stmt->execute([
                     ':participant_id' => $participantId,
                     ':type' => 'talk',
                     ':title' => $talk['title'],
                     ':authors' => $talk['authors'],
                     ':abstract' => $talk['abstract'],
-                    ':session' => $talk['session'],
+                    ':session_id' => $talk['session'],
                     ':duration' => $talk['duration'],
                     ':print' => FALSE
                 ]);

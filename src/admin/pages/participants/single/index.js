@@ -29,7 +29,7 @@ const AdminParticipantsUser = () => {
   const [paymentMethods, setPaymentMethods] = useState([]);
   const [workshops, setWorkshops] = useState([]);
   const [registrationTypes, setRegistrationTypes] = useState([]);
-  const [sessions, setSessions]  = useStae([]);
+  const [sessions, setSessions]  = useState([]);
   const [unsavedChanges, setUnsavedChanges] = useState(false);
   const [total, setTotal] = useState(0);
   const [paypalFee, setPaypalFee] = useState(0);
@@ -56,7 +56,7 @@ const AdminParticipantsUser = () => {
     }
   }, [tab, participantId, navigate]);
 
-  // Fetch available workshops, payment_methods & registration_types from API
+  // Fetch available workshops, payment_methods, sessions & registration_types from API
   useEffect(() => {
     if (hasFetchedData.current) {
       return;

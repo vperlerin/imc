@@ -73,7 +73,7 @@ const TalkPosterForm = ({
         </div>
       </div>
 
-      {/* Suitable IMC Session */}
+      {/* Suitable IMC Session (Stores session ID) */}
       <div className="mb-3 row">
         <label className="col-sm-2 col-form-label fw-bold pb-0">IMC Session</label>
         <div className="col-sm-10">
@@ -92,7 +92,7 @@ const TalkPosterForm = ({
           {errors?.[`${type}s`]?.[index]?.session && <p className="text-danger"><small>{errors[`${type}s`][index].session.message}</small></p>}
         </div>
       </div>
-      
+
       {/* Talk Duration (Only for Talks) */}
       {isTalk && (
         <div className="mb-3 row">
@@ -129,7 +129,7 @@ const TalkPosterForm = ({
               id={`printYes${index}`}
               value="true"
               {...register(`${type}s.${index}.print`, { required: "Please select an option" })}
-              defaultChecked={initialValues.print === "true" || initialValues.print === "1" }
+              defaultChecked={initialValues.print === "true" || initialValues.print === "1"}
             />
             <label className="btn btn-outline-neutral" htmlFor={`printYes${index}`}>
               Yes

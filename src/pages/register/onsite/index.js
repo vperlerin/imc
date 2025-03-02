@@ -45,10 +45,11 @@ const MainForm = () => {
   const [paypalFee, setPaypalFee] = useState(0);
   const [paymentMethods, setPaymentMethods] = useState([]);
   const [registrationTypes, setRegistrationTypes] = useState([]);
+  const [sessions, setSessions]  = useState([]);
   const [workshops, setWorkshops] = useState([])
   const location = useLocation();
   const isDebugMode = new URLSearchParams(location.search).get("debug") === "1";
-  const hasFetcheData = useRef(false);
+  const hasFetchedData = useRef(false);
 
   const {
     control,
@@ -67,26 +68,28 @@ const MainForm = () => {
   const isUnder16 = age !== null && age < 16; 
   const is_early_bird =  new Date() < new Date(cd.deadlines.early_birds);
 
-  // Fetch available workshops, payment_methods & registration_types from API
+  // Fetch available workshops, payment_methods, sessions & registration_types from API
   useEffect(() => {
-    if (hasFetcheData.current) {
+    if (hasFetchedData.current) {
       return;
     }
 
-    hasFetcheData.current = true;
+    hasFetchedData.current = true;
     setLoading(true);
 
     const fetchData = async () => {
       try {
         const response = await axios.get(`${process.env.REACT_APP_API_URL}/get_specific_data.php`);
-        // TODO registration_type_id!!
         if (response.data.success
           && response.data.data.workshops
           && response.data.data.payment_methods
-          && response.data.data.registration_types) {
+          && response.data.data.registration_types
+          && response.data.data.sessions
+        ) {
           setWorkshops(response.data.data.workshops);
           setPaymentMethods(response.data.data.payment_methods);
           setRegistrationTypes(response.data.data.registration_types);
+          setSessions(response.data.data.sessions);
         } else {
           throw new Error(response.data.message || "Failed to fetch data - please try again later.");
         }
@@ -277,6 +280,7 @@ const MainForm = () => {
                 stepTotal={totalStep}
                 getValues={getValues}
                 setValue={setValue}
+                sessions={sessions}
                 trigger={trigger}
                 watch={watch} 
               />
