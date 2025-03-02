@@ -1,19 +1,12 @@
-import { batch } from 'react-redux';
 import { createSlice } from '@reduxjs/toolkit';
+import axios from 'axios';
 
-const loadAuthState = () => {
-  try {
-    const serializedState = localStorage.getItem('auth');
-    const parsedState = serializedState ? JSON.parse(serializedState) : { oauth: null, user: null };
-    return {
-      ...parsedState,
-      user: parsedState.user ? { ...parsedState.user } : null,  
-    };
-  } catch (err) {
-    console.error('Error loading auth state:', err);
-    return { oauth: null, user: null };
-  }
-};
+const loadAuthState = () => ({
+  oauth: null,  
+  user: null, 
+  isAuthenticated: false,
+  isAdmin: false,
+});
 
 const initialState = loadAuthState();
 
@@ -23,11 +16,12 @@ const authSlice = createSlice({
   reducers: {
     setOauth: (state, action) => {
       state.oauth = action.payload;
-      state.isAuthenticated = true;
+      state.isAuthenticated = !!action.payload;
     },
     setUser: (state, action) => {
       state.user = { ...action.payload };
       state.isAuthenticated = true;
+      state.isAdmin = action.payload.is_admin ?? false;  // ✅ Ensure this comes from backend
     },
     logout: (state) => {
       state.oauth = null;
@@ -39,28 +33,28 @@ const authSlice = createSlice({
   },
 });
 
-// Thunk to handle setting authentication and persisting it
-authSlice.actions.setAuth = (data) => (dispatch) => {
-  batch(() => {
-    dispatch(authSlice.actions.setOauth(data.oauth));
-    dispatch(authSlice.actions.setUser(data.user));
-  });
-
+// ✅ Define `fetchUser` directly here
+export const fetchUser = () => async (dispatch) => {
   try {
-    localStorage.setItem('auth', JSON.stringify({ oauth: data.oauth, user: data.user }));
-  } catch (err) {
-    console.error('Error saving auth state:', err);
+    const response = await axios.get(`${process.env.REACT_APP_API_URL}/auth/user`, { withCredentials: true });
+
+    if (!response.data?.success) {
+      throw new Error(response.data?.message || "Failed to fetch user data");
+    }
+
+    dispatch(authSlice.actions.setUser(response.data.user));
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    dispatch(authSlice.actions.logout());
   }
 };
 
-authSlice.selectors = {
+// ✅ Export actions and reducer
+export const authActions = { ...authSlice.actions, fetchUser };
+export const authSelectors = {
   getUser: (state) => state.auth.user,
-  isAdmin: (state) => state.auth.user?.is_admin ?? false,
-  isLoggedIn: (state) => state.auth.user != null && !state.auth.user.is_guest,
+  isAdmin: (state) => state.auth.isAdmin,
+  isLoggedIn: (state) => state.auth.isAuthenticated,
 };
-
-export const authActions = authSlice.actions;
 export const authReducer = authSlice.reducer;
-export const authSelectors = authSlice.selectors;
-
 export default authSlice;

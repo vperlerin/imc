@@ -1,10 +1,20 @@
-import { authSelectors } from 'store/auth';
-import { useSelector } from "react-redux";
+import { authSelectors, fetchUser } from 'store/auth';
+import { useSelector, useDispatch } from "react-redux";
+import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 
 const ProtectedRoute = ({ children }) => {
-  const isAdmin = useSelector(authSelectors.isAdmin); 
-  return isAdmin ? children : <Navigate to="/login" replace />;
+  const dispatch = useDispatch();
+  const isAdmin = useSelector(authSelectors.isAdmin);
+  const isAuthenticated = useSelector(authSelectors.isLoggedIn);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    dispatch(fetchUser()).finally(() => setLoading(false));   
+  }, [dispatch]);
+
+  if (loading) return <div>Loading...</div>;  // Prevent access before API response
+  return isAuthenticated && isAdmin ? children : <Navigate to="/login" replace />;
 };
 
 export default ProtectedRoute;

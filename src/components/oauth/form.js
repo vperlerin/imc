@@ -4,15 +4,15 @@ import Loader from "components/loader";
 import PasswordInput from 'components/form/pwd';
 import { useDispatch } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
-import { authActions } from "store/auth";
+import { authActions } from "store/auth"; // Now fetchUser is inside authActions
 import classNames from "classnames";
 import css from "./index.module.scss";
 import cssForm from "styles/components/form.module.scss";
 
 const Login = () => {
   const [email, setEmail] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -23,23 +23,23 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/login.php`, {
-        email,
-        password,
-      }, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        withCredentials: true,
-      });
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/login.php`,
+        { email, password },
+        {
+          headers: { "Content-Type": "application/json" },
+          withCredentials: true,
+        }
+      );
 
       if (!response.data?.success) {
         throw new Error(response.data?.message || "Invalid response from server");
       }
 
+      // ✅ Securely fetch user details (ensures `isAdmin` is correctly set)
+      await dispatch(authActions.fetchUser());
 
-      dispatch(authActions.setAuth({ oauth: response.data.oauth, user: response.data.user }));
-
+      // ✅ Redirect based on backend-confirmed user role
       const user = response.data.user || {};
       navigate(user.is_admin ? "/admin/dashboard" : "/");
 
@@ -50,12 +50,12 @@ const Login = () => {
     }
   };
 
-
   return (
     <div className={classNames(css.login, "flex-grow-1 d-flex h-100 align-items-center justify-content-center position-relative")}>
       {isLoading && <Loader />}
       <form onSubmit={handleSubmit} className={classNames(cssForm.xSmallW, "w-100 border p-3 rounded-2")}>
         {error && <div className="alert alert-danger fw-bolder">{error}</div>}
+
         <div className="mb-3">
           <label htmlFor="emailInput" className="form-label">Email address</label>
           <input
@@ -64,13 +64,13 @@ const Login = () => {
             type="email"
             className="form-control"
             id="emailInput"
-            aria-describedby="emailHelp"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Your email"
             required
           />
         </div>
+
         <div className="mb-3">
           <label htmlFor="passwordInput" className="form-label">Password</label>
           <PasswordInput
