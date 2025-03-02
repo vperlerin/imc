@@ -187,15 +187,15 @@ class ParticipantManager
     {
         try {
             $this->pdo->beginTransaction();
-
+    
             // Check if participant exists
             $stmt = $this->pdo->prepare("SELECT id FROM participants WHERE id = :participant_id");
             $stmt->execute([':participant_id' => $participantId]);
             if ($stmt->rowCount() === 0) {
                 throw new Exception("Participant with ID {$participantId} does not exist.");
             }
-
-            // Update participant information
+    
+            // Update participant details
             $stmt = $this->pdo->prepare("
                 UPDATE participants 
                 SET title = :title, first_name = :first_name, last_name = :last_name, gender = :gender, 
@@ -205,7 +205,7 @@ class ParticipantManager
                     comments = :comments, payment_method_id = :payment_method_id, updated_at = NOW()
                 WHERE id = :participant_id
             ");
-
+    
             $stmt->execute([
                 ':participant_id' => $participantId,
                 ':title' => $data['title'],
@@ -226,34 +226,33 @@ class ParticipantManager
                 ':comments' => $data['comments'] ?? null,
                 ':payment_method_id' => (int) ($data['payment_method_id'] ?? 0),
             ]);
-
+    
             // Update Workshops
             $stmt = $this->pdo->prepare("DELETE FROM participant_workshops WHERE participant_id = :participant_id");
             $stmt->execute([':participant_id' => $participantId]);
-
+    
             if (!empty($data['workshops']) && is_array($data['workshops'])) {
                 $stmt = $this->pdo->prepare("
-                INSERT INTO participant_workshops (participant_id, workshop_id, attending) 
-                VALUES (:participant_id, :workshop_id, TRUE)
-            ");
-
-                foreach ($data['workshops'] as $workshopId) {
+                    INSERT INTO participant_workshops (participant_id, workshop_id, attending) 
+                    VALUES (:participant_id, :workshop_id, TRUE)
+                ");
+                foreach ($data['workshops'] as $workshop) {
                     $stmt->execute([
                         ':participant_id' => $participantId,
-                        ':workshop_id' => (int) $workshopId
+                        ':workshop_id' => (int) $workshop['id']
                     ]);
                 }
             }
-
+    
             // Update Arrival Details
             $stmt = $this->pdo->prepare("
-            UPDATE arrival 
-            SET arrival_date = :arrival_date, arrival_hour = :arrival_hour, arrival_minute = :arrival_minute, 
-                departure_date = :departure_date, departure_hour = :departure_hour, departure_minute = :departure_minute, 
-                travelling = :travelling, travelling_details = :travelling_details, updated_at = NOW()
-            WHERE participant_id = :participant_id
-        ");
-
+                UPDATE participant_arrival
+                SET arrival_date = :arrival_date, arrival_hour = :arrival_hour, arrival_minute = :arrival_minute, 
+                    departure_date = :departure_date, departure_hour = :departure_hour, departure_minute = :departure_minute, 
+                    travelling = :travelling, travelling_details = :travelling_details, updated_at = NOW()
+                WHERE participant_id = :participant_id
+            ");
+    
             $stmt->execute([
                 ':participant_id' => $participantId,
                 ':arrival_date' => $data['arrival_date'],
@@ -265,27 +264,27 @@ class ParticipantManager
                 ':travelling' => $data['travelling'],
                 ':travelling_details' => $data['travelling_details'] ?? null
             ]);
-
+    
             // Update Accommodation
             $stmt = $this->pdo->prepare("
-                UPDATE accommodation 
+                UPDATE participant_accommodation
                 SET registration_type_id = :registration_type_id, updated_at = NOW()
                 WHERE participant_id = :participant_id
             ");
-
+    
             $stmt->execute([
                 ':participant_id' => $participantId,
                 ':registration_type_id' => (int) $data['registration_type_id']
             ]);
-
+    
             // Update Extra Options
             $stmt = $this->pdo->prepare("
-                UPDATE extra_options 
+                UPDATE extra_options
                 SET excursion = :excursion, buy_tshirt = :buy_tshirt, tshirt_size = :tshirt_size, 
                     proceedings = :proceedings, updated_at = NOW()
                 WHERE participant_id = :participant_id
             ");
-
+    
             $stmt->execute([
                 ':participant_id' => $participantId,
                 ':excursion' => filter_var($data['excursion'], FILTER_VALIDATE_BOOLEAN),
@@ -293,17 +292,17 @@ class ParticipantManager
                 ':tshirt_size' => $data['tshirt_size'] ?? null,
                 ':proceedings' => !empty($data['posters']) && $data['posters'][0]['print'] === "true" ? "pdf_printed" : "pdf"
             ]);
-
+    
             // Update Contributions (Talks & Posters)
             $stmt = $this->pdo->prepare("DELETE FROM contributions WHERE participant_id = :participant_id");
             $stmt->execute([':participant_id' => $participantId]);
-
+    
             $stmt = $this->pdo->prepare("
-                INSERT INTO contributions (participant_id, type, title, authors, abstract, session_id, duration,  print, created_at, updated_at)
-                VALUES (:participant_id, :type, :title, :authors, :abstract, :session_id, :duration,  :print, NOW(), NOW())
+                INSERT INTO contributions (participant_id, type, title, authors, abstract, session_id, duration, print, created_at, updated_at)
+                VALUES (:participant_id, :type, :title, :authors, :abstract, :session_id, :duration, :print, NOW(), NOW())
             ");
-
-            // Insert talks
+    
+            // Insert Talks
             foreach ($data['talks'] as $talk) {
                 $stmt->execute([
                     ':participant_id' => $participantId,
@@ -311,13 +310,13 @@ class ParticipantManager
                     ':title' => $talk['title'],
                     ':authors' => $talk['authors'],
                     ':abstract' => $talk['abstract'],
-                    ':session' => $talk['session_id'],
+                    ':session_id' => (int) $talk['session_id'],
                     ':duration' => $talk['duration'], 
                     ':print' => FALSE
                 ]);
             }
-
-            // Insert posters with print option
+    
+            // Insert Posters
             foreach ($data['posters'] as $poster) {
                 $stmt->execute([
                     ':participant_id' => $participantId,
@@ -325,12 +324,12 @@ class ParticipantManager
                     ':title' => $poster['title'],
                     ':authors' => $poster['authors'],
                     ':abstract' => $poster['abstract'],
-                    ':session' => $poster['session_id'],
+                    ':session_id' => (int) $poster['session_id'],
                     ':duration' => null, 
                     ':print' => filter_var($poster['print'], FILTER_VALIDATE_BOOLEAN)
                 ]);
             }
-
+    
             $this->pdo->commit();
             return true;
         } catch (Exception $e) {
@@ -338,6 +337,7 @@ class ParticipantManager
             throw new Exception("Error updating participant: " . $e->getMessage());
         }
     }
+    
 
 
     /**
