@@ -81,8 +81,8 @@ const Summary = ({
   const paymentMethodName = getPaymentMethodById(allValues.payment_method_id, paymentMethods);
   const isPaypal = paymentMethodName === 'Paypal';
 
-  let totalCost = totalRoomCost + workshopCost + tshirtCost + printedPostersCost;
-  const paypalFee = isPaypal ? getPaypalPrice(totalCost) - totalCost : 0;
+  let totalCost = totalRoomCost + workshopCost + tshirtCost + printedPostersCost; 
+  const paypalFee = isPaypal ? getPaypalPrice(totalCost) - totalCost : 0; 
   totalCost += paypalFee;
 
   // Online conference cost calculation 

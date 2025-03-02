@@ -207,6 +207,7 @@ const AdminParticipantsUser = () => {
     }
   ];
 
+ 
   const isSummaryReady = (
     participant &&
     paymentMethods.length > 0 &&
@@ -217,9 +218,10 @@ const AdminParticipantsUser = () => {
   if (errorGettingDataFromDB) {
     return <div className="alert alert-danger fw-bolder">{errorGettingDataFromDB}</div>
   }
+
+
  
- 
- 
+  
   return (
     <PageContain
       breadcrumb={breadcrumb}
@@ -342,6 +344,7 @@ const AdminParticipantsUser = () => {
             {tab === "summary" && isSummaryReady && (
               <Summary
                 isAdmin
+                isEarlyBird={participant?.participant.is_early_bird}
                 conferenceData={cd}
                 getValues={getValues}
                 setValue={setValue} 
