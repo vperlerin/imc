@@ -236,6 +236,8 @@ class ParticipantManager
                     INSERT INTO participant_workshops (participant_id, workshop_id, attending) 
                     VALUES (:participant_id, :workshop_id, TRUE)
                 ");
+
+                var($data['workshops']);
                 foreach ($data['workshops'] as $workshop) {
                     $stmt->execute([
                         ':participant_id' => $participantId,
