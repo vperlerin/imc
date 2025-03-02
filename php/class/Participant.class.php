@@ -135,10 +135,14 @@ class ParticipantManager
                 INSERT INTO extra_options (participant_id, excursion, buy_tshirt, tshirt_size, created_at, updated_at)
                 VALUES (:participant_id, :excursion, :buy_tshirt, :tshirt_size, NOW(), NOW())
             ");
+
+            $excursionValue = isset($data['excursion']) ? (filter_var($data['excursion'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ? 1 : 0) : 0;
+            $buytshirtValue = isset($data['buy_tshirt']) ? (filter_var($data['buy_tshirt'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ? 1 : 0) : 0;
+
             $stmt->execute([
                 ':participant_id' => $participantId,
-                ':excursion' => filter_var($data['excursion'], FILTER_VALIDATE_BOOLEAN),
-                ':buy_tshirt' => filter_var($data['buy_tshirt'], FILTER_VALIDATE_BOOLEAN),
+                ':excursion' => $excursionValue,  // Already processed as 1 or 0
+                ':buy_tshirt' => $buytshirtValue,  // Already processed as 1 or 0
                 ':tshirt_size' => $data['tshirt_size'] ?? null,
             ]);
 
@@ -147,6 +151,9 @@ class ParticipantManager
                 INSERT INTO contributions (participant_id, type, title, authors, abstract, session_id, duration, print, created_at, updated_at)
                 VALUES (:participant_id, :type, :title, :authors, :abstract, :session_id, :duration, :print, NOW(), NOW())
             ");
+
+            var_dump($data['talks']);
+            var_dump($data['posters']);
 
             // Insert talks
             foreach ($data['talks'] as $talk) {
@@ -295,10 +302,13 @@ class ParticipantManager
                 WHERE participant_id = :participant_id
             ");
 
+            $excursionValue = isset($data['excursion']) ? (filter_var($data['excursion'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ? 1 : 0) : 0;
+            $buytshirtValue = isset($data['buy_tshirt']) ? (filter_var($data['buy_tshirt'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ? 1 : 0) : 0;
+
             $stmt->execute([
                 ':participant_id' => $participantId,
-                ':excursion' => filter_var($data['excursion'], FILTER_VALIDATE_BOOLEAN),
-                ':buy_tshirt' => filter_var($data['buy_tshirt'], FILTER_VALIDATE_BOOLEAN),
+                ':excursion' => $excursionValue,  // Already processed as 1 or 0
+                ':buy_tshirt' => $buytshirtValue,  // Already processed as 1 or 0
                 ':tshirt_size' => $data['tshirt_size'] ?? null,
             ]);
 

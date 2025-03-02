@@ -175,9 +175,9 @@ const AdminParticipantsUser = () => {
 
     // Extras
     if (participant.extra_options) {
-      setValue("excursion", participant.extra_options.excursion ? "1" : "0");
-      setValue("buy_tshirt", participant.extra_options.buy_tshirt ? "1" : "0");
-      setValue("tshirt_size", participant.extra_options.tshirt_size || "");
+      setValue("excursion", participant.extra_options.excursion);
+      setValue("buy_tshirt", participant.extra_options.buy_tshirt);
+      setValue("tshirt_size", participant.extra_options.tshirt_size);
     }
   }, [participant]);
 
