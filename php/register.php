@@ -36,6 +36,8 @@ function create_email(array $data, string $summary): string
         <p>Thank you for registering for IMC <b>{$year}</b>. Your registration is nearly complete.</p>
     ";
 
+    // TODO: get the payment_method from paymentè_id!!!!
+
     if (strtolower($data['payment_method']) == 'paypal') {
         $message .= "<p>If you haven't paid already, all";
     } else {
@@ -145,7 +147,7 @@ try {
     $workshopManager = new WorkshopManager($pdo);
     $workshops = $workshopManager->getWorkshops(); // Fetch all workshops dynamically
 
-    // Get all payment metehods from the database
+    // Get all payment methods from the database
     $paymentManager = new PaymentManager($pdo);
     $payment_methods = $paymentManager->getPaymentMethods(); // Fetch all workshops dynamically
 

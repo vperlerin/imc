@@ -2,6 +2,7 @@ import classNames from "classnames";
 import cssForm from "styles/components/form.module.scss";
 import React, { useEffect, useState } from "react";
 import StepDislay from "components/registration/stepDisplay";
+import { useFormState } from "react-hook-form";
 
 const ExtrasForm = ({
   isAdmin,
@@ -14,10 +15,14 @@ const ExtrasForm = ({
   trigger,
   setValue,
   watch,
+  control,  
 }) => {
   // Watch form values
   const buyTShirt = watch("buy_tshirt");
   const tshirtSize = watch("tshirt_size");
+
+  // Get form state to check if it has been submitted
+  const { isSubmitted } = useFormState({ control });
 
   // State for T-Shirt selection
   const [wantsTShirt, setWantsTShirt] = useState(false);
@@ -28,14 +33,19 @@ const ExtrasForm = ({
 
   // Ensure T-Shirt selection persists & Summary updates
   useEffect(() => {
-    if (buyTShirt === "1") {
-      setWantsTShirt(true);
-    } else {
-      setWantsTShirt(false);
-      setValue("tshirt_size", ""); // Reset size if T-shirt is unselected
+    if (buyTShirt == null) return; // Prevent validation errors from showing on first load
+
+    const wants = buyTShirt === "1";
+    if (wantsTShirt !== wants) {
+      setWantsTShirt(wants);
     }
-    trigger(); // Ensure Summary updates
-  }, [buyTShirt, setValue, trigger]);
+
+    if (!wants) {
+      setValue("tshirt_size", "");
+    }
+
+    trigger();
+  }, [buyTShirt, wantsTShirt, setValue, trigger]);
 
   // Ensure Summary updates when size changes
   useEffect(() => {
@@ -82,7 +92,7 @@ const ExtrasForm = ({
                 <input
                   type="radio"
                   id={`excursion-${option}`}
-                  className={classNames("form-check-input", { "is-invalid": errors.excursion })}
+                  className={classNames("form-check-input", { "is-invalid": isSubmitted && errors.excursion })}
                   value={option}
                   {...register("excursion", { required: "Please select an option" })}
                 />
@@ -92,7 +102,7 @@ const ExtrasForm = ({
               </div>
             ))}
           </div>
-          {errors.excursion && <p className="text-danger"><small>{errors.excursion.message}</small></p>}
+          {isSubmitted && errors.excursion && <p className="text-danger"><small>{errors.excursion.message}</small></p>}
         </div>
 
         {/* Buy T-Shirt */}
@@ -104,7 +114,7 @@ const ExtrasForm = ({
                 <input
                   type="radio"
                   id={`tshirt-${option}`}
-                  className={classNames("form-check-input", { "is-invalid": errors.buy_tshirt })}
+                  className={classNames("form-check-input", { "is-invalid": isSubmitted && errors.buy_tshirt })}
                   value={option}
                   {...register("buy_tshirt", { required: "Please select an option" })}
                   onChange={(e) => handleTShirtSelection(e.target.value)}
@@ -116,7 +126,7 @@ const ExtrasForm = ({
               </div>
             ))}
           </div>
-          {errors.buy_tshirt && <p className="text-danger"><small>{errors.buy_tshirt.message}</small></p>}
+          {isSubmitted && errors.buy_tshirt && <p className="text-danger"><small>{errors.buy_tshirt.message}</small></p>}
         </div>
 
         {/* T-Shirt Size Dropdown */}
@@ -124,7 +134,7 @@ const ExtrasForm = ({
           <div className="mb-4">
             <label className="fw-bold mb-2">Select your T-Shirt size</label>
             <select
-              className={classNames("form-select", { "is-invalid": errors.tshirt_size })}
+              className={classNames("form-select", { "is-invalid": isSubmitted && errors.tshirt_size })}
               {...register("tshirt_size", { required: "Please select a T-Shirt size" })}
               onChange={(e) => handleTShirtSizeSelection(e.target.value)}
               value={tshirtSize || ""}
@@ -134,7 +144,7 @@ const ExtrasForm = ({
                 <option key={size} value={size}>{size}</option>
               ))}
             </select>
-            {errors.tshirt_size && <p className="text-danger"><small>{errors.tshirt_size.message}</small></p>}
+            {isSubmitted && errors.tshirt_size && <p className="text-danger"><small>{errors.tshirt_size.message}</small></p>}
           </div>
         )}
       </div>

@@ -309,6 +309,7 @@ const MainForm = () => {
                 setValue={setValue}
                 trigger={trigger}
                 watch={watch}
+                control={control}
               />
             )}
 

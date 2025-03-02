@@ -136,7 +136,7 @@ const AdminParticipantsOnsite = () => {
                   <th>Reg. Date</th>
                   <th>Name</th>
                   <th>Total Due</th>
-                  <th>Payment Method</th>
+                  <th>Pay. Method</th>
                   <th>Confirmed</th>
                   <th></th>
                 </tr>
@@ -146,8 +146,14 @@ const AdminParticipantsOnsite = () => {
                   filteredParticipants.map((participant) => (
                     <tr key={participant.id}>
                       <td>{participant.created_at.split(' ')[0]}</td>
-                      <td>{participant.title} {participant.first_name} {participant.last_name}</td>
-                      <td>{participant.total_due} €</td>
+                      <td>{participant.title} {participant.first_name} {participant.last_name}</td> 
+                      <td>
+                        {participant.payment_method === 'Paypal' ? (
+                          <>{(parseFloat(participant.total_due) + parseFloat(participant.paypal_fee))}€</>
+                        ) : (
+                          <>{participant.total_due}€</>
+                        )}
+                      </td> 
                       <td>{participant.payment_method || "n/a"}</td>
                       <td>{participant.confirmation_sent === true ? "✅" : "❌"}</td>
                       <td>

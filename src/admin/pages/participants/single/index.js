@@ -218,6 +218,8 @@ const AdminParticipantsUser = () => {
     return <div className="alert alert-danger fw-bolder">{errorGettingDataFromDB}</div>
   }
  
+ 
+ 
   return (
     <PageContain
       breadcrumb={breadcrumb}
@@ -325,6 +327,7 @@ const AdminParticipantsUser = () => {
                 setValue={setValue}
                 trigger={trigger}
                 watch={watch}
+                control={control}
               />
             )}
             {tab === "comments" && (
@@ -346,7 +349,7 @@ const AdminParticipantsUser = () => {
                 setPaypalFee={setPaypalFee}
                 workshops={workshops}
                 registrationTypes={registrationTypes}
-                paymentMethods={paymentMethods}
+                paymentMethods={paymentMethods} 
                 watch={watch}
               />
             )}
