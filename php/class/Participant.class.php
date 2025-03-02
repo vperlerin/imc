@@ -22,7 +22,7 @@ class ParticipantManager
     }
 
     public function saveParticipant($data, $passwordHash)
-    { 
+    {
         try {
             $this->pdo->beginTransaction();
 
@@ -143,24 +143,26 @@ class ParticipantManager
 
             // Insert contributions (talks & posters)
             $stmt = $this->pdo->prepare("
-                INSERT INTO contributions (participant_id, type, title, authors, abstract, session_id, duration,  print, created_at, updated_at)
-                VALUES (:participant_id, :type, :title, :authors, :abstract, :session_id, :duration, :print, NOW(), NOW())
-            ");
+            INSERT INTO contributions (participant_id, type, title, authors, abstract, session_id, duration, print, created_at, updated_at)
+            VALUES (:participant_id, :type, :title, :authors, :abstract, :session_id, :duration, :print, NOW(), NOW())
+        ");
 
             // Insert talks
             foreach ($data['talks'] as $talk) {
                 var_dump($talk);
 
-                $stmt->execute([
-                    ':participant_id' => $participantId,
-                    ':type' => 'talk',
-                    ':title' => $talk['title'],
-                    ':authors' => $talk['authors'],
-                    ':abstract' => $talk['abstract'],
-                    ':session_id' => (int) $talk['session'],
-                    ':duration' => $talk['duration'],
-                    ':print' => FALSE
-                ]);
+                $sessionId = isset($talk['session']) ? (int) $talk['session'] : NULL;
+                $duration = isset($talk['duration']) ? $talk['duration'] : NULL;
+
+                $stmt->bindValue(':participant_id', $participantId, PDO::PARAM_INT);
+                $stmt->bindValue(':type', 'talk', PDO::PARAM_STR);
+                $stmt->bindValue(':title', $talk['title'], PDO::PARAM_STR);
+                $stmt->bindValue(':authors', $talk['authors'], PDO::PARAM_STR);
+                $stmt->bindValue(':abstract', $talk['abstract'], PDO::PARAM_STR);
+                $stmt->bindValue(':session_id', $sessionId !== NULL ? $sessionId : NULL, $sessionId !== NULL ? PDO::PARAM_INT : PDO::PARAM_NULL);
+                $stmt->bindValue(':duration', $duration !== NULL ? $duration : NULL, $duration !== NULL ? PDO::PARAM_STR : PDO::PARAM_NULL);
+                $stmt->bindValue(':print', FALSE, PDO::PARAM_BOOL);
+                $stmt->execute();
             }
 
             // Insert posters with print option
@@ -245,7 +247,7 @@ class ParticipantManager
                 foreach ($data['workshops'] as $workshopId) {
                     $stmt->execute([
                         ':participant_id' => $participantId,
-                        ':workshop_id' => (int) $workshopId   
+                        ':workshop_id' => (int) $workshopId
                     ]);
                 }
             }
