@@ -174,6 +174,8 @@ class ParticipantManager
                 $stmt->bindValue(':duration', $duration, $duration !== NULL ? PDO::PARAM_STR : PDO::PARAM_NULL);
                 $stmt->bindValue(':print', 0, PDO::PARAM_BOOL);
                 $stmt->execute();
+
+                var_dump("talk OK");
             }
 
             // Insert posters with print option
@@ -192,6 +194,8 @@ class ParticipantManager
                 $stmt->bindValue(':duration', $duration, $duration !== NULL ? PDO::PARAM_STR : PDO::PARAM_NULL);
                 $stmt->bindValue(':print', $printValue ? 1 : 0, PDO::PARAM_INT);
                 $stmt->execute();
+
+                var_dump("poster OK");
             }
 
 
