@@ -246,7 +246,7 @@ class ParticipantManager
     
             // Update Arrival Details
             $stmt = $this->pdo->prepare("
-                UPDATE participant_arrival
+                UPDATE arrival
                 SET arrival_date = :arrival_date, arrival_hour = :arrival_hour, arrival_minute = :arrival_minute, 
                     departure_date = :departure_date, departure_hour = :departure_hour, departure_minute = :departure_minute, 
                     travelling = :travelling, travelling_details = :travelling_details, updated_at = NOW()
@@ -267,7 +267,7 @@ class ParticipantManager
     
             // Update Accommodation
             $stmt = $this->pdo->prepare("
-                UPDATE participant_accommodation
+                UPDATE accommodation
                 SET registration_type_id = :registration_type_id, updated_at = NOW()
                 WHERE participant_id = :participant_id
             ");
