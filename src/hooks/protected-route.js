@@ -9,13 +9,12 @@ const ProtectedRoute = ({ children }) => {
   const isAuthenticated = useSelector(authSelectors.isLoggedIn);
   const [loading, setLoading] = useState(true);
   const host = window.location.host;
-
   
   useEffect(() => {
     dispatch(fetchUser()).finally(() => setLoading(false));   
   }, [dispatch]);
 
-  if (loading) return <div>Loading...</div>;  // Prevent access before API response
+  if (loading) return <div>Security check...</div>;  // Prevent access before API response
 
   if(host === 'localhost:3000') {
     return <>{children}</>

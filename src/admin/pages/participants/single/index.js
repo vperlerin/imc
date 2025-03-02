@@ -128,8 +128,8 @@ const AdminParticipantsUser = () => {
     const { dob, ...otherDetails } = participant.participant;
 
     if (dob) {
-      const [year, month, day] = dob.split("-");
-      setValue("dobDay", day);
+      const [year, month, day] = dob.split("-"); 
+      setValue("dobDay", String(Number(day)));
       setValue("dobMonth", String(Number(month)));
       setValue("dobYear", year);
     }
@@ -231,19 +231,18 @@ const AdminParticipantsUser = () => {
   }
 
 
-
-
   return (
     <PageContain
       breadcrumb={breadcrumb}
     >
-      {loading || (error && !loading) || (!participant && !loading) || successMsg}
-      <div className="position-relative">
-        {loading && <Loader />}
-        {error && !loading && <div className="alert alert-danger">{error}</div>}
-        {!participant && !loading && <div className="alert alert-danger">No participant data available.</div>}
-        {successMsg && <div className="alert alert-success">{successMsg}</div>}
-      </div>
+      {loading || (error && !loading) || (!participant && !loading) || successMsg && (
+        <div className="position-relative fw-bolder">
+          {loading && <Loader />}
+          {error && !loading && <div className="alert alert-danger">{error}</div>}
+          {!participant && !loading && <div className="alert alert-danger">No participant data available.</div>}
+          {successMsg && <div className="alert alert-success">{successMsg}</div>}
+        </div>
+      )}
 
       {!loading && participant && isSummaryReady && (
         <form onSubmit={handleSubmit(onSubmit)}>

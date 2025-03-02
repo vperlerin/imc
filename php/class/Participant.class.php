@@ -23,6 +23,8 @@ class ParticipantManager
 
     public function saveParticipant($data, $passwordHash)
     {
+        var_dump($data);
+
         try {
             $this->pdo->beginTransaction();
 
