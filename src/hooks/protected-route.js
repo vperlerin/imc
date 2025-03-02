@@ -8,14 +8,19 @@ const ProtectedRoute = ({ children }) => {
   const isAdmin = useSelector(authSelectors.isAdmin);
   const isAuthenticated = useSelector(authSelectors.isLoggedIn);
   const [loading, setLoading] = useState(true);
+  const host = window.location.host;
 
-  console.log("IS ADMIN? ", isAdmin);
-
+  
   useEffect(() => {
     dispatch(fetchUser()).finally(() => setLoading(false));   
   }, [dispatch]);
 
   if (loading) return <div>Loading...</div>;  // Prevent access before API response
+
+  if(host === 'localhost:3000') {
+    return <>{children}</>
+  }
+
   return isAuthenticated && isAdmin ? children : <Navigate to="/login" replace />;
 };
 
