@@ -22,9 +22,7 @@ class ParticipantManager
     }
 
     public function saveParticipant($data, $passwordHash)
-    {
-        var_dump($data);
-
+    { 
         try {
             $this->pdo->beginTransaction();
 
@@ -187,6 +185,8 @@ class ParticipantManager
 
     public function updateParticipant($participantId, $data)
     {
+        var_dump($data);
+
         try {
             $this->pdo->beginTransaction();
 
