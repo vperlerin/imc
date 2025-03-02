@@ -148,7 +148,7 @@ class ParticipantManager
             ");
 
             // Insert talks
-            foreach ($data['talks'] as $talk) { 
+            foreach ($data['talks'] as $talk) {
                 $sessionId = isset($talk['session']) ? (int) $talk['session'] : NULL;
                 $duration = isset($talk['duration']) ? $talk['duration'] : NULL;
 
@@ -304,37 +304,42 @@ class ParticipantManager
             $stmt = $this->pdo->prepare("DELETE FROM contributions WHERE participant_id = :participant_id");
             $stmt->execute([':participant_id' => $participantId]);
 
+            // Insert contributions (talks & posters)
             $stmt = $this->pdo->prepare("
-                INSERT INTO contributions (participant_id, type, title, authors, abstract, session_id, duration, print, created_at, updated_at)
-                VALUES (:participant_id, :type, :title, :authors, :abstract, :session_id, :duration, :print, NOW(), NOW())
-            ");
+             INSERT INTO contributions (participant_id, type, title, authors, abstract, session_id, duration, print, created_at, updated_at)
+             VALUES (:participant_id, :type, :title, :authors, :abstract, :session_id, :duration, :print, NOW(), NOW())
+         ");
 
-            // Insert Talks
+            // Insert talks
             foreach ($data['talks'] as $talk) {
-                $stmt->execute([
-                    ':participant_id' => $participantId,
-                    ':type' => 'talk',
-                    ':title' => $talk['title'],
-                    ':authors' => $talk['authors'],
-                    ':abstract' => $talk['abstract'],
-                    ':session_id' => (int) $talk['session_id'],
-                    ':duration' => $talk['duration'],
-                    ':print' => FALSE
-                ]);
+                $sessionId = isset($talk['session']) ? (int) $talk['session'] : NULL;
+                $duration = isset($talk['duration']) ? $talk['duration'] : NULL;
+
+                $stmt->bindValue(':participant_id', $participantId, PDO::PARAM_INT);
+                $stmt->bindValue(':type', 'talk', PDO::PARAM_STR);
+                $stmt->bindValue(':title', $talk['title'], PDO::PARAM_STR);
+                $stmt->bindValue(':authors', $talk['authors'], PDO::PARAM_STR);
+                $stmt->bindValue(':abstract', $talk['abstract'], PDO::PARAM_STR);
+                $stmt->bindValue(':session_id', $sessionId !== NULL ? $sessionId : NULL, $sessionId !== NULL ? PDO::PARAM_INT : PDO::PARAM_NULL);
+                $stmt->bindValue(':duration', $duration !== NULL ? $duration : NULL, $duration !== NULL ? PDO::PARAM_STR : PDO::PARAM_NULL);
+                $stmt->bindValue(':print', FALSE, PDO::PARAM_BOOL);
+                $stmt->execute();
             }
 
-            // Insert Posters
+            // Insert posters with print option
             foreach ($data['posters'] as $poster) {
-                $stmt->execute([
-                    ':participant_id' => $participantId,
-                    ':type' => 'poster',
-                    ':title' => $poster['title'],
-                    ':authors' => $poster['authors'],
-                    ':abstract' => $poster['abstract'],
-                    ':session_id' => (int) $poster['session_id'],
-                    ':duration' => null,
-                    ':print' => filter_var($poster['print'], FILTER_VALIDATE_BOOLEAN)
-                ]);
+                $sessionId = isset($talk['session']) ? (int) $talk['session'] : NULL;
+                $duration = isset($talk['duration']) ? $talk['duration'] : NULL;
+
+                $stmt->bindValue(':participant_id', $participantId, PDO::PARAM_INT);
+                $stmt->bindValue(':type', 'poster', PDO::PARAM_STR);
+                $stmt->bindValue(':title', $talk['title'], PDO::PARAM_STR);
+                $stmt->bindValue(':authors', $talk['authors'], PDO::PARAM_STR);
+                $stmt->bindValue(':abstract', $talk['abstract'], PDO::PARAM_STR);
+                $stmt->bindValue(':session_id', $sessionId !== NULL ? $sessionId : NULL, $sessionId !== NULL ? PDO::PARAM_INT : PDO::PARAM_NULL);
+                $stmt->bindValue(':duration', $duration !== NULL ? $duration : NULL, $duration !== NULL ? PDO::PARAM_STR : PDO::PARAM_NULL);
+                $stmt->bindValue(':print', FALSE, PDO::PARAM_BOOL);
+                $stmt->execute();
             }
 
             $this->pdo->commit();
