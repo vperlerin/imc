@@ -10,6 +10,7 @@ import { useDispatch } from 'react-redux';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { menuItems } from 'data/admin-menu';
 import { onStopPropagation } from 'utils/event';
+import axios from 'axios';
 
 const sideMenuWidth = parseInt(css.sharedSideMenuWidth, 10) || 250;
 
@@ -25,8 +26,9 @@ const Menu = ({ cd }) => {
     config: { tension: 350, friction: 30 }
   }));
 
-  const handleLogout = () => {
-    dispatch(authActions.logout());
+  const handleLogout = async () => {
+    await axios.get(`${process.env.REACT_APP_API_URL}/logout.php`, { withCredentials: true });
+    dispatch(authActions.logout());  // ✅ Clears Redux state
     goTo('/');
   };
 

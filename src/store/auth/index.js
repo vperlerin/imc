@@ -33,11 +33,11 @@ const authSlice = createSlice({
   },
 });
 
-// ✅ Define `fetchUser` directly here 
+// ✅ Define `fetchUser` directly here  
 export const fetchUser = () => async (dispatch) => {
   try {
     const response = await axios.get(`${process.env.REACT_APP_API_URL}/auth/user.php`, {
-      withCredentials: true,  // ✅ Ensures session cookie is sent
+      withCredentials: true,  // ✅ Required to send session cookies
     });
 
     if (!response.data?.success) {

@@ -21,34 +21,30 @@ const Login = () => {
     event.preventDefault();
     setError(null);
     setIsLoading(true);
-
+  
     try {
       const response = await axios.post(
         `${process.env.REACT_APP_API_URL}/login.php`,
         { email, password },
         {
           headers: { "Content-Type": "application/json" },
-          withCredentials: true,
+          withCredentials: true,   
         }
       );
-
+  
       if (!response.data?.success) {
         throw new Error(response.data?.message || "Invalid response from server");
       }
-
-      // ✅ Securely fetch user details (ensures `isAdmin` is correctly set)
-      await dispatch(authActions.fetchUser());
-
-      // ✅ Redirect based on backend-confirmed user role
-      const user = response.data.user || {};
-      navigate(user.is_admin ? "/admin/dashboard" : "/");
-
+  
+      await dispatch(authActions.fetchUser());   
+      navigate(response.data.user.is_admin ? "/admin/dashboard" : "/");
     } catch (err) {
       setError(err.message);
     } finally {
       setIsLoading(false);
     }
   };
+  
 
   return (
     <div className={classNames(css.login, "flex-grow-1 d-flex h-100 align-items-center justify-content-center position-relative")}>
