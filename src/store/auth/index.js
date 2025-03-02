@@ -37,7 +37,7 @@ const authSlice = createSlice({
 export const fetchUser = () => async (dispatch) => {
   try {
     const response = await axios.get(`${process.env.REACT_APP_API_URL}/auth/user.php`, {
-      withCredentials: true,  // ✅ Required to send session cookies
+      withCredentials: true,   
     });
 
     if (!response.data?.success) {

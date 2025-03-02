@@ -14,6 +14,9 @@ header("Access-Control-Allow-Headers: Content-Type");
 
 session_start();
 
+echo("Session User ID: " . ($_SESSION["user_id"] ?? "Not Set"));
+
+
 // Handle preflight OPTIONS request
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(204);
