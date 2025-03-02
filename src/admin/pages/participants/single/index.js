@@ -319,7 +319,7 @@ const AdminParticipantsUser = () => {
                 setValue={setValue}
                 watch={watch}
                 trigger={trigger}
-                sessions={sessions}
+                sessions={sessions} 
               />
             )}
             {tab === "accommodation" && (

@@ -14,9 +14,10 @@ const TalkPosterForm = ({
   sessions,
   talkDurations = [],
   initialValues = {},
+  setValue,
+  watch,
 }) => {
   const isTalk = type === "talk";
-
 
   return (
     <div className="border rounded-2 p-3 mb-3 mx-md-5">
@@ -125,10 +126,10 @@ const TalkPosterForm = ({
           {!isAdmin && <p className="form-text mt-0">{conferenceData.poster_print.desc}</p>}
 
           <div className="text-center btn-group d-block" role="group">
-            {/* Normalize the print value */}
+            {/* Fetch the watched value to ensure reactivity */}
             {(() => {
-              const storedPrintValue = initialValues.print; // This is from the DB
-              const printBoolean = storedPrintValue === true || storedPrintValue === "true" || storedPrintValue === 1 || storedPrintValue === "1";
+              const printValue = watch(`${type}s.${index}.print`) ?? initialValues.print;
+              const isPrinted = printValue === true || printValue === "true" || printValue === 1 || printValue === "1";
 
               return (
                 <>
@@ -139,8 +140,8 @@ const TalkPosterForm = ({
                     id={`printYes${index}`}
                     value="true"
                     {...register(`${type}s.${index}.print`, { required: "Please select an option" })}
-                    onChange={() => setValue(`${type}s.${index}.print`, true)}  
-                    checked={watch(`${type}s.${index}.print`) === "true" || printBoolean}
+                    onChange={() => setValue(`${type}s.${index}.print`, "true", { shouldValidate: true, shouldDirty: true })}
+                    checked={isPrinted}
                   />
                   <label className="btn btn-outline-neutral" htmlFor={`printYes${index}`}>
                     Yes
@@ -153,8 +154,8 @@ const TalkPosterForm = ({
                     id={`printNo${index}`}
                     value="false"
                     {...register(`${type}s.${index}.print`, { required: "Please select an option" })}
-                    onChange={() => setValue(`${type}s.${index}.print`, false)}  
-                    checked={watch(`${type}s.${index}.print`) === "false" || !printBoolean}
+                    onChange={() => setValue(`${type}s.${index}.print`, "false", { shouldValidate: true, shouldDirty: true })}
+                    checked={!isPrinted}
                   />
                   <label className="btn btn-outline-neutral" htmlFor={`printNo${index}`}>
                     No
@@ -165,6 +166,7 @@ const TalkPosterForm = ({
           </div>
         </div>
       )}
+
 
     </div>
   );

@@ -137,14 +137,14 @@ class ParticipantManager
                 ':participant_id' => $participantId,
                 ':excursion' => filter_var($data['excursion'], FILTER_VALIDATE_BOOLEAN),
                 ':buy_tshirt' => filter_var($data['buy_tshirt'], FILTER_VALIDATE_BOOLEAN),
-                ':tshirt_size' => $data['tshirt_size'] ?? null, 
+                ':tshirt_size' => $data['tshirt_size'] ?? null,
             ]);
 
             // Insert contributions (talks & posters)
             $stmt = $this->pdo->prepare("
-                INSERT INTO contributions (participant_id, type, title, authors, abstract, session_id, duration, print, created_at, updated_at)
-                VALUES (:participant_id, :type, :title, :authors, :abstract, :session_id, :duration, :print, NOW(), NOW())
-            ");
+INSERT INTO contributions (participant_id, type, title, authors, abstract, session_id, duration, print, created_at, updated_at)
+VALUES (:participant_id, :type, :title, :authors, :abstract, :session_id, :duration, :print, NOW(), NOW())
+");
 
             // Insert talks
             foreach ($data['talks'] as $talk) {
@@ -156,15 +156,16 @@ class ParticipantManager
                 $stmt->bindValue(':title', $talk['title'], PDO::PARAM_STR);
                 $stmt->bindValue(':authors', $talk['authors'], PDO::PARAM_STR);
                 $stmt->bindValue(':abstract', $talk['abstract'], PDO::PARAM_STR);
-                $stmt->bindValue(':session_id', $sessionId !== NULL ? $sessionId : NULL, $sessionId !== NULL ? PDO::PARAM_INT : PDO::PARAM_NULL);
-                $stmt->bindValue(':duration', $duration !== NULL ? $duration : NULL, $duration !== NULL ? PDO::PARAM_STR : PDO::PARAM_NULL);
-                $stmt->bindValue(':print', FALSE, PDO::PARAM_BOOL);
+                $stmt->bindValue(':session_id', $sessionId, $sessionId !== NULL ? PDO::PARAM_INT : PDO::PARAM_NULL);
+                $stmt->bindValue(':duration', $duration, $duration !== NULL ? PDO::PARAM_STR : PDO::PARAM_NULL);
+                $stmt->bindValue(':print', FALSE, PDO::PARAM_BOOL); // Talks never have print
                 $stmt->execute();
             }
 
             // Insert posters with print option
             foreach ($data['posters'] as $poster) {
-                $printValue = isset($poster['print']) && filter_var($poster['print'], FILTER_VALIDATE_BOOLEAN);
+                // Ensure "print" is properly converted to a boolean
+                $printValue = isset($poster['print']) ? filter_var($poster['print'], FILTER_VALIDATE_BOOLEAN) : FALSE;
 
                 $sessionId = isset($poster['session']) ? (int) $poster['session'] : NULL;
                 $duration = isset($poster['duration']) ? $poster['duration'] : NULL;
@@ -174,8 +175,9 @@ class ParticipantManager
                 $stmt->bindValue(':title', $poster['title'], PDO::PARAM_STR);
                 $stmt->bindValue(':authors', $poster['authors'], PDO::PARAM_STR);
                 $stmt->bindValue(':abstract', $poster['abstract'], PDO::PARAM_STR);
-                $stmt->bindValue(':session_id', $sessionId !== NULL ? $sessionId : NULL, $sessionId !== NULL ? PDO::PARAM_INT : PDO::PARAM_NULL);
-                $stmt->bindValue(':print', $printValue ? 1 : 0);
+                $stmt->bindValue(':session_id', $sessionId, $sessionId !== NULL ? PDO::PARAM_INT : PDO::PARAM_NULL);
+                $stmt->bindValue(':duration', $duration, $duration !== NULL ? PDO::PARAM_STR : PDO::PARAM_NULL);
+                $stmt->bindValue(':print', $printValue, PDO::PARAM_BOOL); // Correctly bind as BOOL
                 $stmt->execute();
             }
 
@@ -296,7 +298,7 @@ class ParticipantManager
                 ':excursion' => filter_var($data['excursion'], FILTER_VALIDATE_BOOLEAN),
                 ':buy_tshirt' => filter_var($data['buy_tshirt'], FILTER_VALIDATE_BOOLEAN),
                 ':tshirt_size' => $data['tshirt_size'] ?? null,
-             ]);
+            ]);
 
             // Update Contributions (Talks & Posters)
             $stmt = $this->pdo->prepare("DELETE FROM contributions WHERE participant_id = :participant_id");
