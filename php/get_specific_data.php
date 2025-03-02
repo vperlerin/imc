@@ -20,6 +20,7 @@ try {
     SELECT * FROM registration_types;
     SELECT * FROM payment_methods;
     SELECT * FROM workshops;
+    SELECT * FROM imc_sessions;
 ";
   $stmt = $pdo->prepare($query);
   $stmt->execute();
@@ -30,6 +31,8 @@ try {
   $results['payment_methods'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
   $stmt->nextRowset();  
   $results['workshops'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+  $stmt->nextRowset();  
+  $results['sessions'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
   echo json_encode([
     "success" => true,

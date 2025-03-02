@@ -29,6 +29,7 @@ const AdminParticipantsUser = () => {
   const [paymentMethods, setPaymentMethods] = useState([]);
   const [workshops, setWorkshops] = useState([]);
   const [registrationTypes, setRegistrationTypes] = useState([]);
+  const [sessions, setSessions]  = useStae([]);
   const [unsavedChanges, setUnsavedChanges] = useState(false);
   const [total, setTotal] = useState(0);
   const [paypalFee, setPaypalFee] = useState(0);
@@ -70,10 +71,13 @@ const AdminParticipantsUser = () => {
         if (response.data.success
           && response.data.data.workshops
           && response.data.data.payment_methods
-          && response.data.data.registration_types) {
+          && response.data.data.registration_types
+          && response.data.data.sessions
+        ) {
           setWorkshops(response.data.data.workshops);
           setPaymentMethods(response.data.data.payment_methods);
           setRegistrationTypes(response.data.data.registration_types);
+          setSessions(response.data.data.sessions);
         } else {
           throw new Error(response.data.message || "Failed to fetch data - please try again later.");
         }
@@ -315,6 +319,7 @@ const AdminParticipantsUser = () => {
                 setValue={setValue}
                 watch={watch}
                 trigger={trigger}
+                sessions={sessions}
               />
             )}
             {tab === "accommodation" && (

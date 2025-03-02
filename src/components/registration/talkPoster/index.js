@@ -11,7 +11,7 @@ const TalkPosterForm = ({
   remove,
   type,
   errors,
-  imcSessions,
+  sessions,
   talkDurations = [],
   initialValues = {},
 }) => {
@@ -83,7 +83,7 @@ const TalkPosterForm = ({
             {...register(`${type}s.${index}.session`, { required: "Session is required" })}
           >
             <option value="">Select a session</option>
-            {imcSessions.map((session) => (
+            {sessions.map((session) => (
               <option key={session.id} value={session.id}>
                 {session.name} {/* Display session name but store session ID */}
               </option>

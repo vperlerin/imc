@@ -24,11 +24,10 @@ const ContributionForm = ({
   trigger,
   setValue,
   getValues,
+  sessions
 }) => {
   const [wantsToContribute, setWantsToContribute] = useState(null);
- 
-  const imcSessions = conferenceData.sessions;
- 
+
   const { fields: talks, append: addTalk, remove: removeTalk } = useFieldArray({ control, name: "talks" });
   const { fields: posters, append: addPoster, remove: removePoster } = useFieldArray({ control, name: "posters" });
 
@@ -54,7 +53,7 @@ const ContributionForm = ({
       authors: "John Doe, Jane Smith",
       abstract: "A study on advanced meteor observation methods.",
       session: "Meteor physics and dynamics",
-      duration: "15min", 
+      duration: "15min",
     });
 
     if (!isOnline) {
@@ -62,7 +61,7 @@ const ContributionForm = ({
         title: "Radio Meteor Detection",
         authors: "Alice Brown, Bob White",
         abstract: "An overview of detecting meteors using radio waves.",
-        session: "Radio meteor work", 
+        session: "Radio meteor work",
         print: "true",
       });
     }
@@ -71,21 +70,21 @@ const ContributionForm = ({
   useEffect(() => {
     const existingTalks = getValues("talks") || [];
     const existingPosters = getValues("posters") || [];
-  
+
     if (existingTalks.length > 0 || existingPosters.length > 0) {
       setValue("wantsToContribute", "yes");
       setWantsToContribute(true);
     }
-  
+
     // Populate talks if they exist
     if (existingTalks.length > 0) {
-      removeTalk();  
+      removeTalk();
       existingTalks.forEach((talk) => addTalk({ ...talk, session: talk.session_id })); // Ensure session ID is set
     }
-  
+
     // Populate posters if they exist
     if (existingPosters.length > 0 && !isOnline) {
-      removePoster(); 
+      removePoster();
       existingPosters.forEach((poster) => addPoster({ ...poster, session: poster.session_id }));
     }
   }, [getValues, setValue, addTalk, addPoster, removeTalk, removePoster, isOnline]);
@@ -105,7 +104,7 @@ const ContributionForm = ({
           Contributions
         </h4>
       )}
- 
+
       <div className={classNames(cssForm.smallW, 'mx-auto position-relative')}>
         <div className="mb-3 row">
           <label className={classNames('text-center fw-bold', cssForm.balance)}>
@@ -180,8 +179,8 @@ const ContributionForm = ({
               remove={() => removeTalk(index)}
               type="talk"
               errors={errors}
-              imcSessions={imcSessions}
-              talkDurations={talkDurations} 
+              sessions={sessions}
+              talkDurations={talkDurations}
               initialValues={talk}
             />
           ))}
@@ -198,7 +197,7 @@ const ContributionForm = ({
                 remove={() => removePoster(index)}
                 type="poster"
                 errors={errors}
-                imcSessions={imcSessions} 
+                sessions={sessions}
                 initialValues={poster}
               />
             ))}
