@@ -151,10 +151,7 @@ class ParticipantManager
                 INSERT INTO contributions (participant_id, type, title, authors, abstract, session_id, duration, print, created_at, updated_at)
                 VALUES (:participant_id, :type, :title, :authors, :abstract, :session_id, :duration, :print, NOW(), NOW())
             ");
-
-            var_dump($data['talks']);
-            var_dump($data['posters']);
-
+ 
             // Insert talks
             foreach ($data['talks'] as $talk) {
                 $sessionId = isset($talk['session']) ? (int) $talk['session'] : NULL;
