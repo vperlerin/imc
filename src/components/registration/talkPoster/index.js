@@ -15,7 +15,8 @@ const TalkPosterForm = ({
   talkDurations = [],
   initialValues = {},
 }) => {
-  const isTalk = type === "talk";  
+  const isTalk = type === "talk";
+
 
   return (
     <div className="border rounded-2 p-3 mb-3 mx-md-5">
@@ -122,33 +123,49 @@ const TalkPosterForm = ({
             Do you want to have your poster printed on-site for {conferenceData.poster_print.price}€?
           </label>
           {!isAdmin && <p className="form-text mt-0">{conferenceData.poster_print.desc}</p>}
-          <div className="text-center btn-group d-block" role="group">
-            <input
-              type="radio"
-              className="btn-check"
-              id={`printYes${index}`}
-              value="true"
-              {...register(`${type}s.${index}.print`, { required: "Please select an option" })}
-              defaultChecked={initialValues.print === "true" || initialValues.print === "1"}
-            />
-            <label className="btn btn-outline-neutral" htmlFor={`printYes${index}`}>
-              Yes
-            </label>
 
-            <input
-              type="radio"
-              className="btn-check"
-              id={`printNo${index}`}
-              value="false"
-              {...register(`${type}s.${index}.print`, { required: "Please select an option" })}
-              defaultChecked={initialValues.print === "false" || initialValues.print === "0"}
-            />
-            <label className="btn btn-outline-neutral" htmlFor={`printNo${index}`}>
-              No
-            </label>
+          <div className="text-center btn-group d-block" role="group">
+            {/* Normalize the print value */}
+            {(() => {
+              const storedPrintValue = initialValues.print; // This is from the DB
+              const printBoolean = storedPrintValue === true || storedPrintValue === "true" || storedPrintValue === 1 || storedPrintValue === "1";
+
+              return (
+                <>
+                  {/* Yes Button */}
+                  <input
+                    type="radio"
+                    className="btn-check"
+                    id={`printYes${index}`}
+                    value="true"
+                    {...register(`${type}s.${index}.print`, { required: "Please select an option" })}
+                    onChange={() => setValue(`${type}s.${index}.print`, true)}  
+                    checked={watch(`${type}s.${index}.print`) === "true" || printBoolean}
+                  />
+                  <label className="btn btn-outline-neutral" htmlFor={`printYes${index}`}>
+                    Yes
+                  </label>
+
+                  {/* No Button */}
+                  <input
+                    type="radio"
+                    className="btn-check"
+                    id={`printNo${index}`}
+                    value="false"
+                    {...register(`${type}s.${index}.print`, { required: "Please select an option" })}
+                    onChange={() => setValue(`${type}s.${index}.print`, false)}  
+                    checked={watch(`${type}s.${index}.print`) === "false" || !printBoolean}
+                  />
+                  <label className="btn btn-outline-neutral" htmlFor={`printNo${index}`}>
+                    No
+                  </label>
+                </>
+              );
+            })()}
           </div>
         </div>
       )}
+
     </div>
   );
 };

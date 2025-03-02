@@ -36,12 +36,13 @@ function create_email(array $data, string $summary): string
     ";
 
     // TODO: get the payment_method from paymentè_id!!!!
-
+    /*
     if (strtolower($data['payment_method']) == 'paypal') {
         $message .= "<p>If you haven't paid already, all";
     } else {
         $message .= "<p>All";
     }
+        */
 
     $message .= " you need to do now is send the required payment of:</p>
         <p><b>{$data['total_due']} €</b></p>";

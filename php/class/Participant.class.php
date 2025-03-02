@@ -137,8 +137,7 @@ class ParticipantManager
                 ':participant_id' => $participantId,
                 ':excursion' => filter_var($data['excursion'], FILTER_VALIDATE_BOOLEAN),
                 ':buy_tshirt' => filter_var($data['buy_tshirt'], FILTER_VALIDATE_BOOLEAN),
-                ':tshirt_size' => $data['tshirt_size'] ?? null,
-                ':proceedings' => !empty($data['posters']) && $data['posters'][0]['print'] === "true" ? "pdf_printed" : "pdf"
+                ':tshirt_size' => $data['tshirt_size'] ?? null, 
             ]);
 
             // Insert contributions (talks & posters)
@@ -165,6 +164,8 @@ class ParticipantManager
 
             // Insert posters with print option
             foreach ($data['posters'] as $poster) {
+                $printValue = isset($poster['print']) && filter_var($poster['print'], FILTER_VALIDATE_BOOLEAN);
+
                 $sessionId = isset($poster['session']) ? (int) $poster['session'] : NULL;
                 $duration = isset($poster['duration']) ? $poster['duration'] : NULL;
 
@@ -174,7 +175,7 @@ class ParticipantManager
                 $stmt->bindValue(':authors', $poster['authors'], PDO::PARAM_STR);
                 $stmt->bindValue(':abstract', $poster['abstract'], PDO::PARAM_STR);
                 $stmt->bindValue(':session_id', $sessionId !== NULL ? $sessionId : NULL, $sessionId !== NULL ? PDO::PARAM_INT : PDO::PARAM_NULL);
-                $stmt->bindValue(':print', $poster['print'], PDO::PARAM_BOOL);
+                $stmt->bindValue(':print', $printValue ? 1 : 0);
                 $stmt->execute();
             }
 
@@ -286,8 +287,7 @@ class ParticipantManager
             // Update Extra Options
             $stmt = $this->pdo->prepare("
                 UPDATE extra_options
-                SET excursion = :excursion, buy_tshirt = :buy_tshirt, tshirt_size = :tshirt_size, 
-                    proceedings = :proceedings, updated_at = NOW()
+                SET excursion = :excursion, buy_tshirt = :buy_tshirt, tshirt_size = :tshirt_size,  updated_at = NOW()
                 WHERE participant_id = :participant_id
             ");
 
@@ -296,8 +296,7 @@ class ParticipantManager
                 ':excursion' => filter_var($data['excursion'], FILTER_VALIDATE_BOOLEAN),
                 ':buy_tshirt' => filter_var($data['buy_tshirt'], FILTER_VALIDATE_BOOLEAN),
                 ':tshirt_size' => $data['tshirt_size'] ?? null,
-                ':proceedings' => !empty($data['posters']) && $data['posters'][0]['print'] === "true" ? "pdf_printed" : "pdf"
-            ]);
+             ]);
 
             // Update Contributions (Talks & Posters)
             $stmt = $this->pdo->prepare("DELETE FROM contributions WHERE participant_id = :participant_id");
