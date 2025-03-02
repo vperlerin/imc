@@ -148,9 +148,7 @@ class ParticipantManager
             ");
 
             // Insert talks
-            foreach ($data['talks'] as $talk) {
-                var_dump($talk);
-
+            foreach ($data['talks'] as $talk) { 
                 $sessionId = isset($talk['session']) ? (int) $talk['session'] : NULL;
                 $duration = isset($talk['duration']) ? $talk['duration'] : NULL;
 
@@ -191,8 +189,6 @@ class ParticipantManager
 
     public function updateParticipant($participantId, $data)
     {
-        var_dump($data);
-
         try {
             $this->pdo->beginTransaction();
 
