@@ -79,20 +79,20 @@ const TalkPosterForm = ({
         <div className="col-sm-10">
           <select
             className={classNames("form-select", errors?.[`${type}s`]?.[index]?.session && "is-invalid", cssForm.mdAuto)}
-            defaultValue={initialValues.session_name || ""}
+            defaultValue={initialValues.session_id || ""}
             {...register(`${type}s.${index}.session`, { required: "Session is required" })}
           >
             <option value="">Select a session</option>
             {imcSessions.map((session) => (
-              <option key={session} value={session}>
-                {session}
+              <option key={session.id} value={session.id}>
+                {session.name} {/* Display session name but store session ID */}
               </option>
             ))}
           </select>
           {errors?.[`${type}s`]?.[index]?.session && <p className="text-danger"><small>{errors[`${type}s`][index].session.message}</small></p>}
         </div>
       </div>
-
+      
       {/* Talk Duration (Only for Talks) */}
       {isTalk && (
         <div className="mb-3 row">

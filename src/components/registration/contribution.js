@@ -28,11 +28,7 @@ const ContributionForm = ({
   const [wantsToContribute, setWantsToContribute] = useState(null);
  
   const imcSessions = conferenceData.sessions;
-  const paperDeliveryOptions = [
-    { label: "Before the IMC", value: "before_imc" },
-    { label: "During the IMC", value: "during_imc" },
-    { label: `No later than ${formatFullDate(conferenceData.deadlines.paper)}`, value: "after_imc" }
-  ];
+ 
   const { fields: talks, append: addTalk, remove: removeTalk } = useFieldArray({ control, name: "talks" });
   const { fields: posters, append: addPoster, remove: removePoster } = useFieldArray({ control, name: "posters" });
 
@@ -84,13 +80,13 @@ const ContributionForm = ({
     // Populate talks if they exist
     if (existingTalks.length > 0) {
       removeTalk();  
-      existingTalks.forEach((talk) => addTalk(talk));
+      existingTalks.forEach((talk) => addTalk({ ...talk, session: talk.session_id })); // Ensure session ID is set
     }
   
     // Populate posters if they exist
     if (existingPosters.length > 0 && !isOnline) {
       removePoster(); 
-      existingPosters.forEach((poster) => addPoster(poster));
+      existingPosters.forEach((poster) => addPoster({ ...poster, session: poster.session_id }));
     }
   }, [getValues, setValue, addTalk, addPoster, removeTalk, removePoster, isOnline]);
 
@@ -185,8 +181,7 @@ const ContributionForm = ({
               type="talk"
               errors={errors}
               imcSessions={imcSessions}
-              talkDurations={talkDurations}
-              paperDeliveryOptions={paperDeliveryOptions}
+              talkDurations={talkDurations} 
               initialValues={talk}
             />
           ))}
@@ -203,8 +198,7 @@ const ContributionForm = ({
                 remove={() => removePoster(index)}
                 type="poster"
                 errors={errors}
-                imcSessions={imcSessions}
-                paperDeliveryOptions={paperDeliveryOptions}
+                imcSessions={imcSessions} 
                 initialValues={poster}
               />
             ))}
