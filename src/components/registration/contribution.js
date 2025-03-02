@@ -58,8 +58,7 @@ const ContributionForm = ({
       authors: "John Doe, Jane Smith",
       abstract: "A study on advanced meteor observation methods.",
       session: "Meteor physics and dynamics",
-      duration: "15min",
-      paperDate: "before_imc",
+      duration: "15min", 
     });
 
     if (!isOnline) {
@@ -67,8 +66,7 @@ const ContributionForm = ({
         title: "Radio Meteor Detection",
         authors: "Alice Brown, Bob White",
         abstract: "An overview of detecting meteors using radio waves.",
-        session: "Radio meteor work",
-        paperDate: "after_imc",
+        session: "Radio meteor work", 
         print: "true",
       });
     }

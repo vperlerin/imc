@@ -138,8 +138,8 @@ class ParticipantManager
 
             // Insert contributions (talks & posters)
             $stmt = $this->pdo->prepare("
-                INSERT INTO contributions (participant_id, type, title, authors, abstract, session_id, duration, paper_submission, print, created_at, updated_at)
-                VALUES (:participant_id, :type, :title, :authors, :abstract, (SELECT id FROM imc_sessions WHERE name = :session), :duration, :paper_submission, :print, NOW(), NOW())
+                INSERT INTO contributions (participant_id, type, title, authors, abstract, session_id, duration,  print, created_at, updated_at)
+                VALUES (:participant_id, :type, :title, :authors, :abstract, (SELECT id FROM imc_sessions WHERE name = :session), :duration, , :print, NOW(), NOW())
             ");
 
             // Insert talks
@@ -151,8 +151,7 @@ class ParticipantManager
                     ':authors' => $talk['authors'],
                     ':abstract' => $talk['abstract'],
                     ':session' => $talk['session'],
-                    ':duration' => $talk['duration'],
-                    ':paper_submission' => $talk['paperDate'],
+                    ':duration' => $talk['duration'], 
                     ':print' => FALSE
                 ]);
             }
@@ -166,8 +165,7 @@ class ParticipantManager
                     ':authors' => $poster['authors'],
                     ':abstract' => $poster['abstract'],
                     ':session' => $poster['session'],
-                    ':duration' => null,
-                    ':paper_submission' => $poster['paperDate'],
+                    ':duration' => null, 
                     ':print' => filter_var($poster['print'], FILTER_VALIDATE_BOOLEAN)
                 ]);
             }
@@ -296,8 +294,8 @@ class ParticipantManager
             $stmt->execute([':participant_id' => $participantId]);
 
             $stmt = $this->pdo->prepare("
-                INSERT INTO contributions (participant_id, type, title, authors, abstract, session_id, duration, paper_submission, print, created_at, updated_at)
-                VALUES (:participant_id, :type, :title, :authors, :abstract, (SELECT id FROM imc_sessions WHERE name = :session), :duration, :paper_submission, :print, NOW(), NOW())
+                INSERT INTO contributions (participant_id, type, title, authors, abstract, session_id, duration,  print, created_at, updated_at)
+                VALUES (:participant_id, :type, :title, :authors, :abstract, (SELECT id FROM imc_sessions WHERE name = :session), :duration,  :print, NOW(), NOW())
             ");
 
             // Insert talks
@@ -309,8 +307,7 @@ class ParticipantManager
                     ':authors' => $talk['authors'],
                     ':abstract' => $talk['abstract'],
                     ':session' => $talk['session'],
-                    ':duration' => $talk['duration'],
-                    ':paper_submission' => $talk['paperDate'],
+                    ':duration' => $talk['duration'], 
                     ':print' => FALSE
                 ]);
             }
@@ -324,8 +321,7 @@ class ParticipantManager
                     ':authors' => $poster['authors'],
                     ':abstract' => $poster['abstract'],
                     ':session' => $poster['session'],
-                    ':duration' => null,
-                    ':paper_submission' => $poster['paperDate'],
+                    ':duration' => null, 
                     ':print' => filter_var($poster['print'], FILTER_VALIDATE_BOOLEAN)
                 ]);
             }
