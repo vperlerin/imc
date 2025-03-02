@@ -144,7 +144,7 @@ class ParticipantManager
             // Insert contributions (talks & posters)
             $stmt = $this->pdo->prepare("
                 INSERT INTO contributions (participant_id, type, title, authors, abstract, session_id, duration,  print, created_at, updated_at)
-                VALUES (:participant_id, :type, :title, :authors, :abstract, :session_id, :duration, , :print, NOW(), NOW())
+                VALUES (:participant_id, :type, :title, :authors, :abstract, :session_id, :duration, :print, NOW(), NOW())
             ");
 
             // Insert talks
