@@ -137,13 +137,10 @@ class ParticipantManager
                 ':registration_type_id' => (int) $data['registration_type_id']
             ]);
 
-
-            var_dump("accommodation OK");
-
             // Insert extra options
             $stmt = $this->pdo->prepare("
-                INSERT INTO extra_options (participant_id, excursion, buy_tshirt, tshirt_size, proceedings, created_at, updated_at)
-                VALUES (:participant_id, :excursion, :buy_tshirt, :tshirt_size, :proceedings, NOW(), NOW())
+                INSERT INTO extra_options (participant_id, excursion, buy_tshirt, tshirt_size, created_at, updated_at)
+                VALUES (:participant_id, :excursion, :buy_tshirt, :tshirt_size, NOW(), NOW())
             ");
             $stmt->execute([
                 ':participant_id' => $participantId,
