@@ -330,7 +330,7 @@ class ParticipantManager
 
             // Insert posters with print option
             foreach ($data['posters'] as $poster) {
-                $printValue = isset($poster['print']) ? filter_var($poster['print'], FILTER_VALIDATE_BOOLEAN) : FALSE;
+                $printValue = isset($poster['print']) ? (filter_var($poster['print'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ? 1 : 0) : 0;
 
                 $sessionId = isset($poster['session']) ? (int) $poster['session'] : NULL;
                 $duration = isset($poster['duration']) ? $poster['duration'] : NULL;
@@ -342,7 +342,7 @@ class ParticipantManager
                 $stmt->bindValue(':abstract', $poster['abstract'], PDO::PARAM_STR);
                 $stmt->bindValue(':session_id', $sessionId, $sessionId !== NULL ? PDO::PARAM_INT : PDO::PARAM_NULL);
                 $stmt->bindValue(':duration', $duration, $duration !== NULL ? PDO::PARAM_STR : PDO::PARAM_NULL);
-                $stmt->bindValue(':print', $printValue ? 1 : 0, PDO::PARAM_INT);
+                $stmt->bindValue(':print', $printValue, PDO::PARAM_INT);  // Ensure it's stored as an INT (1 or 0)
                 $stmt->execute();
             }
 
