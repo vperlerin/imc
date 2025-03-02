@@ -124,13 +124,24 @@ const AdminParticipantsUser = () => {
       return;
     }
 
-    // Identity
-    Object.keys(participant.participant).forEach((key) => {
-      if (participant.participant[key]) {
-        setValue(key, participant.participant[key]);
+    // Participant
+    const { dob, ...otherDetails } = participant.participant;
+
+    if (dob) {
+      const [year, month, day] = dob.split("-");
+      setValue("dobDay", day);
+      setValue("dobMonth", String(Number(month)));
+      setValue("dobYear", year);
+    }
+
+    // Set other participant details
+    Object.keys(otherDetails).forEach((key) => {
+      if (otherDetails[key]) {
+        setValue(key, otherDetails[key]);
       }
     });
- 
+
+
     // Workshops
     const participantWorkshops = participant.workshops?.map(workshop => String(workshop.id)) || [];
     setValue("workshops", participantWorkshops);
@@ -162,10 +173,10 @@ const AdminParticipantsUser = () => {
     if (participant.extra_options) {
       setValue("excursion", participant.extra_options.excursion ? "1" : "0");
       setValue("buy_tshirt", participant.extra_options.buy_tshirt ? "1" : "0");
-      setValue("tshirt_size", participant.extra_options.tshirt_size || ""); 
+      setValue("tshirt_size", participant.extra_options.tshirt_size || "");
     }
   }, [participant]);
-  
+
   const onSubmit = async (formData) => {
     setSaving(true);
     setError(null);
@@ -173,7 +184,7 @@ const AdminParticipantsUser = () => {
 
     try {
       const response = await axios.post(
-        `${process.env.REACT_APP_API_URL}/admin/update_participant.php?id=${participantId}`,
+        `${process.env.REACT_APP_API_URL}/update_participant.php?id=${participantId}`,
         formData,
         { headers: { "Content-Type": "application/json" } }
       );
@@ -207,7 +218,7 @@ const AdminParticipantsUser = () => {
     }
   ];
 
- 
+
   const isSummaryReady = (
     participant &&
     paymentMethods.length > 0 &&
@@ -220,8 +231,8 @@ const AdminParticipantsUser = () => {
   }
 
 
- 
-  
+
+
   return (
     <PageContain
       breadcrumb={breadcrumb}
@@ -233,7 +244,7 @@ const AdminParticipantsUser = () => {
         {!participant && !loading && <div className="alert alert-danger">No participant data available.</div>}
         {successMsg && <div className="alert alert-success">{successMsg}</div>}
       </div>
-        
+
       {!loading && participant && isSummaryReady && (
         <form onSubmit={handleSubmit(onSubmit)}>
           <ul className={classNames('nav nav-tabs mb-3 mt-2', cssTabs.tab, 'flex-column flex-sm-row')}>
@@ -315,7 +326,7 @@ const AdminParticipantsUser = () => {
                 register={register}
                 errors={errors}
                 paymentMethods={paymentMethods}
-                setValue={setValue}  
+                setValue={setValue}
                 registrationTypes={registrationTypes}
                 trigger={trigger}
               />
@@ -347,12 +358,12 @@ const AdminParticipantsUser = () => {
                 isEarlyBird={participant?.participant.is_early_bird}
                 conferenceData={cd}
                 getValues={getValues}
-                setValue={setValue} 
+                setValue={setValue}
                 setTotal={setTotal}
                 setPaypalFee={setPaypalFee}
                 workshops={workshops}
                 registrationTypes={registrationTypes}
-                paymentMethods={paymentMethods} 
+                paymentMethods={paymentMethods}
                 watch={watch}
               />
             )}

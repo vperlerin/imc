@@ -21,8 +21,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
  
 
 require_once __DIR__ . "/config.php";
-require_once __DIR__ . "/class/Connect.class.php"; // Ensure $pdo is loaded
-require_once __DIR__ . "/class/ParticipantManager.class.php"; // Ensure ParticipantManager is available
+require_once __DIR__ . "/class/Connect.class.php";  
+require_once __DIR__ . "/class/Particiant.class.php";   
 
 try {
     // Read JSON input
