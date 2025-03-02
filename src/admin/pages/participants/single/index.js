@@ -190,7 +190,7 @@ const AdminParticipantsUser = () => {
       );
 
       if (response.data.success) {
-        setSuccessMsg("Participant details updated successfully!");
+        setSuccessMsg("Participant updated successfully!");
         setUnsavedChanges(false);
       } else {
         throw new Error(response.data.message || "Failed to update participant.");
