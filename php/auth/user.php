@@ -20,6 +20,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
+ 
+
 // Check if the user is logged in
 if (!isset($_SESSION["user_id"])) {
     http_response_code(401);
