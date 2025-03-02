@@ -158,7 +158,7 @@ const AdminParticipantsOnsite = () => {
                       <td>{participant.confirmation_sent === true ? "✅" : "❌"}</td>
                       <td>
                         <div className="d-flex gap-2 justify-content-end">
-                          <a href={`/admin/participants/onsite/${participant.id}/confirm`} className={classNames(css.action, "btn btn-sm btn-outline-success fw-bolder")}>Confirm</a>
+                          <a href={`/admin/participants/onsite/${participant.id}/payment`} className={classNames(css.action, "btn btn-sm btn-outline-success fw-bolder")}>Payments</a>
                           <a href={`/admin/participants/onsite/${participant.id}`} className={classNames(css.action, "btn btn-sm btn-outline-primary fw-bolder")}>Edit</a>
                           <button
                             className={classNames(css.action, "btn btn-sm btn-outline-danger fw-bolder")}

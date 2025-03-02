@@ -21,7 +21,7 @@ const AdminParticipantsUser = () => {
   const { participantId, tab } = useParams();
   //
   const [participant, setParticipant] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
   const [errorGettingDataFromDB, setErrorGettingDataFromDB] = useState(null);
@@ -29,12 +29,13 @@ const AdminParticipantsUser = () => {
   const [paymentMethods, setPaymentMethods] = useState([]);
   const [workshops, setWorkshops] = useState([]);
   const [registrationTypes, setRegistrationTypes] = useState([]);
-  const [sessions, setSessions]  = useState([]);
+  const [sessions, setSessions] = useState([]);
   const [unsavedChanges, setUnsavedChanges] = useState(false);
   const [total, setTotal] = useState(0);
   const [paypalFee, setPaypalFee] = useState(0);
   const activeTab = tab || "identity";
   const hasFetchedData = useRef(false);
+  const hasFetchedParticipant = useRef(false);
   const navigate = useNavigate();
 
   const { control, register, handleSubmit, getValues, setValue, formState: { errors }, reset, trigger, watch } = useForm();
@@ -93,12 +94,18 @@ const AdminParticipantsUser = () => {
 
   // Get participant data
   useEffect(() => {
-    const fetchParticipant = async () => {
+    if(hasFetchedParticipant.current) {
+      return;
+    }
+ 
+    const fetchParticipant = async () => { 
       if (!participantId) {
         setError("Invalid participant ID.");
         setLoading(false);
         return;
       }
+
+      hasFetchedParticipant.current = true;
 
       try {
         const response = await axios.get(
@@ -107,7 +114,7 @@ const AdminParticipantsUser = () => {
 
         if (response.data.success) {
           setParticipant(response.data.data);
-          reset(response.data.data.participant); // Prefill form
+          reset(response.data.data.participant);  
         } else {
           throw new Error(response.data.message || "Failed to fetch participant. Please refresh the page.");
         }
@@ -124,7 +131,7 @@ const AdminParticipantsUser = () => {
 
   // Create all the values for the forms 
   useEffect(() => {
-    if (!participant) {
+    if (!participant && sessions.length === 0) {
       return;
     }
 
@@ -132,7 +139,7 @@ const AdminParticipantsUser = () => {
     const { dob, ...otherDetails } = participant.participant;
 
     if (dob) {
-      const [year, month, day] = dob.split("-"); 
+      const [year, month, day] = dob.split("-");
       setValue("dobDay", String(Number(day)));
       setValue("dobMonth", String(Number(month)));
       setValue("dobYear", year);
@@ -163,10 +170,19 @@ const AdminParticipantsUser = () => {
 
     // Contribution
     const contributions = participant.contributions || [];
-    const talks = contributions.filter(c => c.type === "talk");
-    const posters = contributions.filter(c => c.type === "poster");
-    if (talks.length > 0) setValue('talks', talks);
-    if (posters.length > 0) setValue('posters', posters);
+    if (sessions.length > 0) {
+      const talks = contributions.filter(c => c.type === "talk").map(talk => ({
+        ...talk,
+        session: talk.session_id || sessions[0]?.id,
+      }));
+      const posters = contributions.filter(c => c.type === "poster").map(poster => ({
+        ...poster,
+        session: poster.session_id || sessions[0]?.id,
+      }));
+
+      if (talks.length > 0) setValue('talks', talks);
+      if (posters.length > 0) setValue('posters', posters);
+    }
 
     // Accommodation
     if (participant.accommodation?.registration_type_id) {
@@ -186,6 +202,22 @@ const AdminParticipantsUser = () => {
     setError(null);
     setSuccessMsg(null);
 
+    // ✅ Step 1: Validate the entire form
+    const isValid = await trigger(); // Triggers validation on all fields
+
+    if (!isValid) {
+      setSaving(false);
+      setError("Please fill in all required fields.");
+      return;
+    }
+
+    // ✅ Step 2: Check if the user selected a T-shirt but didn't choose a size
+    if (formData.buy_tshirt === "1" && !formData.tshirt_size) {
+      setSaving(false);
+      setError("You must select a T-shirt size if you choose to buy one.");
+      return;
+    }
+
     try {
       const response = await axios.post(
         `${process.env.REACT_APP_API_URL}/update_participant.php?id=${participantId}`,
@@ -194,8 +226,11 @@ const AdminParticipantsUser = () => {
       );
 
       if (response.data.success) {
-        setSuccessMsg("Participant updated successfully!");
+        setSuccessMsg("Participant updated successfully! The page will now reload to assure data integrity.");
         setUnsavedChanges(false);
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
       } else {
         throw new Error(response.data.message || "Failed to update participant.");
       }
@@ -221,8 +256,7 @@ const AdminParticipantsUser = () => {
         ${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}`
     }
   ];
-
-
+ 
   const isSummaryReady = (
     participant &&
     paymentMethods.length > 0 &&
@@ -233,20 +267,26 @@ const AdminParticipantsUser = () => {
   if (errorGettingDataFromDB) {
     return <div className="alert alert-danger fw-bolder">{errorGettingDataFromDB}</div>
   }
-
-
+ 
   return (
     <PageContain
       breadcrumb={breadcrumb}
-    >
-      {loading || (error && !loading) || (!participant && !loading) || successMsg && (
-        <div className="position-relative fw-bolder">
-          {loading && <Loader />}
-          {error && !loading && <div className="alert alert-danger">{error}</div>}
-          {!participant && !loading && <div className="alert alert-danger">No participant data available.</div>}
-          {successMsg && <div className="alert alert-success">{successMsg}</div>}
-        </div>
-      )}
+    > 
+      <div className="position-relative fw-bolder">
+        {(!loading && error) && (
+          <div className="alert alert-danger">{error}</div>
+        )}
+
+        {(!loading && hasFetchedData.current && hasFetchedParticipant.current && !participant) && (
+          <div className="alert alert-danger">No participant data available.</div>
+        )}
+
+        {(!loading && successMsg) && (
+          <div className="alert alert-success">{successMsg}</div>
+        )}
+      </div>
+ 
+      {(loading || !hasFetchedData.current) && <Loader />}
 
       {!loading && participant && isSummaryReady && (
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -319,7 +359,7 @@ const AdminParticipantsUser = () => {
                 setValue={setValue}
                 watch={watch}
                 trigger={trigger}
-                sessions={sessions} 
+                sessions={sessions}
               />
             )}
             {tab === "accommodation" && (

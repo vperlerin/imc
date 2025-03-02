@@ -54,6 +54,7 @@ const ExtrasForm = ({
 
   const handleTShirtSelection = (value) => {
     setValue("buy_tshirt", value, { shouldDirty: true, shouldTouch: true, shouldValidate: true });
+    trigger("tshirt_size"); // Re-validate the T-Shirt size
   };
 
   const handleTShirtSizeSelection = (value) => {
@@ -123,6 +124,7 @@ const ExtrasForm = ({
                   value={option}
                   {...register("buy_tshirt", { required: "Please select an option" })}
                   checked={watch("buy_tshirt") === option}
+                  onChange={(e) => handleTShirtSelection(e.target.value)}
                 />
                 <label className="form-check-label" htmlFor={`tshirt-${option}`}>
                   {option === "1" ? "Yes" : "No"}
@@ -133,14 +135,15 @@ const ExtrasForm = ({
           {isSubmitted && errors.buy_tshirt && <p className="text-danger"><small>{errors.buy_tshirt.message}</small></p>}
         </div>
 
-
         {/* T-Shirt Size Dropdown */}
         {wantsTShirt && (
           <div className="mb-4">
             <label className="fw-bold mb-2">Select your T-Shirt size</label>
             <select
               className={classNames("form-select", { "is-invalid": isSubmitted && errors.tshirt_size })}
-              {...register("tshirt_size", { required: "Please select a T-Shirt size" })}
+              {...register("tshirt_size", {
+                required: buyTShirt === "1" ? "Please select a T-Shirt size" : false,
+              })}
               onChange={(e) => handleTShirtSizeSelection(e.target.value)}
               value={tshirtSize || ""}
             >

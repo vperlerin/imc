@@ -71,8 +71,7 @@ const ContributionForm = ({
       });
     }
   };
-
-
+ 
   useEffect(() => {
     const existingTalks = getValues("talks") || [];
     const existingPosters = getValues("posters") || [];

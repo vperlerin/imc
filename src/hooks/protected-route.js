@@ -14,7 +14,8 @@ const ProtectedRoute = ({ children }) => {
     dispatch(fetchUser()).finally(() => setLoading(false));   
   }, [dispatch]);
 
-  if (loading) return <div>Security check...</div>;  // Prevent access before API response
+  if (loading) return <div className="position-absolute top-0 start-0 end-0 bottom-0 fw-bolder d-flex align-items-center justify-content-center">Security check...</div>;  // Prevent access before API response
+ 
 
   if(host === 'localhost:3000') {
     return <>{children}</>

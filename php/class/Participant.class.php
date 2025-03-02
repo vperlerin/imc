@@ -151,39 +151,42 @@ class ParticipantManager
                 INSERT INTO contributions (participant_id, type, title, authors, abstract, session_id, duration, print, created_at, updated_at)
                 VALUES (:participant_id, :type, :title, :authors, :abstract, :session_id, :duration, :print, NOW(), NOW())
             ");
- 
-            // Insert talks
-            foreach ($data['talks'] as $talk) {
-                $sessionId = isset($talk['session']) ? (int) $talk['session'] : NULL;
-                $duration = isset($talk['duration']) ? $talk['duration'] : NULL;
 
-                $stmt->bindValue(':participant_id', $participantId, PDO::PARAM_INT);
-                $stmt->bindValue(':type', 'talk', PDO::PARAM_STR);
-                $stmt->bindValue(':title', $talk['title'], PDO::PARAM_STR);
-                $stmt->bindValue(':authors', $talk['authors'], PDO::PARAM_STR);
-                $stmt->bindValue(':abstract', $talk['abstract'], PDO::PARAM_STR);
-                $stmt->bindValue(':session_id', $sessionId, $sessionId !== NULL ? PDO::PARAM_INT : PDO::PARAM_NULL);
-                $stmt->bindValue(':duration', $duration, $duration !== NULL ? PDO::PARAM_STR : PDO::PARAM_NULL);
-                $stmt->bindValue(':print', 0, PDO::PARAM_BOOL);
-                $stmt->execute();
+            // Insert talks
+            if (!empty($data['talks']) && is_array($data['talks'])) {
+                foreach ($data['talks'] as $talk) {
+                    $sessionId = isset($talk['session']) ? (int) $talk['session'] : NULL;
+                    $duration = isset($talk['duration']) ? $talk['duration'] : NULL;
+
+                    $stmt->bindValue(':participant_id', $participantId, PDO::PARAM_INT);
+                    $stmt->bindValue(':type', 'talk', PDO::PARAM_STR);
+                    $stmt->bindValue(':title', $talk['title'], PDO::PARAM_STR);
+                    $stmt->bindValue(':authors', $talk['authors'], PDO::PARAM_STR);
+                    $stmt->bindValue(':abstract', $talk['abstract'], PDO::PARAM_STR);
+                    $stmt->bindValue(':session_id', $sessionId, $sessionId !== NULL ? PDO::PARAM_INT : PDO::PARAM_NULL);
+                    $stmt->bindValue(':duration', $duration, $duration !== NULL ? PDO::PARAM_STR : PDO::PARAM_NULL);
+                    $stmt->bindValue(':print', 0, PDO::PARAM_BOOL);
+                    $stmt->execute();
+                }
             }
 
-            // Insert posters with print option
-            foreach ($data['posters'] as $poster) {
-                $printValue = isset($poster['print']) ? filter_var($poster['print'], FILTER_VALIDATE_BOOLEAN) : FALSE;
+            if (!empty($data['posters']) && is_array($data['posters'])) {
+                foreach ($data['posters'] as $poster) {
+                    $printValue = isset($poster['print']) ? filter_var($poster['print'], FILTER_VALIDATE_BOOLEAN) : FALSE;
 
-                $sessionId = isset($poster['session']) ? (int) $poster['session'] : NULL;
-                $duration = isset($poster['duration']) ? $poster['duration'] : NULL;
+                    $sessionId = isset($poster['session']) ? (int) $poster['session'] : NULL;
+                    $duration = isset($poster['duration']) ? $poster['duration'] : NULL;
 
-                $stmt->bindValue(':participant_id', $participantId, PDO::PARAM_INT);
-                $stmt->bindValue(':type', 'poster', PDO::PARAM_STR);
-                $stmt->bindValue(':title', $poster['title'], PDO::PARAM_STR);
-                $stmt->bindValue(':authors', $poster['authors'], PDO::PARAM_STR);
-                $stmt->bindValue(':abstract', $poster['abstract'], PDO::PARAM_STR);
-                $stmt->bindValue(':session_id', $sessionId, $sessionId !== NULL ? PDO::PARAM_INT : PDO::PARAM_NULL);
-                $stmt->bindValue(':duration', $duration, $duration !== NULL ? PDO::PARAM_STR : PDO::PARAM_NULL);
-                $stmt->bindValue(':print', $printValue ? 1 : 0, PDO::PARAM_INT);
-                $stmt->execute();
+                    $stmt->bindValue(':participant_id', $participantId, PDO::PARAM_INT);
+                    $stmt->bindValue(':type', 'poster', PDO::PARAM_STR);
+                    $stmt->bindValue(':title', $poster['title'], PDO::PARAM_STR);
+                    $stmt->bindValue(':authors', $poster['authors'], PDO::PARAM_STR);
+                    $stmt->bindValue(':abstract', $poster['abstract'], PDO::PARAM_STR);
+                    $stmt->bindValue(':session_id', $sessionId, $sessionId !== NULL ? PDO::PARAM_INT : PDO::PARAM_NULL);
+                    $stmt->bindValue(':duration', $duration, $duration !== NULL ? PDO::PARAM_STR : PDO::PARAM_NULL);
+                    $stmt->bindValue(':print', $printValue ? 1 : 0, PDO::PARAM_INT);
+                    $stmt->execute();
+                }
             }
 
 
@@ -319,38 +322,42 @@ class ParticipantManager
                 VALUES (:participant_id, :type, :title, :authors, :abstract, :session_id, :duration, :print, NOW(), NOW())
             ");
 
-            // Insert talks
-            foreach ($data['talks'] as $talk) {
-                $sessionId = isset($talk['session']) ? (int) $talk['session'] : NULL;
-                $duration = isset($talk['duration']) ? $talk['duration'] : NULL;
+            // ✅ Insert talks only if they exist
+            if (!empty($data['talks']) && is_array($data['talks'])) {
+                // Insert talks
+                foreach ($data['talks'] as $talk) {
+                    $sessionId = isset($talk['session']) ? (int) $talk['session'] : NULL;
+                    $duration = isset($talk['duration']) ? $talk['duration'] : NULL;
 
-                $stmt->bindValue(':participant_id', $participantId, PDO::PARAM_INT);
-                $stmt->bindValue(':type', 'talk', PDO::PARAM_STR);
-                $stmt->bindValue(':title', $talk['title'], PDO::PARAM_STR);
-                $stmt->bindValue(':authors', $talk['authors'], PDO::PARAM_STR);
-                $stmt->bindValue(':abstract', $talk['abstract'], PDO::PARAM_STR);
-                $stmt->bindValue(':session_id', $sessionId, $sessionId !== NULL ? PDO::PARAM_INT : PDO::PARAM_NULL);
-                $stmt->bindValue(':duration', $duration, $duration !== NULL ? PDO::PARAM_STR : PDO::PARAM_NULL);
-                $stmt->bindValue(':print', 0, PDO::PARAM_BOOL);
-                $stmt->execute();
+                    $stmt->bindValue(':participant_id', $participantId, PDO::PARAM_INT);
+                    $stmt->bindValue(':type', 'talk', PDO::PARAM_STR);
+                    $stmt->bindValue(':title', $talk['title'], PDO::PARAM_STR);
+                    $stmt->bindValue(':authors', $talk['authors'], PDO::PARAM_STR);
+                    $stmt->bindValue(':abstract', $talk['abstract'], PDO::PARAM_STR);
+                    $stmt->bindValue(':session_id', $sessionId, $sessionId !== NULL ? PDO::PARAM_INT : PDO::PARAM_NULL);
+                    $stmt->bindValue(':duration', $duration, $duration !== NULL ? PDO::PARAM_STR : PDO::PARAM_NULL);
+                    $stmt->bindValue(':print', 0, PDO::PARAM_BOOL);
+                    $stmt->execute();
+                }
             }
 
-            // Insert posters with print option
-            foreach ($data['posters'] as $poster) {
-                $printValue = isset($poster['print']) ? (filter_var($poster['print'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ? 1 : 0) : 0;
+            if (!empty($data['posters']) && is_array($data['posters'])) {
+                foreach ($data['posters'] as $poster) {
+                    $printValue = isset($poster['print']) ? (filter_var($poster['print'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ? 1 : 0) : 0;
 
-                $sessionId = isset($poster['session']) ? (int) $poster['session'] : NULL;
-                $duration = isset($poster['duration']) ? $poster['duration'] : NULL;
+                    $sessionId = isset($poster['session']) ? (int) $poster['session'] : NULL;
+                    $duration = isset($poster['duration']) ? $poster['duration'] : NULL;
 
-                $stmt->bindValue(':participant_id', $participantId, PDO::PARAM_INT);
-                $stmt->bindValue(':type', 'poster', PDO::PARAM_STR);
-                $stmt->bindValue(':title', $poster['title'], PDO::PARAM_STR);
-                $stmt->bindValue(':authors', $poster['authors'], PDO::PARAM_STR);
-                $stmt->bindValue(':abstract', $poster['abstract'], PDO::PARAM_STR);
-                $stmt->bindValue(':session_id', $sessionId, $sessionId !== NULL ? PDO::PARAM_INT : PDO::PARAM_NULL);
-                $stmt->bindValue(':duration', $duration, $duration !== NULL ? PDO::PARAM_STR : PDO::PARAM_NULL);
-                $stmt->bindValue(':print', $printValue, PDO::PARAM_INT);  // Ensure it's stored as an INT (1 or 0)
-                $stmt->execute();
+                    $stmt->bindValue(':participant_id', $participantId, PDO::PARAM_INT);
+                    $stmt->bindValue(':type', 'poster', PDO::PARAM_STR);
+                    $stmt->bindValue(':title', $poster['title'], PDO::PARAM_STR);
+                    $stmt->bindValue(':authors', $poster['authors'], PDO::PARAM_STR);
+                    $stmt->bindValue(':abstract', $poster['abstract'], PDO::PARAM_STR);
+                    $stmt->bindValue(':session_id', $sessionId, $sessionId !== NULL ? PDO::PARAM_INT : PDO::PARAM_NULL);
+                    $stmt->bindValue(':duration', $duration, $duration !== NULL ? PDO::PARAM_STR : PDO::PARAM_NULL);
+                    $stmt->bindValue(':print', $printValue, PDO::PARAM_INT);  // Ensure it's stored as an INT (1 or 0)
+                    $stmt->execute();
+                }
             }
 
 
