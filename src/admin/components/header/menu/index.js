@@ -28,7 +28,7 @@ const Menu = ({ cd }) => {
 
   const handleLogout = async () => {
     await axios.get(`${process.env.REACT_APP_API_URL}/logout.php`, { withCredentials: true });
-    dispatch(authActions.logout());  // ✅ Clears Redux state
+    dispatch(authActions.logout());  
     goTo('/');
   };
 

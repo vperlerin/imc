@@ -9,6 +9,8 @@ const ProtectedRoute = ({ children }) => {
   const isAuthenticated = useSelector(authSelectors.isLoggedIn);
   const [loading, setLoading] = useState(true);
 
+  console.log("IS ADMIN? ", isAdmin);
+
   useEffect(() => {
     dispatch(fetchUser()).finally(() => setLoading(false));   
   }, [dispatch]);

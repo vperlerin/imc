@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
- 
+var_dum($_SESSION);
 
 // Check if the user is logged in
 if (!isset($_SESSION["user_id"])) {
