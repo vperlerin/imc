@@ -18,9 +18,7 @@ session_start();
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(204);
     exit;
-}
-
-var_dum($_SESSION);
+} 
 
 // Check if the user is logged in
 if (!isset($_SESSION["user_id"])) {
