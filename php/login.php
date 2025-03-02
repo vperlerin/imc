@@ -82,7 +82,7 @@ $_SESSION["is_admin"] = $isAdmin;
 setcookie(session_name(), session_id(), [
   'secure' => false,  // TODO: Set to `true` in production with HTTPS!!
   'httponly' => true,  // Prevent JavaScript access
-  'samesite' => 'Lax'  // Required for cross-origin authentication
+  'samesite' => 'None'  // Use "lax' on prod Required for cross-origin authentication
 ]);
 
 // ✅ Return user info
