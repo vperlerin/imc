@@ -8,6 +8,20 @@ import StaticSummary from "components/billing/static_summary";
 import { useParams } from "react-router-dom";
 import { conferenceData as cd } from "data/conference-data";
 
+// Function to format date to MM-DD-YYYY
+const formatDateToDisplay = (dateString) => {
+  if (!dateString) return "N/A";
+  const date = new Date(dateString);
+  return `${(date.getMonth() + 1).toString().padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}-${date.getFullYear()}`;
+};
+
+// Function to format date for <input type="date">
+const formatDateForInput = (dateString) => {
+  if (!dateString) return new Date().toISOString().split("T")[0]; // Default to today
+  return dateString.split("T")[0]; // Extract YYYY-MM-DD format
+};
+
+
 const Payments = () => {
   const { participantId } = useParams();
   const [loading, setLoading] = useState(true);
@@ -19,6 +33,7 @@ const Payments = () => {
   const [workshops, setWorkshops] = useState([]);
   const [amount, setAmount] = useState("");
   const [paymentMethodId, setPaymentMethodId] = useState("");
+  const [paymentDate, setPaymentDate] = useState(new Date().toISOString().split("T")[0]);
   const [adminNote, setAdminNote] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [successMsg, setSuccessMsg] = useState(null);
@@ -26,6 +41,7 @@ const Payments = () => {
 
   const hasFetchedData = useRef(false);
   const hasFetchedParticipant = useRef(false);
+  const hasFetchedParticipantPayments = useRef(false);
 
   // Fetch available payment methods, workshops, and registration types
   useEffect(() => {
@@ -49,7 +65,10 @@ const Payments = () => {
 
   // Fetch participant data
   useEffect(() => {
-    if (hasFetchedParticipant.current || !participantId) return;
+    if (!hasFetchedData.current || hasFetchedParticipant.current || !participantId) {
+      return;
+    }
+
     hasFetchedParticipant.current = true;
     setLoading(true);
 
@@ -63,7 +82,9 @@ const Payments = () => {
       })
       .catch(err => setError(err.message))
       .finally(() => setLoading(false));
-  }, [participantId]);
+  }, [participantId, hasFetchedData]);
+
+
 
   // Fetch participant's payments
   useEffect(() => {
@@ -82,7 +103,6 @@ const Payments = () => {
       .catch(err => setError(err.message));
   }, [participantId]);
 
-  // Handle form submission to add or update a payment
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -108,6 +128,7 @@ const Payments = () => {
             payment_id: editingPayment.id,
             amount: parseFloat(amount),
             payment_method_id: paymentMethodId,
+            payment_date: paymentDate,
             admin_note: adminNote || null,
           },
           { headers: { "Content-Type": "application/json" } }
@@ -119,6 +140,7 @@ const Payments = () => {
             participant_id: participantId,
             amount: parseFloat(amount),
             payment_method_id: paymentMethodId,
+            payment_date: paymentDate,
             admin_note: adminNote || null,
           },
           { headers: { "Content-Type": "application/json" } }
@@ -168,15 +190,19 @@ const Payments = () => {
   const resetForm = () => {
     setAmount("");
     setPaymentMethodId("");
+    setPaymentDate(new Date().toISOString().split("T")[0]); // Reset to today's date
     setAdminNote("");
     setEditingPayment(null);
   };
+
 
   const isOnline = participant?.participant?.is_online === "1";
   const breadcrumb = [
     { url: `/admin/participants/${isOnline ? 'online' : 'onsite'}`, name: isOnline ? "Online Participants" : "Onsite Participants" },
     { url: `/admin/participants/${isOnline ? 'online' : 'onsite'}/payment/${participantId}`, name: `${participant?.participant?.first_name || "Participant"} ${participant?.participant?.last_name || ""}'s Payments` }
   ];
+
+  console.log("payments? ", payments);
 
 
   return (
@@ -188,9 +214,7 @@ const Payments = () => {
 
       {!loading && participant && (
         <div className="d-flex flex-column flex-md-row gap-3 align-items-start">
-
           <div className="flex-grow-1">
-
             <div className="border p-3 rounded-2">
               <h4 className="mb-3">{editingPayment ? "Edit Payment" : "Add a New Payment"}</h4>
               <form onSubmit={handleSubmit}>
@@ -226,64 +250,28 @@ const Payments = () => {
                     </select>
                   </div>
                 </div>
-                <div className="mb-3">
-                  <label className="form-label fw-bold">Admin Note (Optional)</label>
-                  <textarea
-                    className="form-control"
-                    value={adminNote}
-                    onChange={(e) => setAdminNote(e.target.value)}
-                    rows="2"
-                  />
+                <div className="mb-3 row">
+                  <label className="col-sm-3 col-form-label fw-bold">Payment Date</label>
+                  <div className="col-sm-6">
+                    <input type="date" className="form-control" value={paymentDate} onChange={(e) => setPaymentDate(e.target.value)} required />
+                  </div>
+                </div>
+                <div className="mb-3 row">
+                  <label className="col-sm-3 col-form-label fw-bold">Admin Note (Optional)</label>
+                  <div className="col-sm-9">
+                    <textarea
+                      className="form-control"
+                      value={adminNote}
+                      onChange={(e) => setAdminNote(e.target.value)}
+                      rows="2"
+                    />
+                  </div>
                 </div>
                 <div className="text-end">
                   <button type="submit" className="btn btn-outline-primary fw-bolder">{submitting ? "Processing..." : editingPayment ? "Update Payment" : "Add Payment"}</button>
                 </div>
               </form>
             </div>
-
-            <h5 className="mt-4 border-bottom pb-2">Add a New Payment</h5>
-            <form onSubmit={handleSubmit}>
-              <div className="mb-3 row">
-                <label className="col-sm-3 col-form-label fw-bold">Amount (€)</label>
-                <div className="col-sm-5">
-                  <input
-                    type="number"
-                    className={classNames('form-control', cssForm.md50)}
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                    min="0"
-                    step="0.01"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="mb-3 row">
-                <label className="col-sm-3 col-form-label fw-bold">Payment Method</label>
-                <div className="col-sm-6">
-                  <select
-                    className="form-select"
-                    value={paymentMethodId}
-                    onChange={(e) => setPaymentMethodId(e.target.value)}
-                    required
-                  >
-                    <option value="">Select a payment method</option>
-                    {paymentMethods.map((method) => (
-                      <option key={method.id} value={method.id}>
-                        {method.method}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-
-
-              <button type="submit" className="btn btn-outline-primary fw-bolder" disabled={submitting}>
-                {submitting ? "Adding Payment..." : "Add Payment"}
-              </button>
-
-            </form>
 
 
             <h5 className="mt-4">Previous Payments</h5>

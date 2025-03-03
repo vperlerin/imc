@@ -1,12 +1,7 @@
 import { CiWarning } from "react-icons/ci";
 import { SlArrowLeft, SlArrowRight } from "react-icons/sl";
 import axios from "axios";
-import React, { useEffect, useRef, useState } from "react";
-import { useForm } from "react-hook-form";
-import { useLocation } from "react-router-dom";
-import { conferenceData as cd } from "data/conference-data";
-import { formatFullDate } from "utils/date";
-import css from "./index.module.scss";
+import React, { useState } from "react";
 import Accomodation from "components/registration/accomodation.js";
 import Arrival from "components/registration/arrival.js";
 import Comments from "components/registration/comments";
@@ -18,6 +13,16 @@ import PageContain from "components/page-contain";
 import PayPalForm from "components/paypal";
 import Summary from "components/billing/summary/";
 import Workshops from "components/registration/workshops";
+
+import { useApiSpecificData } from "api/specific-data/index.js";
+import { useForm } from "react-hook-form";
+import { useLocation } from "react-router-dom";
+import { getPaymentMethodById } from 'utils/payment_method';
+
+import { conferenceData as cd } from "data/conference-data";
+import { formatFullDate } from "utils/date";
+
+import css from "./index.module.scss";
 
 const totalStep = 8;
 
@@ -35,21 +40,18 @@ const calculateAge = (dob) => {
 };
 
 const MainForm = () => {
-  const [finalData, setFinalData] = useState(null);
-  const [step, setStep] = useState(1);
-  const [loading, setLoading] = useState(false);
-  const [errorGettingDataFromDB, setErrorGettingDataFromDB] = useState(null);
-  const [errorMsg, setErrorMsg] = useState(null);
-  const [successMsg, setSuccessMsg] = useState(null);
-  const [total, setTotal] = useState(0);
-  const [paypalFee, setPaypalFee] = useState(0);
-  const [paymentMethods, setPaymentMethods] = useState([]);
-  const [registrationTypes, setRegistrationTypes] = useState([]);
-  const [sessions, setSessions]  = useState([]);
-  const [workshops, setWorkshops] = useState([])
   const location = useLocation();
   const isDebugMode = new URLSearchParams(location.search).get("debug") === "1";
-  const hasFetchedData = useRef(false);
+  //
+  const [errorMsg, setErrorMsg] = useState(null);
+  const [finalData, setFinalData] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [paypalFee, setPaypalFee] = useState(0);
+  const [step, setStep] = useState(1);
+  const [successMsg, setSuccessMsg] = useState(null);
+  const [total, setTotal] = useState(0);
+
+  const { workshops, paymentMethods, registrationTypes, loading, sessions, error: errorGettingDataFromDB } = useApiSpecificData();
 
   const {
     control,
@@ -65,43 +67,8 @@ const MainForm = () => {
   // Watch the dob field
   const dob = watch("dob");
   const age = calculateAge(dob);
-  const isUnder16 = age !== null && age < 16; 
-  const is_early_bird =  new Date() < new Date(cd.deadlines.early_birds);
-
-  // Fetch available workshops, payment_methods, sessions & registration_types from API
-  useEffect(() => {
-    if (hasFetchedData.current) {
-      return;
-    }
-
-    hasFetchedData.current = true;
-    setLoading(true);
-
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/get_specific_data.php`);
-        if (response.data.success
-          && response.data.data.workshops
-          && response.data.data.payment_methods
-          && response.data.data.registration_types
-          && response.data.data.sessions
-        ) {
-          setWorkshops(response.data.data.workshops);
-          setPaymentMethods(response.data.data.payment_methods);
-          setRegistrationTypes(response.data.data.registration_types);
-          setSessions(response.data.data.sessions);
-        } else {
-          throw new Error(response.data.message || "Failed to fetch data - please try again later.");
-        }
-      } catch (err) {
-        setErrorGettingDataFromDB(err.message || "An error occurred while fetching data.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
+  const isUnder16 = age !== null && age < 16;
+  const is_early_bird = new Date() < new Date(cd.deadlines.early_birds);
 
   const nextStep = async () => {
     const isValid = await trigger();
@@ -114,7 +81,7 @@ const MainForm = () => {
   const prevStep = () => setStep(step - 1);
 
   const onSubmit = async (formData) => {
-    setLoading(true);
+    setIsLoading(true);
     setErrorMsg(null);
     setSuccessMsg(null);
 
@@ -140,11 +107,14 @@ const MainForm = () => {
         setSuccessMsg("Registration successful!");
       } else {
         setErrorMsg(response.data.message || "Something went wrong.");
+        // TODO: remove on prod
+        setFinalData(formattedData);
+        setSuccessMsg("Registration successful but we couldn't send you an email");
       }
     } catch (error) {
       setErrorMsg("Failed to submit the form. Please try again.");
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -161,9 +131,7 @@ const MainForm = () => {
       {errorMsg && <div className="alert alert-danger fw-bolder">{errorMsg}</div>}
       {successMsg && <div className="alert alert-success fw-bolder">{successMsg}</div>}
 
-
-
-      {step === 8 && successMsg ? (
+      {step === 8 && successMsg && !!finalData ? (
         <>
           <h2>{cd.thank_you}</h2>
           <p>
@@ -171,44 +139,47 @@ const MainForm = () => {
             required to eventually update your travel details and your contributions (talks & posters).
           </p>
 
-          <p>The IMC fee is due without any delay.</p>
+          <div className="d-flex flex-column flex-md-row gap-3">
+            <div>
+              <p className="fw-bolder text-danger">The IMC fee is due without any delay.</p>
 
-          {finalData.payment_method.toLowerCase() === "paypal" ? (
-            <div className="mb-3">
-              <p >Click the button below to pay immediately with Paypal.</p>
-              <PayPalForm amount={total} year={cd.year} />
+              {getPaymentMethodById(finalData.payment_method_id, paymentMethods) === "paypal" ? (
+                <div className="mb-3">
+                  <p >Click the button below to pay immediately with Paypal.</p>
+                  <PayPalForm amount={(total + paypalFee)} year={cd.year} />
+                </div>
+              ) : (
+                <>
+                  <p><strong>  Please, transfer the total amount of {total}€ to confirm your registration immediately.</strong></p>
+                  <blockquote className="border rounded-2 p-3">
+                    International Meteor Organization, Jozef Mattheessensstraat 60, 2540 Hove, Belgium<br />
+                    Bank account at BNP Paribas Fortis Bank Belgium<br />
+                    BIC bank code: GEBABEBB<br />
+                    IBAN account number: BE30 0014 7327 5911<br />
+                    e-mail: treasurer@imo.net
+                  </blockquote>
+                </>
+              )}
             </div>
-          ) : (
-            <>
-              <p><strong>  Please, transfer the total amount mentioned in order to confirm your registration immediately.</strong></p>
-              <blockquote className="border rounded-2 p-3">
-                International Meteor Organization, Jozef Mattheessensstraat 60, 2540 Hove, Belgium<br />
-                Bank account at BNP Paribas Fortis Bank Belgium<br />
-                BIC bank code: GEBABEBB<br />
-                IBAN account number: BE30 0014 7327 5911<br />
-                e-mail: treasurer@imo.net
-              </blockquote>
-            </>
-          )}
-
-          <Summary
-            isOnline={false}
-            getValues={getValues}
-            isEarlyBird={is_early_bird}
-            conferenceData={cd}
-            setTotal={setTotal}
-            setPaypalFee={setPaypalFee} 
-            showInfo
-            workshops={workshops}
-            registrationTypes={registrationTypes}
-            paymentMethods={paymentMethods}
-            watch={watch}
-          />
+            <Summary
+              isOnline={false}
+              getValues={getValues}
+              isEarlyBird={is_early_bird}
+              conferenceData={cd}
+              setTotal={setTotal}
+              setPaypalFee={setPaypalFee} 
+              showInfo={false}
+              workshops={workshops}
+              registrationTypes={registrationTypes}
+              paymentMethods={paymentMethods}
+              watch={watch}
+            />
+          </div>
         </>
       ) :
         (
           <form onSubmit={handleSubmit(onSubmit)} className="d-flex flex-grow-1 flex-column position-relative">
-            {loading && <Loader />}
+            {isLoading && <Loader />}
 
             <input name="is_early_bird" type="hidden" value={is_early_bird} {...register("is_early_bird")} />
             <input name="is_online" type="hidden" value="false" {...register("is_online")} />
@@ -235,7 +206,7 @@ const MainForm = () => {
               <Identitity
                 register={register}
                 errors={errors}
-                isDebugMode={isDebugMode} 
+                isDebugMode={isDebugMode}
                 step={step}
                 stepTotal={totalStep}
                 setValue={setValue}
@@ -248,7 +219,7 @@ const MainForm = () => {
                 conferenceData={cd}
                 register={register}
                 errors={errors}
-                isDebugMode={isDebugMode} 
+                isDebugMode={isDebugMode}
                 step={step}
                 stepTotal={totalStep}
                 setValue={setValue}
@@ -262,7 +233,7 @@ const MainForm = () => {
                 conferenceData={cd}
                 register={register}
                 errors={errors}
-                isDebugMode={isDebugMode} 
+                isDebugMode={isDebugMode}
                 step={step}
                 stepTotal={totalStep}
                 setValue={setValue}
@@ -282,7 +253,7 @@ const MainForm = () => {
                 setValue={setValue}
                 sessions={sessions}
                 trigger={trigger}
-                watch={watch} 
+                watch={watch}
               />
             }
             {step === 5 &&
@@ -290,7 +261,7 @@ const MainForm = () => {
                 conferenceData={cd}
                 control={control}
                 register={register}
-                isDebugMode={isDebugMode} 
+                isDebugMode={isDebugMode}
                 isEarlyBird={is_early_bird}
                 paymentMethods={paymentMethods}
                 errors={errors}
@@ -307,7 +278,7 @@ const MainForm = () => {
                 conferenceData={cd}
                 register={register}
                 errors={errors}
-                isDebugMode={isDebugMode} 
+                isDebugMode={isDebugMode}
                 step={step}
                 stepTotal={totalStep}
                 setValue={setValue}
@@ -321,7 +292,7 @@ const MainForm = () => {
               <Comments
                 register={register}
                 errors={errors}
-                isDebugMode={isDebugMode} 
+                isDebugMode={isDebugMode}
                 isUnder16={isUnder16}
                 showGdpr={true}
                 step={step}
@@ -331,14 +302,14 @@ const MainForm = () => {
               />
             )}
 
-            {step === 8 && (
+            {step === 8 && !successMsg && (
               <Summary
                 isOnline={false}
                 getValues={getValues}
                 isEarlyBird={is_early_bird}
                 conferenceData={cd}
                 setTotal={setTotal}
-                setPaypalFee={setPaypalFee} 
+                setPaypalFee={setPaypalFee}
                 showInfo={!successMsg}
                 workshops={workshops}
                 registrationTypes={registrationTypes}

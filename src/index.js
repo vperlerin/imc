@@ -15,10 +15,10 @@ const root = createRoot(container);
 
 const RootApp = () => {
   const location = useLocation();
-  
+
   useEffect(() => {
     const rootElement = document.getElementById("root");
-    
+
     if (location.pathname.startsWith("/admin")) {
       rootElement.classList.add("is-admin");
     } else {
@@ -35,13 +35,11 @@ const RootApp = () => {
 };
 
 root.render(
-  <React.StrictMode>
-    <Provider store={store}>
-      <HelmetProvider>
-        <Router>
-          <RootApp />
-        </Router>
-      </HelmetProvider>
-    </Provider>
-  </React.StrictMode>
+  <Provider store={store}>
+    <HelmetProvider>
+      <Router>
+        <RootApp />
+      </Router>
+    </HelmetProvider>
+  </Provider>
 );

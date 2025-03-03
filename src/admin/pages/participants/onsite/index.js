@@ -3,42 +3,25 @@ import PageContain from "@/admin/components/page-contain";
 import classNames from "classnames";
 import css from './index.module.scss';
 import Loader from "components/loader";
-import React, { useEffect, useState } from "react";
+import React, { useEffect,   useState } from "react";
 import axios from "axios";
+import { useApiOnlineParticipants } from "api/participants/online.js";  
 
 
-const AdminParticipantsOnsite = () => {
-  const [participants, setParticipants] = useState([]);
+const AdminParticipantsOnsite = () => { 
   const [filteredParticipants, setFilteredParticipants] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [errorDelete, setErrorDelete] = useState(null);
+   const [errorDelete, setErrorDelete] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchType, setSearchType] = useState("last_name");
   const [selectedParticipant, setSelectedParticipant] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showHardDeleteConfirm, setShowHardDeleteConfirm] = useState(false);
+    
+  const { participants, loading, error, setParticipants } = useApiOnlineParticipants();
 
-  useEffect(() => {
-    const fetchParticipants = async () => {
-      try {
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/admin/onsite_participants.php`);
-        if (response.data.success) {
-          setParticipants(response.data.data);
-        } else {
-          throw new Error(response.data.message || "Failed to fetch participants. Please, refresh the page.");
-        }
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchParticipants();
-  }, []);
-
+ 
   
+ 
   useEffect(() => {
     if (!searchQuery) {
       setFilteredParticipants(participants);
