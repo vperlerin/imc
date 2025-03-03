@@ -196,7 +196,7 @@ const AdminParticipantsOnsite = () => {
               <div className="modal-footer">
                 <button className="btn btn-outline-secondary fw-bolder" onClick={() => setShowDeleteModal(false)}>Cancel</button>
                 <button className="btn btn-outline-warning fw-bolder" onClick={() => onDeleteParticipant("soft")}>Soft Delete</button>
-                <button className="btn btn-outline-danger fw-bolder ms-auto" onClick={() => { setShowDeleteModal(false); onDeleteParticipant(true); }}>Hard Delete</button>
+                <button className="btn btn-outline-danger fw-bolder ms-auto" onClick={() => { setShowDeleteModal(false); onDeleteParticipant("hard"); }}>Hard Delete</button>
               </div>
             </div>
           </div>
