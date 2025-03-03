@@ -10,7 +10,6 @@ import { useApiOnlineParticipants } from "api/participants/online.js";
 
 const AdminParticipantsOnsite = () => { 
   const [filteredParticipants, setFilteredParticipants] = useState([]);
-   const [errorDelete, setErrorDelete] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchType, setSearchType] = useState("last_name");
   const [selectedParticipant, setSelectedParticipant] = useState(null);
@@ -18,10 +17,13 @@ const AdminParticipantsOnsite = () => {
   const [showHardDeleteConfirm, setShowHardDeleteConfirm] = useState(false);
     
   const { participants, loading, error, setParticipants } = useApiOnlineParticipants();
-
- 
+  const {  deleteParticipant, errorDelete, isDeleting } = useApiDeleteParticipant(
+    participants, 
+    setParticipants, 
+    filteredParticipants, 
+    setFilteredParticipants
+  );
   
- 
   useEffect(() => {
     if (!searchQuery) {
       setFilteredParticipants(participants);
@@ -47,28 +49,15 @@ const AdminParticipantsOnsite = () => {
   };
 
   // Perform deletion
-  const deleteParticipant = async (deleteType) => {
+  const onDeleteParticipant = async (deleteType) => {
     if (!selectedParticipant) return;
-
-    try {
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/admin/delete_participant.php`, {
-        id: selectedParticipant.id,
-        delete_type: deleteType,
-      });
-
-      if (response.data.success) {
-        setParticipants(participants.filter(p => p.id !== selectedParticipant.id));
-        setFilteredParticipants(filteredParticipants.filter(p => p.id !== selectedParticipant.id));
+    deleteParticipant(selectedParticipant, deleteType, (success) => {
+      if (success) {
+        alert("Participant deleted successfully!");
       } else {
-        throw new Error(response.data.message || "Failed to delete participant.");
+        alert("Failed to delete participant.");
       }
-    } catch (err) {
-      setErrorDelete(err.message);
-    } finally {
-      setShowHardDeleteConfirm(false);
-      setShowDeleteModal(false);
-      setSelectedParticipant(null);
-    }
+    }); 
   };
 
   const breadcrumb = [
@@ -192,8 +181,8 @@ const AdminParticipantsOnsite = () => {
               </div>
               <div className="modal-footer">
                 <button className="btn btn-outline-secondary fw-bolder" onClick={() => setShowDeleteModal(false)}>Cancel</button>
-                <button className="btn btn-outline-warning fw-bolder" onClick={() => deleteParticipant("soft")}>Soft Delete</button>
-                <button className="btn btn-outline-danger fw-bolder ms-auto" onClick={() => { setShowDeleteModal(false); setShowHardDeleteConfirm(true); }}>Hard Delete</button>
+                <button className="btn btn-outline-warning fw-bolder" onClick={() => onDeleteParticipant("soft")}>Soft Delete</button>
+                <button className="btn btn-outline-danger fw-bolder ms-auto" onClick={() => { setShowDeleteModal(false); onDeleteParticipant(true); }}>Hard Delete</button>
               </div>
             </div>
           </div>
