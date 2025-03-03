@@ -86,7 +86,7 @@ const MainForm = () => {
     setSuccessMsg(null);
 
     try {
-      const apiUrl = `${process.env.REACT_APP_API_URL}/register.php`;
+      const apiUrl = `${process.env.REACT_APP_API_URL}/api/register.php`;
 
       const formattedData = {
         ...formData,
