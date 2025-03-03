@@ -11,8 +11,7 @@ if (isset($_SERVER['HTTP_ORIGIN']) && in_array($_SERVER['HTTP_ORIGIN'], $allowed
 header("Access-Control-Allow-Credentials: true");
 header("Content-Type: application/json");
 
-// Load dependencies
-require_once __DIR__ . "/../../config.php";
+// Load dependencies 
 require_once __DIR__ . "/../../class/Connect.class.php";
 require_once __DIR__ . "/../../class/Participant.class.php";
 

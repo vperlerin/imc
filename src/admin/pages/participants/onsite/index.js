@@ -26,9 +26,7 @@ const AdminParticipantsOnsite = () => {
     setFilteredParticipants
   );
 
-  useEffect(() => {
-    console.log("Participants Loaded:", participants); // Debugging
-
+  useEffect(() => {  
     if (!searchQuery) {
       setFilteredParticipants(participants);
     } else {
