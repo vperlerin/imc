@@ -18,7 +18,7 @@ const ProtectedRoute = ({ children }) => {
     dispatch(fetchUser()).finally(() => setLoading(false));   
   }, [dispatch]);
 
-  if (loading) return;  // Prevent access before API response
+  if (loading) return <></>;  // Prevent access before API response
   
   // To remove on prod
   if(host === 'localhost:3000') {
