@@ -24,10 +24,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
  
-
-require_once __DIR__ . "/config.php";
-require_once __DIR__ . "/class/Connect.class.php";  
-require_once __DIR__ . "/class/Participant.class.php";   
+require_once __DIR__ . "/../../config.php";
+require_once __DIR__ . "/../../class/Connect.class.php";
+require_once __DIR__ . "/../../class/Participant.class.php";
 
 try {
     // Ensure participant ID is provided via query parameter

@@ -12,9 +12,9 @@ header("Access-Control-Allow-Credentials: true");
 header("Content-Type: application/json");
 
 // Load dependencies
-require_once __DIR__ . "/../config.php";
-require_once __DIR__ . "/../class/Connect.class.php";
-require_once __DIR__ . "/../class/Participant.class.php";
+require_once __DIR__ . "/../../config.php";
+require_once __DIR__ . "/../../class/Connect.class.php";
+require_once __DIR__ . "/../../class/Participant.class.php";
 
 try {
     // Retrieve participant ID from GET param (e.g., ?id=123)

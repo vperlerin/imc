@@ -10,13 +10,9 @@ export const useApiOnlineParticipants = () => {
     console.log("Fetching onsite participants...");
 
     const fetchParticipants = async () => {
-      try {
-        console.log("API Call: ", `${process.env.REACT_APP_API_URL}/admin/api/onsite_participants.php`);
-
+      try { 
         const response = await axios.get(`${process.env.REACT_APP_API_URL}/admin/api/onsite_participants.php`);
-
-        console.log("API Response:", response.data);
-
+ 
         if (response.data.success && Array.isArray(response.data.data)) {
           setParticipants(response.data.data);
         } else {
