@@ -27,8 +27,7 @@ const ProtectedRoute = ({ children }) => {
   if(host === 'localhost:3000') {
     return <>{children}</>
   }
-
-
+ 
 
   return isAuthenticated && isAdmin ? children : <Navigate to="/login" replace />;
 };

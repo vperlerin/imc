@@ -72,20 +72,20 @@ if (!$user || !password_verify($password, $user["password_hash"])) {
     exit;
 }
 
-// ✅ Secure session handling
+// Secure session handling
 session_regenerate_id(true);
 $_SESSION["user_id"] = $user["id"];
 $_SESSION["email"] = $user["email"];
 $_SESSION["is_admin"] = $isAdmin;
 
-// ✅ Ensure session cookie is sent
+// Ensure session cookie is sent
 setcookie(session_name(), session_id(), [
   'secure' => false,  // TODO: Set to `true` in production with HTTPS!!
-  'httponly' => true,  // Prevent JavaScript access
+ // 'httponly' => true,  // Prevent JavaScript access
   'samesite' => 'lax'  // Required for cross-origin authentication
 ]);
 
-// ✅ Return user info
+// Return user info
 $response = [
     "success" => true,
     "message" => "Login successful",
