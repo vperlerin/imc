@@ -8,10 +8,14 @@ const ProtectedRoute = ({ children }) => {
   const isAdmin = useSelector(authSelectors.isAdmin);
   const isAuthenticated = useSelector(authSelectors.isLoggedIn);
   const [loading, setLoading] = useState(true); // Start with true to prevent early redirection
+  const host = window.location.host;
 
   useEffect(() => {
+    if(host === 'localhost:3000') { return }
     dispatch(fetchUser()).finally(() => setLoading(false));   
   }, [dispatch]);
+
+  if(host === 'localhost:3000') { return <>{children}</>}
 
   if (loading) return <></>;  // Prevents redirection before API call completes
 

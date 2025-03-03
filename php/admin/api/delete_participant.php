@@ -40,6 +40,7 @@ try {
 
     echo json_encode(["success" => true, "message" => "Participant deleted successfully."]);
 } catch (Exception $e) {
+    var_dump($e);
     echo json_encode(["success" => false, "message" => $e->getMessage()]);
 }
 ?>
