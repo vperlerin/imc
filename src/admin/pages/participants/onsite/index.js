@@ -136,6 +136,7 @@ const AdminParticipantsOnsite = () => {
                   <th>Reg. Date</th>
                   <th>Name</th>
                   <th>Total Due</th>
+                  <th>Total Paid</th>
                   <th>Pay. Method</th>
                   <th>Confirmed</th>
                   <th></th>
@@ -154,11 +155,17 @@ const AdminParticipantsOnsite = () => {
                           <>{participant.total_due}€</>
                         )}
                       </td> 
+                      <td>{participant.total_paid}€</td> 
                       <td>{participant.payment_method || "n/a"}</td>
-                      <td>{participant.confirmation_sent === true ? "✅" : "❌"}</td>
+                      <td>
+                        {participant.confirmation_sent === true ? "✅" : "❌"}
+                        {participant.confirmation_sent === true && (
+                          (participant.confirmation_date)
+                        )}
+                      </td>
                       <td>
                         <div className="d-flex gap-2 justify-content-end">
-                          <a href={`/admin/participants/onsite/${participant.id}/payment`} className={classNames(css.action, "btn btn-sm btn-outline-success fw-bolder")}>Payments</a>
+                          <a href={`/admin/participants/onsite/payment/${participant.id}`} className={classNames(css.action, "btn btn-sm btn-outline-success fw-bolder")}>Payments</a>
                           <a href={`/admin/participants/onsite/${participant.id}`} className={classNames(css.action, "btn btn-sm btn-outline-primary fw-bolder")}>Edit</a>
                           <button
                             className={classNames(css.action, "btn btn-sm btn-outline-danger fw-bolder")}

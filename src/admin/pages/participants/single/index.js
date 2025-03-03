@@ -6,7 +6,7 @@ import Loader from "components/loader";
 import React, { useEffect, useRef, useState } from "react";
 import { useBlockNavigation } from "hooks/block-navigation.js";
 import { useParams, useNavigate } from "react-router-dom";
-import { get, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { conferenceData as cd } from "data/conference-data";
 import Identitity from "components/registration/identity";
 import Workshops from "components/registration/workshops";
@@ -33,6 +33,10 @@ const AdminParticipantsUser = () => {
   const [unsavedChanges, setUnsavedChanges] = useState(false);
   const [total, setTotal] = useState(0);
   const [paypalFee, setPaypalFee] = useState(0);
+  const [talks, setTalks] = useState([]);
+  const [posters, setPosters] = useState([]);
+
+
   const activeTab = tab || "identity";
   const hasFetchedData = useRef(false);
   const hasFetchedParticipant = useRef(false);
@@ -94,11 +98,11 @@ const AdminParticipantsUser = () => {
 
   // Get participant data
   useEffect(() => {
-    if(hasFetchedParticipant.current) {
+    if (hasFetchedParticipant.current) {
       return;
     }
- 
-    const fetchParticipant = async () => { 
+
+    const fetchParticipant = async () => {
       if (!participantId) {
         setError("Invalid participant ID.");
         setLoading(false);
@@ -114,7 +118,7 @@ const AdminParticipantsUser = () => {
 
         if (response.data.success) {
           setParticipant(response.data.data);
-          reset(response.data.data.participant);  
+          reset(response.data.data.participant);
         } else {
           throw new Error(response.data.message || "Failed to fetch participant. Please refresh the page.");
         }
@@ -171,18 +175,24 @@ const AdminParticipantsUser = () => {
     // Contribution
     const contributions = participant.contributions || [];
     if (sessions.length > 0) {
-      const talks = contributions.filter(c => c.type === "talk").map(talk => ({
+      const updatedTalks = contributions.filter(c => c.type === "talk").map(talk => ({
         ...talk,
         session: talk.session_id || sessions[0]?.id,
       }));
-      const posters = contributions.filter(c => c.type === "poster").map(poster => ({
+      const updatedPosters = contributions.filter(c => c.type === "poster").map(poster => ({
         ...poster,
         session: poster.session_id || sessions[0]?.id,
       }));
 
-      if (talks.length > 0) setValue('talks', talks);
-      if (posters.length > 0) setValue('posters', posters);
+      // Store in state
+      setTalks(updatedTalks);
+      setPosters(updatedPosters);
+
+      // Set values in form so they persist on submit
+      setValue("talks", updatedTalks);
+      setValue("posters", updatedPosters);
     }
+
 
     // Accommodation
     if (participant.accommodation?.registration_type_id) {
@@ -202,7 +212,7 @@ const AdminParticipantsUser = () => {
     setError(null);
     setSuccessMsg(null);
 
-    // ✅ Step 1: Validate the entire form
+    // isAdminStep 1: Validate the entire form
     const isValid = await trigger(); // Triggers validation on all fields
 
     if (!isValid) {
@@ -211,12 +221,15 @@ const AdminParticipantsUser = () => {
       return;
     }
 
-    // ✅ Step 2: Check if the user selected a T-shirt but didn't choose a size
+    // isAdminStep 2: Check if the user selected a T-shirt but didn't choose a size
     if (formData.buy_tshirt === "1" && !formData.tshirt_size) {
       setSaving(false);
       setError("You must select a T-shirt size if you choose to buy one.");
       return;
     }
+
+    formData.talks = talks;
+    formData.posters = posters;
 
     try {
       const response = await axios.post(
@@ -256,7 +269,7 @@ const AdminParticipantsUser = () => {
         ${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}`
     }
   ];
- 
+
   const isSummaryReady = (
     participant &&
     paymentMethods.length > 0 &&
@@ -267,11 +280,11 @@ const AdminParticipantsUser = () => {
   if (errorGettingDataFromDB) {
     return <div className="alert alert-danger fw-bolder">{errorGettingDataFromDB}</div>
   }
- 
+
   return (
     <PageContain
       breadcrumb={breadcrumb}
-    > 
+    >
       <div className="position-relative fw-bolder">
         {(!loading && error) && (
           <div className="alert alert-danger">{error}</div>
@@ -285,7 +298,7 @@ const AdminParticipantsUser = () => {
           <div className="alert alert-success">{successMsg}</div>
         )}
       </div>
- 
+
       {(loading || !hasFetchedData.current) && <Loader />}
 
       {!loading && participant && isSummaryReady && (
