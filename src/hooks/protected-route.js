@@ -7,27 +7,13 @@ const ProtectedRoute = ({ children }) => {
   const dispatch = useDispatch();
   const isAdmin = useSelector(authSelectors.isAdmin);
   const isAuthenticated = useSelector(authSelectors.isLoggedIn);
-  const [loading, setLoading] = useState(false);
-  const host = window.location.host;
-  
-  console.log("IS ADMIN? ", isAdmin);
-  console.log("IS isAuthenticated? ", isAuthenticated);
+  const [loading, setLoading] = useState(true); // Start with true to prevent early redirection
 
   useEffect(() => {
-    if(loading) {
-      return;
-    }
-    setLoading(true);
     dispatch(fetchUser()).finally(() => setLoading(false));   
   }, [dispatch]);
 
-  if (loading) return <></>;  // Prevent access before API response
-  
-  // To remove on prod
-  if(host === 'localhost:3000') {
-    return <>{children}</>
-  }
- 
+  if (loading) return <></>;  // Prevents redirection before API call completes
 
   return isAuthenticated && isAdmin ? children : <Navigate to="/login" replace />;
 };

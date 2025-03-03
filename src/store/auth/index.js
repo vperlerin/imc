@@ -21,7 +21,7 @@ const authSlice = createSlice({
     setUser: (state, action) => {
       state.user = { ...action.payload };
       state.isAuthenticated = true;
-      state.isAdmin = action.payload.is_admin ?? false;  // ✅ Ensure this comes from backend
+      state.isAdmin = action.payload.is_admin ?? false;  //  Ensure this comes from backend
     },
     logout: (state) => {
       state.oauth = null;
@@ -33,7 +33,7 @@ const authSlice = createSlice({
   },
 });
 
-// ✅ Define `fetchUser` directly here  
+//  Define `fetchUser` directly here  
 export const fetchUser = () => async (dispatch) => {
   try {
     const response = await axios.get(`${process.env.REACT_APP_API_URL}/auth/user.php`, {
@@ -52,7 +52,7 @@ export const fetchUser = () => async (dispatch) => {
 };
 
 
-// ✅ Export actions and reducer
+//  Export actions and reducer
 export const authActions = { ...authSlice.actions, fetchUser };
 export const authSelectors = {
   getUser: (state) => state.auth.user,

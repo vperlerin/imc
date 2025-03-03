@@ -142,6 +142,6 @@ if sql_statements:
     print "Running:", mysql_command
     os.system(mysql_command)
 
-    print "✅ Database updated successfully!"
+    print " Database updated successfully!"
 else:
     print "No new data to insert. Database is already up to date."

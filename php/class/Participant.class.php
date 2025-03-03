@@ -322,7 +322,7 @@ class ParticipantManager
                 VALUES (:participant_id, :type, :title, :authors, :abstract, :session_id, :duration, :print, NOW(), NOW())
             ");
 
-            // ✅ Insert talks only if they exist
+            //  Insert talks only if they exist
             if (!empty($data['talks']) && is_array($data['talks'])) {
                 // Insert talks
                 foreach ($data['talks'] as $talk) {

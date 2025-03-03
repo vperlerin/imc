@@ -56,4 +56,4 @@ mysql -u root -p < "$TEMP_SQL"
 # Remove the temporary SQL file after execution
 rm "$TEMP_SQL"
 
-echo "✅ Database setup completed successfully! Time to run python fill_db.py"
+echo " Database setup completed successfully! Time to run python fill_db.py"
