@@ -7,16 +7,24 @@ export const useApiOnlineParticipants = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    console.log("Fetching onsite participants...");
+
     const fetchParticipants = async () => {
-      try { 
+      try {
+        console.log("API Call: ", `${process.env.REACT_APP_API_URL}/admin/api/onsite_participants.php`);
+
         const response = await axios.get(`${process.env.REACT_APP_API_URL}/admin/api/onsite_participants.php`);
-        if (response.data.success) {
+
+        console.log("API Response:", response.data);
+
+        if (response.data.success && Array.isArray(response.data.data)) {
           setParticipants(response.data.data);
         } else {
-          throw new Error(response.data.message || "Failed to fetch participants. Please, refresh the page.");
+          throw new Error(response.data.message || "Unexpected API response format.");
         }
       } catch (err) {
-        setError(err.message || "Failed to fetch participants. Please, refresh the page.");
+        console.error("API Fetch Error:", err.message);
+        setError(err.message || "Failed to fetch participants. Please refresh the page.");
       } finally {
         setLoading(false);
       }

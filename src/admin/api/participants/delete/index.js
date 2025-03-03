@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 
-const useApiDeleteParticipant = ( setParticipants, setFilteredParticipants) => {
+export const useApiDeleteParticipant = ( setParticipants, setFilteredParticipants) => {
   const [errorDelete, setErrorDelete] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -35,4 +35,4 @@ const useApiDeleteParticipant = ( setParticipants, setFilteredParticipants) => {
   return { deleteParticipant, errorDelete, isDeleting };
 };
 
-export default useApiDeleteParticipant;
+ 

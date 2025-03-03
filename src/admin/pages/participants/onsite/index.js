@@ -3,28 +3,32 @@ import PageContain from "@/admin/components/page-contain";
 import classNames from "classnames";
 import css from './index.module.scss';
 import Loader from "components/loader";
-import React, { useEffect,   useState } from "react";
-import axios from "axios";
-import { useApiOnlineParticipants } from "api/participants/online.js";  
+import React, { useEffect, useState } from "react";
+import { useApiOnlineParticipants } from "api/participants/online.js";
+import { useApiDeleteParticipant } from "@/admin/api/participants/delete";
 
 
-const AdminParticipantsOnsite = () => { 
+const AdminParticipantsOnsite = () => {
   const [filteredParticipants, setFilteredParticipants] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchType, setSearchType] = useState("last_name");
   const [selectedParticipant, setSelectedParticipant] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showHardDeleteConfirm, setShowHardDeleteConfirm] = useState(false);
-    
+  const [success, setSuccess] = useState('');
+  const [errorDeletion, setErrorDeletion] = useState('');
+
   const { participants, loading, error, setParticipants } = useApiOnlineParticipants();
-  const {  deleteParticipant, errorDelete, isDeleting } = useApiDeleteParticipant(
-    participants, 
-    setParticipants, 
-    filteredParticipants, 
+  const { deleteParticipant, errorDelete, isDeleting } = useApiDeleteParticipant(
+    participants,
+    setParticipants,
+    filteredParticipants,
     setFilteredParticipants
   );
-  
+
   useEffect(() => {
+    console.log("Participants Loaded:", participants); // Debugging
+
     if (!searchQuery) {
       setFilteredParticipants(participants);
     } else {
@@ -53,17 +57,17 @@ const AdminParticipantsOnsite = () => {
     if (!selectedParticipant) return;
     deleteParticipant(selectedParticipant, deleteType, (success) => {
       if (success) {
-        alert("Participant deleted successfully!");
+        setSuccess("Participant deleted successfully!");
       } else {
-        alert("Failed to delete participant.");
+        setErrorDeletion("Impossible to delete the participant for now, please try again later.")
       }
-    }); 
+    });
   };
 
   const breadcrumb = [
     { url: "/admin/participants/onsite", name: "Onsite Participants" },
   ];
-
+  
   return (
     <PageContain
       breadcrumb={breadcrumb}
@@ -73,11 +77,23 @@ const AdminParticipantsOnsite = () => {
           <strong>Confirmed:</strong> {totalConfirmed} / {totalParticipants}
         </>
       }
-    >
+    > 
+      {errorDeletion && (
+        <div className="alert alert-danger">
+          {errorDeletion}
+        </div>
+      )}
+      {success && (
+        <div className="alert alert-success">
+          {success}
+        </div>
+      )}
+      {error && (
+        <p className="alert alert-danger">{error}</p>
+      )}
+
       {loading ? (
         <Loader />
-      ) : error ? (
-        <p className="alert alert-danger">{error}</p>
       ) : (
         <>
           {errorDelete && <p className="alert alert-danger">{errorDelete}</p>}
@@ -119,15 +135,15 @@ const AdminParticipantsOnsite = () => {
                   filteredParticipants.map((participant) => (
                     <tr key={participant.id}>
                       <td>{participant.created_at.split(' ')[0]}</td>
-                      <td>{participant.title} {participant.first_name} {participant.last_name}</td> 
+                      <td>{participant.title} {participant.first_name} {participant.last_name}</td>
                       <td>
                         {participant.payment_method === 'Paypal' ? (
                           <>{(parseFloat(participant.total_due) + parseFloat(participant.paypal_fee))}€</>
                         ) : (
                           <>{participant.total_due}€</>
                         )}
-                      </td> 
-                      <td>{participant.total_paid}€</td> 
+                      </td>
+                      <td>{participant.total_paid}€</td>
                       <td>{participant.payment_method || "n/a"}</td>
                       <td>
                         {participant.confirmation_sent === true ? "✅" : "❌"}
