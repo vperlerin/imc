@@ -1,4 +1,8 @@
 <?php 
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 $allowed_origins = [
     "https://imc2025.imo.net",
     "http://localhost:3000"
@@ -15,11 +19,8 @@ require_once __DIR__ . "/config.php";
 require_once __DIR__ . "/class/Payment.class.php";
 require_once __DIR__ . "/class/Connect.class.php";
  
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
 
-
+ 
 // Handle preflight OPTIONS request
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);

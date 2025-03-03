@@ -67,7 +67,9 @@ const Payments = () => {
 
   // Fetch participant's payments
   useEffect(() => {
-    if (!participantId) return;
+    if (!participantId) {
+      return;
+    }
 
     axios.get(`${process.env.REACT_APP_API_URL}/get_participant_payments.php?id=${participantId}`)
       .then(response => {
