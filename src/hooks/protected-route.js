@@ -10,6 +10,9 @@ const ProtectedRoute = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const host = window.location.host;
   
+  console.log("IS ADMIN? ", isAdmin);
+  console.log("IS isAuthenticated? ", isAuthenticated);
+
   useEffect(() => {
     if(loading) {
       return;
@@ -25,8 +28,7 @@ const ProtectedRoute = ({ children }) => {
     return <>{children}</>
   }
 
-  console.log("IS ADMIN? ", isAdmin);
-  console.log("IS isAuthenticated? ", isAuthenticated);
+
 
   return isAuthenticated && isAdmin ? children : <Navigate to="/login" replace />;
 };
