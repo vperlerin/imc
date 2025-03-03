@@ -16,19 +16,19 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
  
-require_once __DIR__ . "../config.php";
-require_once __DIR__ . "../class/Connect.class.php"; // Ensures $pdo is loaded
-require_once __DIR__ . "../class/ConferenceData.class.php";
-require_once __DIR__ . "../class/Mail.class.php";
-require_once __DIR__ . "../class/Participant.class.php";
-require_once __DIR__ . "../class/Workshop.class.php";
-require_once __DIR__ . "../class/Arrival.class.php";
-require_once __DIR__ . "../class/Contribution.class.php";
-require_once __DIR__ . "../class/Accommodation.class.php";
-require_once __DIR__ . "../class/Payment.class.php";
-require_once __DIR__ . "../class/Extras.class.php";
-require_once __DIR__ . "../class/Summary.class.php";
-require_once __DIR__ . "../class/Registrationtype.class.php";
+require_once __DIR__ . "/config.php";
+require_once __DIR__ . "/class/Connect.class.php"; // Ensures $pdo is loaded
+require_once __DIR__ . "*/class/ConferenceData.class.php";
+require_once __DIR__ . "/class/Mail.class.php";
+require_once __DIR__ . "/class/Participant.class.php";
+require_once __DIR__ . "/class/Workshop.class.php";
+require_once __DIR__ . "/class/Arrival.class.php";
+require_once __DIR__ . "/class/Contribution.class.php";
+require_once __DIR__ . "/class/Accommodation.class.php";
+require_once __DIR__ . "/class/Payment.class.php";
+require_once __DIR__ . "/class/Extras.class.php";
+require_once __DIR__ . "/class/Summary.class.php";
+require_once __DIR__ . "/class/Registrationtype.class.php";
 
 function create_email(array $data, string $summary): string
 {
