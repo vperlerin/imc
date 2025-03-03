@@ -1,7 +1,8 @@
 <?php
 require '../vendor/autoload.php';
 require_once __DIR__ . "/config.php";
-require_once __DIR__ . "/../class/PaymentManager.php";
+require_once __DIR__ . "/class/PaymentManager.php";
+ 
 
 $allowed_origins = [
     "https://imc2025.imo.net",
