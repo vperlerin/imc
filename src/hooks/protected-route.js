@@ -26,6 +26,7 @@ const ProtectedRoute = ({ children }) => {
   }
 
   console.log("IS ADMIN? ", isAdmin);
+  console.log("IS isAuthenticated? ", isAuthenticated);
 
   return isAuthenticated && isAdmin ? children : <Navigate to="/login" replace />;
 };

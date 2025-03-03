@@ -19,6 +19,7 @@ header("Access-Control-Allow-Methods: POST, OPTIONS, DELETE");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
 header("Content-Type: application/json");
 
+
 require_once __DIR__ . "/../../class/Connect.class.php";
 require_once __DIR__ . "/../../class/Participant.class.php";
  
