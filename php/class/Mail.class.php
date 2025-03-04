@@ -3,43 +3,52 @@
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 use PHPMailer\PHPMailer\OAuth;
-use PHPMailer\PHPMailer\SMTP;
 use League\OAuth2\Client\Provider\Google;
 
-require_once __DIR__ . '/../../vendor/autoload.php';
 require_once __DIR__ . "/../config.php";
+require_once __DIR__ . '/../../vendor/autoload.php';
+
+// Debug
+ini_set('display_errors', '1');
+ini_set('display_startup_errors', '1');
+error_reporting(E_ALL);
 
 class Mail
 {
-    private $mailer;
-    private $emailSender;
-    private $emailSenderName;
+    private $mailer; 
 
     public function __construct()
     {
         $this->mailer = new PHPMailer;
-        $this->configureSMTP();
-    }
-
-    private function configureSMTP()
-    {
         try {
-            date_default_timezone_set('Etc/UTC');  
+            date_default_timezone_set('Etc/UTC');
 
             // Load SMTP credentials
             $clientId = getenv("SMTP_CLIENT_ID");
             $clientSecret = getenv("SMTP_CLIENT_SECRET");
             $refreshToken = getenv("SMTP_REFRESH_TOKEN");
-
-            $this->emailSender = getenv("SMTP_USER_EMAIL");
-            $this->emailSenderName = getenv("SMTP_USER_NAME");
+            $emailSender = 'president@imo.net';
 
             // Validate credentials
-            if (!$clientId || !$clientSecret || !$refreshToken || !$this->emailSender) {
+            if (!$clientId || !$clientSecret || !$refreshToken || !$emailSender) {
                 throw new Exception("SMTP OAuth credentials are missing or invalid.");
             }
 
-            // Correct SMTP settings order
+            // OAuth2 Provider Setup
+            $provider = new Google([
+                'clientId'     => $clientId,
+                'clientSecret' => $clientSecret,
+            ]);
+ 
+            // Configure OAuth2 authentication
+            $this->mailer->setOAuth(new OAuth([
+                'provider'     => $provider,
+                'clientId'     => $clientId,
+                'clientSecret' => $clientSecret,
+                'refreshToken' => $refreshToken,
+                'userName'     =>  $emailSender,
+            ]));
+
             $this->mailer->isSMTP();
             $this->mailer->SMTPDebug = 4;
             $this->mailer->Host = getenv("SMTP_HOST");
@@ -49,20 +58,7 @@ class Mail
             $this->mailer->AuthType = 'XOAUTH2';
             $this->mailer->CharSet = PHPMailer::CHARSET_UTF8;
 
-            // OAuth2 Provider Setup
-            $provider = new Google([
-                'clientId'     => $clientId,
-                'clientSecret' => $clientSecret,
-            ]);
 
-            // Configure OAuth2 authentication
-            $this->mailer->setOAuth(new OAuth([
-                'provider'     => $provider,
-                'clientId'     => $clientId,
-                'clientSecret' => $clientSecret,
-                'refreshToken' => $refreshToken,
-                'userName'     => $this->emailSender,
-            ]));
 
             // Debug sender email
             if (!filter_var($this->emailSender, FILTER_VALIDATE_EMAIL)) {
@@ -70,13 +66,13 @@ class Mail
             }
 
             // Hardcode a working sender email for debugging
-            $this->mailer->setFrom("webserver@imo.net", "International Meteor Organization"); 
-
+            $this->mailer->setFrom("webserver@imo.net", "International Meteor Organization");
         } catch (Exception $e) {
             error_log("Mailer Configuration Error: " . $e->getMessage());
             throw $e; // Prevent silent failure
         }
     }
+
 
     public function sendEmail(array $recipients, string $subject, string $message, string $replyTo = null, array $bccRecipients = [])
     {
