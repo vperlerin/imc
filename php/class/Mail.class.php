@@ -26,7 +26,7 @@ class Mail
             // Load SMTP credentials
             $clientId = getenv("SMTP_CLIENT_ID");
             $clientSecret = getenv("SMTP_CLIENT_SECRET");
-            $refreshToken = "1//05UIktT5WOgnXCgYIARAAGAUSNwF-L9Irnns5cLoQpdHsGJ6DZeD1OzIEE_bAv5uw0LBAzg8vUEI4sLBheLetBsL2Vrm8zn0uOrw";
+            $refreshToken =  getenv("SMTP_REFRESH_TOKEN");
 
             $this->emailSender = getenv("SMTP_USER_EMAIL");
             $this->emailSenderName = getenv("SMTP_USER_NAME");
@@ -60,14 +60,7 @@ class Mail
                 'refreshToken' => $refreshToken,
                 'userName'     => $this->emailSender,
             ]));
-            
-            echo(var_dump(([
-                'clientId'     => $clientId,
-                'clientSecret' => $clientSecret,
-                'refreshToken' => $refreshToken,
-                'userName'     => $this->emailSender,
-            ])));
- 
+             
             // Validate and set sender email
             if (!filter_var($this->emailSender, FILTER_VALIDATE_EMAIL)) {
                 throw new Exception("Invalid sender email: {$this->emailSender}");
