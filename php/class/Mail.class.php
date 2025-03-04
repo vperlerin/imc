@@ -60,7 +60,7 @@ class Mail
     }
 
 
-    public function sendEmail(array $recipients, string $subject, string $message, string $replyTo = null, array $bccRecipients = [])
+    public static function sendEmail(array $recipients, string $subject, string $message, string $replyTo = null, array $bccRecipients = [])
     {
         $mail = Mail::getMailer();
 
