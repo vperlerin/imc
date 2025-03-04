@@ -29,6 +29,7 @@ if (file_exists($envPath)) {
     }
 }
 
- 
+define('SMTP_refreshToken', '1//05SsZ8NEdpL3gCgYIARAAGAUSNwF-L9IrY1QntjCYd3xUS7HNyWmxoCqxeizXPSHrDyF0MEFUCKnLG87IMDjsH8uFsr9Zr2OUCN0');
+  
 ?>
  
