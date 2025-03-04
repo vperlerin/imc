@@ -26,7 +26,7 @@ class Mail
             // Load SMTP credentials
             $clientId = getenv("SMTP_CLIENT_ID");
             $clientSecret = getenv("SMTP_CLIENT_SECRET");
-            $refreshToken = getenv("SMTP_REFRESH_TOKEN");
+            $refreshToken = trim(getenv("SMTP_REFRESH_TOKEN"));
             $emailSender = 'president@imo.net';  
 
             echo "CLIENT ID ***" . $clientId ."***";
