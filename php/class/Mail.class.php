@@ -3,6 +3,7 @@
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 use PHPMailer\PHPMailer\OAuth;
+use PHPMailer\PHPMailer\SMTP;
 use League\OAuth2\Client\Provider\Google;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
@@ -16,13 +17,15 @@ class Mail
 
     public function __construct()
     {
-        $this->mailer = new PHPMailer(true); // Enable exceptions
+        $this->mailer = new PHPMailer;
         $this->configureSMTP();
     }
 
     private function configureSMTP()
     {
         try {
+            date_default_timezone_set('Etc/UTC');  
+
             // Load SMTP credentials
             $clientId = getenv("SMTP_CLIENT_ID");
             $clientSecret = getenv("SMTP_CLIENT_SECRET");
@@ -36,12 +39,11 @@ class Mail
                 throw new Exception("SMTP OAuth credentials are missing or invalid.");
             }
 
-            // Configure PHPMailer
+            // Correct SMTP settings order
             $this->mailer->isSMTP();
-            $this->mailer->SMTPDebug = 4; // Set debug level (can be changed in production)
-            $this->mailer->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
             $this->mailer->Host = getenv("SMTP_HOST");
             $this->mailer->Port = 465;
+            $this->mailer->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
             $this->mailer->SMTPAuth = true;
             $this->mailer->AuthType = 'XOAUTH2';
             $this->mailer->CharSet = PHPMailer::CHARSET_UTF8;
@@ -49,7 +51,7 @@ class Mail
             // OAuth2 Provider Setup
             $provider = new Google([
                 'clientId'     => $clientId,
-                'clientSecret' => $clientSecret, 
+                'clientSecret' => $clientSecret,
             ]);
 
             // Configure OAuth2 authentication
@@ -61,15 +63,19 @@ class Mail
                 'userName'     => $this->emailSender,
             ]));
 
-            // Validate and set sender email
+            // Debug sender email
             if (!filter_var($this->emailSender, FILTER_VALIDATE_EMAIL)) {
                 throw new Exception("Invalid sender email: {$this->emailSender}");
             }
 
-            $this->mailer->setFrom($this->emailSender, $this->emailSenderName ?: "IMC " . getenv("YEAR"));
+            // Hardcode a working sender email for debugging
+            $this->mailer->setFrom("webserver@imo.net", "International Meteor Organization");
+
+//            $this->mailer->setFrom($this->emailSender, $this->emailSenderName ?: "IMC " . getenv("YEAR"));
+
         } catch (Exception $e) {
             error_log("Mailer Configuration Error: " . $e->getMessage());
-            throw $e; // Re-throw to prevent silent failure
+            throw $e; // Prevent silent failure
         }
     }
 
@@ -119,7 +125,7 @@ class Mail
             // Email content
             $this->mailer->Subject = $subject;
             $this->mailer->Body = $message;
-            $this->mailer->AltBody = strip_tags($message); // Fallback for non-HTML email clients
+            $this->mailer->AltBody = strip_tags($message);
 
             // Send the email
             $this->mailer->send();
