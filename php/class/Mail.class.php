@@ -27,7 +27,7 @@ class Mail
             $clientId = getenv("SMTP_CLIENT_ID");
             $clientSecret = getenv("SMTP_CLIENT_SECRET");
             $refreshToken = getenv("SMTP_REFRESH_TOKEN");
-            $emailSender = 'president@imo.net';
+            $emailSender = 'president@imo.net';  
 
             // Validate credentials
             if (!$clientId || !$clientSecret || !$refreshToken || !$emailSender) {
@@ -39,18 +39,18 @@ class Mail
                 'clientId'     => $clientId,
                 'clientSecret' => $clientSecret,
             ]);
- 
+
             // Configure OAuth2 authentication
             $this->mailer->setOAuth(new OAuth([
                 'provider'     => $provider,
                 'clientId'     => $clientId,
                 'clientSecret' => $clientSecret,
                 'refreshToken' => $refreshToken,
-                'userName'     =>  $emailSender,
+                'userName'     => $emailSender,
             ]));
 
             $this->mailer->isSMTP();
-            $this->mailer->SMTPDebug = 4;
+            $this->mailer->SMTPDebug = 4; // Adjust for production
             $this->mailer->Host = getenv("SMTP_HOST");
             $this->mailer->Port = 465;
             $this->mailer->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
@@ -63,8 +63,9 @@ class Mail
                 throw new Exception("Invalid sender email: {$emailSender}");
             }
 
-            // Hardcode a working sender email for debugging
-            $this->mailer->setFrom("webserver@imo.net", "International Meteor Organization");
+            // Set the From address to match the OAuth user
+            $this->mailer->setFrom($emailSender, "International Meteor Organization");
+
         } catch (Exception $e) {
             error_log("Mailer Configuration Error: " . $e->getMessage());
             throw $e; // Prevent silent failure
