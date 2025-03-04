@@ -16,7 +16,7 @@ class Mail
 
     public function __construct()
     {
-        $this->mailer = new PHPMailer;
+        $this->mailer = new PHPMailer(true); // Enable exceptions
         $this->configureSMTP();
     }
 
@@ -26,33 +26,33 @@ class Mail
             // Load SMTP credentials
             $clientId = getenv("SMTP_CLIENT_ID");
             $clientSecret = getenv("SMTP_CLIENT_SECRET");
-            $refreshToken =  getenv("SMTP_REFRESH_TOKEN");
+            $refreshToken = getenv("SMTP_REFRESH_TOKEN");
 
             $this->emailSender = getenv("SMTP_USER_EMAIL");
             $this->emailSenderName = getenv("SMTP_USER_NAME");
 
-            // SMTP Configuration
+            // Validate credentials
+            if (!$clientId || !$clientSecret || !$refreshToken || !$this->emailSender) {
+                throw new Exception("SMTP OAuth credentials are missing or invalid.");
+            }
+
+            // Configure PHPMailer
             $this->mailer->isSMTP();
-            $this->mailer->SMTPDebug = 4;
+            $this->mailer->SMTPDebug = 4; // Set debug level (can be changed in production)
+            $this->mailer->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
             $this->mailer->Host = getenv("SMTP_HOST");
             $this->mailer->Port = 465;
             $this->mailer->SMTPAuth = true;
             $this->mailer->AuthType = 'XOAUTH2';
-            $this->mailer->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
             $this->mailer->CharSet = PHPMailer::CHARSET_UTF8;
 
-            // Set up OAuth2 Provider
+            // OAuth2 Provider Setup
             $provider = new Google([
                 'clientId'     => $clientId,
-                'clientSecret' => $clientSecret
+                'clientSecret' => $clientSecret, 
             ]);
 
-            echo(var_dump(([
-                'clientId'     => $clientId,
-                'clientSecret' => $clientSecret
-            ])));
-            
-            // Configure OAuth2 authentication with the valid access token
+            // Configure OAuth2 authentication
             $this->mailer->setOAuth(new OAuth([
                 'provider'     => $provider,
                 'clientId'     => $clientId,
@@ -60,7 +60,7 @@ class Mail
                 'refreshToken' => $refreshToken,
                 'userName'     => $this->emailSender,
             ]));
-             
+
             // Validate and set sender email
             if (!filter_var($this->emailSender, FILTER_VALIDATE_EMAIL)) {
                 throw new Exception("Invalid sender email: {$this->emailSender}");
@@ -69,6 +69,7 @@ class Mail
             $this->mailer->setFrom($this->emailSender, $this->emailSenderName ?: "IMC " . getenv("YEAR"));
         } catch (Exception $e) {
             error_log("Mailer Configuration Error: " . $e->getMessage());
+            throw $e; // Re-throw to prevent silent failure
         }
     }
 
@@ -98,6 +99,9 @@ class Mail
 
             // Add BCC recipients if provided
             foreach ($bccRecipients as $bccEmail) {
+                if (!filter_var($bccEmail, FILTER_VALIDATE_EMAIL)) {
+                    throw new Exception("Invalid BCC email: $bccEmail");
+                }
                 $this->mailer->addBCC($bccEmail, '');
             }
 
@@ -121,7 +125,8 @@ class Mail
             $this->mailer->send();
             return ["success" => true, "message" => "Message sent successfully"];
         } catch (Exception $e) {
-            return ["success" => false, "message" => "Failed to send message. Check logs." . $this->mailer->ErrorInfo];
+            error_log("Email Error: " . $e->getMessage());
+            return ["success" => false, "message" => "Failed to send message. Error: " . $e->getMessage()];
         }
     }
 }
