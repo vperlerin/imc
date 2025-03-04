@@ -41,6 +41,7 @@ class Mail
 
             // Correct SMTP settings order
             $this->mailer->isSMTP();
+            $this->mailer->SMTPDebug = 4;
             $this->mailer->Host = getenv("SMTP_HOST");
             $this->mailer->Port = 465;
             $this->mailer->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
