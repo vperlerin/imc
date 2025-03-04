@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useBeforeUnload, useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 export const useBlockNavigation = (unsavedChanges) => {
   const navigate = useNavigate();
@@ -9,7 +9,8 @@ export const useBlockNavigation = (unsavedChanges) => {
     const handleBeforeUnload = (event) => {
       if (unsavedChanges) {
         event.preventDefault();
-        event.returnValue = "You have unsaved changes. Do you really want to leave?";
+        event.returnValue =
+          "You have unsaved changes. Do you really want to leave?";
       }
     };
 
@@ -23,7 +24,9 @@ export const useBlockNavigation = (unsavedChanges) => {
   useEffect(() => {
     const handleNavigation = (event) => {
       if (unsavedChanges) {
-        const confirmLeave = window.confirm("You have unsaved changes. Do you really want to leave?");
+        const confirmLeave = window.confirm(
+          "You have unsaved changes. Do you really want to leave?",
+        );
         if (!confirmLeave) {
           event.preventDefault();
           navigate(location.pathname, { replace: true }); // Stay on the same page
@@ -38,5 +41,3 @@ export const useBlockNavigation = (unsavedChanges) => {
     };
   }, [unsavedChanges, navigate, location.pathname]);
 };
-
- 

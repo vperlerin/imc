@@ -1,3 +1,3 @@
-import conferenceData from './conference-data.json';
+import conferenceData from "./conference-data.json";
 
 export { conferenceData };

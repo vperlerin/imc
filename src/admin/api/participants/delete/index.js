@@ -1,28 +1,44 @@
 import { useState } from "react";
 import axios from "axios";
 
-export const useApiDeleteParticipant = ( setParticipants, setFilteredParticipants) => {
+export const useApiDeleteParticipant = (
+  setParticipants,
+  setFilteredParticipants,
+) => {
   const [errorDelete, setErrorDelete] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const deleteParticipant = async (selectedParticipant, deleteType, onComplete = () => {}) => {
+  const deleteParticipant = async (
+    selectedParticipant,
+    deleteType,
+    onComplete = () => {},
+  ) => {
     if (!selectedParticipant) return;
 
     setIsDeleting(true);
     setErrorDelete(null);
 
     try {
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/admin/api/delete_participant.php`, {
-        id: selectedParticipant.id,
-        delete_type: deleteType,
-      });
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/admin/api/delete_participant.php`,
+        {
+          id: selectedParticipant.id,
+          delete_type: deleteType,
+        },
+      );
 
       if (response.data.success) {
-        setParticipants((prev) => prev.filter((p) => p.id !== selectedParticipant.id));
-        setFilteredParticipants((prev) => prev.filter((p) => p.id !== selectedParticipant.id));
-        onComplete(true);  
+        setParticipants((prev) =>
+          prev.filter((p) => p.id !== selectedParticipant.id),
+        );
+        setFilteredParticipants((prev) =>
+          prev.filter((p) => p.id !== selectedParticipant.id),
+        );
+        onComplete(true);
       } else {
-        throw new Error(response.data.message || "Failed to delete participant.");
+        throw new Error(
+          response.data.message || "Failed to delete participant.",
+        );
       }
     } catch (err) {
       setErrorDelete(err.message);
@@ -34,5 +50,3 @@ export const useApiDeleteParticipant = ( setParticipants, setFilteredParticipant
 
   return { deleteParticipant, errorDelete, isDeleting };
 };
-
- 
