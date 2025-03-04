@@ -6,6 +6,7 @@ use PHPMailer\PHPMailer\OAuth;
 use League\OAuth2\Client\Provider\Google;
 
 require_once __DIR__ . "/../config.php";
+require_once __DIR__ . "/../config/gmail.config.php";
 require_once __DIR__ . '/../../vendor/autoload.php';
 
 // Debug
@@ -24,12 +25,10 @@ class Mail
             date_default_timezone_set('Etc/UTC');
 
             // Load SMTP credentials
-            $clientId = getenv("SMTP_CLIENT_ID");
-            $clientSecret = getenv("SMTP_CLIENT_SECRET");
-            $refreshToken = SMTP_refreshToken;
-            $emailSender = 'president@imo.net';  
-
-            var_dump($refreshToken);
+            $clientId = SMTP_CLIENT_ID;
+            $clientSecret = SMTP_CLIENT_SECRET;
+            $refreshToken = SMTP_REFRESH_TOKEN;
+            $emailSender = SMTP_USER_EMAIL;  
   
             // Validate credentials
             if (!$clientId || !$clientSecret || !$refreshToken || !$emailSender) {
@@ -53,8 +52,8 @@ class Mail
 
             $this->mailer->isSMTP();
             $this->mailer->SMTPDebug = 4; // Adjust for production
-            $this->mailer->Host = getenv("SMTP_HOST");
-            $this->mailer->Port = 465;
+            $this->mailer->Host = SMTP_HOST;
+            $this->mailer->Port = SMTP_TLS_PORT;
             $this->mailer->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
             $this->mailer->SMTPAuth = true;
             $this->mailer->AuthType = 'XOAUTH2';
