@@ -29,6 +29,10 @@ class Mail
             $refreshToken = getenv("SMTP_REFRESH_TOKEN");
             $emailSender = 'president@imo.net';  
 
+            echo "CLIENT ID ***" . $clientId ."***";
+            echo "CLIENT SECRET ***" . $clientSecret ."***";
+            echo "REF ***".$refreshToken ."****";
+
             // Validate credentials
             if (!$clientId || !$clientSecret || !$refreshToken || !$emailSender) {
                 throw new Exception("SMTP OAuth credentials are missing or invalid.");
