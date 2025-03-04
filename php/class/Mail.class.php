@@ -29,6 +29,11 @@ class Mail
             $clientSecret = SMTP_CLIENT_SECRET;
             $refreshToken = SMTP_REFRESH_TOKEN;
             $emailSender = SMTP_USER_EMAIL;  
+
+            echo(var_dump("ID " . $clientId));
+            echo(var_dump("SEC " . $clientSecret));
+            echo(var_dump("REF " . $refreshToken));
+            echo(var_dump("SEND " . $emailSender));
   
             // Validate credentials
             if (!$clientId || !$clientSecret || !$refreshToken || !$emailSender) {
@@ -65,7 +70,7 @@ class Mail
             }
 
             // Set the From address to match the OAuth user
-            $this->mailer->setFrom($emailSender, "International Meteor Organization");
+            $this->mailer->setFrom($emailSender, SMTP_USER_NAME);
 
         } catch (Exception $e) {
             error_log("Mailer Configuration Error: " . $e->getMessage());
