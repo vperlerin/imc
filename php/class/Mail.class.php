@@ -69,9 +69,7 @@ class Mail
             }
 
             // Hardcode a working sender email for debugging
-            $this->mailer->setFrom("webserver@imo.net", "International Meteor Organization");
-
-//            $this->mailer->setFrom($this->emailSender, $this->emailSenderName ?: "IMC " . getenv("YEAR"));
+            $this->mailer->setFrom("webserver@imo.net", "International Meteor Organization"); 
 
         } catch (Exception $e) {
             error_log("Mailer Configuration Error: " . $e->getMessage());
