@@ -34,6 +34,7 @@ class Mail
             echo(var_dump("SEC " . $clientSecret));
             echo(var_dump("REF " . $refreshToken));
             echo(var_dump("SEND " . $emailSender));
+            echo("************************************************************");
   
             // Validate credentials
             if (!$clientId || !$clientSecret || !$refreshToken || !$emailSender) {
