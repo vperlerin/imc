@@ -58,11 +58,9 @@ class Mail
             $this->mailer->AuthType = 'XOAUTH2';
             $this->mailer->CharSet = PHPMailer::CHARSET_UTF8;
 
-
-
             // Debug sender email
-            if (!filter_var($this->emailSender, FILTER_VALIDATE_EMAIL)) {
-                throw new Exception("Invalid sender email: {$this->emailSender}");
+            if (!filter_var($emailSender, FILTER_VALIDATE_EMAIL)) {
+                throw new Exception("Invalid sender email: {$emailSender}");
             }
 
             // Hardcode a working sender email for debugging
