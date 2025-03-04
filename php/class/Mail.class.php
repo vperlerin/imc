@@ -28,6 +28,8 @@ class Mail
             $clientSecret = getenv("SMTP_CLIENT_SECRET");
             $refreshToken = SMTP_refreshToken;
             $emailSender = 'president@imo.net';  
+
+            var_dump($refreshToken);
   
             // Validate credentials
             if (!$clientId || !$clientSecret || !$refreshToken || !$emailSender) {
