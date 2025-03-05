@@ -72,9 +72,7 @@ class ParticipantManager
             ]);
 
             $participantId = $this->pdo->lastInsertId();
-
-            var_dump("PART ID ? ", $participantId);
-
+  
             // Insert workshops participation
             if (!empty($data['workshops']) && is_array($data['workshops'])) {
                 $stmt = $this->pdo->prepare("
