@@ -15,9 +15,9 @@ if (isset($_SERVER['HTTP_ORIGIN']) && in_array($_SERVER['HTTP_ORIGIN'], $allowed
 header("Content-Type: application/json");
 header("Access-Control-Allow-Methods: GET, OPTIONS");
 
-require_once __DIR__ . "/config.php";
-require_once __DIR__ . "/class/Participant.class.php";
-require_once __DIR__ . "/class/Connect.class.php";
+require_once __DIR__ . "../config.php";
+require_once __DIR__ . "../class/Participant.class.php";
+require_once __DIR__ . "../class/Connect.class.php";
  
 // Handle preflight OPTIONS request
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {

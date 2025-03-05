@@ -21,7 +21,7 @@ export const useApiParticipant = (participantId) => {
 
       try {
         const response = await axios.get(
-          `${process.env.REACT_APP_API_URL}/admin/api/get_participant.php?id=${participantId}`
+          `${process.env.REACT_APP_API_URL}/api/get_participant.php?id=${participantId}`
         );
 
         if (response.data.success && response.data.data) {
