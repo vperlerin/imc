@@ -69,6 +69,7 @@ const AdminParticipantsOnsite = () => {
   return (
     <PageContain
       breadcrumb={breadcrumb}
+      isMaxWidth
       title="Onsite Participants"
       rightContent={
         <>

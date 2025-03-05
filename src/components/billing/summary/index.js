@@ -1,6 +1,7 @@
 import classNames from "classnames";
 import css from "./index.module.scss";
 import React, { useEffect } from "react";
+import { getPaymentMethodById } from 'utils/payment_method';
 
 const getPaypalPrice = (price) => {
   return Math.round((price + (0.034 * price + 0.35) / 0.966) * 100) / 100;
@@ -36,11 +37,7 @@ const getSelectedWorkshops = (selectedWorkshopIds = [], workshops = [], isOnline
   return { selected, totalPrice };
 };
 
-
-const getPaymentMethodById = (paymentMethodId, paymentMethods) => {
-  const method = paymentMethods.find(pm => pm.id === paymentMethodId);
-  return method ? method.method : "Payment method not found";
-};
+ 
 
 const Summary = ({
   isOnline = false,

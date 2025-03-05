@@ -6,6 +6,7 @@ import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { conferenceData as cd } from '../../../data/conference-data';
 import BreadCrumb from '@/admin/components/breadcrumb';
+import classNames from 'classnames';
 
 
 const PageContain = ({
@@ -13,6 +14,7 @@ const PageContain = ({
   title = '',
   rightContent,
   children,
+  isMaxWidth = false,
 }) => {
   const pageTitle = title ? `${title} | ${cd.name_display} ${cd.year}` : `${cd.name_display} ${cd.year}`;
 
@@ -36,7 +38,9 @@ const PageContain = ({
               {title && <h2>{title}</h2>}
               {rightContent && <div>{rightContent}</div>}
             </div>
-            {children}
+            <div className={classNames(isMaxWidth && css.maxW)}>
+              {children}
+            </div>
           </div>
         </div>
       </div>

@@ -113,7 +113,7 @@ const AdminParticipantsUser = () => {
 
       try {
         const response = await axios.get(
-          `${process.env.REACT_APP_API_URL}/admin/participant.php?id=${participantId}`
+          `${process.env.REACT_APP_API_URL}/admin/api/participant.php?id=${participantId}`
         );
 
         if (response.data.success) {
@@ -284,6 +284,7 @@ const AdminParticipantsUser = () => {
   return (
     <PageContain
       breadcrumb={breadcrumb}
+      isMaxWidth
     >
       <div className="position-relative fw-bolder">
         {(!loading && error) && (

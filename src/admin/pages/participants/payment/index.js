@@ -5,21 +5,9 @@ import Loader from "components/loader";
 import cssForm from "styles/components/form.module.scss";
 import classNames from "classnames";
 import StaticSummary from "components/billing/static_summary";
+import { getPaymentMethodById } from 'utils/payment_method';
 import { useParams } from "react-router-dom";
 import { conferenceData as cd } from "data/conference-data";
-
-// Function to format date to MM-DD-YYYY
-const formatDateToDisplay = (dateString) => {
-  if (!dateString) return "N/A";
-  const date = new Date(dateString);
-  return `${(date.getMonth() + 1).toString().padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}-${date.getFullYear()}`;
-};
-
-// Function to format date for <input type="date">
-const formatDateForInput = (dateString) => {
-  if (!dateString) return new Date().toISOString().split("T")[0]; // Default to today
-  return dateString.split("T")[0]; // Extract YYYY-MM-DD format
-};
 
 
 const Payments = () => {
@@ -38,70 +26,70 @@ const Payments = () => {
   const [submitting, setSubmitting] = useState(false);
   const [successMsg, setSuccessMsg] = useState(null);
   const [editingPayment, setEditingPayment] = useState(null);
+  const [totalDue, setTotalDue] = useState(null);
 
   const hasFetchedData = useRef(false);
   const hasFetchedParticipant = useRef(false);
   const hasFetchedParticipantPayments = useRef(false);
 
-  // Fetch available payment methods, workshops, and registration types
   useEffect(() => {
-    if (hasFetchedData.current) return;
-    hasFetchedData.current = true;
-    setLoading(true);
+    const fetchData = async () => {
+      if (hasFetchedData.current) return;
+      hasFetchedData.current = true;
+      setLoading(true);
 
-    axios.get(`${process.env.REACT_APP_API_URL}/get_specific_data.php`)
-      .then(response => {
-        if (response.data.success) {
-          setWorkshops(response.data.data.workshops || []);
-          setPaymentMethods(response.data.data.payment_methods || []);
-          setRegistrationTypes(response.data.data.registration_types || []);
-        } else {
-          throw new Error(response.data.message || "Failed to fetch data.");
+      try {
+        // Step 1: Fetch Payment Methods, Workshops, and Registration Types
+        const specificDataResponse = await axios.get(`${process.env.REACT_APP_API_URL}/get_specific_data.php`);
+        if (!specificDataResponse.data.success) throw new Error(specificDataResponse.data.message || "Failed to fetch data.");
+
+        setWorkshops(specificDataResponse.data.data.workshops || []);
+        setPaymentMethods(specificDataResponse.data.data.payment_methods || []);
+        setRegistrationTypes(specificDataResponse.data.data.registration_types || []);
+
+        // Step 2: Fetch Participant Data (Only after Step 1 completes)
+        if (!participantId) return;
+        hasFetchedParticipant.current = true;
+
+        const participantResponse = await axios.get(`${process.env.REACT_APP_API_URL}/admin/api/participant.php?id=${participantId}`);
+        if (!participantResponse.data.success) throw new Error(participantResponse.data.message || "Failed to fetch participant data.");
+
+        setParticipant(participantResponse.data.data);
+
+        // Step 3: Set Default Payment Method (Only if accommodation data exists)
+        if (participantResponse.data.data?.accommodation?.payment_method_id) {
+          setPaymentMethodId(participantResponse.data.data.accommodation.payment_method_id);
+
+          const methodType = getPaymentMethodById(participantResponse.data.data.accommodation.payment_method_id, specificDataResponse.data.data.payment_methods);
+          const calculatedTotalDue = methodType === 'paypal'
+            ? parseFloat(participantResponse.data.data.participant.total_due) + parseFloat(participantResponse.data.data.participant.paypal_fee) - parseFloat(participantResponse.data.data.participant.total_paid)
+            : parseFloat(participantResponse.data.data.participant.total_due) - parseFloat(participantResponse.data.data.participant.total_paid);
+
+          setTotalDue(calculatedTotalDue);
         }
-      })
-      .catch(err => setError(err.message || "An error occurred while fetching data."))
-      .finally(() => setLoading(false));
-  }, []);
 
-  // Fetch participant data
-  useEffect(() => {
-    if (!hasFetchedData.current || hasFetchedParticipant.current || !participantId) {
-      return;
-    }
+        // Step 4: Fetch Payments (Only after Participant Data is fetched)
+        const paymentsResponse = await axios.get(`${process.env.REACT_APP_API_URL}/get_participant_payments.php?id=${participantId}`);
+        if (!paymentsResponse.data.success) throw new Error(paymentsResponse.data.message || "Failed to fetch payments.");
 
-    hasFetchedParticipant.current = true;
-    setLoading(true);
+        setPayments(paymentsResponse.data.data.payments || []);
+      } catch (err) {
+        setError(err.message || "An error occurred while fetching data.");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    axios.get(`${process.env.REACT_APP_API_URL}/admin/participant.php?id=${participantId}`)
-      .then(response => {
-        if (response.data.success) {
-          setParticipant(response.data.data);
-        } else {
-          throw new Error(response.data.message || "Failed to fetch participant data.");
-        }
-      })
-      .catch(err => setError(err.message))
-      .finally(() => setLoading(false));
-  }, [participantId, hasFetchedData]);
-
-
-
-  // Fetch participant's payments
-  useEffect(() => {
-    if (!participantId) {
-      return;
-    }
-
-    axios.get(`${process.env.REACT_APP_API_URL}/get_participant_payments.php?id=${participantId}`)
-      .then(response => {
-        if (response.data.success) {
-          setPayments(response.data.data.payments || []);
-        } else {
-          throw new Error(response.data.message || "Failed to fetch payments.");
-        }
-      })
-      .catch(err => setError(err.message));
+    fetchData();
   }, [participantId]);
+
+  // Step 5: Set default value for amount when totalDue is updated
+  useEffect(() => {
+    if (totalDue !== null && !editingPayment) {
+      setAmount(totalDue.toFixed(2)); // Ensure two decimal places
+    }
+  }, [totalDue, editingPayment]);
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -123,7 +111,7 @@ const Payments = () => {
       let response;
       if (editingPayment) {
         response = await axios.put(
-          `${process.env.REACT_APP_API_URL}/update_payment.php`,
+          `${process.env.REACT_APP_API_URL}/admin/api/update_payment.php`,
           {
             payment_id: editingPayment.id,
             amount: parseFloat(amount),
@@ -135,7 +123,7 @@ const Payments = () => {
         );
       } else {
         response = await axios.post(
-          `${process.env.REACT_APP_API_URL}/add_payment.php`,
+          `${process.env.REACT_APP_API_URL}/admin/api/add_payment.php`,
           {
             participant_id: participantId,
             amount: parseFloat(amount),
@@ -195,39 +183,41 @@ const Payments = () => {
     setEditingPayment(null);
   };
 
-
   const isOnline = participant?.participant?.is_online === "1";
   const breadcrumb = [
     { url: `/admin/participants/${isOnline ? 'online' : 'onsite'}`, name: isOnline ? "Online Participants" : "Onsite Participants" },
     { url: `/admin/participants/${isOnline ? 'online' : 'onsite'}/payment/${participantId}`, name: `${participant?.participant?.first_name || "Participant"} ${participant?.participant?.last_name || ""}'s Payments` }
   ];
 
-  console.log("payments? ", payments);
-
-
   return (
-    <PageContain breadcrumb={breadcrumb}>
+    <PageContain breadcrumb={breadcrumb} isMaxWidth>
       {loading && <Loader />}
       {!loading && error && <div className="alert alert-danger">{error}</div>}
       {successMsg && <div className="alert alert-success">{successMsg}</div>}
 
-
       {!loading && participant && (
-        <div className="d-flex flex-column flex-md-row gap-3 align-items-start">
-          <div className="flex-grow-1">
-            <div className="border p-3 rounded-2">
+        <>
+          <div className="d-flex flex-column flex-md-row gap-3 align-items-strecht">
+
+            <div className="border p-3 rounded-2 flex-grow-1">
               <h4 className="mb-3">{editingPayment ? "Edit Payment" : "Add a New Payment"}</h4>
               <form onSubmit={handleSubmit}>
                 <div className="mb-3 row">
                   <label className="col-sm-3 col-form-label fw-bold">Amount (€)</label>
                   <div className="col-sm-5">
                     <input
-                      type="number"
+                      type="text"  // Using "text" to fully control the input formatting
                       className={classNames('form-control', cssForm.md50)}
-                      value={amount}
-                      onChange={(e) => setAmount(e.target.value)}
+                      value={amount.replace(",", ".")}  // Ensure `.` is always displayed
+                      inputMode="decimal"  // Helps on mobile keyboards
+                      pattern="[0-9]*[.]?[0-9]*"  // Ensures proper decimal input
+                      onChange={(e) => {
+                        let value = e.target.value.replace(",", "."); // Replace ',' with '.'
+                        if (/^[0-9]*[.]?[0-9]*$/.test(value)) { // Allow only numbers and '.'
+                          setAmount(value);
+                        }
+                      }}
                       min="0"
-                      step="0.01"
                       required
                     />
                   </div>
@@ -257,7 +247,7 @@ const Payments = () => {
                   </div>
                 </div>
                 <div className="mb-3 row">
-                  <label className="col-sm-3 col-form-label fw-bold">Admin Note (Optional)</label>
+                  <label className="col-sm-3 col-form-label fw-bold">Marc's Note (Optional)</label>
                   <div className="col-sm-9">
                     <textarea
                       className="form-control"
@@ -274,7 +264,18 @@ const Payments = () => {
             </div>
 
 
-            <h5 className="mt-4">Previous Payments</h5>
+            <StaticSummary
+              isOnline={isOnline}
+              conferenceData={cd}
+              participantData={participant}
+              workshops={workshops}
+              registrationTypes={registrationTypes}
+              paymentMethods={paymentMethods}
+            />
+
+          </div >
+          <div className="border p-3 rounded-2 mt-3">
+            <h4 className="mb-3">Previous Payments</h4>
             {payments.length > 0 ? (
               <table className="table table-bordered table-striped">
                 <thead>
@@ -297,21 +298,10 @@ const Payments = () => {
                 </tbody>
               </table>
             ) : (
-              <p>No payments recorded.</p>
+              <p><i className="text-muted">No payments recorded.</i></p>
             )}
-
           </div>
-
-          <StaticSummary
-            isOnline={isOnline}
-            conferenceData={cd}
-            participantData={participant}
-            workshops={workshops}
-            registrationTypes={registrationTypes}
-            paymentMethods={paymentMethods}
-          />
-
-        </div >
+        </>
       )}
     </PageContain >
   );

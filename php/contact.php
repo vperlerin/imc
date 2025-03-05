@@ -19,7 +19,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 require '../vendor/autoload.php';
 require_once __DIR__ . "/config.php";
-require_once __DIR__ . "/class/Mail.class.php";
 
 // Capture raw input
 $rawInput = file_get_contents("php://input");
@@ -50,7 +49,6 @@ $recaptchaResponse = $input['token'];
 $recaptchaVerify = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=$recaptchaSecret&response=$recaptchaResponse");
 $recaptchaData = json_decode($recaptchaVerify, true);
 
-// Ensure reCAPTCHA response exists before accessing 'success'
 if (!isset($recaptchaData['success']) || !$recaptchaData['success']) {
     echo json_encode(["success" => false, "message" => "reCAPTCHA verification failed"]);
     exit;
@@ -74,7 +72,9 @@ $emailMessage .= "Email: $email<br>";
 $emailMessage .= "Message:\n$message<br>";
 
 // Define the Reply-To address
-$to = ['email' => getenv("CONTACT_EMAIL"), 'name' => getenv("CONTACT_NAME")];
+$to = getenv("CONTACT_EMAIL");
+$to_name = getenv("CONTACT_NAME");
+
 $bcc = getenv('BCC_ALL');
 
 // Convert BCC into an array if valid 
@@ -85,14 +85,39 @@ if ($bcc) {
     
     foreach ($bccArray as $bccEmail) {
         if (filter_var($bccEmail, FILTER_VALIDATE_EMAIL)) {
-            $bccRecipients[] = $bccEmail;
+            $bccRecipients[] = ['email' => $bccEmail, 'name' => 'BCC Recipient'];
         } else {
             error_log("Invalid BCC email: $bccEmail");
         }
     }
 }
 
-$response = Mail::sendEmail([$to], $subject, $emailMessage, $email );
+// Prepare API request payload
+$data = [
+    "subject" => $subject,
+    "message" => $emailMessage,
+    "to" => $to,
+    "to_name" => $to_name,
+    "from_name" => "IMC 2025",
+    "reply_to" => $email,
+    "reply_name" => $name,
+    "bcc" => $bccRecipients
+];
 
-echo json_encode($response);
+// Send the request to the API using cURL
+$ch = curl_init("https://www.imo.net/members/api/imc_mailer_api/send_email");
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_POST, true);
+curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+curl_setopt($ch, CURLOPT_HTTPHEADER, [
+    "Content-Type: application/json"
+]);
+
+$response = curl_exec($ch);
+$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+curl_close($ch);
+
+// Return API response
+http_response_code($httpCode);
+echo $response;
 ?>
