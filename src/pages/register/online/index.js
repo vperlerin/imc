@@ -3,7 +3,7 @@ import { SlArrowLeft, SlArrowRight } from "react-icons/sl";
 import Accomodation from "components/registration/accomodation.js";
 import Comments from "components/registration/comments";
 import Contribution from "components/registration/contribution.js";
-import Identitity from "components/registration/identity.js";
+import Identity from "components/registration/identity.js";
 import PageContain from "components/page-contain";
 import React, { useState } from "react";
 import Summary from "components/billing/summary/";
@@ -84,7 +84,7 @@ const MainForm = () => {
         />
 
         {step === 1 && (
-          <Identitity
+          <Identity
             register={register}
             errors={errors}
             isDebugMode={isDebugMode}

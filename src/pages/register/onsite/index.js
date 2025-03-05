@@ -1,26 +1,25 @@
-import { CiWarning } from "react-icons/ci";
-import { SlArrowLeft, SlArrowRight } from "react-icons/sl";
-import axios from "axios";
+import axios from "axios"; 
 import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import { useLocation } from "react-router-dom";
+import { formatFullDate } from "utils/date";
+import { getPaymentMethodById } from "utils/payment_method";
 import Accomodation from "components/registration/accomodation.js";
 import Arrival from "components/registration/arrival.js";
 import Comments from "components/registration/comments";
 import Contribution from "components/registration/contribution.js";
 import Extras from "components/registration/extras.js";
-import Identitity from "components/registration/identity.js";
+import Identity from "components/registration/identity.js";
 import Loader from "components/loader";
 import PageContain from "components/page-contain";
 import PayPalForm from "components/paypal";
 import Summary from "components/billing/summary/";
 import Workshops from "components/registration/workshops";
-
-import { useApiSpecificData } from "api/specific-data/index.js";
-import { useForm } from "react-hook-form";
-import { useLocation } from "react-router-dom";
-import { getPaymentMethodById } from 'utils/payment_method';
-
+import { CiWarning } from "react-icons/ci";
 import { conferenceData as cd } from "data/conference-data";
-import { formatFullDate } from "utils/date";
+import { sendEmail } from "hooks/send-email";
+import { SlArrowLeft, SlArrowRight } from "react-icons/sl";
+import { useApiSpecificData } from "api/specific-data/index.js";
 
 import css from "./index.module.scss";
 
@@ -105,6 +104,7 @@ const MainForm = () => {
       if (response.data.success) {
         setFinalData(formattedData);
         setSuccessMsg("Registration successful!");
+        console.log("FORMATTED DATA ", formattedData);
       } else {
         setErrorMsg(response.data.message || "Something went wrong.");
         // TODO: remove on prod
@@ -124,6 +124,10 @@ const MainForm = () => {
 
   if (errorGettingDataFromDB) {
     return <div className="alert alert-danger fw-bolder">{errorGettingDataFromDB}</div>
+  }
+
+  if(loading) {
+    return <Loader/>;
   }
 
   return (
@@ -203,7 +207,7 @@ const MainForm = () => {
             )}
 
             {step === 1 && (
-              <Identitity
+              <Identity
                 register={register}
                 errors={errors}
                 isDebugMode={isDebugMode}

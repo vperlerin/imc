@@ -6,9 +6,7 @@ export const useApiOnlineParticipants = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    console.log("Fetching onsite participants...");
-
+  useEffect(() => {  
     const fetchParticipants = async () => {
       try {
         const response = await axios.get(

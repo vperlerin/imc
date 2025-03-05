@@ -7,7 +7,6 @@ import React, { useEffect, useState } from "react";
 import { useApiOnlineParticipants } from "api/participants/online.js";
 import { useApiDeleteParticipant } from "@/admin/api/participants/delete";
 
-
 const AdminParticipantsOnsite = () => {
   const [filteredParticipants, setFilteredParticipants] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -26,7 +25,7 @@ const AdminParticipantsOnsite = () => {
     setFilteredParticipants
   );
 
-  useEffect(() => {  
+  useEffect(() => {
     if (!searchQuery) {
       setFilteredParticipants(participants);
     } else {
@@ -65,7 +64,7 @@ const AdminParticipantsOnsite = () => {
   const breadcrumb = [
     { url: "/admin/participants/onsite", name: "Onsite Participants" },
   ];
-  
+
   return (
     <PageContain
       breadcrumb={breadcrumb}
@@ -76,7 +75,7 @@ const AdminParticipantsOnsite = () => {
           <strong>Confirmed:</strong> {totalConfirmed} / {totalParticipants}
         </>
       }
-    > 
+    >
       {errorDeletion && (
         <div className="alert alert-danger">
           {errorDeletion}
@@ -145,9 +144,12 @@ const AdminParticipantsOnsite = () => {
                       <td>{participant.total_paid}€</td>
                       <td>{participant.payment_method || "n/a"}</td>
                       <td>
-                        {participant.confirmation_sent === true ? "✅" : "❌"}
-                        {participant.confirmation_sent === true && (
-                          (participant.confirmation_date)
+                        {participant.confirmation_sent ? (
+                          <>
+                            ✅ {participant.confirmation_date && formatFullDate(participant.confirmation_date)}
+                          </>
+                        ) : (
+                          "❌"
                         )}
                       </td>
                       <td>
@@ -166,7 +168,7 @@ const AdminParticipantsOnsite = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="6" className="text-center">No onsite participants found.</td>
+                    <td colSpan="7" className="text-center">No onsite participants found.</td>
                   </tr>
                 )}
               </tbody>
