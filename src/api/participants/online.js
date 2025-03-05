@@ -20,8 +20,7 @@ export const useApiOnlineParticipants = () => {
             response.data.message || "Unexpected API response format.",
           );
         }
-      } catch (err) {
-        console.error("API Fetch Error:", err.message);
+      } catch (err) { 
         setError(
           err.message ||
             "Failed to fetch participants. Please refresh the page.",

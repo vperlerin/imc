@@ -85,8 +85,7 @@ try {
         "success" => true,
         "message" => "Registration successful",
         "participant_id" => $participant_id,
-        "password" => $plain_password,
-        "email_status" => $emailResponse
+        "password" => $plain_password, 
     ]);
 } catch (Exception $e) {
     echo json_encode([

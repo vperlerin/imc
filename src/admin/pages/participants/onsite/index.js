@@ -78,7 +78,7 @@ const AdminParticipantsOnsite = () => {
     >
       {errorDeletion && (
         <div className="alert alert-danger">
-          {errorDeletion}
+          ERROR DELETION {errorDeletion}
         </div>
       )}
       {success && (
@@ -87,10 +87,10 @@ const AdminParticipantsOnsite = () => {
         </div>
       )}
       {error && (
-        <p className="alert alert-danger">{error}</p>
+        <p className="alert alert-danger">ERROR {error}</p>
       )}
 
-      {loading ? (
+      {loading || isDeleting ? (
         <Loader />
       ) : (
         <>
