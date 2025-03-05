@@ -19,7 +19,11 @@ import { CiWarning } from "react-icons/ci";
 import { conferenceData as cd } from "data/conference-data";
 import { sendEmail } from "hooks/send-email";
 import { SlArrowLeft, SlArrowRight } from "react-icons/sl";
+import { useApiParticipant } from "api/participants";
 import { useApiSpecificData } from "api/specific-data/index.js";
+
+// TMP
+import RegistrationDetails from "email-templates/onsite-registration";
 
 import css from "./index.module.scss";
 
@@ -43,14 +47,15 @@ const MainForm = () => {
   const isDebugMode = new URLSearchParams(location.search).get("debug") === "1";
   //
   const [errorMsg, setErrorMsg] = useState(null);
-  const [finalData, setFinalData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [participantId, setParticipantId] = useState(null);
   const [paypalFee, setPaypalFee] = useState(0);
   const [step, setStep] = useState(1);
   const [successMsg, setSuccessMsg] = useState(null);
   const [total, setTotal] = useState(0);
 
   const { workshops, paymentMethods, registrationTypes, loading, sessions, error: errorGettingDataFromDB } = useApiSpecificData();
+  const { participant, loading: participantLoading, error: participantError } = useApiParticipant(participantId);
 
   const {
     control,
@@ -101,14 +106,13 @@ const MainForm = () => {
         headers: { "Content-Type": "application/json" },
       });
 
+
       if (response.data.success) {
-        setFinalData(formattedData);
-        setSuccessMsg("Registration successful!");
-        console.log("FORMATTED DATA ", formattedData);
+        setSuccessMsg(`Registration successful! (ID: ${response.data.participant_id}) `); 
+        setParticipantId(response.data.participant_id);
+        console.log("Participant registered, setting ID:", response.data.participant_id);
       } else {
         setErrorMsg(response.data.message || "Something went wrong.");
-        // TODO: remove on prod
-        setFinalData(formattedData);
         setSuccessMsg("Registration successful but we couldn't send you an email");
       }
     } catch (error) {
@@ -130,19 +134,22 @@ const MainForm = () => {
     return <Loader/>;
   }
 
+  console.log("PARTICIPANT ", participant);
+  console.log("PARITCIPANT ID ", participantId);
+
   return (
     <PageContain title="Register Onsite">
       {errorMsg && <div className="alert alert-danger fw-bolder">{errorMsg}</div>}
       {successMsg && <div className="alert alert-success fw-bolder">{successMsg}</div>}
 
-      {step === 8 && successMsg && !!finalData ? (
+      {step === 8 && successMsg  ? (
         <>
           <h2>{cd.thank_you}</h2>
           <p>
             We just sent you an email with some instructions. This email contains a summary of your information as well as the password
             required to eventually update your travel details and your contributions (talks & posters).
           </p>
-
+          {/*
           <div className="d-flex flex-column flex-md-row gap-3">
             <div>
               <p className="fw-bolder text-danger">The IMC fee is due without any delay.</p>
@@ -178,7 +185,12 @@ const MainForm = () => {
               paymentMethods={paymentMethods}
               watch={watch}
             />
+
+            {finalData && (
+              <RegistrationDetails participant={finalData} workshops={workshops} />
+            )}
           </div>
+          */}
         </>
       ) :
         (

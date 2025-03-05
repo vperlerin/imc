@@ -76,7 +76,7 @@ const Summary = ({
 
   // Payment Method
   const paymentMethodName = getPaymentMethodById(allValues.payment_method_id, paymentMethods);
-  const isPaypal = paymentMethodName === 'Paypal';
+  const isPaypal = paymentMethodName === 'paypal';
 
   let totalCost = totalRoomCost + workshopCost + tshirtCost + printedPostersCost; 
   const paypalFee = isPaypal ? getPaypalPrice(totalCost) - totalCost : 0; 
@@ -91,14 +91,14 @@ const Summary = ({
   
   useEffect(() => {
     if (isOnline) {
-      if (paymentMethodName === 'Paypal') {
+      if (paymentMethodName === 'paypal') {
         setTotal(totalOnlineCost - onlinePaypalFee);
         setPaypalFee(onlinePaypalFee);
       } else {
         setTotal(totalOnlineCost);
       }
     } else {
-      if (paymentMethodName === 'Paypal') {
+      if (paymentMethodName === 'paypal') {
         setTotal(totalCost - paypalFee);
         setPaypalFee(paypalFee);
       } else {

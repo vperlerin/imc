@@ -18,12 +18,7 @@ const AdminParticipantsOnsite = () => {
   const [errorDeletion, setErrorDeletion] = useState('');
 
   const { participants, loading, error, setParticipants } = useApiOnlineParticipants();
-  const { deleteParticipant, errorDelete, isDeleting } = useApiDeleteParticipant(
-    participants,
-    setParticipants,
-    filteredParticipants,
-    setFilteredParticipants
-  );
+  const { deleteParticipant, errorDelete, isDeleting } = useApiDeleteParticipant(setParticipants, setFilteredParticipants);
 
   useEffect(() => {
     if (!searchQuery) {
@@ -49,16 +44,20 @@ const AdminParticipantsOnsite = () => {
     setShowDeleteModal(true);
   };
 
-  // Perform deletion
+  // Perform deletion 
   const onDeleteParticipant = async (deleteType) => {
     if (!selectedParticipant) return;
-    deleteParticipant(selectedParticipant, deleteType, (success) => {
-      if (success) {
-        setSuccess("Participant deleted successfully!");
+
+    try {
+      const response = await deleteParticipant(selectedParticipant, deleteType);
+      if (response?.data?.success) {
+        setSuccess(response.data.message || "Participant deleted successfully!");
       } else {
-        setErrorDeletion("Impossible to delete the participant for now, please try again later.")
+        setErrorDeletion(response?.data?.message || "Impossible to delete the participant for now, please try again later.");
       }
-    });
+    } catch (error) {
+      setErrorDeletion("An unexpected error occurred while deleting the participant.");
+    }
   };
 
   const breadcrumb = [
@@ -77,17 +76,17 @@ const AdminParticipantsOnsite = () => {
       }
     >
       {errorDeletion && (
-        <div className="alert alert-danger">
-          ERROR DELETION {errorDeletion}
+        <div className="alert alert-danger fw-bolder">
+          {errorDeletion}
         </div>
       )}
       {success && (
-        <div className="alert alert-success">
+        <div className="alert alert-success fw-bolder">
           {success}
         </div>
       )}
       {error && (
-        <p className="alert alert-danger">ERROR {error}</p>
+        <p className="alert alert-danger fw-bolder">{error}</p>
       )}
 
       {loading || isDeleting ? (
@@ -135,7 +134,7 @@ const AdminParticipantsOnsite = () => {
                       <td>{participant.created_at.split(' ')[0]}</td>
                       <td>{participant.title} {participant.first_name} {participant.last_name}</td>
                       <td>
-                        {participant.payment_method === 'Paypal' ? (
+                        {participant.payment_method.toLowerCase() === 'paypal' ? (
                           <>{(parseFloat(participant.total_due) + parseFloat(participant.paypal_fee))}€</>
                         ) : (
                           <>{participant.total_due}€</>
@@ -199,7 +198,7 @@ const AdminParticipantsOnsite = () => {
               <div className="modal-footer">
                 <button className="btn btn-outline-secondary fw-bolder" onClick={() => setShowDeleteModal(false)}>Cancel</button>
                 <button className="btn btn-outline-warning fw-bolder" onClick={() => onDeleteParticipant("soft")}>Soft Delete</button>
-                <button className="btn btn-outline-danger fw-bolder ms-auto" onClick={() => { setShowDeleteModal(false); onDeleteParticipant("hard"); }}>Hard Delete</button>
+                <button className="btn btn-outline-danger fw-bolder ms-auto" onClick={() => { setShowDeleteModal(false); setShowHardDeleteConfirm(true);  }}>Hard Delete</button>
               </div>
             </div>
           </div>
@@ -220,7 +219,7 @@ const AdminParticipantsOnsite = () => {
               </div>
               <div className="modal-footer">
                 <button className="btn btn-outline-secondary fw-bolder" onClick={() => setShowHardDeleteConfirm(false)}>No</button>
-                <button className="btn btn-outline-danger  fw-bolder" onClick={() => deleteParticipant("hard")}>Yes, Delete</button>
+                <button className="btn btn-outline-danger  fw-bolder" onClick={() => { onDeleteParticipant("hard"); setShowHardDeleteConfirm(false); }}>Yes, Delete</button>
               </div>
             </div>
           </div>

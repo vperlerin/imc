@@ -1,19 +1,12 @@
 import { useState } from "react";
 import axios from "axios";
 
-export const useApiDeleteParticipant = (
-  setParticipants,
-  setFilteredParticipants,
-) => {
+export const useApiDeleteParticipant = (setParticipants, setFilteredParticipants) => {
   const [errorDelete, setErrorDelete] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const deleteParticipant = async (
-    selectedParticipant,
-    deleteType,
-    onComplete = () => {},
-  ) => {
-    if (!selectedParticipant) return;
+  const deleteParticipant = async (selectedParticipant, deleteType) => {
+    if (!selectedParticipant) return null; 
 
     setIsDeleting(true);
     setErrorDelete(null);
@@ -24,25 +17,23 @@ export const useApiDeleteParticipant = (
         {
           id: selectedParticipant.id,
           delete_type: deleteType,
-        },
-      );
+        }
+      ); 
+
 
       if (response.data.success) {
-        setParticipants((prev) =>
-          prev.filter((p) => p.id !== selectedParticipant.id),
-        );
-        setFilteredParticipants((prev) =>
-          prev.filter((p) => p.id !== selectedParticipant.id),
-        );
-        onComplete(true);
+        setParticipants((prev) => prev.filter((p) => p.id !== selectedParticipant.id));
+        setFilteredParticipants((prev) => prev.filter((p) => p.id !== selectedParticipant.id));
       } else {
-        throw new Error(
-          response.data.message || "Failed to delete participant.",
-        );
+        setErrorDelete(response.data.message || "Failed to delete participant.");
       }
-    } catch (err) {
-      setErrorDelete(err.message);
-      onComplete(false);
+
+      return response; 
+
+    } catch (err) { 
+      const errorMessage = err.response?.data?.message || "An unexpected error occurred.";
+      setErrorDelete(errorMessage);
+      return { data: { success: false, message: errorMessage } }; 
     } finally {
       setIsDeleting(false);
     }

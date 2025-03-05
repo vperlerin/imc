@@ -121,7 +121,7 @@ const Contact = () => {
           <ReCAPTCHA ref={recaptchaRef} sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY} theme="dark" />
         </div>
 
-        <button type="submit" className="btn fw-bolder btn-primary" disabled={loading}>
+        <button type="submit" className="btn fw-bolder btn-outline-primary fw-bolder" disabled={loading}>
           {loading ? "Submitting..." : "Submit"}
         </button>
       </form>
