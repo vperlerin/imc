@@ -21,18 +21,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
-var_dump("USER ID ", $_SESSION["user_id"]);
-var_dump("email ", $_SESSION["email"]); 
-var_dump("is_admin ", $_SESSION["is_admin"]);
-
 // Check if the user is logged in
 if (!isset($_SESSION["user_id"])) {
     http_response_code(401);
     echo json_encode(["success" => false, "message" => "Unauthorized"]);
     exit;
 }
-
-
 
 // Return user information
 $response = [

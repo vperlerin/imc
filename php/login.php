@@ -38,8 +38,6 @@ if ($conn->connect_error) {
     exit;
 }
 
-echo "SESESSION SAVE PATH " . session_save_path();
-
 // Retrieve POST data
 $data = json_decode(file_get_contents("php://input"), true);
 $email = isset($data["email"]) ? trim($data["email"]) : "";
@@ -85,9 +83,9 @@ $_SESSION["is_admin"] = $isAdmin;
 
 // Ensure session cookie is sent
 setcookie(session_name(), session_id(), [
-    'secure' => false,  // Set to true only in production (HTTPS)
-    'httponly' => true, 
-    'samesite' => 'None'  // Change to 'Lax' if it causes issues
+  'secure' => true,  // TODO: Set to `true` in production with HTTPS!!
+  'httponly' => true,  // Prevent JavaScript access
+  'samesite' => 'lax'  // Required for cross-origin authentication
 ]);
 
 // Return user info
