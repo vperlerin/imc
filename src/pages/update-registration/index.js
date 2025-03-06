@@ -6,6 +6,7 @@ import { useSelector } from 'react-redux';
 const UpdateRegistration = () => {
   const isLoggedIn = useSelector(authSelectors.isLoggedIn);
   const user = useSelector(authSelectors.getUser);
+  
   console.log("USER? ", user);
   console.log("isLoggedIn? ", isLoggedIn);
 
