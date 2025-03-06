@@ -143,7 +143,7 @@ const AdminParticipantsOnsite = () => {
                       <td>{participant.total_paid}€</td>
                       <td>{participant.payment_method || "n/a"}</td>
                       <td>
-                        {participant.confirmation_sent ? (
+                        {participant.confirmation_sent === "1" ? (
                           <>
                             ✅ {participant.confirmation_date && formatFullDate(participant.confirmation_date)}
                           </>

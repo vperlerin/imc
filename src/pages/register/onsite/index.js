@@ -1,5 +1,5 @@
-import axios from "axios"; 
-import React, { useState } from "react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useLocation } from "react-router-dom";
 import { formatFullDate } from "utils/date";
@@ -13,20 +13,20 @@ import Identity from "components/registration/identity.js";
 import Loader from "components/loader";
 import PageContain from "components/page-contain";
 import PayPalForm from "components/paypal";
+import StaticSummary from "components/billing/static_summary/";
 import Summary from "components/billing/summary/";
 import Workshops from "components/registration/workshops";
 import { CiWarning } from "react-icons/ci";
 import { conferenceData as cd } from "data/conference-data";
+import { Link } from "react-router-dom";
 import { sendEmail } from "hooks/send-email";
 import { SlArrowLeft, SlArrowRight } from "react-icons/sl";
 import { useApiParticipant } from "api/participants";
 import { useApiSpecificData } from "api/specific-data/index.js";
-
-// TMP
-import RegistrationDetails from "email-templates/onsite-registration";
+import { registrationEmailToTeam, registrationEmailToParticipant } from "email-templates/registration";
 
 import css from "./index.module.scss";
-
+ 
 const totalStep = 8;
 
 const calculateAge = (dob) => {
@@ -46,10 +46,16 @@ const MainForm = () => {
   const location = useLocation();
   const isDebugMode = new URLSearchParams(location.search).get("debug") === "1";
   //
+  const [emailStatus, setEmailStatus] = useState({
+    teamEmailSent: null,
+    participantEmailSent: null,
+    error: null
+  });
   const [errorMsg, setErrorMsg] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [participantId, setParticipantId] = useState(null);
   const [paypalFee, setPaypalFee] = useState(0);
+  const [password, setPassword] = useState('');
   const [step, setStep] = useState(1);
   const [successMsg, setSuccessMsg] = useState(null);
   const [total, setTotal] = useState(0);
@@ -106,11 +112,10 @@ const MainForm = () => {
         headers: { "Content-Type": "application/json" },
       });
 
-
       if (response.data.success) {
-        setSuccessMsg(`Registration successful! (ID: ${response.data.participant_id}) `); 
+        setSuccessMsg(`Registration successful! (ID: ${response.data.participant_id}) `);
         setParticipantId(response.data.participant_id);
-        console.log("Participant registered, setting ID:", response.data.participant_id);
+        setPassword(response.data.password);
       } else {
         setErrorMsg(response.data.message || "Something went wrong.");
         setSuccessMsg("Registration successful but we couldn't send you an email");
@@ -122,6 +127,78 @@ const MainForm = () => {
     }
   };
 
+  useEffect(() => {
+    if (!participant) {
+      return;
+    }
+
+    const sendEmails = async () => {
+      try {
+        const emailToTeam = registrationEmailToTeam(
+          participant, 
+          workshops,
+          paymentMethods,  
+          registrationTypes,
+        );
+       
+        const emailToParticipant = registrationEmailToParticipant(
+          participant, 
+          workshops,
+          paymentMethods,  
+          registrationTypes,
+          password
+        );
+
+        const bccRecipients = process.env.REACT_APP_BCC_ALL
+          ? process.env.REACT_APP_BCC_ALL.split(',').map(email => ({ email, name: 'BCC Recipient' }))
+          : [];
+
+        // Send email to team
+        const responseEmailTeam = await sendEmail({
+          subject: 'New Onsite IMC Registration',
+          message: emailToTeam,
+          to: process.env.REACT_APP_CONTACT_EMAIL,
+          toName: process.env.REACT_APP_CONTACT_NAME,
+          fromName: "IMC 2025",
+          replyTo: 'no-reply@imc.net',
+          replyName: 'Do not reply',
+          bcc: bccRecipients
+        });
+
+        // Send email to participant
+        const responseEmailParticipant = await sendEmail({
+          subject: 'New Onsite IMC Registration',
+          message: emailToParticipant,
+          to: participant.participant.email,
+          toName: `${participant.participant.first_name} ${participant.participant.last_name}`,
+          fromName: "IMC 2025",
+          replyTo: 'no-reply@imc.net',
+          replyName: 'Do not reply',
+          bcc: bccRecipients
+        });
+
+        // Update email status
+        setEmailStatus({
+          teamEmailSent: responseEmailTeam,
+          participantEmailSent: responseEmailParticipant,
+          error: null
+        });
+
+
+      } catch (error) {
+        console.error("Error sending emails:", error);
+        setEmailStatus({
+          teamEmailSent: null,
+          participantEmailSent: null,
+          error: error.message || "Failed to send emails"
+        });
+      }
+    };
+
+    sendEmails();
+  }, [participant, workshops, password]);
+
+
   if (!isDebugMode) {
     return <PageContain title="Register Onsite">Come back soon…</PageContain>;
   }
@@ -130,67 +207,102 @@ const MainForm = () => {
     return <div className="alert alert-danger fw-bolder">{errorGettingDataFromDB}</div>
   }
 
-  if(loading) {
-    return <Loader/>;
+  if (loading || participantLoading) {
+    return <Loader />;
   }
 
-  console.log("PARTICIPANT ", participant);
-  console.log("PARITCIPANT ID ", participantId);
+
 
   return (
     <PageContain title="Register Onsite">
       {errorMsg && <div className="alert alert-danger fw-bolder">{errorMsg}</div>}
       {successMsg && <div className="alert alert-success fw-bolder">{successMsg}</div>}
 
-      {step === 8 && successMsg  ? (
+
+      {step === 8 && successMsg ? (
         <>
-          <h2>{cd.thank_you}</h2>
-          <p>
-            We just sent you an email with some instructions. This email contains a summary of your information as well as the password
-            required to eventually update your travel details and your contributions (talks & posters).
-          </p>
-          {/*
-          <div className="d-flex flex-column flex-md-row gap-3">
-            <div>
-              <p className="fw-bolder text-danger">The IMC fee is due without any delay.</p>
+          {!participant || participantError ? (
 
-              {getPaymentMethodById(finalData.payment_method_id, paymentMethods) === "paypal" ? (
-                <div className="mb-3">
-                  <p >Click the button below to pay immediately with Paypal.</p>
-                  <PayPalForm amount={(total + paypalFee)} year={cd.year} />
-                </div>
-              ) : (
-                <>
-                  <p><strong>  Please, transfer the total amount of {total}€ to confirm your registration immediately.</strong></p>
-                  <blockquote className="border rounded-2 p-3">
-                    International Meteor Organization, Jozef Mattheessensstraat 60, 2540 Hove, Belgium<br />
-                    Bank account at BNP Paribas Fortis Bank Belgium<br />
-                    BIC bank code: GEBABEBB<br />
-                    IBAN account number: BE30 0014 7327 5911<br />
-                    e-mail: treasurer@imo.net
-                  </blockquote>
-                </>
-              )}
+            <div className="alert alert-danger fw-bolder">
+              Database access error. We are sorry, but we couldn't properly record your registration. Please try again or contact us
+              <Link
+                aria-label="Contact"
+                to="/contact"
+                title="Contact"
+              >
+                contact us
+              </Link>{' '} for assistance.
             </div>
-            <Summary
-              isOnline={false}
-              getValues={getValues}
-              isEarlyBird={is_early_bird}
-              conferenceData={cd}
-              setTotal={setTotal}
-              setPaypalFee={setPaypalFee} 
-              showInfo={false}
-              workshops={workshops}
-              registrationTypes={registrationTypes}
-              paymentMethods={paymentMethods}
-              watch={watch}
-            />
+          ) : (
+            <>
+              {
+                participantError ? (
+                  <div className="alert alert-danger fw-bolder">
+                    Database access error. We are sorry, but we couldn't properly record your registration. Please try again or contact us
+                    <Link
+                      aria-label="Contact"
+                      to="/contact"
+                      title="Contact"
+                    >
+                      contact us
+                    </Link>{' '} for assistance.
+                  </div>
+                ) : (
+                  <>
+                    <h2>{cd.thank_you}</h2>
+                    <p>
+                      We just sent you an email with some instructions. This email contains a summary of your information as well as the password
+                      required to eventually update your travel details and your contributions (talks & posters).<br />
+                      If you do not receive this email within the next two hours{' '}
+                      <Link
+                        aria-label="Contact"
+                        to="/contact"
+                        title="Contact"
+                      >
+                        contact us
+                      </Link>{' '} immediately.
+                    </p>
 
-            {finalData && (
-              <RegistrationDetails participant={finalData} workshops={workshops} />
-            )}
-          </div>
-          */}
+                    <div className="d-flex flex-column flex-md-row gap-3">
+                      <div className="flew-grow-1">
+                        <p className="fw-bolder text-danger">The IMC fee is due without any delay.</p>
+
+                        {getPaymentMethodById(participant.participant.payment_method_id, paymentMethods) === "paypal" ? (
+                          <div className="mb-3">
+                            <p >Click the button below to pay immediately with Paypal.</p>
+                            <PayPalForm amount={(total + paypalFee)} year={cd.year} />
+                          </div>
+                        ) : (
+                          <>
+                            <p><strong>  Please, transfer the total amount of {total}€ to confirm your registration immediately.</strong></p>
+                            <blockquote className="border rounded-2 p-3">
+                              International Meteor Organization, Jozef Mattheessensstraat 60, 2540 Hove, Belgium<br />
+                              Bank account at BNP Paribas Fortis Bank Belgium<br />
+                              BIC bank code: GEBABEBB<br />
+                              IBAN account number: BE30 0014 7327 5911<br />
+                              e-mail: treasurer@imo.net
+                            </blockquote>
+                          </>
+                        )}
+                      </div>
+
+                      <StaticSummary
+                        isOnline={false}
+                        conferenceData={cd}
+                        participantData={participant}
+                        workshops={workshops}
+                        registrationTypes={registrationTypes}
+                        paymentMethods={paymentMethods}
+                      />
+
+                    </div>
+                  </>
+                )
+              }
+
+
+            </>
+          )}
         </>
       ) :
         (
@@ -351,9 +463,10 @@ const MainForm = () => {
               </div>
             </div>
           </form>
-        )}
+        )
+      }
 
-    </PageContain>
+    </PageContain >
   );
 };
 

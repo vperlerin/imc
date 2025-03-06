@@ -503,13 +503,7 @@ class ParticipantManager
 
         // 2. Fetch workshops the participant is registered for
         $stmt = $this->pdo->prepare("
-            SELECT 
-                w.id, 
-                w.title, 
-                w.date, 
-                w.period, 
-                w.price, 
-                w.price_online
+            SELECT *
             FROM participant_workshops pw
             INNER JOIN workshops w ON pw.workshop_id = w.id
             WHERE pw.participant_id = :participant_id
@@ -565,18 +559,14 @@ class ParticipantManager
         // 7. Fetch contributions
         //    (including the IMC session name, if you want to join that table)
         $stmt = $this->pdo->prepare("
-            SELECT c.*,
-                s.name AS session_name
+            SELECT c.*, s.name AS session_name
             FROM contributions c
             INNER JOIN imc_sessions s ON c.session_id = s.id
             WHERE c.participant_id = :participant_id
         ");
         $stmt->execute([':participant_id' => $participantId]);
         $contributions = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        // 8. Payments detail
-
-
+ 
         // Combine everything into a structured array
         $details = [
             'participant'    => $participant,

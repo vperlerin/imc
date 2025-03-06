@@ -7,15 +7,11 @@ export const useApiParticipant = (participantId) => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    console.log("PARTICIPANT ID IN API ", participantId);
-
     if (!participantId) {
       return;
     }
 
-    const fetchParticipant = async () => {
-      console.log("FETCH PARTICPATN !!!!!");
-
+    const fetchParticipant = async () => { 
       setLoading(true);
       setError(null);
 
@@ -38,9 +34,6 @@ export const useApiParticipant = (participantId) => {
 
     fetchParticipant();
   }, [participantId]);  
-
-  console.log("IN useApiParticipant ", participantId);
-
-
+ 
   return { participant, loading, error, setParticipant };
 };
