@@ -1,16 +1,18 @@
 import { SlArrowLeft, SlArrowRight } from "react-icons/sl";
-
 import classNames from "classnames";
 import css from "./index.module.scss";
 import React, { useState, useEffect } from "react";
 import PageContain from "components/page-contain";
 import { formatFullDate } from "utils/date";
-import { Link, useParams } from "react-router-dom";
-import { Navigate } from "react-router-dom";  
+import { Link, useParams, useNavigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { programData as pd } from "data/program";
+import { useSwipeable } from "react-swipeable";
+import { motion, AnimatePresence } from "framer-motion"; // Import animation
 
 const Program = () => {
   const { day } = useParams();
+  const navigate = useNavigate();
   const days = Object.keys(pd);
   const currentIndex = days.indexOf(day || "day1");
 
@@ -21,6 +23,7 @@ const Program = () => {
   const dayProgram = pd[selectedDay];
 
   const [activeTab, setActiveTab] = useState(selectedDay);
+  const [direction, setDirection] = useState(0); // Controls swipe direction
 
   useEffect(() => {
     setActiveTab(selectedDay);
@@ -31,7 +34,7 @@ const Program = () => {
     const formattedToday = `${String(today.getMonth() + 1).padStart(2, "0")}-${String(
       today.getDate()
     ).padStart(2, "0")}-${today.getFullYear()}`;
-  
+
     const currentDay = Object.entries(pd).find(([key, data]) => data.date === formattedToday)?.[0] || "day1";
     setActiveTab(day || currentDay);
   }, [day]);
@@ -40,13 +43,46 @@ const Program = () => {
     return <Navigate to="/404" replace />;
   }
 
+  // Swipe handlers
+  const handlers = useSwipeable({
+    onSwipedLeft: () => {
+      if (nextDay) {
+        setDirection(1); // Swipe left
+        navigate(`/program/${nextDay}`);
+      }
+    },
+    onSwipedRight: () => {
+      if (prevDay) {
+        setDirection(-1); // Swipe right
+        navigate(`/program/${prevDay}`);
+      }
+    },
+    preventDefaultTouchmoveEvent: true,
+    trackMouse: true,
+  });
+
+  // Animation variants
+  const swipeVariants = {
+    enter: (direction) => ({
+      x: direction > 0 ? "100%" : "-100%",
+      opacity: 0,
+    }),
+    center: { x: 0, opacity: 1 },
+    exit: (direction) => ({
+      x: direction > 0 ? "-100%" : "100%",
+      opacity: 0,
+    }),
+  };
+
   return (
-    <PageContain title="Daily Program"> 
-        <p>Times are in CEST = UTC + 2h</p>
-    
+    <PageContain title="Daily Program">
+      <p>Times are in CEST = UTC + 2h</p>
+
+      {/* Swipeable Container */}
+      <div {...handlers}>
         <div className={classNames(css.arrows, 'd-flex justify-content-between align-items-center mb-4 mt-3 d-md-none')}>
           {prevDay ? (
-            <Link to={`/program/${prevDay}`} className={css.arrow}>
+            <Link to={`/program/${prevDay}`} className={css.arrow} onClick={() => setDirection(-1)}>
               <SlArrowLeft />
             </Link>
           ) : <div />}
@@ -54,32 +90,43 @@ const Program = () => {
           <h3 className="m-0">{formatFullDate(dayProgram.date, false)}</h3>
 
           {nextDay ? (
-            <Link to={`/program/${nextDay}`} className={css.arrow}>
+            <Link to={`/program/${nextDay}`} className={css.arrow} onClick={() => setDirection(1)}>
               <SlArrowRight />
             </Link>
           ) : <div />}
         </div>
 
+        {/* Animation Wrapper */}
         <div className={classNames("mt-3", css.programWrap)}>
-          {Object.entries(pd).map(([day, data]) => (
-            <div key={day} hidden={activeTab !== day}>
+          <AnimatePresence custom={direction} initial={false} mode="popLayout">
+            <motion.div
+              key={activeTab}
+              custom={direction}
+              variants={swipeVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ type: "tween", ease: "easeInOut", duration: 0.4 }}
+            >
               <h3 className="mt-0 mb-4 border-bottom pb-2 d-none d-md-flex align-items-center gap-3">
                 {prevDay && (
-                  <Link to={`/program/${prevDay}`} className={css.arrow}>
+                  <Link to={`/program/${prevDay}`} className={css.arrow} onClick={() => setDirection(-1)}>
                     <SlArrowLeft />
                   </Link>
                 )}
-                {formatFullDate(data.date, false)}
+                {formatFullDate(dayProgram.date, false)}
                 {nextDay ? (
-                  <Link to={`/program/${nextDay}`} className={css.arrow}>
+                  <Link to={`/program/${nextDay}`} className={css.arrow} onClick={() => setDirection(1)}>
                     <SlArrowRight />
                   </Link>
                 ) : <div />}
-
               </h3>
               <dl>
-                {data.program.map((item, index) => (
-                  <div className={classNames('d-flex flex-column flex-md-row', item?.lectures?.length > 0 && 'flex-column flex-md-column')} key={index}>
+                {dayProgram.program.map((item, index) => (
+                  <div
+                    className={classNames('d-flex flex-column flex-md-row', item?.lectures?.length > 0 && 'flex-column flex-md-column')}
+                    key={index}
+                  >
                     {item.session ? (
                       <>
                         <div className={classNames(item?.lectures?.length > 0 && css.sessionWrap, 'border-bottom pb-2 mb-2')}>
@@ -111,9 +158,10 @@ const Program = () => {
                   </div>
                 ))}
               </dl>
-            </div>
-          ))}
-        </div> 
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      </div>
     </PageContain>
   );
 };

@@ -5,35 +5,39 @@ import { authSelectors } from 'store/auth';
 import { useSelector } from 'react-redux';
 import { useApiParticipant } from "api/participants";
 import { useApiSpecificData } from "api/specific-data/index.js";
+import { Navigate } from "react-router-dom";
 
-
-const UpdateRegistration = () => { 
+const UpdateRegistration = () => {
   const [participantId, setParticipantId] = useState();
   const isLoggedIn = useSelector(authSelectors.isLoggedIn);
   const user = useSelector(authSelectors.getUser);
- 
+
+  console.log("isLoggedIn? ", isLoggedIn);
+
   console.log("USER? ", user);
 
   const { participant, loading: participantLoading, error: participantError } = useApiParticipant(participantId);
   const { workshops, paymentMethods, registrationTypes, loading: specificdataLoading, sessions, error: errorGettingDataFromDB } = useApiSpecificData();
-   
+
   useEffect(() => {
-    if(!user) {
+    if (!user) {
       return;
     }
 
     setParticipantId(user.id);
-  }, [ user ])
+  }, [user])
 
 
-  console.log("PARTICIPA NT ", participant);
 
   return (
     <PageContain title="Update your data">
-       {isLoggedIn && !!user.user_id && (
+      {isLoggedIn && !!user.user_id && (
         <>
-          {(participantLoading || specificdataLoading) && <Loader text="We are fetching your record…|Please, wait."/>  }
+          {(participantLoading || specificdataLoading) && <Loader text="We are fetching your record…|Please, wait." />}
         </>
+      )}
+      {!participantLoading && !participant && (
+        <Navigate to="/login" replace />
       )}
 
       {!!participant && (
@@ -41,7 +45,7 @@ const UpdateRegistration = () => {
           {`Hello ${curParticipant.title} ${curParticipant.first_name} ${curParticipant.last_name}`}
         </>
       )}
-       
+
     </PageContain>
   )
 };

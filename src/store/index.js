@@ -1,7 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { authReducer } from "./auth";
 
- 
 const isJSON = (jsonString) => {
   try {
     const parsed = JSON.parse(jsonString);
@@ -10,7 +9,6 @@ const isJSON = (jsonString) => {
     return false;
   }
 };
-
  
 const session = localStorage.getItem("session");
 const parsedSession = isJSON(session);
