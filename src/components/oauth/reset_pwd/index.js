@@ -33,7 +33,7 @@ const ResetPassword = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/reset_password.php`, {
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/auth/reset_password.php`, {
         token,
         password
       });
