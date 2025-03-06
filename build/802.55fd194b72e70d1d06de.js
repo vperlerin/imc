@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkimc2025=self.webpackChunkimc2025||[]).push([[802],{8495:(e,t,s)=>{s.r(t),s.d(t,{default:()=>u});var d=s(4567),r=(s(6540),s(8983)),a=s(1448),c=s(4848);const u=()=>{(0,a.d4)(r.Pg.isLoggedIn),(0,a.d4)(r.Pg.getUser);return(0,c.jsx)(d.A,{title:"Update your data",children:"TEST"})}}}]);

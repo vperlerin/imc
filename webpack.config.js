@@ -137,7 +137,7 @@ module.exports = (env, argv) => {
                 new TerserPlugin({
                     parallel: true,
                     terserOptions: {
-                        compress: { drop_console: true },
+                        compress: { drop_console: false },
                         output: { comments: false },
                     }
                 }),
