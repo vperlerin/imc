@@ -19,8 +19,8 @@ if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
     exit;
 }
 
-require_once __DIR__ . "/config.php";
-require_once __DIR__ . "/class/Connect.class.php"; 
+require_once __DIR__ . "/../config.php";
+require_once __DIR__ . "/../class/Connect.class.php"; 
  
 // Read JSON input
 $input = file_get_contents("php://input");
