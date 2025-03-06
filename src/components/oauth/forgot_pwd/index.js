@@ -23,9 +23,7 @@ const ForgotPassword = () => {
         `${process.env.REACT_APP_API_URL}/auth/forgot_password.php`,
         { email }
       );
-
-      console.log("RESPONSE ? ", response);
-
+ 
       if (response.data.success && response.data.token && response.data.email) {
         const emailResponse = await sendEmail({
           subject: `IMC ${process.env.YEAR} Password Reset`,

@@ -1,7 +1,7 @@
 import axios from "axios";
 import React, { useState } from "react";
 import Loader from "components/loader";
-import PasswordInput from 'components/form/pwd';
+import PasswordInput from "components/form/pwd";
 import { useDispatch } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
 import { authActions } from "store/auth"; // Now fetchUser is inside authActions
@@ -21,30 +21,30 @@ const Login = () => {
     event.preventDefault();
     setError(null);
     setIsLoading(true);
-  
+
     try {
       const response = await axios.post(
         `${process.env.REACT_APP_API_URL}/login.php`,
         { email, password },
         {
           headers: { "Content-Type": "application/json" },
-          withCredentials: true,   
+          withCredentials: true,
         }
       );
-  
+
       if (!response.data?.success) {
         throw new Error(response.data?.message || "Invalid response from server");
       }
-  
-      await dispatch(authActions.fetchUser());   
-      navigate(response.data.user.is_admin ? "/admin/dashboard" : "/");
+
+      await dispatch(authActions.fetchUser());
+      navigate(response.data.user?.is_admin ? "/admin/dashboard" : "/");
     } catch (err) {
-      setError(err.message);
+      // Handle API error responses properly
+      setError(err.response?.data?.message || err.message || "Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
-  
 
   return (
     <div className={classNames(css.login, "flex-grow-1 d-flex h-100 align-items-center justify-content-center position-relative")}>
@@ -81,7 +81,7 @@ const Login = () => {
         <div className="d-flex justify-content-between align-items-center">
           <Link to="/forgot-password" className="text-decoration-none">Forgot your password?</Link>
           <button
-            disabled={isLoading || !email || !password}
+            disabled={isLoading || !email.trim() || !password.trim()}
             type="submit"
             className="btn btn-outline-primary fw-bolder"
           >

@@ -60,7 +60,7 @@ const ResetPassword = () => {
           <div className="alert alert-success fw-bolder">
             {message}
             <div className="mt-3">
-              <Link to="/login" className="btn btn-primary fw-bolder">
+              <Link to="/login" className="btn btn-outline-primary fw-bolder">
                 Log in now
               </Link>
             </div>
