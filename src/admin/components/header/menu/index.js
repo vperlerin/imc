@@ -27,7 +27,7 @@ const Menu = ({ cd }) => {
   }));
 
   const handleLogout = async () => {
-    await axios.get(`${process.env.REACT_APP_API_URL}/logout.php`, { withCredentials: true });
+    await axios.get(`${process.env.REACT_APP_API_URL}/auth/logout.php`, { withCredentials: true });
     dispatch(authActions.logout());  
     goTo('/');
   };
