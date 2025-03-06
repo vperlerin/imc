@@ -7,26 +7,41 @@ $allowed_origins = [
 if (isset($_SERVER['HTTP_ORIGIN']) && in_array($_SERVER['HTTP_ORIGIN'], $allowed_origins)) {
     header("Access-Control-Allow-Origin: " . $_SERVER['HTTP_ORIGIN']);
 }
+
 header("Access-Control-Allow-Credentials: true");
-header("Access-Control-Allow-Methods: POST");
+header("Access-Control-Allow-Methods: POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
 header("Content-Type: application/json"); // Ensure JSON response
 
+// Handle preflight requests (OPTIONS method)
+if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
+    http_response_code(200);
+    exit;
+}
+
 require_once __DIR__ . "/config.php";
 require_once __DIR__ . "/class/Connect.class.php"; 
+ 
+// Read JSON input
+$input = file_get_contents("php://input");
+$data = json_decode($input, true);
 
-$data = json_decode(file_get_contents("php://input"), true);
+if (json_last_error() !== JSON_ERROR_NONE) {
+    echo json_encode(["success" => false, "message" => "Invalid JSON format"]);
+    exit;
+}
+
 $email = isset($data["email"]) ? trim($data["email"]) : "";
 
 if (empty($email)) {
-    echo json_encode(["success" => false, "message" => "Email is required"]);
+    echo json_encode(["success" => false, "message" => "Email not found"]); 
     exit;
 }
 
 // Function to check if the email exists in the database
 function getUserByEmail($pdo, $email) {
     try {
-        $stmt = $pdo->prepare("SELECT id, email FROM admins WHERE email = ? UNION SELECT id, email FROM participants WHERE email = ?");
+        $stmt = $pdo->prepare("SELECT id FROM admins WHERE email = ? UNION SELECT id FROM participants WHERE email = ?");
         $stmt->execute([$email, $email]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     } catch (PDOException $e) {
@@ -38,7 +53,7 @@ function getUserByEmail($pdo, $email) {
 $user = getUserByEmail($pdo, $email);
 
 if (!$user) {
-    echo json_encode(["success" => false, "message" => "Email not found"]);
+    echo json_encode(["success" => true, "message" => "Email not found"]);
     exit;
 }
 
@@ -47,35 +62,18 @@ $token = bin2hex(random_bytes(32));
 $expires_at = date("Y-m-d H:i:s", strtotime("+1 hour"));
 
 try {
-    // Store token in database (Insert or Update)
+    // Store token in the database
     $stmt = $pdo->prepare("
         INSERT INTO password_resets (email, token, expires_at) 
         VALUES (?, ?, ?) 
-        ON DUPLICATE KEY UPDATE token = VALUES(token), expires_at = VALUES(expires_at)
+        ON DUPLICATE KEY UPDATE token = ?, expires_at = ?
     ");
-    $stmt->execute([$email, $token, $expires_at]);
+    $stmt->execute([$email, $token, $expires_at, $token, $expires_at]);
 
-    // Construct reset link
-    $year = getenv("YEAR") ?: date("Y");  
-    $reset_link = "https://imc{$year}.imo.net/reset-password?token=$token";
+    // Send the response (Do NOT reveal the token)
+    echo json_encode(["success" => true, "token" => $token]);
 
-    // Send reset email
-    $mailer = new Mail();
-    $response = $mailer->sendEmail(
-        [$email], 
-        "Password Reset", 
-        "Click the link to reset your IMC{$year} password:\n\n$reset_link\n\nPlease do not reply to this email as it is automatically generated.", 
-        "no-reply@imo.net"
-    );
-
-    if ($response["success"]) {
-        echo json_encode(["success" => true, "message" => "Password reset email sent"]);
-    } else {
-        error_log("Email Sending Error: " . $response["message"]);
-        echo json_encode(["success" => false, "message" => "Failed to send email."]);
-    }
 } catch (PDOException $e) {
-    error_log("Database Error: " . $e->getMessage());
-    echo json_encode(["success" => false, "message" => "Database error: " . $e->getMessage()]);
+     echo json_encode(["success" => false, "message" => "Something went wrong. Please try again later."]);
 }
 ?>

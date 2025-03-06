@@ -23,10 +23,10 @@ import { sendEmail } from "hooks/send-email";
 import { SlArrowLeft, SlArrowRight } from "react-icons/sl";
 import { useApiParticipant } from "api/participants";
 import { useApiSpecificData } from "api/specific-data/index.js";
-import { registrationEmailToTeam, registrationEmailToParticipant } from "email-templates/registration";
+import { registrationEmailToTeam, registrationEmailToParticipant, registrationEmailToWorkshopRep } from "email-templates/registration";
 
 import css from "./index.module.scss";
- 
+
 const totalStep = 8;
 
 const calculateAge = (dob) => {
@@ -131,62 +131,93 @@ const MainForm = () => {
     if (!participant) {
       return;
     }
-
+  
     const sendEmails = async () => {
       try {
         const emailToTeam = registrationEmailToTeam(
-          participant, 
+          participant,
           workshops,
-          paymentMethods,  
-          registrationTypes,
+          paymentMethods,
+          registrationTypes
         );
-       
+  
         const emailToParticipant = registrationEmailToParticipant(
-          participant, 
+          participant,
           workshops,
-          paymentMethods,  
+          paymentMethods,
           registrationTypes,
           password
         );
-
+  
+        const attendingWorkshops = participant.workshops.filter(workshop => workshop.attending === "1");
+  
         const bccRecipients = process.env.REACT_APP_BCC_ALL
-          ? process.env.REACT_APP_BCC_ALL.split(',').map(email => ({ email, name: 'BCC Recipient' }))
+          ? process.env.REACT_APP_BCC_ALL.split(",").map(email => ({ email, name: "BCC Recipient" }))
           : [];
-
+  
+        // Send email to responsible persons for each attended workshop
+        const workshopEmailPromises = attendingWorkshops.map(async (workshop) => {
+          const emailSubject = `Workshop Registration`;
+          const responsibleLastName = workshop.responsible_name.split(" ")[0];
+  
+          const emailBody = `
+            Hey ${responsibleLastName},<br><br>
+            
+            This is to inform you that ${participant.participant.first_name} ${participant.participant.last_name} (${participant.participant.email}) has registered to attend the "${workshop.title}" (ONSITE version).<br>
+  
+            If you need further details, feel free to contact the participant.<br><br>
+            
+            Best regards,<br>
+            IMC Conference Team
+          `;
+  
+          return sendEmail({
+            subject: emailSubject,
+            message: emailBody,
+            to: 'vperlerin@gmail.com', // workshop.responsible_email,
+            toName: workshop.responsible_name,
+            fromName: "IMC 2025",
+            replyTo: participant.participant.email,
+            replyName: participant.participant.first_name + ' ' + participant.participant.last_name,
+            bcc: bccRecipients
+          });
+        });
+  
         // Send email to team
         const responseEmailTeam = await sendEmail({
-          subject: 'New Onsite IMC Registration',
+          subject: "New Onsite IMC Registration",
           message: emailToTeam,
           to: process.env.REACT_APP_CONTACT_EMAIL,
           toName: process.env.REACT_APP_CONTACT_NAME,
           fromName: "IMC 2025",
-          replyTo: 'no-reply@imc.net',
-          replyName: 'Do not reply',
+          replyTo: "no-reply@imc.net",
+          replyName: "Do not reply",
           bcc: bccRecipients
         });
-
+  
         // Send email to participant
         const responseEmailParticipant = await sendEmail({
-          subject: 'New Onsite IMC Registration',
+          subject: "New Onsite IMC Registration",
           message: emailToParticipant,
           to: participant.participant.email,
           toName: `${participant.participant.first_name} ${participant.participant.last_name}`,
           fromName: "IMC 2025",
-          replyTo: 'no-reply@imc.net',
-          replyName: 'Do not reply',
+          replyTo: "no-reply@imc.net",
+          replyName: "Do not reply",
           bcc: bccRecipients
         });
-
+  
+        // Wait for all workshop emails to be sent
+        await Promise.all(workshopEmailPromises);
+  
         // Update email status
         setEmailStatus({
           teamEmailSent: responseEmailTeam,
           participantEmailSent: responseEmailParticipant,
           error: null
         });
-
-
-      } catch (error) {
-        console.error("Error sending emails:", error);
+  
+      } catch (error) { 
         setEmailStatus({
           teamEmailSent: null,
           participantEmailSent: null,
@@ -194,10 +225,10 @@ const MainForm = () => {
         });
       }
     };
-
+  
     sendEmails();
   }, [participant, workshops, password]);
-
+  
 
   if (!isDebugMode) {
     return <PageContain title="Register Onsite">Come back soon…</PageContain>;
@@ -264,7 +295,7 @@ const MainForm = () => {
                     </p>
 
                     <div className="d-flex flex-column flex-md-row gap-3">
-                      <div className="flew-grow-1">
+                      <div className="flex-grow-1">
                         <p className="fw-bolder text-danger">The IMC fee is due without any delay.</p>
 
                         {getPaymentMethodById(participant.participant.payment_method_id, paymentMethods) === "paypal" ? (
