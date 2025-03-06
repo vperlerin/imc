@@ -1,32 +1,41 @@
-$i: 0;
+// Variables
+$border-color: #eee;
+$animation-duration: 3s;
 
-@while $i < 4 {
-  .orbit#{$i} {
-    @extend .orbit;
-    animation-delay:-$i+s;
-  }
-  .pos#{$i}{
-    @extend .pos;
-    animation-delay:-$i+s;
-  }
-  .dot#{$i}{
-    @extend .dot;
-    animation-delay:-$i+s;
-  }
-  $i: $i+1;
-} 
+// Loop for Orbiting Elements
+@for $i from 0 through 3 {
 
-.universe {
-  z-index: 1;
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  .orbit#{$i},
+  .pos#{$i},
+  .dot#{$i} {
+    @extend .orbit, .pos, .dot;
+    animation-delay: -#{$i}s;
+  }
 }
 
+// Overlay
+.overlay {
+  background-color: var(--imc-loader-overlay-bg);
+}
+
+// Universe
+.universe {
+  z-index: 1;
+}
+
+// Text
+.text {
+  z-index: 3;
+  font-weight: 100;
+  font-size: 1.25rem;
+  text-wrap: balance;
+  max-width: calc(100% - 2rem);
+  color: var(--imc-loader-overlay);
+  line-height: 1;
+  margin-top: 5rem;
+}
+
+// Galaxy Container
 .galaxy {
   transform: rotateX(75deg);
   transform-style: preserve-3d;
@@ -35,117 +44,93 @@ $i: 0;
   height: 100%;
 }
 
-.circle {
+// Mixin for Circle Styles
+@mixin circle-style($size, $animation) {
   border-radius: 50%;
-  border: 1px solid #eee;
+  border: 1px solid $border-color;
   width: 1em;
   height: 1em;
-  margin-top: -.5em;
-  margin-left: -.5em;
-  -webkit-animation: spinner 1.5s infinite ease;
+  margin: -0.5em;
+  animation: $animation infinite ease;
   position: absolute;
   top: 50%;
   left: 50%;
   transform: rotateX(-75deg);
+  font-size: $size;
+}
+
+// Circles (Spinner Elements)
+.circle {
+  @include circle-style(6em, spinner 1.5s);
 }
 
 .circle2 {
-  border-radius: 50%;
-  border: 1px solid #eee;
-  width: 1em;
-  height: 1em;
-  margin-top: -.5em;
-  margin-left: -.5em;
-  -webkit-animation: spinner2 2s infinite ease;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: rotateX(-75deg);
+  @include circle-style(5em, spinner2 2s);
 }
 
 .circle3 {
-  border-radius: 50%;
-  border: 1px solid #eee;
-  width: 1em;
-  height: 1em;
-  margin-top: -.5em;
-  margin-left: -.5em;
-  -webkit-animation: spinner3 2.5s infinite ease;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: rotateX(-75deg);
+  @include circle-style(4em, spinner3 2.5s);
 }
 
-
+// Orbit Styles
 .orbit {
   transform-style: preserve-3d;
   position: absolute;
   top: 50%;
   left: 50%;
-   animation-name: orbit;
-  animation-iteration-count: infinite;
-  animation-timing-function: linear;
+  animation: orbit $animation-duration infinite linear;
   width: 8em;
   height: 8em;
-  margin-top: -4em;
-  margin-left: -4em;
+  margin: -4em;
   border-radius: 50%;
 }
 
+// Positioning
 .pos {
   position: absolute;
   width: 2em;
   height: 2em;
-  margin-left: -1em;
-  margin-top: -1em;
-  animation-name: invert;
-  animation-iteration-count: infinite;
-  animation-timing-function: linear;
+  margin: -1em;
+  animation: invert $animation-duration infinite linear;
   left: 50%;
   top: -1px;
 }
 
+// Dot Styles
 .dot {
-  background-color: #eee;
-  width: .5em;
-  height: .5em;
+  background-color: $border-color;
+  width: 0.5em;
+  height: 0.5em;
   position: absolute;
   top: 50%;
   left: 50%;
-  margin-top: -.25em;
-  margin-left: -.25em;
+  margin: -0.25em;
   border-radius: 50%;
   animation-iteration-count: infinite;
   animation-timing-function: linear;
-}
-
-
-/* Planet animation durations */
-
-.orbit,
-.pos {
-  animation-duration: 3s;
-}
-
-.circle{
-  font-size: 6em;
-}
-.circle2 {
-  font-size: 5em;
-}
-.circle3 {
-  font-size: 4em;
-}
-
-.dot {
   font-size: 0.2em;
 }
 
+
+.text span {
+  position: absolute;
+  transition: opacity 1s ease-in-out;
+}
+
+.visible {
+  opacity: 1;
+}
+
+.hidden {
+  opacity: 0;
+}
+
+// Keyframes (Animations)
 @keyframes orbit {
   0% {
     transform: rotateZ(0deg);
   }
+
   100% {
     transform: rotateZ(-360deg);
   }
@@ -155,43 +140,51 @@ $i: 0;
   0% {
     transform: rotateX(-90deg) rotateY(360deg) rotateZ(0deg);
   }
+
   100% {
     transform: rotateX(-90deg) rotateY(0deg) rotateZ(0deg);
   }
 }
 
+// Spinner Animations
 @keyframes spinner {
   0% {
-    -webkit-transform: rotate3d(1, 0, 1, 0deg);
+    transform: rotate3d(1, 0, 1, 0deg);
   }
+
   50% {
-    -webkit-transform: rotate3d(1, 0, 1, 180deg);
+    transform: rotate3d(1, 0, 1, 180deg);
   }
+
   100% {
-    -webkit-transform: rotate3d(1, 0, 1, 360deg);
+    transform: rotate3d(1, 0, 1, 360deg);
   }
 }
 
 @keyframes spinner2 {
   0% {
-    -webkit-transform: rotate3d(0, 1, 1, 0deg);
+    transform: rotate3d(0, 1, 1, 0deg);
   }
+
   50% {
-    -webkit-transform: rotate3d(0, 1, 1, 180deg);
+    transform: rotate3d(0, 1, 1, 180deg);
   }
+
   100% {
-    -webkit-transform: rotate3d(0, 1, 1, 360deg);
+    transform: rotate3d(0, 1, 1, 360deg);
   }
 }
 
 @keyframes spinner3 {
   0% {
-    -webkit-transform: rotate3d(1, 1, 0, 0deg);
+    transform: rotate3d(1, 1, 0, 0deg);
   }
+
   50% {
-    -webkit-transform: rotate3d(1, 1, 0, 180deg);
+    transform: rotate3d(1, 1, 0, 180deg);
   }
+
   100% {
-    -webkit-transform: rotate3d(1, 1, 0, 360deg);
+    transform: rotate3d(1, 1, 0, 360deg);
   }
 }

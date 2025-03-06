@@ -1,3 +1,4 @@
+import { retry } from "utils/retry.js";
 import { useState, useEffect } from "react";
 import axios from "axios"; 
 
@@ -16,8 +17,8 @@ export const useApiParticipant = (participantId) => {
       setError(null);
 
       try {
-        const response = await axios.get(
-          `${process.env.REACT_APP_API_URL}/api/get_participant.php?id=${participantId}`
+        const response = await retry(() =>
+          axios.get(`${process.env.REACT_APP_API_URL}/api/get_participant.php?id=${participantId}`)
         );
 
         if (response.data.success && response.data.data) {

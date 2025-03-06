@@ -18,10 +18,7 @@ if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
     http_response_code(200);
     exit;
 }
-
-require_once __DIR__ . "/../config.php";
-require_once __DIR__ . "/../class/Connect.class.php"; 
- 
+  
 // Read JSON input
 $input = file_get_contents("php://input");
 $data = json_decode($input, true);
@@ -38,6 +35,7 @@ if (empty($email)) {
     exit;
 }
 
+ 
 // Function to check if the email exists in the database
 function getUserByEmail($pdo, $email) {
     try {

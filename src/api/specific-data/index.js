@@ -1,3 +1,4 @@
+import { retry } from "utils/retry.js";
 import { useState, useEffect } from "react";
 import axios from "axios";
 
@@ -12,8 +13,8 @@ export const useApiSpecificData = () => {
   useEffect(() => {
     const fetchSpecificData = async () => {
       try {
-        const response = await axios.get(
-          `${process.env.REACT_APP_API_URL}/get_specific_data.php`,
+        const response = await retry(() =>
+          axios.get(`${process.env.REACT_APP_API_URL}/get_specific_data.php`)
         );
         if (response.data.success) {
           setWorkshops(response.data.data.workshops || []);

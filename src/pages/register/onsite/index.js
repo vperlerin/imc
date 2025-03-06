@@ -60,7 +60,7 @@ const MainForm = () => {
   const [successMsg, setSuccessMsg] = useState(null);
   const [total, setTotal] = useState(0);
 
-  const { workshops, paymentMethods, registrationTypes, loading, sessions, error: errorGettingDataFromDB } = useApiSpecificData();
+  const { workshops, paymentMethods, registrationTypes, loading: specificdataLoading, sessions, error: errorGettingDataFromDB } = useApiSpecificData();
   const { participant, loading: participantLoading, error: participantError } = useApiParticipant(participantId);
 
   const {
