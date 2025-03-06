@@ -24,7 +24,7 @@ const Login = () => {
 
     try {
       const response = await axios.post(
-        `${process.env.REACT_APP_API_URL}/login.php`,
+        `${process.env.REACT_APP_API_URL}/auth/login.php`,
         { email, password },
         {
           headers: { "Content-Type": "application/json" },

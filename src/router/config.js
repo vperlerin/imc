@@ -30,6 +30,7 @@ const lazyPages = {
   Surroundings: lazy(() => import("pages/community/surroundings")),
   Travel: lazy(() => import("pages/location/travel")),
   Topics: lazy(() => import("pages/submission/topics")),
+  UpdateRegistration: lazy(() => import("pages/update-registration")), 
   Venue: lazy(() => import("pages/location/venue")),
   WorkshopRadio: lazy(() => import("pages/program/workshops/radio")),
   WorkshopSpectro: lazy(() => import("pages/program/workshops/spectro")),
@@ -75,6 +76,7 @@ const routeConfig = [
   { path: "/register/membership", element: <lazyPages.Membership /> },
   { path: "/register/payment", element: <lazyPages.Payment /> },
   { path: "/reset-password", element: <lazyPages.ResetPassword /> },
+  { path: "/update-registration", element: <lazyPages.UpdateRegistration /> },
   { path: "/submission/guidelines", element: <lazyPages.Guidelines /> },
   { path: "/submission/topics", element: <lazyPages.Topics /> },
   // ADMIN (protected routes)
