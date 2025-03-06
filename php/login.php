@@ -83,12 +83,9 @@ $_SESSION["is_admin"] = $isAdmin;
 
 // Ensure session cookie is sent
 setcookie(session_name(), session_id(), [
-// TODO: allow on prod!!!!
-    /*
-  'secure' => true,  // TODO: Set to `true` in production with HTTPS!!
-  'httponly' => true,  // Prevent JavaScript access
-  'samesite' => 'lax'  // Required for cross-origin authentication
-  */
+    'secure' => false,  // Set to true only in production (HTTPS)
+    'httponly' => true, 
+    'samesite' => 'None'  // Change to 'Lax' if it causes issues
 ]);
 
 // Return user info
