@@ -28,6 +28,10 @@ if (!isset($_SESSION["user_id"])) {
     exit;
 }
 
+var_dump("USER ID ", $_SESSION["user_id"]);
+var_dump("email ", $_SESSION["email"]); 
+var_dump("is_admin ", $_SESSION["is_admin"]);
+
 // Return user information
 $response = [
     "success" => true,
