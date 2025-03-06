@@ -32,9 +32,11 @@ const Menu = ({ cd }) => {
     config: { tension: 350, friction: 30 }
   }));
 
-  const handleLogout = () => {
-    dispatch(authActions.logout());
-    goTo('/');
+  const handleLogout = async () => {
+    await axios.get(`${process.env.REACT_APP_API_URL}/auth/logout.php`, { withCredentials: true });
+    dispatch(authActions.logout());  
+    localStorage.removeItem("session");
+    navigate('/');
   };
 
   useEffect(() => {

@@ -11,7 +11,7 @@ if (isset($_SERVER['HTTP_ORIGIN']) && in_array($_SERVER['HTTP_ORIGIN'], $allowed
 }
 
 header("Access-Control-Allow-Methods: GET, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type");
+header("Access-Control-Allow-Headers: Content-Type, Authorization");
 
 session_start();
 
@@ -28,13 +28,13 @@ if (!isset($_SESSION["user_id"])) {
     exit;
 }
 
-// Return user information
+
 $response = [
     "success" => true,
     "user" => [
         "id" => $_SESSION["user_id"],
         "email" => $_SESSION["email"],
-        "is_admin" => $_SESSION["is_admin"]
+        "is_admin" => $_SESSION["is_admin"],
     ]
 ];
 

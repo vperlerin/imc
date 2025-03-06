@@ -2,9 +2,9 @@ import axios from "axios";
 import React, { useState } from "react";
 import Loader from "components/loader";
 import PasswordInput from "components/form/pwd";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux"; // ✅ Import useSelector
 import { useNavigate, Link } from "react-router-dom";
-import { authActions } from "store/auth"; // Now fetchUser is inside authActions
+import { authActions, authSelectors } from "store/auth"; // ✅ Import selectors & actions
 import classNames from "classnames";
 import css from "./index.module.scss";
 import cssForm from "styles/components/form.module.scss";
@@ -17,6 +17,9 @@ const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const user = useSelector(authSelectors.getUser); // ✅ Get user from Redux store
+  const isAdmin = useSelector(authSelectors.isAdmin); // ✅ Get admin status
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError(null);
@@ -26,21 +29,23 @@ const Login = () => {
       const response = await axios.post(
         `${process.env.REACT_APP_API_URL}/auth/login.php`,
         { email, password },
-        {
-          headers: { "Content-Type": "application/json" },
-          withCredentials: true,
-        }
+        { headers: { "Content-Type": "application/json" }, withCredentials: true }
       );
 
       if (!response.data?.success) {
         throw new Error(response.data?.message || "Invalid response from server");
       }
 
+      // Store session token
+      dispatch(authActions.setSession("authenticated"));
+
+      // Fetch user details securely from backend
       await dispatch(authActions.fetchUser());
-      navigate(response.data.user?.is_admin ? "/admin/dashboard" : "/");
+
+      // ✅ Get updated state from Redux after fetchUser()
+      navigate(isAdmin ? "/admin/dashboard" : "/update-registration");
     } catch (err) {
-      // Handle API error responses properly
-      setError(err.response?.data?.message || err.message || "Something went wrong. Please try again.");
+      setError(err.response?.data?.message || err.message || "Something went wrong.");
     } finally {
       setIsLoading(false);
     }

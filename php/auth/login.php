@@ -1,6 +1,5 @@
 <?php
-
-
+ 
 // CORS headers
 $allowed_origins = [
     "https://imc2025.imo.net",
@@ -83,9 +82,10 @@ $_SESSION["is_admin"] = $isAdmin;
 
 // Ensure session cookie is sent
 setcookie(session_name(), session_id(), [
-  'secure' => true,  // TODO: Set to `true` in production with HTTPS!!
-  'httponly' => true,  // Prevent JavaScript access
-  'samesite' => 'lax'  // Required for cross-origin authentication
+    'expires' => time() + 259200, // 3.days   
+    'secure' => true,   
+    'httponly' => true,
+    'samesite' => 'None'  
 ]);
 
 // Return user info
@@ -102,4 +102,6 @@ $response = [
 http_response_code(200);
 echo json_encode($response);
 $conn->close();
+
+session_write_close();
 ?>

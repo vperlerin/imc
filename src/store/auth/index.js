@@ -1,46 +1,45 @@
 import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const loadAuthState = () => ({
-  oauth: null,
-  user: null,
-  isAuthenticated: false,
-  isAdmin: false,
-});
+const loadAuthState = () => {
+  const session = localStorage.getItem("session");
+  return {
+    oauth: session || null, 
+    user: null,  
+    isAuthenticated: !!session,
+    isAdmin: false,  
+  };
+};
 
 const initialState = loadAuthState();
-
 const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    setOauth: (state, action) => {
+    setSession: (state, action) => {
       state.oauth = action.payload;
       state.isAuthenticated = !!action.payload;
+      localStorage.setItem("session", action.payload); // Store session token
     },
     setUser: (state, action) => {
       state.user = { ...action.payload };
-      state.isAuthenticated = true;
-      state.isAdmin = action.payload.is_admin ?? false; //  Ensure this comes from backend
+      state.isAdmin = action.payload.is_admin ?? false;
     },
     logout: (state) => {
       state.oauth = null;
       state.user = null;
       state.isAuthenticated = false;
       state.isAdmin = false;
-      localStorage.removeItem("auth");
+      localStorage.removeItem("session"); // Only remove session token
     },
   },
 });
 
-//  Define `fetchUser` directly here
 export const fetchUser = () => async (dispatch) => {
   try {
     const response = await axios.get(
       `${process.env.REACT_APP_API_URL}/auth/user.php`,
-      {
-        withCredentials: true,
-      },
+      { withCredentials: true }
     );
 
     if (!response.data?.success) {
@@ -54,8 +53,10 @@ export const fetchUser = () => async (dispatch) => {
   }
 };
 
-//  Export actions and reducer
-export const authActions = { ...authSlice.actions, fetchUser };
+export const authActions = {
+  ...authSlice.actions,
+  fetchUser,
+};
 export const authSelectors = {
   getUser: (state) => state.auth.user,
   isAdmin: (state) => state.auth.isAdmin,
