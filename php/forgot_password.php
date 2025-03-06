@@ -71,7 +71,7 @@ try {
     $stmt->execute([$email, $token, $expires_at, $token, $expires_at]);
 
     // Send the response (Do NOT reveal the token)
-    echo json_encode(["success" => true, "token" => $token]);
+    echo json_encode(["success" => true, "token" => $token, "email" => $email]);
 
 } catch (PDOException $e) {
      echo json_encode(["success" => false, "message" => "Something went wrong. Please try again later."]);

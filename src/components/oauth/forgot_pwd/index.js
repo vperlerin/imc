@@ -1,15 +1,16 @@
 import classNames from "classnames";
-import css from '../index.module.scss';
+import css from "../index.module.scss";
 import cssForm from "styles/components/form.module.scss";
 import Loader from "components/loader";
 import React, { useState } from "react";
 import axios from "axios";
+import { sendEmail } from "hooks/send-email";
 
 const ForgotPassword = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [email, setEmail] = useState("");
   const [message, setMessage] = useState(null);
   const [error, setError] = useState(null);
+  const [email, setEmail] = useState(""); 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -18,16 +19,36 @@ const ForgotPassword = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/forgot_password.php`, { email });
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/forgot_password.php`,
+        { email }
+      );
 
-      if (response.data.success) {
-        setMessage(response.data.message || "Password reset email sent successfully.");
-        setEmail("");
+      console.log("RESPONSE ? ", response);
+
+      if (response.data.success && response.data.token && response.data.email) {
+        const emailResponse = await sendEmail({
+          subject: `IMC ${process.env.YEAR} Password Reset`,
+          message: `Click the link below to reset your password: <br>
+            <a href="https://imc${process.env.YEAR}.imo.net/reset-password?token=${response.data.token}">
+            Reset Password</a>`,
+          to: response.data.email,
+          toName: "IMC Participant",
+          fromName: "IMC 2025",
+          replyTo: "no-reply@imc2025.imo.net",
+          replyName: "no-reply",
+        });
+
+        if (emailResponse.success) {
+          setMessage("Password reset email sent successfully.");
+        } else {
+          setError("Something went wrong. Impossible to send you an email for now. Please try again later.");
+        }
       } else {
-        setError(response.data.message || "Something went wrong. Please try again.");
+        setError(response.data.message || "Something went wrong.");
       }
     } catch (err) {
-      setError("Error sending reset email. Please check your connection and try again.");
+      setError(err.response?.data?.message || "Something went wrong. Please try again later.");
     } finally {
       setIsLoading(false);
     }
