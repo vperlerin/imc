@@ -1,9 +1,13 @@
 @use 'styles/index' as *; 
 
-.form {
-  max-width: 47rem;
-
+.form {  
   iframe {
     border: 2px solid var(--imc-bg);
+  }
+
+  .faqCol {
+    @include media-breakpoint-up(md) {
+      max-width: 30rem;
+    } 
   }
 }

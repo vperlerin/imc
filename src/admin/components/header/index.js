@@ -3,7 +3,7 @@ import smallLogo from 'assets/img/logo/small.svg';
 import classnames from 'classnames';
 import css from './index.module.scss';
 import Menu from './menu';
-import { conferenceData as cd } from '../../../data/conference-data';
+import { conferenceData as cd } from 'data/conference-data';
 import { Link } from 'react-router-dom';
 
 const Header = () => {

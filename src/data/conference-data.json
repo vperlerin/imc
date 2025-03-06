@@ -115,5 +115,27 @@
         "email": "herve.lamy@aeronomie.be"
       }
     }
+  ],
+  "contact": [
+    {
+      "q": "a question about the website or a technical difficulty",
+      "email": "vperlerin@gmail.com",
+      "name": "V. Perlerin"
+    },
+    {
+      "q": "a question about the conference or accommodation",
+      "email": "imc2025@imo.net",
+      "name": "IMC 2025 Team"
+    },
+    {
+      "q": "a question about payment or your registration",
+      "email": "marc.gyssens@uhasselt.be",
+      "name": "IMO Treasuer"
+    },
+    {
+      "q": "a question about any other topic",
+      "email": "imc2025@imo.net",
+      "name": "IMC 2025 Team"
+    }
   ]
 }

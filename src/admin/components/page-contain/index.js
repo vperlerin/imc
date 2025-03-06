@@ -4,7 +4,7 @@ import Header from '@/admin/components/header';
 import Menu from '@/admin/components/header/menu';
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import { conferenceData as cd } from '../../../data/conference-data';
+import { conferenceData as cd } from 'data/conference-data';
 import BreadCrumb from '@/admin/components/breadcrumb';
 import classNames from 'classnames';
 
