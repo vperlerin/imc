@@ -38,6 +38,8 @@ if ($conn->connect_error) {
     exit;
 }
 
+echo "SESESSION SAVE PATH " . session_save_path();
+
 // Retrieve POST data
 $data = json_decode(file_get_contents("php://input"), true);
 $email = isset($data["email"]) ? trim($data["email"]) : "";
