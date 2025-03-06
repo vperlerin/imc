@@ -4,7 +4,7 @@ require_once __DIR__ . "/../class/Connect.class.php";
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL); 
-
+ 
 $data = json_decode(file_get_contents("php://input"), true);
 $token = isset($data["token"]) ? trim($data["token"]) : "";
 $new_password = isset($data["password"]) ? trim($data["password"]) : "";
@@ -46,9 +46,13 @@ try {
         exit;
     }
 
-    // Update password for the found tables
+    // Validate and update password in the found table(s)
     foreach ($userTables as $table) {
-        $stmt = $pdo->prepare("UPDATE $table SET password_hash = ? WHERE email = ?");
+        if ($table !== "admins" && $table !== "participants") {
+            error_log("Invalid table name detected: " . $table);
+            continue; // Skip invalid table names
+        }
+        $stmt = $pdo->prepare("UPDATE `$table` SET password_hash = ? WHERE email = ?");
         $stmt->execute([$hashed_password, $email]);
     }
 
@@ -59,8 +63,8 @@ try {
     echo json_encode(["success" => true, "message" => "Password updated successfully"]);
 
 } catch (PDOException $e) { 
-    // TODO : delete
-    echo "ERROR " . $e;
-    echo json_encode(["success" => false, "message" => "An error occurred. Please try again later."]);
+    echo("Database error: " . $e->getMessage());  
+    http_response_code(500);
+    echo json_encode(["success" => false, "message" => "An internal error occurred."]);
 }
 ?>
