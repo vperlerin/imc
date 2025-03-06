@@ -1,12 +1,11 @@
 import classNames from "classnames";
-import css from '../index.module.scss';
+import css from "../index.module.scss";
 import cssForm from "styles/components/form.module.scss";
 import Loader from "components/loader";
 import React, { useState } from "react";
-import { useSearchParams } from "react-router-dom";
 import axios from "axios";
-import PasswordInput from 'components/form/pwd';
-
+import PasswordInput from "components/form/pwd"; 
+import { useSearchParams, Link } from "react-router-dom";  
 
 const ResetPassword = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -16,6 +15,8 @@ const ResetPassword = () => {
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
 
+  const API_URL = process.env.REACT_APP_API_URL;
+
   // Password validation regex
   const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
 
@@ -24,7 +25,6 @@ const ResetPassword = () => {
     setError(null);
     setMessage(null);
 
-    // Validate password before sending request
     if (!passwordRegex.test(password)) {
       setError("Password must be at least 8 characters, include an uppercase letter, a lowercase letter, and a number.");
       return;
@@ -33,18 +33,18 @@ const ResetPassword = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/auth/reset_password.php`, {
+      const response = await axios.post(`${API_URL}/auth/reset_password.php`, {
         token,
-        password
+        password,
       });
 
       if (response.data.success) {
-        setMessage(response.data.message || "Password reset email sent successfully.");
+        setMessage(response.data.message || "Your password has been reset successfully.");
       } else {
         setError(response.data.message || "Something went wrong. Please try again.");
       }
     } catch (err) {
-      setError("Error resetting password");
+      setError(err.response?.data?.message || "Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -71,7 +71,6 @@ const ResetPassword = () => {
           <PasswordInput
             autoFocus
             disabled={isLoading}
-            type="password"
             placeholder="Enter new password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
