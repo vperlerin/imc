@@ -37,6 +37,7 @@ const authSlice = createSlice({
 
 export const fetchUser = () => async (dispatch) => {
   try {
+    
     const response = await axios.get(
       `${process.env.REACT_APP_API_URL}/auth/user.php`,
       { withCredentials: true }
@@ -45,6 +46,8 @@ export const fetchUser = () => async (dispatch) => {
     if (!response.data?.success) {
       throw new Error(response.data?.message || "Failed to fetch user data");
     }
+
+    console.log("FETHCING USER : ", reponse);
 
     dispatch(authActions.setUser(response.data.user));
   } catch (error) {
