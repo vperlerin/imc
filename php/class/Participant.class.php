@@ -1,10 +1,4 @@
 <?php
-
-// Debug 
-ini_set('display_errors', '1');
-ini_set('display_startup_errors', '1');
-error_reporting(E_ALL);
-
 class ParticipantManager
 {
     private $pdo;
@@ -304,27 +298,40 @@ class ParticipantManager
             // Check if participant exists
             $stmt = $this->pdo->prepare("SELECT id FROM participants WHERE id = :participant_id");
             $stmt->execute([':participant_id' => $participantId]);
-            
+
             if ($stmt->rowCount() === 0) {
                 throw new Exception("Participant with ID {$participantId} does not exist.");
             }
-            
+
             // Prepare fields for update
             $fields = [
-                'title = :title', 'first_name = :first_name', 'last_name = :last_name', 'gender = :gender',
-                'dob = :dob', 'email = :email', 'phone = :phone', 'address = :address', 'postal_code = :postal_code',
-                'city = :city', 'country = :country', 'organization = :organization', 'is_online = :is_online',
-                'paypal_fee = :paypal_fee', 'total_due = :total_due', 'comments = :comments',
-                'payment_method_id = :payment_method_id', 'updated_at = NOW()'
+                'title = :title',
+                'first_name = :first_name',
+                'last_name = :last_name',
+                'gender = :gender',
+                'dob = :dob',
+                'email = :email',
+                'phone = :phone',
+                'address = :address',
+                'postal_code = :postal_code',
+                'city = :city',
+                'country = :country',
+                'organization = :organization',
+                'is_online = :is_online',
+                'paypal_fee = :paypal_fee',
+                'total_due = :total_due',
+                'comments = :comments',
+                'payment_method_id = :payment_method_id',
+                'updated_at = NOW()'
             ];
-            
+
             if (isset($data['admin_notes'])) {
                 $fields[] = 'admin_notes = :admin_notes';
             }
-            
+
             $sql = "UPDATE participants SET " . implode(', ', $fields) . " WHERE id = :participant_id";
             $stmt = $this->pdo->prepare($sql);
-            
+
             // Bind parameters
             $params = [
                 ':participant_id' => $participantId,
@@ -346,7 +353,7 @@ class ParticipantManager
                 ':comments' => $data['comments'] ?? null,
                 ':payment_method_id' => (int) ($data['payment_method_id'] ?? 0),
             ];
-            
+
             if (isset($data['admin_notes'])) {
                 $params[':admin_notes'] = $data['admin_notes'];
             }
@@ -423,62 +430,61 @@ class ParticipantManager
                 ':tshirt_size' => $data['tshirt_size'] ?? null,
             ]);
 
-            // Update Contributions (Talks & Posters)
-            $stmt = $this->pdo->prepare("DELETE FROM contributions WHERE participant_id = :participant_id");
-            $stmt->execute([':participant_id' => $participantId]);
+            // Delete existing contributions
+            $stmtDelete = $this->pdo->prepare("DELETE FROM contributions WHERE participant_id = :participant_id");
+            $stmtDelete->execute([':participant_id' => $participantId]);
 
             // Insert contributions (talks & posters)
-            $stmt = $this->pdo->prepare("
-                INSERT INTO contributions (participant_id, type, title, authors, abstract, session_id, duration, print, created_at, updated_at)
-                VALUES (:participant_id, :type, :title, :authors, :abstract, :session_id, :duration, :print, NOW(), NOW())
-            ");
+            $stmtInsert = $this->pdo->prepare("
+    INSERT INTO contributions (participant_id, type, title, authors, abstract, session_id, duration, print, created_at, updated_at)
+    VALUES (:participant_id, :type, :title, :authors, :abstract, :session_id, :duration, :print, NOW(), NOW())
+");
 
-            //  Insert talks only if they exist
+            // Insert talks
             if (!empty($data['talks']) && is_array($data['talks'])) {
-                // Insert talks
                 foreach ($data['talks'] as $talk) {
-                    $sessionId = isset($talk['session_id']) ? (int) $talk['session_id'] : NULL;
-                    $duration = isset($talk['duration']) ? $talk['duration'] : NULL;
+                    $sessionId = isset($talk['session_id']) ? (int) $talk['session_id'] : null;
+                    $duration = isset($talk['duration']) ? $talk['duration'] : null;
 
-                    $stmt->bindValue(':participant_id', $participantId, PDO::PARAM_INT);
-                    $stmt->bindValue(':type', 'talk', PDO::PARAM_STR);
-                    $stmt->bindValue(':title', $talk['title'], PDO::PARAM_STR);
-                    $stmt->bindValue(':authors', $talk['authors'], PDO::PARAM_STR);
-                    $stmt->bindValue(':abstract', $talk['abstract'], PDO::PARAM_STR);
-                    $stmt->bindValue(
-                        ':session_id', 
-                        $sessionId !== null ? (int) $sessionId : null, 
+                    $stmtInsert->bindValue(':participant_id', $participantId, PDO::PARAM_INT);
+                    $stmtInsert->bindValue(':type', 'talk', PDO::PARAM_STR);
+                    $stmtInsert->bindValue(':title', $talk['title'], PDO::PARAM_STR);
+                    $stmtInsert->bindValue(':authors', $talk['authors'], PDO::PARAM_STR);
+                    $stmtInsert->bindValue(':abstract', $talk['abstract'], PDO::PARAM_STR);
+                    $stmtInsert->bindValue(
+                        ':session_id',
+                        $sessionId !== null ? (int) $sessionId : null,
                         $sessionId !== null ? PDO::PARAM_INT : PDO::PARAM_NULL
                     );
-                    $stmt->bindValue(':duration', $duration, $duration !== NULL ? PDO::PARAM_STR : PDO::PARAM_NULL);
-                    $stmt->bindValue(':print', 0, PDO::PARAM_BOOL);
-                    $stmt->execute();
+                    $stmtInsert->bindValue(':duration', $talk['duration'] ?? null, PDO::PARAM_STR);
+                    $stmtInsert->bindValue(':print', 0, PDO::PARAM_BOOL);
+                    $stmtInsert->execute();
                 }
             }
 
+            // Insert posters
             if (!empty($data['posters']) && is_array($data['posters'])) {
                 foreach ($data['posters'] as $poster) {
-                    $printValue = isset($poster['print']) ? (filter_var($poster['print'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ? 1 : 0) : 0;
-            
-                    $sessionId = isset($poster['session_id']) ? (int) $poster['session_id'] : NULL;
-                    $duration = isset($poster['duration']) ? $poster['duration'] : NULL;
-            
-                    $stmt->bindValue(':participant_id', $participantId, PDO::PARAM_INT);
-                    $stmt->bindValue(':type', 'poster', PDO::PARAM_STR);
-                    $stmt->bindValue(':title', $poster['title'], PDO::PARAM_STR);
-                    $stmt->bindValue(':authors', $poster['authors'], PDO::PARAM_STR);
-                    $stmt->bindValue(':abstract', $poster['abstract'], PDO::PARAM_STR);
-                    $stmt->bindValue(
-                        ':session_id', 
-                        $sessionId !== null ? (int) $sessionId : null, 
+                    $printValue = isset($poster['print']) ? (filter_var($poster['print'], FILTER_VALIDATE_BOOLEAN) ? 1 : 0) : 0;
+                    $sessionId = isset($poster['session_id']) ? (int) $poster['session_id'] : null;
+                    $duration = isset($poster['duration']) ? $poster['duration'] : null;
+
+                    $stmtInsert->bindValue(':participant_id', $participantId, PDO::PARAM_INT);
+                    $stmtInsert->bindValue(':type', 'poster', PDO::PARAM_STR);
+                    $stmtInsert->bindValue(':title', $poster['title'], PDO::PARAM_STR);
+                    $stmtInsert->bindValue(':authors', $poster['authors'], PDO::PARAM_STR);
+                    $stmtInsert->bindValue(':abstract', $poster['abstract'], PDO::PARAM_STR);
+                    $stmtInsert->bindValue(
+                        ':session_id',
+                        $sessionId !== null ? (int) $sessionId : null,
                         $sessionId !== null ? PDO::PARAM_INT : PDO::PARAM_NULL
                     );
-                    $stmt->bindValue(':duration', $duration, $duration !== NULL ? PDO::PARAM_STR : PDO::PARAM_NULL);
-                    $stmt->bindValue(':print', $printValue, PDO::PARAM_INT);
-                    $stmt->execute();
+                    $stmtInsert->bindValue(':duration', $duration, $duration !== null ? PDO::PARAM_STR : PDO::PARAM_NULL);
+                    $stmtInsert->bindValue(':print', $printValue, PDO::PARAM_INT);
+                    $stmtInsert->execute();
                 }
             }
-            
+
 
             $this->pdo->commit();
             return true;
@@ -666,7 +672,7 @@ class ParticipantManager
         guardian_email,
         created_at,
         updated_at';
-    
+
         // 1. Fetch participant’s primary details
         $stmt = $this->pdo->prepare("
             SELECT {$columns}
