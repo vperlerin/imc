@@ -18,10 +18,7 @@ const ProtectedRoute = ({ children }) => {
   if(host === 'localhost:3000') { return <>{children}</>}
 
   if (loading) return <></>;  // Prevents redirection before API call completes
-
-  console.log("ProtectedRoute isAuthenticated ", isAuthenticated);
-  console.log("ProtectedRoute isAdmin ", isAdmin);
-
+  
   return isAuthenticated && isAdmin ? children : <Navigate to="/login" replace />;
 };
 

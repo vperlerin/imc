@@ -35,10 +35,12 @@ const UpdateRegistration = () => {
         </>
       )}
       
-      {!!participant && (
+      {!!participant ? (
         <>
-          {`Hello ${curParticipant.title} ${curParticipant.first_name} ${curParticipant.last_name}`}
+          {`Hello ${participant.title} ${participant.first_name} ${participant.last_name}`}
         </>
+      ) : (
+        <>Participant not found</>
       )}
 
     </PageContain>
