@@ -47,7 +47,7 @@ export const fetchUser = () => async (dispatch) => {
       throw new Error(response.data?.message || "Failed to fetch user data");
     }
 
-    console.log("FETHCING USER : ", reponse);
+    console.log("FETHCING USER : ", response);
 
     dispatch(authActions.setUser(response.data.user));
   } catch (error) {
