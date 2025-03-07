@@ -12,10 +12,15 @@ class SummaryFormatter
     
         return !empty($filtered) ? reset($filtered)['description'] : "Description not found";
     }
-     
+ 
     public static function formatEmailContent(array $data, array $workshops, array $paymentMethods, array $registrations_types, array $sessions, bool $withPwd): string
     {
         $content = "";
+
+        $sessionMap = [];
+        foreach ($sessions as $session) {
+            $sessionMap[$session['id']] = $session['name'];
+        }
 
         // PASSWORD (If applicable)
         if ($withPwd) {
@@ -90,11 +95,12 @@ class SummaryFormatter
             $content .= "<br><b>Talk Contribution(s)</b><br>";
 
             foreach ($data['talks'] as $talk) {
+                $sessionName = $sessionMap[$talk['session']] ?? "Unknown Session";
                 $content .= "
                     <b>Title:</b> {$talk['title']}<br>
                     <b>Authors:</b> {$talk['authors']}<br>
                     <b>Abstract:</b> {$talk['abstract']}<br>
-                    <b>Session:</b> {$talk['session']}<br>
+                    <b>Session:</b> {$sessionName}<br>
                     <b>Duration:</b> {$talk['duration']}<br>
                 ";
             }
@@ -105,11 +111,12 @@ class SummaryFormatter
             $content .= "<br><b>Poster Contribution(s)</b><br>";
 
             foreach ($data['posters'] as $poster) {
+                $sessionName = $sessionMap[$poster['session']] ?? "Unknown Session";
                 $content .= "
                     <b>Title:</b> {$poster['title']}<br>
                     <b>Authors:</b> {$poster['authors']}<br>
                     <b>Abstract:</b> {$poster['abstract']}<br>
-                    <b>Session:</b> {$poster['session']}<br>
+                    <b>Session:</b> {$sessionName}<br>
                 ";
             }
         }

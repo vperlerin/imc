@@ -251,7 +251,7 @@ const MainForm = () => {
 
       {step === 8 && successMsg ? (
         <>
-          {!participant || participantError ? (
+          {!participant  ? (
 
             <div className="alert alert-danger fw-bolder">
               Database access error. We are sorry, but we couldn't properly record your registration. Please try again or  {' '}
