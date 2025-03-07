@@ -128,62 +128,34 @@ const MainForm = () => {
   };
 
   useEffect(() => {
-    if (!participant) {
-      return;
-    }
-  
+    if (!participant || !password) return;
+
     const sendEmails = async () => {
       try {
-        const emailToTeam = registrationEmailToTeam(
-          participant,
-          workshops,
-          paymentMethods,
-          registrationTypes
-        );
+        const emailToTeam = registrationEmailToTeam(participant, workshops, paymentMethods, registrationTypes, sessions);
+        const emailToParticipant = registrationEmailToParticipant(participant, workshops, paymentMethods, registrationTypes, sessions, password);
   
-        const emailToParticipant = registrationEmailToParticipant(
-          participant,
-          workshops,
-          paymentMethods,
-          registrationTypes,
-          password
-        );
-  
-        const attendingWorkshops = participant.workshops.filter(workshop => workshop.attending === "1");
-  
+        const attendingWorkshops = participant.workshops?.filter((workshop) => workshop.attending === "1") || [];
+
         const bccRecipients = process.env.REACT_APP_BCC_ALL
-          ? process.env.REACT_APP_BCC_ALL.split(",").map(email => ({ email, name: "BCC Recipient" }))
+          ? process.env.REACT_APP_BCC_ALL.split(",").map((email) => ({ email, name: "BCC Recipient" }))
           : [];
-  
-        // Send email to responsible persons for each attended workshop
+
         const workshopEmailPromises = attendingWorkshops.map(async (workshop) => {
-          const emailSubject = `Workshop Registration`;
-          const responsibleLastName = workshop.responsible_name.split(" ")[0];
-  
-          const emailBody = `
-            Hey ${responsibleLastName},<br><br>
-            
-            This is to inform you that ${participant.participant.first_name} ${participant.participant.last_name} (${participant.participant.email}) has registered to attend the "${workshop.title}" (ONSITE version).<br>
-  
-            If you need further details, feel free to contact the participant.<br><br>
-            
-            Best regards,<br>
-            IMC Conference Team
-          `;
-  
           return sendEmail({
-            subject: emailSubject,
-            message: emailBody,
-            to: 'vperlerin@gmail.com', // workshop.responsible_email,
+            subject: `Workshop Registration`,
+            message: `Hey ${workshop.responsible_name.split(" ")[0]},<br><br>
+                      ${participant.participant.first_name} ${participant.participant.last_name} (${participant.participant.email})
+                      has registered for "${workshop.title}" (ONSITE).`,
+            to: workshop.responsible_email,
             toName: workshop.responsible_name,
             fromName: "IMC 2025",
             replyTo: participant.participant.email,
-            replyName: participant.participant.first_name + ' ' + participant.participant.last_name,
-            bcc: bccRecipients
+            replyName: participant.participant.first_name + " " + participant.participant.last_name,
+            bcc: bccRecipients,
           });
-        });
-  
-        // Send email to team
+        }); 
+
         const responseEmailTeam = await sendEmail({
           subject: "New Onsite IMC Registration",
           message: emailToTeam,
@@ -192,10 +164,9 @@ const MainForm = () => {
           fromName: "IMC 2025",
           replyTo: "no-reply@imc.net",
           replyName: "Do not reply",
-          bcc: bccRecipients
+          bcc: bccRecipients,
         });
-  
-        // Send email to participant
+
         const responseEmailParticipant = await sendEmail({
           subject: "New Onsite IMC Registration",
           message: emailToParticipant,
@@ -204,31 +175,26 @@ const MainForm = () => {
           fromName: "IMC 2025",
           replyTo: "no-reply@imc.net",
           replyName: "Do not reply",
-          bcc: bccRecipients
+          bcc: bccRecipients,
         });
-  
-        // Wait for all workshop emails to be sent
+
         await Promise.all(workshopEmailPromises);
-  
-        // Update email status
+
         setEmailStatus({
           teamEmailSent: responseEmailTeam,
           participantEmailSent: responseEmailParticipant,
-          error: null
+          error: null,
         });
-  
-      } catch (error) { 
-        setEmailStatus({
-          teamEmailSent: null,
-          participantEmailSent: null,
-          error: error.message || "Failed to send emails"
-        });
+      } catch (error) {
+        console.log("ERROR ", error);
+        setEmailStatus({ teamEmailSent: null, participantEmailSent: null, error: error.message || "Failed to send emails" });
       }
     };
-  
+
     sendEmails();
   }, [participant, workshops, password]);
-  
+
+  console.log("email status ", emailStatus);
 
   if (!isDebugMode) {
     return <PageContain title="Register Onsite">Come back soon…</PageContain>;

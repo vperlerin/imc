@@ -1,4 +1,11 @@
 const year = process.env.REACT_APP_YEAR || "2025";
+ 
+const getSessionName = (sessionId, sessions = []) => {
+    if (!Array.isArray(sessions) || sessions.length === 0) return "Unknown Session";
+    const session = sessions.find(s => s.id === sessionId);
+    return session ? session.name : "Unknown Session";
+};
+
 
 const registrationDetails = (
     curParticipant,
@@ -9,7 +16,8 @@ const registrationDetails = (
     curParticipantArrival,
     workshops,
     paymentMethods,
-    registrationTypes
+    registrationTypes,
+    sessions
 ) => {  
     const totalDue = parseFloat(curParticipant.total_due) || 0;
     const paypalFee = curParticipant.payment_method_id === "1" ? (parseFloat(curParticipant.paypal_fee) || 0) : 0;
@@ -48,7 +56,7 @@ const registrationDetails = (
             ${curParticipantContributions.filter(c => c.type === "talk").length > 0 ? `
                 <ul style="margin-top:0; padding-left:15px;">
                     ${curParticipantContributions.filter(c => c.type === "talk").map(talk => `
-                        <li><strong>${talk.title}</strong> by ${talk.authors} (${talk.duration})<br>${talk.abstract}<br>Session: ${talk.session_name}</li>
+                        <li><strong>${talk.title}</strong> by ${talk.authors} (${talk.duration})<br>${talk.abstract}<br>Session: ${getSessionName(talk.session_id, sessions)}</li>
                     `).join("")}
                 </ul>
             ` : "No talks submitted."}
@@ -59,8 +67,8 @@ const registrationDetails = (
                     ${curParticipantContributions.filter(c => c.type === "poster").map(poster => `
                         <li>
                             <strong>${poster.title}</strong> by ${poster.authors}<br>
-                            ${poster.abstract}<br>
-                            ${poster.print === "1" ? "<strong>The poster will be printed on site by the LOC.</strong><br>" : ""}
+                            ${poster.abstract}<br>Session: ${getSessionName(poster.session_id, sessions)}
+                            ${poster.print === "1" ? "<br><strong>The poster will be printed on site by the LOC.</strong><br>" : ""}
                         </li>
                     `).join("")}
                 </ul>
@@ -92,7 +100,7 @@ export const registrationEmailToWorkshopRep = (participant, workshop) => {
 
 };
 
-export const registrationEmailToTeam = (participant, workshops, paymentMethods, registrationTypes) => {
+export const registrationEmailToTeam = (participant, workshops, paymentMethods, registrationTypes, sessions) => {
 
     const {
         participant: curParticipant,
@@ -100,7 +108,7 @@ export const registrationEmailToTeam = (participant, workshops, paymentMethods, 
         accommodation: curParticipantAccomodation,
         arrival: curParticipantArrival,
         extra_options: curPariticipantOptions,
-        contributions: curPariticipantContributions
+        contributions: curParticipantContributions
     } = participant;
 
 
@@ -110,13 +118,13 @@ export const registrationEmailToTeam = (participant, workshops, paymentMethods, 
         Good news: a new Participant has just registered for <strong>${isOnline ? 'ONLINE' : 'ON SITE'}</strong> IMC ${year}!<br><br>
 
         Here is a summary of the registration:<br>
-        ${participantIntro(curParticipant, curParticipantAccomodation, curParticipantWorkshops, curPariticipantContributions, curPariticipantOptions)}
+        ${participantIntro(curParticipant, curParticipantAccomodation, curParticipantWorkshops, curParticipantContributions, curPariticipantOptions, sessions)}
         <br>
         Below are the details of the registration: <hr>
-    ` + registrationDetails(curParticipant, curParticipantAccomodation, curParticipantWorkshops, curPariticipantContributions, curPariticipantOptions, curParticipantArrival, workshops, paymentMethods, registrationTypes);
+    ` + registrationDetails(curParticipant, curParticipantAccomodation, curParticipantWorkshops, curParticipantContributions, curPariticipantOptions, curParticipantArrival, workshops, paymentMethods, registrationTypes, sessions);
 };
 
-export const registrationEmailToParticipant = (participant, workshops, paymentMethods, registrationTypes, password) => {
+export const registrationEmailToParticipant = (participant, workshops, paymentMethods, registrationTypes, sessions, password) => {
 
     const {
         participant: curParticipant,
@@ -124,7 +132,7 @@ export const registrationEmailToParticipant = (participant, workshops, paymentMe
         accommodation: curParticipantAccomodation,
         arrival: curParticipantArrival,
         extra_options: curPariticipantOptions,
-        contributions: curPariticipantContributions
+        contributions: curParticipantContributions
     } = participant;
 
     const paymentInstructions = curParticipant.payment_method_id === "1"
@@ -165,15 +173,23 @@ export const registrationEmailToParticipant = (participant, workshops, paymentMe
 
         <h3 style="margin-bottom:5px;">Summary</h3>
         ${participantIntro(
-            curParticipant, curParticipantAccomodation, curParticipantWorkshops, curPariticipantContributions, curPariticipantOptions, true
+            curParticipant, curParticipantAccomodation, curParticipantWorkshops, curParticipantContributions, curPariticipantOptions, sessions, true
         )}
         <hr>
-        ${registrationDetails(curParticipant, curParticipantAccomodation, curParticipantWorkshops, curPariticipantContributions, curPariticipantOptions, curParticipantArrival, workshops, paymentMethods, registrationTypes)}
+        ${registrationDetails(curParticipant, curParticipantAccomodation, curParticipantWorkshops, curParticipantContributions, curPariticipantOptions, curParticipantArrival, workshops, paymentMethods, registrationTypes, sessions)}
     `;
 };
 
 
-const participantIntro = (curParticipant, curParticipantAccomodation, curParticipantWorkshops, curParticipantContributions, curParticipantOptions, you = false) => {
+const participantIntro = (curParticipant, curParticipantAccomodation, curParticipantWorkshops, curParticipantContributions, curParticipantOptions, sessions, you = false) => {
+    
+    const contributionsList = curParticipantContributions?.length > 0
+        ? curParticipantContributions.map(contribution =>
+            `<li>a ${contribution.type === "talk" ? "Talk" : "Poster"} titled "<strong>${contribution.title}</strong>"
+            (Session: ${getSessionName(contribution.session_id, sessions)})</li>`
+        ).join("")
+        : "No contributions submitted.";
+    
     const _pronoun = you ? 'you' : (curParticipant.gender === "Female" ? 'she' : 'he');
     const _pronoun2 = you ? 'yourself' : (curParticipant.gender === "Female" ? 'herself' : 'himself');
 
@@ -199,18 +215,7 @@ const participantIntro = (curParticipant, curParticipantAccomodation, curPartici
         _contributionDetails = `<br>${_pronoun.charAt(0).toUpperCase() + _pronoun.slice(1)} won't present anything during the conference.<br>`;
     } else {
         _contributionDetails = `<br>${_pronoun.charAt(0).toUpperCase() + _pronoun.slice(1)} will present:<br>`;
-        curParticipantContributions.forEach(contribution => {
-            _contributionDetails += `- ${contribution.type === "talk" ?
-                `a talk titled <strong>"${contribution.title}"</strong>` :
-                `a poster titled <strong>"${contribution.title}"</strong>`
-                }`;
-
-            if (contribution.type === "poster" && contribution.print === "1") {
-                _contributionDetails += `, and ${_pronoun} would like this poster to be printed on-site by the LOC.`;
-            }
-
-            _contributionDetails += "<br>";
-        });
+        _contributionDetails += contributionsList;
     }
 
     let _extraDetails = '';
