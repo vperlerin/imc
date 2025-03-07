@@ -455,7 +455,7 @@ class ParticipantManager
             }
 
             if (!empty($data['posters']) && is_array($data['posters'])) {
-                var_dump($data['talk']);
+                var_dump($data['posters']);
                 foreach ($data['posters'] as $poster) {
                     $printValue = isset($poster['print']) ? (filter_var($poster['print'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ? 1 : 0) : 0;
 
