@@ -25,6 +25,13 @@ const TalkPosterForm = ({
   const initialPrintValue = initialValues.print === true || initialValues.print === "true" || initialValues.print === 1 || initialValues.print === "1";
   const isPrinted = printValue === true || printValue === "true" || printValue === 1 || printValue === "1";
 
+  // Ensure session_id is properly stored instead of session name
+  useEffect(() => {
+    if (initialValues.session_id) {
+      setValue(`${type}s.${index}.session_id`, initialValues.session_id);
+    }
+  }, [initialValues.session_id, setValue, index, type]);
+
   useEffect(() => {
     if (isEditing && initialPrintValue !== isPrinted) {
       setPrintChanged(true);
@@ -32,7 +39,6 @@ const TalkPosterForm = ({
       setPrintChanged(false);
     }
   }, [isPrinted, initialPrintValue, isEditing]);
-
 
   return (
     <div className="border rounded-2 p-3 mb-3 mx-md-5">
@@ -95,9 +101,10 @@ const TalkPosterForm = ({
         <label className="col-sm-2 col-form-label fw-bold pb-0">IMC Session</label>
         <div className="col-sm-10">
           <select
-            className={classNames("form-select", errors?.[`${type}s`]?.[index]?.session && "is-invalid", cssForm.mdAuto)}
+            className={classNames("form-select", errors?.[`${type}s`]?.[index]?.session_id && "is-invalid", cssForm.mdAuto)}
+            {...register(`${type}s.${index}.session_id`, { required: "Session is required" })}
             defaultValue={initialValues.session_id || ""}
-            {...register(`${type}s.${index}.session`, { required: "Session is required" })}
+            onChange={(e) => setValue(`${type}s.${index}.session_id`, e.target.value, { shouldValidate: true })}
           >
             <option value="">Select a session</option>
             {sessions.map((session) => (
@@ -106,7 +113,7 @@ const TalkPosterForm = ({
               </option>
             ))}
           </select>
-          {errors?.[`${type}s`]?.[index]?.session && <p className="text-danger"><small>{errors[`${type}s`][index].session.message}</small></p>}
+          {errors?.[`${type}s`]?.[index]?.session_id && <p className="text-danger"><small>{errors[`${type}s`][index].session_id.message}</small></p>}
         </div>
       </div>
 
@@ -132,7 +139,7 @@ const TalkPosterForm = ({
         </div>
       )}
 
-      {/* Printing (Only for Posters) - no when isEditing as it updates the total price */}
+      {/* Printing (Only for Posters) */}
       {!isTalk && (
         <>
           {/* Display warning message if print value changes while editing */}
@@ -151,9 +158,6 @@ const TalkPosterForm = ({
             <div className="text-center btn-group d-block" role="group">
               {/* Fetch the watched value to ensure reactivity */}
               {(() => {
-                const printValue = watch(`${type}s.${index}.print`) ?? initialValues.print;
-                const isPrinted = printValue === true || printValue === "true" || printValue === 1 || printValue === "1";
-
                 return (
                   <>
                     {/* Yes Button */}
@@ -189,10 +193,7 @@ const TalkPosterForm = ({
             </div>
           </div>
         </>
-
       )}
-
-
     </div>
   );
 };

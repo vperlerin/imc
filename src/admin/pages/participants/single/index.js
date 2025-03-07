@@ -176,13 +176,9 @@ const AdminParticipantsUser = () => {
     const contributions = participant.contributions || [];
     if (sessions.length > 0) {
       const updatedTalks = contributions.filter(c => c.type === "talk").map(talk => ({
-        ...talk,
-        session: talk.session_id || sessions[0]?.id,
-      }));
+        ...talk  }));
       const updatedPosters = contributions.filter(c => c.type === "poster").map(poster => ({
-        ...poster,
-        session: poster.session_id || sessions[0]?.id,
-      }));
+        ...poster  }));
 
       // Store in state
       setTalks(updatedTalks);

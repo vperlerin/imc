@@ -50,12 +50,12 @@ const Contact = () => {
       alert("Please complete the reCAPTCHA verification.");
       return;
     }
-  
+
     setLoading(true);
     setResponseMessage("");
-   
+
     const selectedRecipient = JSON.parse(data.recipient);
-  
+
     try {
       const response = await sendEmail({
         subject: data.subject,
@@ -64,7 +64,7 @@ const Contact = () => {
                   Email: ${data.email}<br>
                   Recipient: ${selectedRecipient.name} (${selectedRecipient.email})<br>
                   Message: ${data.message}<br>`,
-        to: selectedRecipient.email,  
+        to: selectedRecipient.email,
         toName: selectedRecipient.name,
         fromName: "IMC 2025",
         replyTo: data.email,
@@ -72,7 +72,7 @@ const Contact = () => {
         bcc: process.env.REACT_APP_BCC_ALL ? process.env.REACT_APP_BCC_ALL.split(',').map(email => ({ email, name: 'BCC Recipient' })) : [],
         token,
       });
-  
+
       if (response.success) {
         setResponseMessage("Your message has been sent successfully. We will get back to you ASAP.");
         reset();
@@ -83,16 +83,16 @@ const Contact = () => {
     } catch (error) {
       setResponseMessage("An error occurred while sending your message. Please, try again later.");
     }
-  
+
     setLoading(false);
   };
-  
+
 
   const toggleItem = (id) => {
     setOpenItem(openItem === id ? null : id);
   };
 
- 
+
 
   return (
     <PageContain title="Contact">
@@ -148,7 +148,7 @@ const Contact = () => {
               isOpen={openItem === "item5"}
               toggle={toggleItem}
             >
-              Yes. A passion for meteors knows no age, gender, or boundaries. However, you may need to contact the LOC to arrange accommodation details.
+              If your partner wishes to use the accommodation provided by the IMC, they must be registered as a participant. The same applies to children, except perhaps for infants, for whom ad-hoc solutions can be arranged with the LOC (feel free to contact us!). However, if your partner or children book their own accommodation, registration will depend on whether they intend to use IMC facilities, such as meals. 
             </AccordionItem>
 
             <AccordionItem
@@ -176,7 +176,7 @@ const Contact = () => {
               <option value="">-- … --</option>
               {cd.contact.map((contact, index) => (
                 <option key={index} value={JSON.stringify(contact)}>
-                  {contact.q} 
+                  {contact.q}
                 </option>
               ))}
             </select>

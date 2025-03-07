@@ -195,6 +195,7 @@ const ContributionForm = ({
               type="talk"
               errors={errors}
               sessions={sessions}
+              setValue={setValue}
               talkDurations={talkDurations}
               initialValues={talk}
               watch={watch}

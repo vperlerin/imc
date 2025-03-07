@@ -75,17 +75,20 @@ const UpdateRegistration = () => {
 
     // Process contributions
     const contributions = participant.contributions || [];
+ 
     const updatedTalks = contributions
       .filter(c => c.type === "talk")
-      .map(talk => ({ ...talk, session: talk.session_id || sessions[0]?.id }));
+      .map(talk => ({ ...talk  || sessions[0]?.id }));
 
     const updatedPosters = contributions
       .filter(c => c.type === "poster")
-      .map(poster => ({ ...poster, session: poster.session_id || sessions[0]?.id }));
+      .map(poster => ({ ...poster  || sessions[0]?.id }));
 
     // Store data in form fields
     setValue("talks", updatedTalks);
     setValue("posters", updatedPosters);
+
+    console.log("UDPATED TALKS ", updatedTalks);
 
   }, [participant, sessions, setValue]);
 
