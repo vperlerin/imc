@@ -15,24 +15,37 @@ header("Content-Type: application/json");
 require_once __DIR__ . "/config.php";
 require_once __DIR__ . "/class/Connect.class.php";
 
-try {
-  $query = "
-    SELECT * FROM registration_types;
-    SELECT * FROM payment_methods;
-    SELECT * FROM workshops;
-    SELECT * FROM imc_sessions;
-";
-  $stmt = $pdo->prepare($query);
-  $stmt->execute();
+// Initialize Memcached
+$memcached = new Memcached();
+$memcached->addServer('localhost', 11211);
+$cacheKey = 'imc_specific_data';
+$cacheTTL = 4320000;  // Cache for 50 jours
 
-  $results = [];
-  $results['registration_types'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
-  $stmt->nextRowset(); 
-  $results['payment_methods'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
-  $stmt->nextRowset();  
-  $results['workshops'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
-  $stmt->nextRowset();  
-  $results['sessions'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+try {
+  $results = $memcached->get($cacheKey);
+
+  if (!$results) {
+    $query = "
+      SELECT * FROM registration_types;
+      SELECT * FROM payment_methods;
+      SELECT * FROM workshops;
+      SELECT * FROM imc_sessions;
+    ";
+    $stmt = $pdo->prepare($query);
+    $stmt->execute();
+
+    $results = [];
+    $results['registration_types'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $stmt->nextRowset(); 
+    $results['payment_methods'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $stmt->nextRowset();  
+    $results['workshops'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $stmt->nextRowset();  
+    $results['sessions'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Store fetched data in Memcached
+    $memcached->set($cacheKey, $results, $cacheTTL);
+  }
 
   echo json_encode([
     "success" => true,

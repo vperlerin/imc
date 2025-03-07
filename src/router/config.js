@@ -5,6 +5,8 @@ import { Link } from "react-router-dom";
 import Loader from "components/loader";
 import ProtectedRoute from "hooks/protected-route";
 
+ 
+
 // Lazy-load pages using relative paths (Webpack resolves them correctly)
 const lazyPages = {
   Home: lazy(() => import("pages/home")),
@@ -37,6 +39,7 @@ const lazyPages = {
   // ADMIN
   AdminDashboard: lazy(() => import("admin/pages/dashboard")),
   AdminParticipantsOnsite: lazy(() => import("admin/pages/participants/onsite")),
+  AdminParticipantsOnline: lazy(() => import("admin/pages/participants/online")),
   AdminParticipantsUser: lazy(() => import("admin/pages/participants/single")),
   AdminParticipantsPayment: lazy(() => import("admin/pages/participants/payment")),
 };
@@ -81,7 +84,8 @@ const routeConfig = [
   { path: "/submission/topics", element: <lazyPages.Topics /> },
   // ADMIN (protected routes)
   { path: "/admin/dashboard", element: <ProtectedRoute><lazyPages.AdminDashboard /></ProtectedRoute>},
-  { path: "/admin/participants/onsite", element: <ProtectedRoute><lazyPages.AdminParticipantsOnsite /></ProtectedRoute>},
+  { path: "/admin/participants/online", element: <ProtectedRoute><lazyPages.AdminParticipantsOnline /></ProtectedRoute> },
+  { path: "/admin/participants/onsite", element: <ProtectedRoute><lazyPages.AdminParticipantsOnsite/></ProtectedRoute>},
   { path: "/admin/participants/onsite/:participantId/:tab?", element: (<ProtectedRoute><lazyPages.AdminParticipantsUser/></ProtectedRoute>) },
   { path: "/admin/participants/onsite/payment/:participantId", element: (<ProtectedRoute><lazyPages.AdminParticipantsPayment/></ProtectedRoute>) },
   

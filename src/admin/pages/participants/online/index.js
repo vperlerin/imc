@@ -1,3 +1,4 @@
+import css from "./index.module.scss";
 import { CiSearch } from "react-icons/ci";
 import PageContain from "@/admin/components/page-contain";
 import classNames from "classnames"; 

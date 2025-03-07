@@ -15,3 +15,5 @@ For other updates
 3- Once pushed on the server, use ./deploy.sh to deploy the files in the proper directories.
 
 
+TODO: 
+- easy version without workshops

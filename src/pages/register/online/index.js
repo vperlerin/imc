@@ -18,7 +18,7 @@ import { sendEmail } from "hooks/send-email";
 import { SlArrowLeft, SlArrowRight } from "react-icons/sl";
 import { useApiParticipant } from "api/participants";
 import { useApiSpecificData } from "api/specific-data/index.js";
-import { registrationEmailToTeam, registrationEmailToParticipant, registrationEmailToWorkshopRep } from "email-templates/registration";
+import { registrationEmailToTeam, registrationEmailToParticipant } from "email-templates/registration";
 
 const totalStep = 5;
 
@@ -183,7 +183,7 @@ const MainForm = () => {
 
 
   return (
-    <PageContain title="Register Online">
+    <PageContain title="Register Online" showRegBtn={false}>
       {errorMsg && <div className="alert alert-danger fw-bolder">{errorMsg}</div>}
       {successMsg && !errorMsg && <div className="alert alert-success fw-bolder">{successMsg}</div>}
 

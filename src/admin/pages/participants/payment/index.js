@@ -5,10 +5,11 @@ import Loader from "components/loader";
 import cssForm from "styles/components/form.module.scss";
 import classNames from "classnames";
 import StaticSummary from "components/billing/static_summary";
+import WysiwygEditor from 'utils/wysiwyg-editor.js';
 import { getPaymentMethodById } from 'utils/payment_method';
 import { useParams } from "react-router-dom";
 import { conferenceData as cd } from "data/conference-data";
-
+import { useForm } from "react-hook-form";
 
 const Payments = () => {
   const { participantId } = useParams();
@@ -32,6 +33,19 @@ const Payments = () => {
   const hasFetchedParticipant = useRef(false);
   const hasFetchedParticipantPayments = useRef(false);
 
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    defaultValues: {
+      amount: totalDue?.toFixed(2) || "",
+      paymentMethodId: paymentMethodId || "",
+      paymentDate: new Date().toISOString().split("T")[0],
+      adminNote: "",
+    },
+  });
   useEffect(() => {
     const fetchData = async () => {
       if (hasFetchedData.current) return;
@@ -91,50 +105,34 @@ const Payments = () => {
   }, [totalDue, editingPayment]);
 
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!amount || isNaN(amount) || parseFloat(amount) <= 0) {
-      setError("Please enter a valid payment amount.");
-      return;
-    }
-    if (!paymentMethodId) {
-      setError("Please select a payment method.");
-      return;
-    }
-
-    setSubmitting(true);
+  const submitForm = async (data) => {
     setError(null);
     setSuccessMsg(null);
-
+  
     try {
       let response;
+      const payload = {
+        participant_id: participantId,
+        amount: parseFloat(data.amount),
+        payment_method_id: data.paymentMethodId,
+        payment_date: data.paymentDate,
+        admin_note: data.adminNote || null,
+      };
+  
       if (editingPayment) {
         response = await axios.put(
           `${process.env.REACT_APP_API_URL}/admin/api/update_payment.php`,
-          {
-            payment_id: editingPayment.id,
-            amount: parseFloat(amount),
-            payment_method_id: paymentMethodId,
-            payment_date: paymentDate,
-            admin_note: adminNote || null,
-          },
+          { payment_id: editingPayment.id, ...payload },
           { headers: { "Content-Type": "application/json" } }
         );
       } else {
         response = await axios.post(
           `${process.env.REACT_APP_API_URL}/admin/api/add_payment.php`,
-          {
-            participant_id: participantId,
-            amount: parseFloat(amount),
-            payment_method_id: paymentMethodId,
-            payment_date: paymentDate,
-            admin_note: adminNote || null,
-          },
+          payload,
           { headers: { "Content-Type": "application/json" } }
         );
       }
-
+  
       if (response.data.success) {
         setSuccessMsg(editingPayment ? "Payment updated successfully!" : "Payment added successfully!");
         setPayments(prev =>
@@ -148,8 +146,6 @@ const Payments = () => {
       }
     } catch (err) {
       setError(err.message);
-    } finally {
-      setSubmitting(false);
     }
   };
 
@@ -174,14 +170,16 @@ const Payments = () => {
     }
   };
 
-  // Reset form fields
-  const resetForm = () => {
-    setAmount("");
-    setPaymentMethodId("");
-    setPaymentDate(new Date().toISOString().split("T")[0]); // Reset to today's date
-    setAdminNote("");
-    setEditingPayment(null);
-  };
+  // Reset form fields 
+const resetForm = () => {
+  reset({
+    amount: totalDue?.toFixed(2) || "",
+    paymentMethodId: "",
+    paymentDate: new Date().toISOString().split("T")[0],
+    adminNote: "",
+  });
+  setEditingPayment(null);
+};
 
   const isOnline = participant?.participant?.is_online === "1";
   const breadcrumb = [
@@ -191,9 +189,16 @@ const Payments = () => {
 
   return (
     <PageContain breadcrumb={breadcrumb} isMaxWidth>
+       
+
       {loading && <Loader />}
       {!loading && error && <div className="alert alert-danger">{error}</div>}
       {successMsg && <div className="alert alert-success">{successMsg}</div>}
+
+      <form>
+      <WysiwygEditor/>
+
+      </form>
 
       {!loading && participant && (
         <>
@@ -206,14 +211,14 @@ const Payments = () => {
                   <label className="col-sm-3 col-form-label fw-bold">Amount (€)</label>
                   <div className="col-sm-5">
                     <input
-                      type="text"  // Using "text" to fully control the input formatting
+                      type="text"  
                       className={classNames('form-control', cssForm.md50)}
                       value={amount.replace(",", ".")}  // Ensure `.` is always displayed
-                      inputMode="decimal"  // Helps on mobile keyboards
-                      pattern="[0-9]*[.]?[0-9]*"  // Ensures proper decimal input
+                      inputMode="decimal"   
+                      pattern="[0-9]*[.]?[0-9]*"  
                       onChange={(e) => {
-                        let value = e.target.value.replace(",", "."); // Replace ',' with '.'
-                        if (/^[0-9]*[.]?[0-9]*$/.test(value)) { // Allow only numbers and '.'
+                        let value = e.target.value.replace(",", "."); 
+                        if (/^[0-9]*[.]?[0-9]*$/.test(value)) {  
                           setAmount(value);
                         }
                       }}

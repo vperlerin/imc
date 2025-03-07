@@ -1,4 +1,4 @@
-const year = process.env.REACT_APP_YEAR || "2025";
+const year = process.env.REACT_APP_YEAR || '2025';
  
 const getSessionName = (sessionId, sessions = []) => {
     if (!Array.isArray(sessions) || sessions.length === 0) return "Unknown Session";
@@ -19,9 +19,52 @@ const registrationDetails = (
     registrationTypes,
     sessions
 ) => {  
+    const isOnline = curParticipant.is_online === '1';
     const totalDue = parseFloat(curParticipant.total_due) || 0;
     const paypalFee = curParticipant.payment_method_id === "1" ? (parseFloat(curParticipant.paypal_fee) || 0) : 0;
  
+    if (isOnline) {
+        return `
+            <h3 style="margin-bottom:5px;">Personal Details</h3>
+            <strong>Name:</strong> ${curParticipant.title} ${curParticipant.first_name} ${curParticipant.last_name}<br>
+            <strong>Email:</strong> ${curParticipant.email}<br>
+            <strong>Date of Birth:</strong> ${curParticipant.dob}<br>
+
+            <h3 style="margin-bottom:5px;">Workshops</h3>
+            ${curParticipantWorkshops.length > 0 ? `
+                <ul style="margin-top:0; padding-left:15px;">
+                    ${curParticipantWorkshops.map(workshop => `
+                        <li><strong>${workshop.title}</strong> on ${workshop.date} (${workshop.period})</li>
+                    `).join("")}
+                </ul>
+            ` : "No workshops selected.<br>"} 
+
+            <h3 style="margin-bottom:5px;">Contributions</h3>
+            ${curParticipantContributions.length > 0 ? `
+                <h4 style="margin-bottom:5px;">Talks</h4>
+                ${curParticipantContributions.filter(c => c.type === "talk").length > 0 ? `
+                    <ul style="margin-top:0; padding-left:15px;">
+                        ${curParticipantContributions.filter(c => c.type === "talk").map(talk => `
+                            <li><strong>${talk.title}</strong> by ${talk.authors} (${talk.duration})<br>
+                            ${talk.abstract}<br><strong>Session:</strong> ${getSessionName(talk.session_id, sessions)}</li>
+                        `).join("")}
+                    </ul>
+                ` : "No talks submitted."}
+            ` : "No contributions."} 
+
+            <h3 style="margin-bottom:5px;">Payment Details</h3>
+            <strong>Payment Method:</strong>  
+            ${paymentMethods.find(method => method.id === curParticipant.payment_method_id)?.method || "Unknown"}<br>
+
+            <strong>Total Due:</strong> 
+            ${curParticipant.payment_method_id === "1"
+                        ? (parseFloat(totalDue) + parseFloat(paypalFee)).toFixed(2)
+                        : totalDue.toFixed(2)}€<br>
+
+            ${curParticipant.payment_method_id === "1" ? `including ${paypalFee.toFixed(2)}€ of PayPal fees<br>` : ""} 
+        `;
+    }
+
     return `
         <h3 style="margin-bottom:5px;">Personal Details</h3>
         <strong>Name:</strong> ${curParticipant.title} ${curParticipant.first_name} ${curParticipant.last_name}<br>
@@ -56,7 +99,7 @@ const registrationDetails = (
             ${curParticipantContributions.filter(c => c.type === "talk").length > 0 ? `
                 <ul style="margin-top:0; padding-left:15px;">
                     ${curParticipantContributions.filter(c => c.type === "talk").map(talk => `
-                        <li><strong>${talk.title}</strong> by ${talk.authors} (${talk.duration})<br>${talk.abstract}<br>Session: ${getSessionName(talk.session_id, sessions)}</li>
+                        <li><strong>${talk.title}</strong> by ${talk.authors} (${talk.duration})<br>${talk.abstract}<br><strong>Session:</strong> ${getSessionName(talk.session_id, sessions)}</li>
                     `).join("")}
                 </ul>
             ` : "No talks submitted."}
@@ -67,7 +110,7 @@ const registrationDetails = (
                     ${curParticipantContributions.filter(c => c.type === "poster").map(poster => `
                         <li>
                             <strong>${poster.title}</strong> by ${poster.authors}<br>
-                            ${poster.abstract}<br>Session: ${getSessionName(poster.session_id, sessions)}
+                            ${poster.abstract}<br><strong>Session:</strong> ${getSessionName(poster.session_id, sessions)}
                             ${poster.print === "1" ? "<br><strong>The poster will be printed on site by the LOC.</strong><br>" : ""}
                         </li>
                     `).join("")}
@@ -116,9 +159,6 @@ export const registrationEmailToTeam = (participant, workshops, paymentMethods, 
     return `
         Hey the IMC ${year} Team, <br><br>
         Good news: a new Participant has just registered for <strong>${isOnline ? 'ONLINE' : 'ON SITE'}</strong> IMC ${year}!<br><br>
-
-        Here is a summary of the registration:<br>
-        ${participantIntro(curParticipant, curParticipantAccomodation, curParticipantWorkshops, curParticipantContributions, curPariticipantOptions, sessions)}
         <br>
         Below are the details of the registration: <hr>
     ` + registrationDetails(curParticipant, curParticipantAccomodation, curParticipantWorkshops, curParticipantContributions, curPariticipantOptions, curParticipantArrival, workshops, paymentMethods, registrationTypes, sessions);

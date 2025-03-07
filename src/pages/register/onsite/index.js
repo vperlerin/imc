@@ -1,3 +1,4 @@
+import css from "./index.module.scss";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -23,9 +24,8 @@ import { sendEmail } from "hooks/send-email";
 import { SlArrowLeft, SlArrowRight } from "react-icons/sl";
 import { useApiParticipant } from "api/participants";
 import { useApiSpecificData } from "api/specific-data/index.js";
-import { registrationEmailToTeam, registrationEmailToParticipant, registrationEmailToWorkshopRep } from "email-templates/registration";
+import { registrationEmailToTeam, registrationEmailToParticipant } from "email-templates/registration";
 
-import css from "./index.module.scss";
 
 const totalStep = 8;
 
@@ -208,7 +208,7 @@ const MainForm = () => {
  
 
   return (
-    <PageContain title="Register On site">
+    <PageContain title="Register On site" showRegBtn={false}>
       {errorMsg && <div className="alert alert-danger fw-bolder">{errorMsg}</div>}
       {successMsg && !errorMsg && <div className="alert alert-success fw-bolder">{successMsg}</div>}
  
