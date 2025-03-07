@@ -447,7 +447,11 @@ class ParticipantManager
                     $stmt->bindValue(':title', $talk['title'], PDO::PARAM_STR);
                     $stmt->bindValue(':authors', $talk['authors'], PDO::PARAM_STR);
                     $stmt->bindValue(':abstract', $talk['abstract'], PDO::PARAM_STR);
-                    $stmt->bindValue(':session_id', $sessionId, $sessionId !== NULL ? PDO::PARAM_INT : PDO::PARAM_NULL);
+                    $stmt->bindValue(
+                        ':session_id', 
+                        $sessionId !== null ? (int) $sessionId : null, 
+                        $sessionId !== null ? PDO::PARAM_INT : PDO::PARAM_NULL
+                    );
                     $stmt->bindValue(':duration', $duration, $duration !== NULL ? PDO::PARAM_STR : PDO::PARAM_NULL);
                     $stmt->bindValue(':print', 0, PDO::PARAM_BOOL);
                     $stmt->execute();
