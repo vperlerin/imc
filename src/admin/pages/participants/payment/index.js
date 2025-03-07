@@ -108,7 +108,7 @@ const Payments = () => {
   const submitForm = async (data) => {
     setError(null);
     setSuccessMsg(null);
-  
+
     try {
       let response;
       const payload = {
@@ -118,7 +118,7 @@ const Payments = () => {
         payment_date: data.paymentDate,
         admin_note: data.adminNote || null,
       };
-  
+
       if (editingPayment) {
         response = await axios.put(
           `${process.env.REACT_APP_API_URL}/admin/api/update_payment.php`,
@@ -132,7 +132,7 @@ const Payments = () => {
           { headers: { "Content-Type": "application/json" } }
         );
       }
-  
+
       if (response.data.success) {
         setSuccessMsg(editingPayment ? "Payment updated successfully!" : "Payment added successfully!");
         setPayments(prev =>
@@ -171,15 +171,15 @@ const Payments = () => {
   };
 
   // Reset form fields 
-const resetForm = () => {
-  reset({
-    amount: totalDue?.toFixed(2) || "",
-    paymentMethodId: "",
-    paymentDate: new Date().toISOString().split("T")[0],
-    adminNote: "",
-  });
-  setEditingPayment(null);
-};
+  const resetForm = () => {
+    reset({
+      amount: totalDue?.toFixed(2) || "",
+      paymentMethodId: "",
+      paymentDate: new Date().toISOString().split("T")[0],
+      adminNote: "",
+    });
+    setEditingPayment(null);
+  };
 
   const isOnline = participant?.participant?.is_online === "1";
   const breadcrumb = [
@@ -189,14 +189,14 @@ const resetForm = () => {
 
   return (
     <PageContain breadcrumb={breadcrumb} isMaxWidth>
-       
+
 
       {loading && <Loader />}
       {!loading && error && <div className="alert alert-danger">{error}</div>}
       {successMsg && <div className="alert alert-success">{successMsg}</div>}
 
       <form>
-      <WysiwygEditor/>
+        <WysiwygEditor />
 
       </form>
 
@@ -211,14 +211,14 @@ const resetForm = () => {
                   <label className="col-sm-3 col-form-label fw-bold">Amount (€)</label>
                   <div className="col-sm-5">
                     <input
-                      type="text"  
+                      type="text"
                       className={classNames('form-control', cssForm.md50)}
                       value={amount.replace(",", ".")}  // Ensure `.` is always displayed
-                      inputMode="decimal"   
-                      pattern="[0-9]*[.]?[0-9]*"  
+                      inputMode="decimal"
+                      pattern="[0-9]*[.]?[0-9]*"
                       onChange={(e) => {
-                        let value = e.target.value.replace(",", "."); 
-                        if (/^[0-9]*[.]?[0-9]*$/.test(value)) {  
+                        let value = e.target.value.replace(",", ".");
+                        if (/^[0-9]*[.]?[0-9]*$/.test(value)) {
                           setAmount(value);
                         }
                       }}

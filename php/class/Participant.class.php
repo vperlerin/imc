@@ -304,22 +304,29 @@ class ParticipantManager
             // Check if participant exists
             $stmt = $this->pdo->prepare("SELECT id FROM participants WHERE id = :participant_id");
             $stmt->execute([':participant_id' => $participantId]);
+            
             if ($stmt->rowCount() === 0) {
                 throw new Exception("Participant with ID {$participantId} does not exist.");
             }
-
-            // Update participant details
-            $stmt = $this->pdo->prepare("
-                UPDATE participants 
-                SET title = :title, first_name = :first_name, last_name = :last_name, gender = :gender, 
-                    dob = :dob, email = :email, phone = :phone, address = :address, postal_code = :postal_code, 
-                    city = :city, country = :country, organization = :organization, is_online = :is_online,
-                    paypal_fee = :paypal_fee, total_due = :total_due, 
-                    comments = :comments, payment_method_id = :payment_method_id, updated_at = NOW()
-                WHERE id = :participant_id
-            ");
-
-            $stmt->execute([
+            
+            // Prepare fields for update
+            $fields = [
+                'title = :title', 'first_name = :first_name', 'last_name = :last_name', 'gender = :gender',
+                'dob = :dob', 'email = :email', 'phone = :phone', 'address = :address', 'postal_code = :postal_code',
+                'city = :city', 'country = :country', 'organization = :organization', 'is_online = :is_online',
+                'paypal_fee = :paypal_fee', 'total_due = :total_due', 'comments = :comments',
+                'payment_method_id = :payment_method_id', 'updated_at = NOW()'
+            ];
+            
+            if (isset($data['admin_notes'])) {
+                $fields[] = 'admin_notes = :admin_notes';
+            }
+            
+            $sql = "UPDATE participants SET " . implode(', ', $fields) . " WHERE id = :participant_id";
+            $stmt = $this->pdo->prepare($sql);
+            
+            // Bind parameters
+            $params = [
                 ':participant_id' => $participantId,
                 ':title' => $data['title'],
                 ':first_name' => $data['first_name'],
@@ -338,7 +345,13 @@ class ParticipantManager
                 ':total_due' => $data['total_due'],
                 ':comments' => $data['comments'] ?? null,
                 ':payment_method_id' => (int) ($data['payment_method_id'] ?? 0),
-            ]);
+            ];
+            
+            if (isset($data['admin_notes'])) {
+                $params[':admin_notes'] = $data['admin_notes'];
+            }
+
+            $stmt->execute($params);
 
             // Delete existing workshop selections for the participant
             $stmt = $this->pdo->prepare("DELETE FROM participant_workshops WHERE participant_id = :participant_id");
@@ -424,7 +437,7 @@ class ParticipantManager
             if (!empty($data['talks']) && is_array($data['talks'])) {
                 // Insert talks
                 foreach ($data['talks'] as $talk) {
-                    $sessionId = isset($talk['session']) ? (int) $talk['session'] : NULL;
+                    $sessionId = isset($talk['session_id']) ? (int) $talk['session_id'] : NULL;
                     $duration = isset($talk['duration']) ? $talk['duration'] : NULL;
 
                     $stmt->bindValue(':participant_id', $participantId, PDO::PARAM_INT);
@@ -611,11 +624,44 @@ class ParticipantManager
     /**
      * Get participants INFO
      */
-    public function getParticipantDetails($participantId)
+    public function getParticipantDetails($participantId, $widhAdminNotes = false)
     {
+        $columns = $withAdminNotes ? '*' : '
+        id,
+        title,
+        first_name,
+        last_name,
+        gender,
+        phone,
+        email,
+        address,
+        postal_code,
+        city,
+        country,
+        organization,
+        dob,
+        is_online,
+        is_early_bird,
+        confirmation_sent,
+        confirmation_date,
+        password_hash,
+        paypal_fee,
+        payment_method_id,
+        total_due,
+        total_paid,
+        total_reimbursed,
+        status,
+        deleted_at,
+        comments,
+        guardian_name,
+        guardian_contact,
+        guardian_email,
+        created_at,
+        updated_at';
+    
         // 1. Fetch participant’s primary details
         $stmt = $this->pdo->prepare("
-            SELECT *
+            SELECT {$columns}
             FROM participants
             WHERE id = :participant_id
         ");

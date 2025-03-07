@@ -18,7 +18,7 @@ header("Access-Control-Allow-Methods: GET, OPTIONS");
 require_once __DIR__ . "/../config.php";
 require_once __DIR__ . "/../class/Participant.class.php";
 require_once __DIR__ . "/../class/Connect.class.php";
- 
+
 // Handle preflight OPTIONS request
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
@@ -32,9 +32,12 @@ if (!$participantId || !is_numeric($participantId)) {
     exit;
 }
 
+// Check if admin_notes parameter is set and convert to boolean
+$admin_notes = isset($_GET['admin_notes']) && filter_var($_GET['admin_notes'], FILTER_VALIDATE_BOOLEAN);
+
 try {
     $participantManager = new ParticipantManager($pdo);
-    $participant = $participantManager->getParticipantDetails($participantId);
+    $participant = $participantManager->getParticipantDetails($participantId, $admin_notes);
 
     echo json_encode(["success" => true, "data" => $participant]);
 } catch (Exception $e) {

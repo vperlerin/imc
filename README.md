@@ -14,6 +14,8 @@ For other updates
 2- Update src/ (git pull)
 3- Once pushed on the server, use ./deploy.sh to deploy the files in the proper directories.
 
+DO NOT FORGET TO CLEAR MEMCACHED ON THE SERVER IF YOU MODIFY THE specific_data
 
 TODO: 
 - easy version without workshops
+- have "admin_notes" an option of getParticipant (public)

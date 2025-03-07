@@ -2,7 +2,7 @@ import { retry } from "utils/retry.js";
 import { useState, useEffect, useCallback } from "react";
 import axios from "axios"; 
 
-export const useApiParticipant = (participantId, fetchTrigger = 0) => {
+export const useApiParticipant = (participantId, fetchTrigger = 0, withAdminNotes = false) => {
   const [participant, setParticipant] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -15,7 +15,7 @@ export const useApiParticipant = (participantId, fetchTrigger = 0) => {
 
     try {
       const response = await retry(() =>
-        axios.get(`${process.env.REACT_APP_API_URL}/api/get_participant.php?id=${participantId}`)
+        axios.get(`${process.env.REACT_APP_API_URL}/api/get_participant.php?id=${participantId}&admin_notes=${withAdminNotes}`)
       );
 
       if (response.data.success && response.data.data) {
