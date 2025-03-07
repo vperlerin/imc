@@ -16,6 +16,11 @@ const UpdateRegistration = () => {
   const { participant, loading: participantLoading, error: participantError } = useApiParticipant(participantId);
   const { workshops, paymentMethods, registrationTypes, loading: specificdataLoading, sessions, error: errorGettingDataFromDB } = useApiSpecificData();
 
+  console.log("IS LOGGED IN ", isLoggedIn);
+  console.log("USER? ", user);
+
+
+
   useEffect(() => {
     if (!user) {
       dispatch(fetchUser());  
@@ -29,9 +34,11 @@ const UpdateRegistration = () => {
   }, [user]);
 
   // Redirect if not logged in
+  /*
   if (!isLoggedIn) {
     return <Navigate to="/login" replace />;
   }
+    */
 
   return (
     <PageContain title="Update your data">
@@ -39,7 +46,7 @@ const UpdateRegistration = () => {
       
       {!!participant ? (
         <>
-          {`Hello ${participant.title} ${participant.first_name} ${participant.last_name}`}
+          {`Hello ${participant.participant.title} ${participant.participant.first_name} ${participant.participant.last_name}`}
         </>
       ) : (
         <>Participant not found</>
