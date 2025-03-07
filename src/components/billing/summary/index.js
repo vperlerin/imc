@@ -36,7 +36,6 @@ const getSelectedWorkshops = (selectedWorkshopIds = [], workshops = [], isOnline
 
   return { selected, totalPrice };
 };
-
  
 
 const Summary = ({

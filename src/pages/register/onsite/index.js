@@ -95,9 +95,7 @@ const MainForm = () => {
     setErrorMsg(null);
     setSuccessMsg(null);
 
-    try {
-      console.log("SUBMIUT!!!! ");
-
+    try {  
       const apiUrl = `${process.env.REACT_APP_API_URL}/api/register_onsite.php`;
 
       const formattedData = {
@@ -212,9 +210,8 @@ const MainForm = () => {
   return (
     <PageContain title="Register On site">
       {errorMsg && <div className="alert alert-danger fw-bolder">{errorMsg}</div>}
-      {successMsg && <div className="alert alert-success fw-bolder">{successMsg}</div>}
-
-
+      {successMsg && !errorMsg && <div className="alert alert-success fw-bolder">{successMsg}</div>}
+ 
       {step === totalStep && successMsg ? (
         <>
           {!participant  ? (

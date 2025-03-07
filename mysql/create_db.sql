@@ -27,12 +27,12 @@ CREATE TABLE IF NOT EXISTS participants (
     first_name VARCHAR(100) NOT NULL,
     last_name VARCHAR(100) NOT NULL,
     gender ENUM('Male', 'Female', 'Other') NOT NULL,
-    phone VARCHAR(20) NOT NULL,
+    phone VARCHAR(20) DEFAULT NULL,   
     email VARCHAR(255) NOT NULL UNIQUE,
-    address VARCHAR(255) NOT NULL,
-    postal_code VARCHAR(20) NOT NULL,
-    city VARCHAR(100) NOT NULL,
-    country CHAR(2) NOT NULL,
+    address VARCHAR(255) DEFAULT NULL,   
+    postal_code VARCHAR(20) DEFAULT NULL,   
+    city VARCHAR(100) DEFAULT NULL,  
+    country CHAR(2) NOT NULL,  
     organization VARCHAR(255) DEFAULT NULL,
     dob DATE NOT NULL,
     admin_notes TEXT DEFAULT NULL,
@@ -42,19 +42,20 @@ CREATE TABLE IF NOT EXISTS participants (
     confirmation_date DATETIME DEFAULT NULL,
     password_hash VARCHAR(255) NOT NULL, 
     paypal_fee DECIMAL(10,2) UNSIGNED NOT NULL DEFAULT 0.00,
-    payment_method_id INT NOT NULL,  
+    payment_method_id INT DEFAULT NULL,  
     total_due DECIMAL(10,2) UNSIGNED NOT NULL DEFAULT 0.00,
     total_paid DECIMAL(10,2) UNSIGNED NOT NULL DEFAULT 0.00, 
     total_reimbursed DECIMAL(10,2) UNSIGNED NOT NULL DEFAULT 0.00, 
     status ENUM('active', 'deleted') NOT NULL DEFAULT 'active',
     deleted_at TIMESTAMP NULL DEFAULT NULL,
     comments TEXT DEFAULT NULL,  
-    guardian_name VARCHAR(100) DEFAULT NULL, 
-    guardian_contact VARCHAR(20) DEFAULT NULL,  
-    guardian_email VARCHAR(255) DEFAULT NULL, 
+    guardian_name VARCHAR(100) DEFAULT NULL,   
+    guardian_contact VARCHAR(20) DEFAULT NULL, 
+    guardian_email VARCHAR(255) DEFAULT NULL,  
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 
 -- Password Reset Table
 CREATE TABLE IF NOT EXISTS password_resets (

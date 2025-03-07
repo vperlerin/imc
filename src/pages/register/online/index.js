@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useLocation } from "react-router-dom";
 import { getPaymentMethodById } from "utils/payment_method";
+import Accommodation from "components/registration/accomodation.js"; 
 import Contribution from "components/registration/contribution.js";
 import Identity from "components/registration/identity.js";
 import Loader from "components/loader";
@@ -19,7 +20,7 @@ import { useApiParticipant } from "api/participants";
 import { useApiSpecificData } from "api/specific-data/index.js";
 import { registrationEmailToTeam, registrationEmailToParticipant, registrationEmailToWorkshopRep } from "email-templates/registration";
 
-const totalStep = 4;
+const totalStep = 5;
 
 const MainForm = () => {
   const location = useLocation();
@@ -120,7 +121,7 @@ const MainForm = () => {
             subject: `Workshop Registration`,
             message: `Hey ${workshop.responsible_name.split(" ")[0]},<br><br>
                       ${participant.participant.first_name} ${participant.participant.last_name} (${participant.participant.email})
-                      has just registered for the "${workshop.title}" (ONSITE).<br>See you,<br>V./<br>`,
+                      has just registered for the "${workshop.title}" (<b>ONLINE version</b>).<br>See you,<br>V./<br>`,
             to: workshop.responsible_email,
             toName: workshop.responsible_name,
             fromName: "IMC 2025",
@@ -131,7 +132,7 @@ const MainForm = () => {
         });
 
         const responseEmailTeam = await sendEmail({
-          subject: "New Onsite IMC Registration",
+          subject: "New ONLINE IMC Registration",
           message: emailToTeam,
           to: process.env.REACT_APP_CONTACT_EMAIL,
           toName: process.env.REACT_APP_CONTACT_NAME,
@@ -142,7 +143,7 @@ const MainForm = () => {
         });
 
         const responseEmailParticipant = await sendEmail({
-          subject: "New Onsite IMC Registration",
+          subject: "New ONLINE IMC Registration",
           message: emailToParticipant,
           to: participant.participant.email,
           toName: `${participant.participant.first_name} ${participant.participant.last_name}`,
@@ -184,7 +185,7 @@ const MainForm = () => {
   return (
     <PageContain title="Register Online">
       {errorMsg && <div className="alert alert-danger fw-bolder">{errorMsg}</div>}
-      {successMsg && <div className="alert alert-success fw-bolder">{successMsg}</div>}
+      {successMsg && !errorMsg && <div className="alert alert-success fw-bolder">{successMsg}</div>}
 
 
       {step === totalStep && successMsg ? (
