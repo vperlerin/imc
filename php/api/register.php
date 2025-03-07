@@ -82,9 +82,7 @@ try {
     $workshops = $stmt->fetchAll(PDO::FETCH_ASSOC);
     $stmt->nextRowset();
     $sessions = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-
-    var_dump("SESSIONS IN REGISSTER ", $sessions);
+ 
  
     $subject = "IMC " . getenv("YEAR") . " Registration";
     $summary = SummaryFormatter::formatEmailContent($data, $workshops, $payment_methods, $registrations_types, $sessions, true);

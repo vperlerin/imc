@@ -95,7 +95,7 @@ class SummaryFormatter
             $content .= "<br><b>Talk Contribution(s)</b><br>";
 
             foreach ($data['talks'] as $talk) {
-                $sessionName = $sessionMap[$talk['session']] ?? "Unknown Session";
+                $sessionName = $sessionMap[$talk['session_id']] ?? "Unknown Session";
                 $content .= "
                     <b>Title:</b> {$talk['title']}<br>
                     <b>Authors:</b> {$talk['authors']}<br>
@@ -111,7 +111,7 @@ class SummaryFormatter
             $content .= "<br><b>Poster Contribution(s)</b><br>";
 
             foreach ($data['posters'] as $poster) {
-                $sessionName = $sessionMap[$poster['session']] ?? "Unknown Session";
+                $sessionName = $sessionMap[$poster['session_id']] ?? "Unknown Session";
                 $content .= "
                     <b>Title:</b> {$poster['title']}<br>
                     <b>Authors:</b> {$poster['authors']}<br>
