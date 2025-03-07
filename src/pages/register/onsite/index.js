@@ -96,7 +96,9 @@ const MainForm = () => {
     setSuccessMsg(null);
 
     try {
-      const apiUrl = `${process.env.REACT_APP_API_URL}/api/register.php`;
+      console.log("SUBMIUT!!!! ");
+
+      const apiUrl = `${process.env.REACT_APP_API_URL}/api/register_onsite.php`;
 
       const formattedData = {
         ...formData,
@@ -146,7 +148,7 @@ const MainForm = () => {
             subject: `Workshop Registration`,
             message: `Hey ${workshop.responsible_name.split(" ")[0]},<br><br>
                       ${participant.participant.first_name} ${participant.participant.last_name} (${participant.participant.email})
-                      has registered for "${workshop.title}" (ONSITE).`,
+                      has just registered for the "${workshop.title}" (ONSITE).<br>See you,<br>V./<br>`,
             to: workshop.responsible_email,
             toName: workshop.responsible_name,
             fromName: "IMC 2025",
@@ -185,20 +187,18 @@ const MainForm = () => {
           participantEmailSent: responseEmailParticipant,
           error: null,
         });
-      } catch (error) {
-        console.log("ERROR ", error);
+      } catch (error) { 
         setEmailStatus({ teamEmailSent: null, participantEmailSent: null, error: error.message || "Failed to send emails" });
       }
     };
 
     sendEmails();
   }, [participant, workshops, password]);
-
-  console.log("email status ", emailStatus);
-
-  if (!isDebugMode) {
+ 
+ 
+  if (!isDebugMode && false) {
     return <PageContain title="Register Onsite">Come back soon…</PageContain>;
-  }
+  } 
 
   if (errorGettingDataFromDB) {
     return <div className="alert alert-danger fw-bolder">{errorGettingDataFromDB}</div>
@@ -210,12 +210,12 @@ const MainForm = () => {
  
 
   return (
-    <PageContain title="Register Onsite">
+    <PageContain title="Register On site">
       {errorMsg && <div className="alert alert-danger fw-bolder">{errorMsg}</div>}
       {successMsg && <div className="alert alert-success fw-bolder">{successMsg}</div>}
 
 
-      {step === 8 && successMsg ? (
+      {step === totalStep && successMsg ? (
         <>
           {!participant  ? (
 
@@ -249,7 +249,7 @@ const MainForm = () => {
                     <p>
                       We just sent you an email with some instructions. This email contains a summary of your information as well as the password
                       required to eventually update your travel details and your contributions (talks & posters).<br />
-                      If you do not receive this email within the next two hours{' '}
+                      If you do not receive this email within the next 20 minutes{' '}
                       <Link
                         aria-label="Contact"
                         to="/contact"

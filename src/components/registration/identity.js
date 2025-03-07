@@ -20,24 +20,37 @@ const IdentityForm = ({
   step,
   stepTotal,
   trigger,
-  setValue, 
+  setValue,
 }) => {
-   
+
   const fillTestData = () => {
-    setValue("title", "Dr.");
-    setValue("first_name", "Vincent");
-    setValue("last_name", "Perlerin");
-    setValue("gender", "Male");
-    setValue("phone", "+33 686753212");
-    setValue("email", "vperlerin@gmail.com");
-    setValue("address", "16, rue Georges Bernanos");
-    setValue("postal_code", "51100");
-    setValue("city", "Reims");
-    setValue("country", "FR");
-    setValue("organization", "AMS/IMO");
-    setValue("dobDay", "10");
-    setValue("dobMonth", "9");
-    setValue("dobYear", "1976");
+    if (!isOnline) {
+      setValue("title", "Dr.");
+      setValue("first_name", "Vincent");
+      setValue("last_name", "Perlerin");
+      setValue("gender", "Male");
+      setValue("phone", "+33 686753212");
+      setValue("email", "vperlerin@gmail.com");
+      setValue("address", "16, rue Georges Bernanos");
+      setValue("postal_code", "51100");
+      setValue("city", "Reims");
+      setValue("country", "FR");
+      setValue("organization", "AMS/IMO");
+      setValue("dobDay", "10");
+      setValue("dobMonth", "9");
+      setValue("dobYear", "1976");
+    } else {
+      setValue("title", "Dr.");
+      setValue("first_name", "Hélène");
+      setValue("last_name", "Perlerin");
+      setValue("email", "vperlerin@gmail.com");
+      setValue("gender", "Female");
+      setValue("country", "FR"); 
+      setValue("dobDay", "10");
+      setValue("dobMonth", "9");
+      setValue("dobYear", "1976");
+    }
+
     trigger();
   };
 
@@ -129,26 +142,28 @@ const IdentityForm = ({
         </div>
 
         {/* Phone Number */}
-        <div className="mb-3 row">
-          <label className="col-sm-2 col-form-label fw-bold">Phone #</label>
-          <div className="col-sm-10">
-            <input type="tel"
-              className={classNames('form-control', errors.phone && "is-invalid", cssForm.md50)}
-              placeholder="Your Phone Number"
-              {...register("phone",
-                {
-                  required: "Phone number is required",
-                  pattern: {
-                    value: /^\+\d{1,3}\s?\d+$/,
-                    message: "Invalid phone number format - please add +Country Code. Ex: +33 686 753 89"
-                  }
-                })}
-              onBlur={() => trigger("phone")}
-            />
-            {errors.phone && <p className="text-danger mb-0"><small>{errors.phone.message}</small></p>}
+        {!isOnline && (
+          <div className="mb-3 row">
+            <label className="col-sm-2 col-form-label fw-bold">Phone #</label>
+            <div className="col-sm-10">
+              <input type="tel"
+                className={classNames('form-control', errors.phone && "is-invalid", cssForm.md50)}
+                placeholder="Your Phone Number"
+                {...register("phone",
+                  {
+                    required: "Phone number is required",
+                    pattern: {
+                      value: /^\+\d{1,3}\s?\d+$/,
+                      message: "Invalid phone number format - please add +Country Code. Ex: +33 686 753 89"
+                    }
+                  })}
+                onBlur={() => trigger("phone")}
+              />
+              {errors.phone && <p className="text-danger mb-0"><small>{errors.phone.message}</small></p>}
+            </div>
           </div>
-        </div>
-
+        )}
+ 
         {/* Email */}
         <div className="mb-3 row">
           <label className="col-sm-2 col-form-label fw-bold">Email</label>
@@ -160,8 +175,10 @@ const IdentityForm = ({
               onBlur={() => trigger("email")}
             />
             {errors.email && <p className="text-danger mb-0"><small>{errors.email.message}</small></p>}
-            {isOnline && !isAdmin &&(
-              <div className="form-text">We will use this email to send you the access details for the online conference.</div>
+            {isOnline && !isAdmin && (
+              <div className="form-text fw-bold">
+                We will use this email to send you the access details for the online conference.
+              </div>
             )}
           </div>
         </div>
@@ -270,7 +287,7 @@ const IdentityForm = ({
               </select>
             </div>
 
-            {!isOnline && !isAdmin &&  (
+            {!isOnline && !isAdmin && (
               <div className="form-text">
                 <b>Underaged IMC participants</b> must be accompanied and have the <b>legalized documents for travelling abroad without parents</b>.
               </div>

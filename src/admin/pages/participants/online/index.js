@@ -3,10 +3,10 @@ import PageContain from "@/admin/components/page-contain";
 import classNames from "classnames"; 
 import Loader from "components/loader";
 import React, { useEffect, useState } from "react";
-import { useApiOnsiteParticipants } from "api/participants/onsite.js";
+import { useApiOnlineParticipants } from "api/participants/online.js";
 import { useApiDeleteParticipant } from "@/admin/api/participants/delete";
 
-const AdminParticipantsOnsite = () => {
+const AdminParticipantsOnline = () => {
   const [filteredParticipants, setFilteredParticipants] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchType, setSearchType] = useState("last_name");
@@ -228,4 +228,4 @@ const AdminParticipantsOnsite = () => {
   );
 };
 
-export default AdminParticipantsOnsite;
+export default AdminParticipantsOnline;

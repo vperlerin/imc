@@ -6,6 +6,7 @@ import { formatFullDate } from 'utils/date';
 
 const Workshops = ({
   isAdmin = false, 
+  isOnline = false,
   isDebugMode = false, 
   errors,
   step,
@@ -19,6 +20,12 @@ const Workshops = ({
   // Watch selected workshop IDs
   const selectedWorkshops = watch("workshops") || [];
 
+  // For online version, we don't display the workshops without price 
+  const filteredWorkshops = isOnline
+    ? workshops.filter(workshop => parseFloat(workshop.price_online) !== 0)
+    : workshops;
+ 
+
   // Function to toggle selection
   const toggleWorkshop = (workshopId) => {
     const updatedWorkshops = selectedWorkshops.includes(workshopId)
@@ -27,6 +34,7 @@ const Workshops = ({
 
     setValue("workshops", updatedWorkshops, { shouldDirty: true, shouldTouch: true, shouldValidate: true });
   };
+ 
 
   return (
     <div className="position-relative">
@@ -35,7 +43,7 @@ const Workshops = ({
           type="button"
           className="position-absolute top-0 end-0 btn btn-secondary"
           onClick={() => {
-            const allWorkshopIds = workshops.map(workshop => workshop.id);
+            const allWorkshopIds = filteredWorkshops.map(workshop => workshop.id);
             setValue("workshops", allWorkshopIds, { shouldDirty: true, shouldTouch: true, shouldValidate: true });
             trigger();
           }}
@@ -52,15 +60,15 @@ const Workshops = ({
       )}
 
       <div className={classNames(cssForm.smallW, "mx-auto position-relative")}>
-        {workshops.map((workshop) => {
+        {filteredWorkshops.map((workshop) => {
           const workshopId = workshop.id.toString();
           const isSelected = selectedWorkshops.includes(workshopId);
 
           return (
             <div className="mb-5 row" key={workshopId}>
               <label className={classNames("text-md-center", cssForm.balance)}>
-                <b>{workshop.title}</b> will be held on <b>{formatFullDate(workshop.date)}</b> from <b>{workshop.period}</b>.<br /> 
-                Do you wish to attend for an extra price of {parseFloat(workshop.price).toFixed(2)}€?
+                <b>The {workshop.title}</b> will be held on <b>{formatFullDate(workshop.date)}</b> from <b>{workshop.period}</b>.<br /> 
+                 Would you like to attend {isOnline && 'online' } for an extra price of {parseFloat(isOnline ? workshop.price_online : workshop.price).toFixed(2)}€?
               </label>
 
               <div className="text-center d-block mt-3">
@@ -88,7 +96,11 @@ const Workshops = ({
 
         {!isAdmin && (
           <p className="text-center">
-            Read more about the <a href="/program/workshops/radio" target="_blank">Radio Workshop</a> and the <a href="/program/workshops/specto" target="_blank">Spectroscopy Workshop</a>.
+            Read more about the <a href="/program/workshops/radio" target="_blank">Radio Workshop</a>
+             {!isOnline && (
+              <>and the <a href="/program/workshops/specto" target="_blank">Spectroscopy Workshop</a></>
+             )}
+             .
           </p>
         )}
       </div>

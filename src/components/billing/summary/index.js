@@ -83,7 +83,7 @@ const Summary = ({
   totalCost += paypalFee;
 
   // Online conference cost calculation 
-  const onlineConferenceCost = conferenceData.costs.online;
+  const onlineConferenceCost = conferenceData.costs.online; 
   let totalOnlineCost = workshopCost + onlineConferenceCost;
   const onlinePaypalFee = isPaypal ? getPaypalPrice(totalOnlineCost) - totalOnlineCost : 0;
   totalOnlineCost += onlinePaypalFee;
@@ -111,7 +111,11 @@ const Summary = ({
     <>
       {!isAdmin && showInfo && (
         <p className="fw-bolder alert alert-info">
-          Please review your registration details and total cost carefully before submitting. If any changes are needed, go back and update your selections. Once registered, you will receive a password that allows you to update only your travel details and contributions (talks & posters).
+          {!isOnline ? 
+              <> Please review your registration details and total cost carefully before submitting. If any changes are needed, go back and update your selections. Once registered, you will receive a password that allows you to update only your travel details and contributions (talks & posters).</>  
+           :
+              <>Please review your registration details before submitting. If any changes are needed, go back and update your selections. Once registered, you will receive a password that allows you to update only your eventual contributions (talks).</>
+          }
         </p>
       )}
 
@@ -136,7 +140,7 @@ const Summary = ({
             ) : (
               <tr>
                 <td className="ps-3 text-muted">Online Conference Registration</td>
-                <td className="text-end">{onlineConferenceCost.toFixed(2)}€</td>
+                <td className="text-end">{parseFloat(onlineConferenceCost).toFixed(2)}€</td>
               </tr>
             )}
 

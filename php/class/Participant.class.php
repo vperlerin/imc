@@ -72,7 +72,7 @@ class ParticipantManager
             ]);
 
             $participantId = $this->pdo->lastInsertId();
-  
+
             // Insert workshops participation
             if (!empty($data['workshops']) && is_array($data['workshops'])) {
                 $stmt = $this->pdo->prepare("
@@ -195,6 +195,106 @@ class ParticipantManager
             throw new Exception("Error saving participant: " . $e->getMessage());
         }
     }
+
+
+    public function saveOnlineParticipant($data, $passwordHash)
+    {
+        try {
+            $this->pdo->beginTransaction();
+
+            // Check if email exists
+            if ($this->emailExists($data['email'])) {
+                throw new Exception("The email address '{$data['email']}' is already registered. Please use a different email or log in.");
+            }
+
+            // Insert participant
+            $stmt = $this->pdo->prepare("
+            INSERT INTO participants (
+                title, first_name, last_name, gender, dob, email, country, 
+                organization, is_online, is_early_bird, confirmation_sent, confirmation_date, 
+                password_hash, paypal_fee, total_due, total_paid, total_reimbursed, status, deleted_at, 
+                comments, payment_method_id, created_at, updated_at
+            ) VALUES (
+                :title, :first_name, :last_name, :gender, :dob, :email, :country, 
+                :organization, :is_online, :is_early_bird, FALSE, NULL, 
+                :password_hash, :paypal_fee, :total_due, 0.00, 0.00, 'active', NULL, 
+                :comments, :payment_method_id, NOW(), NOW()
+            )
+        ");
+
+            $stmt->execute([
+                ':title' => $data['title'],
+                ':first_name' => $data['first_name'],
+                ':last_name' => $data['last_name'],
+                ':gender' => $data['gender'],
+                ':dob' => "{$data['dobYear']}-{$data['dobMonth']}-{$data['dobDay']}",
+                ':email' => $data['email'],
+                ':country' => $data['country'],
+                ':organization' => $data['organization'] ?? null,
+                ':is_online' => filter_var($data['is_online'], FILTER_VALIDATE_BOOLEAN),
+                ':is_early_bird' => filter_var($data['is_early_bird'], FILTER_VALIDATE_BOOLEAN),
+                ':password_hash' => $passwordHash,
+                ':paypal_fee' => $data['paypal_fee'],
+                ':total_due' => $data['total_due'],
+                ':comments' => $data['comments'] ?? null,
+                ':payment_method_id' => (int) ($data['payment_method_id'] ?? 0),
+            ]);
+
+            $participantId = $this->pdo->lastInsertId();
+
+            // Insert only workshops where price_online > 0
+            if (!empty($data['workshops']) && is_array($data['workshops'])) {
+                $stmt = $this->pdo->prepare("
+                INSERT INTO participant_workshops (participant_id, workshop_id, attending) 
+                SELECT :participant_id, id, TRUE FROM workshops WHERE id = :workshop_id AND price_online > 0
+            ");
+
+                foreach ($data['workshops'] as $workshopId) {
+                    $stmt->execute([
+                        ':participant_id' => $participantId,
+                        ':workshop_id' => (int) $workshopId
+                    ]);
+                }
+            }
+
+            // **Insert payment details**
+            $stmt = $this->pdo->prepare("
+            INSERT INTO payments (participant_id, payment_date, amount, payment_method_id, created_at, updated_at)
+            VALUES (:participant_id, NULL, :amount, :payment_method_id, NOW(), NOW())
+        ");
+            $stmt->execute([
+                ':participant_id' => $participantId,
+                ':amount' => 0,
+                ':payment_method_id' => (int) ($data['payment_method_id'] ?? 0)
+            ]);
+
+            // Insert **only online contributions (talks)**
+            if (!empty($data['talks']) && is_array($data['talks'])) {
+                $stmt = $this->pdo->prepare("
+                INSERT INTO contributions (participant_id, type, title, authors, abstract, session_id, duration, print, created_at, updated_at)
+                VALUES (:participant_id, 'talk', :title, :authors, :abstract, :session_id, :duration, 0, NOW(), NOW())
+            ");
+
+                foreach ($data['talks'] as $talk) {
+                    $stmt->execute([
+                        ':participant_id' => $participantId,
+                        ':title' => $talk['title'],
+                        ':authors' => $talk['authors'],
+                        ':abstract' => $talk['abstract'],
+                        ':session_id' => (int) $talk['session_id'],
+                        ':duration' => $talk['duration']
+                    ]);
+                }
+            }
+
+            $this->pdo->commit();
+            return $participantId;
+        } catch (Exception $e) {
+            $this->pdo->rollBack();
+            throw new Exception("Error saving online participant: " . $e->getMessage());
+        }
+    }
+
 
     public function updateParticipant($participantId, $data)
     {
@@ -353,7 +453,7 @@ class ParticipantManager
                     $stmt->bindValue(':abstract', $poster['abstract'], PDO::PARAM_STR);
                     $stmt->bindValue(':session_id', $sessionId, $sessionId !== NULL ? PDO::PARAM_INT : PDO::PARAM_NULL);
                     $stmt->bindValue(':duration', $duration, $duration !== NULL ? PDO::PARAM_STR : PDO::PARAM_NULL);
-                    $stmt->bindValue(':print', $printValue, PDO::PARAM_INT);  
+                    $stmt->bindValue(':print', $printValue, PDO::PARAM_INT);
                     $stmt->execute();
                 }
             }
@@ -454,6 +554,32 @@ class ParticipantManager
             WHERE p.is_online = FALSE AND p.status = 'active'
             ORDER BY p.last_name, p.first_name;
         ");
+
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getOnlineParticipants()
+    {
+        $stmt = $this->pdo->prepare("
+        SELECT 
+         p.id,
+         p.created_at,
+         p.title, 
+         p.first_name, 
+         p.last_name, 
+         p.email,
+         p.confirmation_sent, 
+         p.total_due, 
+         p.total_paid,
+         p.paypal_fee,
+         pm.method AS payment_method
+         FROM participants p
+         LEFT JOIN payments pay ON p.id = pay.participant_id  
+         LEFT JOIN payment_methods pm ON pay.payment_method_id = pm.id  
+         WHERE p.is_online = TRUE AND p.status = 'active'
+         ORDER BY p.last_name, p.first_name;
+     ");
 
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -566,7 +692,7 @@ class ParticipantManager
         ");
         $stmt->execute([':participant_id' => $participantId]);
         $contributions = $stmt->fetchAll(PDO::FETCH_ASSOC);
- 
+
         // Combine everything into a structured array
         $details = [
             'participant'    => $participant,

@@ -46,6 +46,7 @@ const ContributionForm = ({
     setValue("wantsToContribute", "yes");
     setWantsToContribute(true);
     removeTalk();
+
     if (!isOnline) {
       removePoster();
     }
@@ -120,8 +121,8 @@ const ContributionForm = ({
       <div className={classNames(cssForm.smallW, 'mx-auto position-relative')}>
         <div className="mb-3 row">
           <label className={classNames('text-center fw-bold', cssForm.balance)}>
-            Would you like to contribute a talk
-            {!isOnline && (<>{' '}or a poster</>)}  to the main IMC {conferenceData.year} conference?</label>
+          Would you like to contribute a{isOnline && 'n online '} talk
+          {!isOnline && (<>{' '}or a poster</>)}  to the main IMC {conferenceData.year} conference program?</label>
           <div className="text-center btn-group d-block mt-3" role="group">
             <input
               type="radio"

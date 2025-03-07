@@ -1,0 +1,12 @@
+@use 'styles/index' as *; 
+
+.warning {
+  font-size: 2rem;
+  flex-shrink: 0;
+  align-items: start;
+
+  @include media-breakpoint-up(md) {
+    font-size: 1.5rem;
+    align-items: center;
+  }
+}
