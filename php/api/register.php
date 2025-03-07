@@ -15,10 +15,10 @@ header("Access-Control-Allow-Headers: Content-Type");
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
- 
+
 require_once __DIR__ . "/../config.php";
-require_once __DIR__ . "/../class/Connect.class.php";  
-require_once __DIR__ . "/../class/ConferenceData.class.php"; 
+require_once __DIR__ . "/../class/Connect.class.php";
+require_once __DIR__ . "/../class/ConferenceData.class.php";
 require_once __DIR__ . "/../class/Participant.class.php";
 require_once __DIR__ . "/../class/Workshop.class.php";
 require_once __DIR__ . "/../class/Arrival.class.php";
@@ -28,7 +28,7 @@ require_once __DIR__ . "/../class/Payment.class.php";
 require_once __DIR__ . "/../class/Extras.class.php";
 require_once __DIR__ . "/../class/Summary.class.php";
 require_once __DIR__ . "/../class/Registrationtype.class.php";
- 
+
 try {
     $data = json_decode(file_get_contents("php://input"), true);
 
@@ -48,12 +48,12 @@ try {
             throw new Exception("Missing required field: $field");
         }
     }
- 
+
     // Generate a random password
     $plain_password = bin2hex(random_bytes(4));
     $password_hash = password_hash($plain_password, PASSWORD_DEFAULT);
     $data['password'] = $plain_password;
- 
+
 
     // Initialize ParticipantManager using existing $pdo from Connect.class.php
     $participantManager = new ParticipantManager($pdo);
@@ -65,26 +65,35 @@ try {
     // Save participant
     $participant_id = $participantManager->saveParticipant($data, $password_hash);
 
-    // Get all workshops from the database
-    $workshopManager = new WorkshopManager($pdo);
-    $workshops = $workshopManager->getWorkshops(); // Fetch all workshops dynamically
+    $query = "
+        SELECT * FROM registration_types;
+        SELECT * FROM payment_methods;
+        SELECT * FROM workshops;
+        SELECT * FROM imc_sessions;
+    ";
+    $stmt = $pdo->prepare($query);
+    $stmt->execute();
 
-    // Get all payment methods from the database
-    $paymentManager = new PaymentManager($pdo);
-    $payment_methods = $paymentManager->getPaymentMethods(); // Fetch all workshops dynamically
+    $results = [];
+    $registrations_types = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $stmt->nextRowset();
+    $payment_methods = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $stmt->nextRowset();
+    $workshops = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $stmt->nextRowset();
+    $sessions = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // Get all registration from the database
-    $registrationTypeManager = new RegistrationtypeManager($pdo);
-    $registrations_types = $registrationTypeManager->getRegistrationTypes(); 
 
-    $subject = "IMC " . getenv("YEAR") . " Registration";
-    $summary = SummaryFormatter::formatEmailContent($data, $workshops, $payment_methods, $registrations_types, true);
+    var_dump("SESSIONS IN REGISSTER ", $sessions);
  
+    $subject = "IMC " . getenv("YEAR") . " Registration";
+    $summary = SummaryFormatter::formatEmailContent($data, $workshops, $payment_methods, $registrations_types, $sessions, true);
+
     echo json_encode([
         "success" => true,
         "message" => "Registration successful",
         "participant_id" => $participant_id,
-        "password" => $plain_password, 
+        "password" => $plain_password,
     ]);
 } catch (Exception $e) {
     echo json_encode([

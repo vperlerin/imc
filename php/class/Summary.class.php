@@ -13,7 +13,7 @@ class SummaryFormatter
         return !empty($filtered) ? reset($filtered)['description'] : "Description not found";
     }
      
-    public static function formatEmailContent(array $data, array $workshops, array $paymentMethods, array $registrations_types, bool $withPwd): string
+    public static function formatEmailContent(array $data, array $workshops, array $paymentMethods, array $registrations_types, array $sessions, bool $withPwd): string
     {
         $content = "";
 
