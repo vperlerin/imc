@@ -19,8 +19,8 @@ const ProtectedRoute = ({ children }) => {
 
   if (loading) return <></>;  // Prevents redirection before API call completes
 
-  console.log("IN PROTECTED ROUT  isAuthenticated ", isAuthenticated);
-  console.log("IN PROTECTED ROUT  isAdmin ", isAdmin);
+  console.log("ProtectedRoute isAuthenticated ", isAuthenticated);
+  console.log("ProtectedRoute isAdmin ", isAdmin);
 
   return isAuthenticated && isAdmin ? children : <Navigate to="/login" replace />;
 };

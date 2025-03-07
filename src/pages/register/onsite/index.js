@@ -241,8 +241,7 @@ const MainForm = () => {
   if (specificdataLoading || participantLoading) {
     return <Loader />;
   }
-
-
+ 
 
   return (
     <PageContain title="Register Onsite">
