@@ -209,7 +209,7 @@ const AdminParticipantsUser = () => {
         {isLoading && <Loader />}
 
         {!isLoading && hasError && (
-          <div className="alert alert-danger">{articipantError || specificDataError || error}</div>
+          <div className="alert alert-danger">{participantError || specificDataError || error}</div>
         )}
 
         {!participant && !isLoading && (

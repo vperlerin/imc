@@ -435,6 +435,8 @@ class ParticipantManager
 
             //  Insert talks only if they exist
             if (!empty($data['talks']) && is_array($data['talks'])) {
+                var_dump($data['talk']);
+
                 // Insert talks
                 foreach ($data['talks'] as $talk) {
                     $sessionId = isset($talk['session_id']) ? (int) $talk['session_id'] : NULL;
@@ -453,6 +455,7 @@ class ParticipantManager
             }
 
             if (!empty($data['posters']) && is_array($data['posters'])) {
+                var_dump($data['talk']);
                 foreach ($data['posters'] as $poster) {
                     $printValue = isset($poster['print']) ? (filter_var($poster['print'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ? 1 : 0) : 0;
 
