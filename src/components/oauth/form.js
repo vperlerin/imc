@@ -2,9 +2,9 @@ import axios from "axios";
 import React, { useState } from "react";
 import Loader from "components/loader";
 import PasswordInput from "components/form/pwd";
-import { useDispatch, useSelector } from "react-redux"; // ✅ Import useSelector
+import { useDispatch, useSelector } from "react-redux";  
 import { useNavigate, Link } from "react-router-dom";
-import { authActions, authSelectors } from "store/auth"; // ✅ Import selectors & actions
+import { authActions, authSelectors } from "store/auth"; 
 import classNames from "classnames";
 import css from "./index.module.scss";
 import cssForm from "styles/components/form.module.scss";
@@ -15,10 +15,8 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const dispatch = useDispatch();
-  const navigate = useNavigate();
-
-  const user = useSelector(authSelectors.getUser); // ✅ Get user from Redux store
-  const isAdmin = useSelector(authSelectors.isAdmin); // ✅ Get admin status
+  const navigate = useNavigate(); 
+  const isAdmin = useSelector(authSelectors.isAdmin);  
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -37,12 +35,9 @@ const Login = () => {
       }
 
       // Store session token
-      dispatch(authActions.setSession("authenticated"));
-
+      dispatch(authActions.setSession("authenticated")); 
       // Fetch user details securely from backend
-      await dispatch(authActions.fetchUser());
-
-      // ✅ Get updated state from Redux after fetchUser()
+      await dispatch(authActions.fetchUser());  
       navigate(isAdmin ? "/admin/dashboard" : "/update-registration");
     } catch (err) {
       setError(err.response?.data?.message || err.message || "Something went wrong.");

@@ -238,7 +238,7 @@ const MainForm = () => {
     return <div className="alert alert-danger fw-bolder">{errorGettingDataFromDB}</div>
   }
 
-  if (loading || participantLoading) {
+  if (specificdataLoading || participantLoading) {
     return <Loader />;
   }
 
