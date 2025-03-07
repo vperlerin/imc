@@ -435,7 +435,7 @@ class ParticipantManager
 
             //  Insert talks only if they exist
             if (!empty($data['talks']) && is_array($data['talks'])) {
-                var_dump($data['talk']);
+                var_dump($data['talks']);
 
                 // Insert talks
                 foreach ($data['talks'] as $talk) {
