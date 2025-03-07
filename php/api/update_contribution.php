@@ -17,8 +17,8 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 require_once __DIR__ . "/../config.php";
-require_once __DIR__ . "/../class/Connect.class.php"; 
-require_once __DIR__ . "/../class/Arrival.class.php"; 
+require_once __DIR__ . "/../class/Connect.class.php";  
+require_once __DIR__ . "/../class/Contribution.class.php"; 
 
 try {
     $data = json_decode(file_get_contents("php://input"), true);
@@ -28,26 +28,10 @@ try {
     }
 
     $participant_id = intval($data['participant_id']);
-
-    $required_fields = [
-        'arrival_date',
-        'arrival_hour',
-        'arrival_minute',
-        'departure_date',
-        'departure_hour',
-        'departure_minute',
-        'travelling', 
-    ];
- 
-    foreach ($required_fields as $field) {
-        if (!isset($data[$field]) || empty($data[$field])) {
-            throw new Exception("Missing required field: $field");
-        }
-    }
-
+  
     // Initialize ArrivalManager
-    $arrivalManager = new ArrivalManager($pdo);
-    $arrivalManager->updateArrival($participant_id, $data);
+    $ContributionManager = new ContributionManager($pdo);
+    $ContributionManager->updateContributions($participant_id, $data);
  
     echo json_encode([
         "success" => true,

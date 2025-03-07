@@ -11,22 +11,23 @@ import { useApiParticipant } from "api/participants";
 import { useApiSpecificData } from "api/specific-data/index.js";
 import { useForm } from "react-hook-form";
 import { useSelector, useDispatch } from 'react-redux';
-import { useBlockNavigation } from "hooks/block-navigation.js"; // Prevent accidental navigation if form is unsaved
+import { useBlockNavigation } from "hooks/block-navigation.js";  
 
 const UpdateRegistration = () => {
   const dispatch = useDispatch();
   const [activeSection, setActiveSection] = useState(null);
   const [errMsg, setErrMsg] = useState('');
-  const [sucessMsg, setSuccessMsg] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
   const [saving, setSaving] = useState(false);
   const [participantId, setParticipantId] = useState(null);
   const [unsavedChanges, setUnsavedChanges] = useState(false);
+  const [fetchTrigger, setFetchTrigger] = useState(0);  
   const hasFetchedParticipant = useRef(false);
 
   const user = useSelector(authSelectors.getUser);
   const { control, register, handleSubmit, getValues, setValue, formState: { errors }, reset, trigger, watch } = useForm();
 
-  const { participant, loading: participantLoading } = useApiParticipant(participantId);
+  const { participant, loading: participantLoading } = useApiParticipant(participantId, fetchTrigger); // UPDATED: Added fetchTrigger
   const { loading: specificDataLoading, sessions } = useApiSpecificData();
 
   useBlockNavigation(unsavedChanges);
@@ -95,9 +96,10 @@ const UpdateRegistration = () => {
 
     setSaving(true);
     setUnsavedChanges(false);
+    setErrMsg('');
+    setSuccessMsg('');
 
     try {
-
       const apiFile = (activeSection === "arrival") ? 'update_arrival' : 'update_contribution';
       const response = await fetch(`${process.env.REACT_APP_API_URL}/api/${apiFile}.php`, {
         method: "POST",
@@ -115,8 +117,9 @@ const UpdateRegistration = () => {
       }
 
       setSuccessMsg("Your changes have been saved successfully!");
+      setFetchTrigger(prev => prev + 1); // NEW: Trigger re-fetch after successful update
     } catch (err) {
-      setErrMsg("An error occurred while saving your data. Please, try again later of contact us.");
+      setErrMsg("An error occurred while saving your data. Please, try again later or contact us.");
     } finally {
       setSaving(false);
     }
@@ -155,8 +158,8 @@ const UpdateRegistration = () => {
             <div className="alert alert-danger fw-bolder mt-3">{errMsg}</div>
           )}
 
-          {sucessMsg && (
-            <div className="alert alert-success fw-bolder mt-3">{sucessMsg}</div>
+          {successMsg && (
+            <div className="alert alert-success fw-bolder mt-3">{successMsg}</div>
           )}
 
           {!!activeSection && (
