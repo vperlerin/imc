@@ -4,7 +4,7 @@ import axios from "axios";
 
 export const useApiParticipant = (participantId, fetchTrigger = 0, withAdminNotes = false) => {
   const [participant, setParticipant] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const fetchParticipant = useCallback(async () => {

@@ -624,7 +624,7 @@ class ParticipantManager
     /**
      * Get participants INFO
      */
-    public function getParticipantDetails($participantId, $widhAdminNotes = false)
+    public function getParticipantDetails($participantId, $withAdminNotes = false)
     {
         $columns = $withAdminNotes ? '*' : '
         id,

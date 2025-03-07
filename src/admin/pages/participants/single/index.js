@@ -35,8 +35,9 @@ const AdminParticipantsUser = () => {
   useBlockNavigation(unsavedChanges);
 
   const { workshops, paymentMethods, registrationTypes, loading: specificdataLoading, sessions, error: specificDataError } = useApiSpecificData();
-  const { participant, loading: participantLoading, error: participantError } = useApiParticipant(participantId, 1, true);
+  const { participant, loading: participantLoading, error: participantError } = useApiParticipant(participantId, 0, true);
   const { control, register, handleSubmit, getValues, setValue, formState: { errors }, trigger, watch } = useForm();
+ 
 
   // Detect form changes
   useEffect(() => {
@@ -188,6 +189,7 @@ const AdminParticipantsUser = () => {
     }
   ];
 
+ 
   const isSummaryReady = (
     participant &&
     paymentMethods.length > 0 &&
@@ -207,7 +209,7 @@ const AdminParticipantsUser = () => {
         {isLoading && <Loader />}
 
         {!isLoading && hasError && (
-          <div className="alert alert-danger">{error}</div>
+          <div className="alert alert-danger">{articipantError || specificDataError || error}</div>
         )}
 
         {!participant && !isLoading && (
@@ -219,7 +221,7 @@ const AdminParticipantsUser = () => {
         )}
       </div>
 
-      {!isLoading && participant && isSummaryReady && (
+      {participant && isSummaryReady && (
         <form onSubmit={handleSubmit(onSubmit)}>
           <ul className={classNames('nav nav-tabs mb-3 mt-2', cssTabs.tab, 'flex-column flex-sm-row')}>
             {[
