@@ -12,6 +12,7 @@ import { useApiSpecificData } from "api/specific-data/index.js";
 import { useForm } from "react-hook-form";
 import { useSelector, useDispatch } from 'react-redux';
 import { useBlockNavigation } from "hooks/block-navigation.js";  
+import { useApiLogout } from 'api/oauth/logout';  
 
 const UpdateRegistration = () => {
   const dispatch = useDispatch();
@@ -27,8 +28,9 @@ const UpdateRegistration = () => {
   const user = useSelector(authSelectors.getUser);
   const { control, register, handleSubmit, getValues, setValue, formState: { errors }, reset, trigger, watch } = useForm();
 
-  const { participant, loading: participantLoading } = useApiParticipant(participantId, fetchTrigger); // UPDATED: Added fetchTrigger
+  const { participant, loading: participantLoading } = useApiParticipant(participantId, fetchTrigger);
   const { loading: specificDataLoading, sessions } = useApiSpecificData();
+  const { logout, loading: logoutLoading } = useApiLogout();
 
   useBlockNavigation(unsavedChanges);
 
@@ -105,7 +107,7 @@ const UpdateRegistration = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          participant_id: participantId, // Explicitly adding participantId
+          participant_id: participantId,
           ...formData
         }),
       });
@@ -116,8 +118,8 @@ const UpdateRegistration = () => {
         throw new Error(data.message || "Failed to update data.");
       }
 
-      setSuccessMsg("Your changes have been saved successfully!");
-      setFetchTrigger(prev => prev + 1); // NEW: Trigger re-fetch after successful update
+      setSuccessMsg("Your changes have been saved successfully! If you don't have other updates to make, please don't forget to ");
+      setFetchTrigger(prev => prev + 1); // Trigger re-fetch after successful update
     } catch (err) {
       setErrMsg("An error occurred while saving your data. Please, try again later or contact us.");
     } finally {
@@ -131,67 +133,61 @@ const UpdateRegistration = () => {
 
       {participant && !participantLoading && (
         <>
-          <p>{`Hello ${participant.participant.title} ${participant.participant.first_name} ${participant.participant.last_name},`}</p>
-          <p>
-            On this page, you have the option to update either your travel details or contributions (talks & posters).
-            If you need to make any other changes to your records, please{' '}
-            <Link aria-label="Contact" to="/contact" title="Contact">contact us</Link>.
-          </p>
+          <div className="border rounded-2 p-3 mb-3">
+            <p className="fw-bolder">{`Hello ${participant.participant.title} ${participant.participant.first_name} ${participant.participant.last_name},`}</p>
+            <p>
+              On this page, you have the option to update either your travel details or contributions (talks & posters).
+              If you need to make any other changes to your records, please{' '}
+              <Link aria-label="Contact" to="/contact" title="Contact">contact us</Link>.
+            </p>
 
-          <div className="d-flex gap-2">
-            <button
-              className={classNames('btn fw-bolder', activeSection === "arrival" ? 'btn-primary' : 'btn-outline-primary')}
-              onClick={() => setActiveSection(activeSection === "arrival" ? null : "arrival")}
-            >
-              Travel Details
-            </button>
+            <div className="d-flex gap-2 mb-2">
+              <button
+                className={classNames('btn fw-bolder', activeSection === "arrival" ? 'btn-primary' : 'btn-outline-primary')}
+                onClick={() => setActiveSection(activeSection === "arrival" ? null : "arrival")}
+              >
+                Travel Details
+              </button>
 
-            <button
-              className={classNames('btn fw-bolder', activeSection === "contributions" ? 'btn-primary' : 'btn-outline-primary')}
-              onClick={() => setActiveSection(activeSection === "contributions" ? null : "contributions")}
-            >
-              Contributions
-            </button>
+              <button
+                className={classNames('btn fw-bolder', activeSection === "contributions" ? 'btn-primary' : 'btn-outline-primary')}
+                onClick={() => setActiveSection(activeSection === "contributions" ? null : "contributions")}
+              >
+                Contributions
+              </button>
+            </div>
+
+            {errMsg && (
+              <div className="alert alert-danger fw-bolder mt-3">{errMsg}</div>
+            )}
+
+            {successMsg && (
+              <div className="alert alert-success fw-bolder mt-3">
+                {successMsg}
+                <button
+                  aria-label="Logout"
+                  className="btn btn-outline-danger px-3 fw-bolder ms-3"
+                  onClick={logout}
+                  disabled={logoutLoading}
+                  title="Logout"
+                >
+                  {logoutLoading ? "Logging out..." : "Logout"}
+                </button>
+              </div>
+            )}
           </div>
 
-          {errMsg && (
-            <div className="alert alert-danger fw-bolder mt-3">{errMsg}</div>
-          )}
-
-          {successMsg && (
-            <div className="alert alert-success fw-bolder mt-3">{successMsg}</div>
-          )}
-
           {!!activeSection && (
-            <div className="mt-4 pt-2 position-relative">
+            <div className="mt-2 position-relative">
               <form onSubmit={handleSubmit(onSubmit)}>
-
-                {saving && <Loader isFixed={false}/>}
+                {saving && <Loader isFixed={false} />}
 
                 {activeSection === "arrival" && (
-                  <Arrival
-                    isEditing
-                    conferenceData={cd}
-                    register={register}
-                    errors={errors}
-                    setValue={setValue}
-                    trigger={trigger}
-                  />
+                  <Arrival isEditing conferenceData={cd} register={register} errors={errors} setValue={setValue} trigger={trigger} />
                 )}
 
                 {activeSection === "contributions" && (
-                  <Contribution
-                    isEditing
-                    conferenceData={cd}
-                    control={control}
-                    register={register}
-                    errors={errors}
-                    getValues={getValues}
-                    setValue={setValue}
-                    watch={watch}
-                    trigger={trigger}
-                    sessions={sessions}
-                  />
+                  <Contribution isEditing conferenceData={cd} control={control} register={register} errors={errors} getValues={getValues} setValue={setValue} watch={watch} trigger={trigger} sessions={sessions} />
                 )}
 
                 <div className="mt-4 d-flex justify-content-end">

@@ -353,7 +353,7 @@ class ParticipantManager
                     $stmt->bindValue(':abstract', $poster['abstract'], PDO::PARAM_STR);
                     $stmt->bindValue(':session_id', $sessionId, $sessionId !== NULL ? PDO::PARAM_INT : PDO::PARAM_NULL);
                     $stmt->bindValue(':duration', $duration, $duration !== NULL ? PDO::PARAM_STR : PDO::PARAM_NULL);
-                    $stmt->bindValue(':print', $printValue, PDO::PARAM_INT);  // Ensure it's stored as an INT (1 or 0)
+                    $stmt->bindValue(':print', $printValue, PDO::PARAM_INT);  
                     $stmt->execute();
                 }
             }

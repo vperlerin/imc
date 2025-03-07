@@ -1,13 +1,13 @@
 import classNames from "classnames";
 import cssForm from "styles/components/form.module.scss";
 import { FiTrash2 } from "react-icons/fi";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 const TalkPosterForm = ({
   isAdmin = false,
   isEditing = false,
   conferenceData,
-  index, 
+  index,
   register,
   remove,
   type,
@@ -18,7 +18,21 @@ const TalkPosterForm = ({
   setValue,
   watch,
 }) => {
+  const [printChanged, setPrintChanged] = useState(false);
   const isTalk = type === "talk";
+
+  const printValue = watch(`${type}s.${index}.print`) ?? initialValues.print;
+  const initialPrintValue = initialValues.print === true || initialValues.print === "true" || initialValues.print === 1 || initialValues.print === "1";
+  const isPrinted = printValue === true || printValue === "true" || printValue === 1 || printValue === "1";
+
+  useEffect(() => {
+    if (isEditing && initialPrintValue !== isPrinted) {
+      setPrintChanged(true);
+    } else {
+      setPrintChanged(false);
+    }
+  }, [isPrinted, initialPrintValue, isEditing]);
+
 
   return (
     <div className="border rounded-2 p-3 mb-3 mx-md-5">
@@ -119,53 +133,63 @@ const TalkPosterForm = ({
       )}
 
       {/* Printing (Only for Posters) - no when isEditing as it updates the total price */}
-      {!isTalk && !isEditing &&  (
-        <div className="mb-3 row">
-          <label className="fw-bold pb-0">
-            Do you want to have your poster printed on-site for {conferenceData.poster_print.price}€?
-          </label>
-          {!isAdmin && <p className="form-text mt-0">{conferenceData.poster_print.desc}</p>}
+      {!isTalk && (
+        <>
+          {/* Display warning message if print value changes while editing */}
+          {isEditing && printChanged && (
+            <div className="alert alert-warning mt-2 fw-bolder">
+              Changing this option will update the total fees. The treasurer will be notified, and you may need to be reimbursed or pay more.
+            </div>
+          )}
 
-          <div className="text-center btn-group d-block" role="group">
-            {/* Fetch the watched value to ensure reactivity */}
-            {(() => {
-              const printValue = watch(`${type}s.${index}.print`) ?? initialValues.print;
-              const isPrinted = printValue === true || printValue === "true" || printValue === 1 || printValue === "1";
+          <div className="mb-3 row">
+            <label className="fw-bold pb-0">
+              Do you want to have your poster printed on-site for {conferenceData.poster_print.price}€?
+            </label>
+            {!isAdmin && <p className="form-text mt-0">{conferenceData.poster_print.desc}</p>}
 
-              return (
-                <>
-                  {/* Yes Button */}
-                  <input
-                    type="radio"
-                    className="btn-check"
-                    id={`printYes${index}`}
-                    value="true"
-                    {...register(`${type}s.${index}.print`, { required: "Please select an option" })}
-                    onChange={() => setValue(`${type}s.${index}.print`, "true", { shouldValidate: true, shouldDirty: true })}
-                    checked={isPrinted}
-                  />
-                  <label className="btn btn-outline-neutral" htmlFor={`printYes${index}`}>
-                    Yes
-                  </label>
+            <div className="text-center btn-group d-block" role="group">
+              {/* Fetch the watched value to ensure reactivity */}
+              {(() => {
+                const printValue = watch(`${type}s.${index}.print`) ?? initialValues.print;
+                const isPrinted = printValue === true || printValue === "true" || printValue === 1 || printValue === "1";
 
-                  {/* No Button */}
-                  <input
-                    type="radio"
-                    className="btn-check"
-                    id={`printNo${index}`}
-                    value="false"
-                    {...register(`${type}s.${index}.print`, { required: "Please select an option" })}
-                    onChange={() => setValue(`${type}s.${index}.print`, "false", { shouldValidate: true, shouldDirty: true })}
-                    checked={!isPrinted}
-                  />
-                  <label className="btn btn-outline-neutral" htmlFor={`printNo${index}`}>
-                    No
-                  </label>
-                </>
-              );
-            })()}
+                return (
+                  <>
+                    {/* Yes Button */}
+                    <input
+                      type="radio"
+                      className="btn-check"
+                      id={`printYes${index}`}
+                      value="true"
+                      {...register(`${type}s.${index}.print`, { required: "Please select an option" })}
+                      onChange={() => setValue(`${type}s.${index}.print`, "true", { shouldValidate: true, shouldDirty: true })}
+                      checked={isPrinted}
+                    />
+                    <label className="btn btn-outline-neutral" htmlFor={`printYes${index}`}>
+                      Yes
+                    </label>
+
+                    {/* No Button */}
+                    <input
+                      type="radio"
+                      className="btn-check"
+                      id={`printNo${index}`}
+                      value="false"
+                      {...register(`${type}s.${index}.print`, { required: "Please select an option" })}
+                      onChange={() => setValue(`${type}s.${index}.print`, "false", { shouldValidate: true, shouldDirty: true })}
+                      checked={!isPrinted}
+                    />
+                    <label className="btn btn-outline-neutral" htmlFor={`printNo${index}`}>
+                      No
+                    </label>
+                  </>
+                );
+              })()}
+            </div>
           </div>
-        </div>
+        </>
+
       )}
 
 

@@ -1,43 +1,35 @@
 import logo from 'assets/img/logo/logo.svg';
 import { SlClose, SlMenu } from "react-icons/sl";
-
-
 import classnames from 'classnames';
 import css from './index.module.scss';
 import MenuItem from './item';
 import React, { useState, useEffect } from 'react';
 import { animated, useSpring } from '@react-spring/web';
-import { authActions } from 'store/auth';
-import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
 import { authSelectors } from 'store/auth';
 import { formatConferenceDates } from 'utils/date';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { menuItems } from 'data/menu';
 import { onStopPropagation } from 'utils/event';
+import { useApiLogout } from 'api/oauth/logout';  
 
 const sideMenuWidth = parseInt(css.sharedSideMenuWidth, 10) || 250;
 
 const Menu = ({ cd }) => {
   const [isMenuOpened, setIsMenuOpened] = useState(false);
   const [isFullyClosed, setIsFullyClosed] = useState(true);
-  const dispatch = useDispatch();
+  
   const location = useLocation();
   const navigate = useNavigate();
   const isAdmin = useSelector(authSelectors.isAdmin);
   const isLoggedIn = useSelector(authSelectors.isLoggedIn);
 
+  const { logout, loading: logoutLoading, error: logoutError } = useApiLogout(); // Use logout hook
+
   const [spring, api] = useSpring(() => ({
     right: -sideMenuWidth,
     config: { tension: 350, friction: 30 }
   }));
-
-  const handleLogout = async () => {
-    await axios.get(`${process.env.REACT_APP_API_URL}/auth/logout.php`, { withCredentials: true });
-    dispatch(authActions.logout());  
-    localStorage.removeItem("session");
-    navigate('/');
-  };
 
   useEffect(() => {
     if (isMenuOpened) {
@@ -57,7 +49,6 @@ const Menu = ({ cd }) => {
     };
   }, [isMenuOpened, api]);
 
-
   useEffect(() => {
     const handleResize = () => {
       setIsMenuOpened(false);
@@ -76,6 +67,11 @@ const Menu = ({ cd }) => {
   const goTo = (url) => {
     navigate(url);
     onToggle();
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    setIsMenuOpened(false); 
   };
 
   return (
@@ -110,7 +106,6 @@ const Menu = ({ cd }) => {
             {menuItems.map((item) => {
               const isActive = location.pathname.startsWith(item.link) ||
                 (item.subLinks && item.subLinks.some(sub => location.pathname.startsWith(sub.link)));
- 
 
               if (!item.hideFromMenu) {
                 return (
@@ -144,11 +139,11 @@ const Menu = ({ cd }) => {
                   </MenuItem>
                 );
               }
+              return null;
             })}
           </div>
 
           <div className={classnames(css.footer, 'mt-auto')}>
-
             <div className="d-flex flex-column justify-content-center mb-3 p-3 gap-2 px-4">
               {!isLoggedIn ? (
                 <div className="d-flex justify-content-center mb-3 p-3">
@@ -168,7 +163,7 @@ const Menu = ({ cd }) => {
                     <Link
                       aria-label="Admin"
                       className="btn btn-outline-tertiary px-3 fw-bolder"
-                      to="/admin/dashboard" 
+                      to="/admin/dashboard"
                       onClick={() => goTo('/admin/dashboard')}
                       title="Admin"
                     >
@@ -191,9 +186,12 @@ const Menu = ({ cd }) => {
                     className="btn btn-outline-danger px-3 fw-bolder"
                     onClick={handleLogout}
                     title="Logout"
+                    disabled={logoutLoading}
                   >
-                    Logout
+                    {logoutLoading ? "Logging out..." : "Logout"}
                   </button>
+
+                  {logoutError && <p className="text-danger mt-2">{logoutError}</p>}
                 </>
               )}
             </div>

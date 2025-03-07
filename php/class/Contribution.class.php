@@ -12,10 +12,11 @@ class ContributionManager
     public function saveContributions($participantId, $talks, $posters)
     {
         foreach ($talks as $talk) {
-            $this->pdo->prepare("
-                INSERT INTO contributions (participant_id, type, title, authors, abstract, session_id, duration,  created_at, updated_at)
-                VALUES (?, 'talk', ?, ?, ?, (SELECT id FROM imc_sessions WHERE name = ? LIMIT 1), ?, ?, NOW(), NOW())
-            ")->execute([
+            $stmt = $this->pdo->prepare("
+                INSERT INTO contributions (participant_id, type, title, authors, abstract, session_id, duration, created_at, updated_at)
+                VALUES (?, 'talk', ?, ?, ?, ?, ?, NOW(), NOW())
+            ");
+            $stmt->execute([
                 $participantId,
                 $talk['title'],
                 $talk['authors'],
@@ -26,28 +27,33 @@ class ContributionManager
         }
 
         foreach ($posters as $poster) {
-            $this->pdo->prepare("
-                INSERT INTO contributions (participant_id, type, title, authors, abstract, session_id, duration,  created_at, updated_at)
-                VALUES (?, 'poster', ?, ?, ?, (SELECT id FROM imc_sessions WHERE name = ? LIMIT 1), NULL, ?, NOW(), NOW())
-            ")->execute([
+            $stmt = $this->pdo->prepare("
+                INSERT INTO contributions (participant_id, type, title, authors, abstract, session_id, print, created_at, updated_at)
+                VALUES (?, 'poster', ?, ?, ?, ?, ?, NOW(), NOW())
+            ");
+            $stmt->execute([
                 $participantId,
                 $poster['title'],
                 $poster['authors'],
                 $poster['abstract'],
-                $poster['session']
+                $poster['session'],
+                isset($poster['print']) ? (filter_var($poster['print'], FILTER_VALIDATE_BOOLEAN) ? 1 : 0) : 0
             ]);
         }
     }
-
 
     public function updateContributions($participantId, $data)
     {
         try {
             $this->pdo->beginTransaction();
-
-            $stmt = $this->pdo->prepare("DELETE FROM contributions WHERE participant_id = ?");
-            $stmt->execute([$participantId]);
-
+ 
+            $stmtCheck = $this->pdo->prepare("SELECT COUNT(*) FROM contributions WHERE participant_id = ?");
+            $stmtCheck->execute([$participantId]);
+            if ($stmtCheck->fetchColumn() > 0) {
+                $stmtDelete = $this->pdo->prepare("DELETE FROM contributions WHERE participant_id = ?");
+                $stmtDelete->execute([$participantId]);
+            }
+ 
             if (!empty($data['talks']) && is_array($data['talks'])) {
                 $stmtTalk = $this->pdo->prepare("
                     INSERT INTO contributions (participant_id, type, title, authors, abstract, session_id, duration, print, created_at, updated_at)
@@ -55,37 +61,31 @@ class ContributionManager
                 ");
 
                 foreach ($data['talks'] as $talk) {
-                    $sessionId = isset($talk['session']) ? (int) $talk['session'] : NULL;
-                    $duration = isset($talk['duration']) ? $talk['duration'] : NULL;
-
                     $stmtTalk->execute([
                         $participantId,
                         $talk['title'],
                         $talk['authors'],
                         $talk['abstract'],
-                        $sessionId,
-                        $duration
+                        isset($talk['session']) ? (int) $talk['session'] : NULL,
+                        isset($talk['duration']) ? $talk['duration'] : NULL
                     ]);
                 }
             }
-
+ 
             if (!empty($data['posters']) && is_array($data['posters'])) {
                 $stmtPoster = $this->pdo->prepare("
-                    INSERT INTO contributions (participant_id, type, title, authors, abstract, session_id, duration, print, created_at, updated_at)
-                    VALUES (?, 'poster', ?, ?, ?, ?, NULL, ?, NOW(), NOW())
+                    INSERT INTO contributions (participant_id, type, title, authors, abstract, session_id, print, created_at, updated_at)
+                    VALUES (?, 'poster', ?, ?, ?, ?, ?, NOW(), NOW())
                 ");
 
                 foreach ($data['posters'] as $poster) {
-                    $printValue = isset($poster['print']) ? (filter_var($poster['print'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ? 1 : 0) : 0;
-                    $sessionId = isset($poster['session']) ? (int) $poster['session'] : NULL;
-
                     $stmtPoster->execute([
                         $participantId,
                         $poster['title'],
                         $poster['authors'],
                         $poster['abstract'],
-                        $sessionId,
-                        $printValue
+                        isset($poster['session']) ? (int) $poster['session'] : NULL,
+                        isset($poster['print']) ? (filter_var($poster['print'], FILTER_VALIDATE_BOOLEAN) ? 1 : 0) : 0
                     ]);
                 }
             }
