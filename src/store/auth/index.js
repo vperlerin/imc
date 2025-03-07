@@ -44,13 +44,13 @@ export const fetchUser = () => async (dispatch) => {
     if (!response.data?.success) {
       throw new Error(response.data?.message || "Failed to fetch user data");
     }
- 
+
     const user = {
       ...response.data.user,
       is_admin: !!response.data.user?.is_admin,  
     };
 
-    dispatch(authActions.setUser(user));
+    dispatch(authActions.setUser(user)); 
   } catch (error) {
     console.error("Error fetching user:", error);
     dispatch(authActions.logout());
@@ -58,14 +58,15 @@ export const fetchUser = () => async (dispatch) => {
 };
 
 
+
 export const authActions = {
   ...authSlice.actions,
   fetchUser,
 };
 export const authSelectors = {
-  getUser: (state) => state.auth.user,
-  isAdmin: (state) => state.auth.isAdmin,
-  isLoggedIn: (state) => state.auth.isAuthenticated,
+  getUser: (state) => state.auth.user, 
+  isAdmin: (state) => !!state.auth.user?.is_admin,
+  isLoggedIn: (state) => !!state.auth.user,  
 };
 export const authReducer = authSlice.reducer;
 export default authSlice;
