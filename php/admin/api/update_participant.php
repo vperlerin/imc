@@ -41,9 +41,7 @@ try {
     }
 
     // Initialize ParticipantManager using $pdo
-    $participantManager = new ParticipantManager($pdo);
-
-    // Attempt to update participant
+    $participantManager = new ParticipantManager($pdo); 
     $updateSuccess = $participantManager->updateParticipant($participantId, $data);
 
     if ($updateSuccess) {
