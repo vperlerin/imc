@@ -4,9 +4,10 @@ import { FiTrash2 } from "react-icons/fi";
 import React from "react";
 
 const TalkPosterForm = ({
-  conferenceData,
-  index,
   isAdmin = false,
+  isEditing = false,
+  conferenceData,
+  index, 
   register,
   remove,
   type,
@@ -117,8 +118,8 @@ const TalkPosterForm = ({
         </div>
       )}
 
-      {/* Printing (Only for Posters) */}
-      {!isTalk && (
+      {/* Printing (Only for Posters) - no when isEditing as it updates the total price */}
+      {!isTalk && !isEditing &&  (
         <div className="mb-3 row">
           <label className="fw-bold pb-0">
             Do you want to have your poster printed on-site for {conferenceData.poster_print.price}€?

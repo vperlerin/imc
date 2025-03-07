@@ -13,6 +13,7 @@ const talkDurations = ["10min", "15min", "20min", "25min", "30min"];
 
 const ContributionForm = ({
   isAdmin = false,
+  isEditing = false,
   conferenceData,
   control,
   isDebugMode = false,
@@ -71,7 +72,7 @@ const ContributionForm = ({
       });
     }
   };
- 
+
   useEffect(() => {
     const existingTalks = getValues("talks") || [];
     const existingPosters = getValues("posters") || [];
@@ -103,10 +104,16 @@ const ContributionForm = ({
         </button>
       )}
 
-      {!isAdmin && (
+      {!isAdmin && !isEditing && (
         <h4 className="mb-3 border-bottom pb-2">
           <StepDislay step={step} stepTotal={stepTotal} />
           Contributions
+        </h4>
+      )}
+
+      {isEditing && (
+        <h4 className="mb-3 border-bottom pb-2">
+          Update your Contributions
         </h4>
       )}
 
@@ -132,13 +139,14 @@ const ContributionForm = ({
               id="contributeNo"
               value="no"
               {...register("wantsToContribute", { required: "Please select an option" })}
-              onChange={() => {
+              onChange={(e) => {
                 if (talks.length > 0 || posters.length > 0) {
                   const confirmDelete = window.confirm(
                     "Are you sure? All talks and posters you have entered will be deleted."
                   );
 
                   if (!confirmDelete) {
+                    e.preventDefault();
                     return;
                   }
 
@@ -149,6 +157,7 @@ const ContributionForm = ({
                 setWantsToContribute(false);
               }}
             />
+
             <label className="btn btn-outline-primary" htmlFor="contributeNo">No</label>
           </div>
           {errors.wantsToContribute && <p className="text-danger fw-bold text-center"><small>{errors.wantsToContribute.message}</small></p>}
@@ -177,6 +186,7 @@ const ContributionForm = ({
           {talks.map((talk, index) => (
             <TalkPosterForm
               isAdmin={isAdmin}
+              isEditing={isEditing}
               conferenceData={conferenceData}
               key={talk.id}
               index={index}
@@ -196,6 +206,7 @@ const ContributionForm = ({
             posters.map((poster, index) => (
               <TalkPosterForm
                 isAdmin={isAdmin}
+                isEditing={isEditing}
                 conferenceData={conferenceData}
                 key={poster.id}
                 index={index}

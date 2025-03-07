@@ -1,55 +1,205 @@
+import Arrival from "components/registration/arrival.js";
+import Contribution from "components/registration/contribution";
 import Loader from "components/loader";
 import PageContain from "components/page-contain";
-import React, { useEffect, useState } from "react";
+import classNames from "classnames";
+import React, { useEffect, useState, useRef } from "react";
+import { conferenceData as cd } from "data/conference-data";
 import { authSelectors, fetchUser } from 'store/auth';
-import { useSelector, useDispatch } from 'react-redux';
+import { Link } from "react-router-dom";
 import { useApiParticipant } from "api/participants";
 import { useApiSpecificData } from "api/specific-data/index.js";
-import { Navigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { useSelector, useDispatch } from 'react-redux';
+import { useBlockNavigation } from "hooks/block-navigation.js"; // Prevent accidental navigation if form is unsaved
 
 const UpdateRegistration = () => {
   const dispatch = useDispatch();
+  const [activeSection, setActiveSection] = useState(null);
+  const [errMsg, setErrMsg] = useState('');
+  const [sucessMsg, setSuccessMsg] = useState('');
+  const [saving, setSaving] = useState(false);
   const [participantId, setParticipantId] = useState(null);
-  const isLoggedIn = useSelector(authSelectors.isLoggedIn);
+  const [unsavedChanges, setUnsavedChanges] = useState(false);
+  const hasFetchedParticipant = useRef(false);
+
   const user = useSelector(authSelectors.getUser);
+  const { control, register, handleSubmit, getValues, setValue, formState: { errors }, reset, trigger, watch } = useForm();
 
-  const { participant, loading: participantLoading, error: participantError } = useApiParticipant(participantId);
-  const { workshops, paymentMethods, registrationTypes, loading: specificdataLoading, sessions, error: errorGettingDataFromDB } = useApiSpecificData();
+  const { participant, loading: participantLoading } = useApiParticipant(participantId);
+  const { loading: specificDataLoading, sessions } = useApiSpecificData();
 
-  console.log("IS LOGGED IN ", isLoggedIn);
-  console.log("USER? ", user);
+  useBlockNavigation(unsavedChanges);
 
+  // Detect form changes to prevent accidental navigation
+  useEffect(() => {
+    const subscription = watch(() => setUnsavedChanges(true));
+    return () => subscription.unsubscribe();
+  }, [watch]);
 
-
+  // Fetch user if missing
   useEffect(() => {
     if (!user) {
-      dispatch(fetchUser());  
+      dispatch(fetchUser());
     }
   }, [dispatch, user]);
 
+  // Set participant ID once user is loaded
   useEffect(() => {
-    if (user) {
+    if (user?.id) {
       setParticipantId(user.id);
     }
   }, [user]);
 
-  // Redirect if not logged in
-  /*
-  if (!isLoggedIn) {
-    return <Navigate to="/login" replace />;
-  }
-    */
+  // Populate form with participant data when available
+  useEffect(() => {
+    if (!participant || sessions.length === 0 || hasFetchedParticipant.current) return;
+    hasFetchedParticipant.current = true;
+
+    // Set arrival details
+    if (participant.arrival) {
+      Object.keys(participant.arrival).forEach((key) => {
+        if (participant.arrival[key] !== null) {
+          setValue(
+            key,
+            key.includes("hour") || key.includes("minute")
+              ? participant.arrival[key].toString().padStart(2, "0")
+              : participant.arrival[key]
+          );
+        }
+      });
+    }
+
+    // Process contributions
+    const contributions = participant.contributions || [];
+    const updatedTalks = contributions
+      .filter(c => c.type === "talk")
+      .map(talk => ({ ...talk, session: talk.session_id || sessions[0]?.id }));
+
+    const updatedPosters = contributions
+      .filter(c => c.type === "poster")
+      .map(poster => ({ ...poster, session: poster.session_id || sessions[0]?.id }));
+
+    // Store data in form fields
+    setValue("talks", updatedTalks);
+    setValue("posters", updatedPosters);
+
+  }, [participant, sessions, setValue]);
+
+  // Form submission handler
+  const onSubmit = async (formData) => {
+    if (!participantId) {
+      alert("Error: Participant ID is missing. Please refresh the page and try again.");
+      return;
+    }
+
+    setSaving(true);
+    setUnsavedChanges(false);
+
+    try {
+
+      const apiFile = (activeSection === "arrival") ? 'update_arrival' : 'update_contribution';
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/${apiFile}.php`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          participant_id: participantId, // Explicitly adding participantId
+          ...formData
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!data.success) {
+        throw new Error(data.message || "Failed to update data.");
+      }
+
+      setSuccessMsg("Your changes have been saved successfully!");
+    } catch (err) {
+      setErrMsg("An error occurred while saving your data. Please, try again later of contact us.");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
-    <PageContain title="Update your data">
-      {(participantLoading || specificdataLoading) && <Loader text="We are fetching your record… Please wait." />}
-      
-      {!!participant ? (
+    <PageContain title="Update Your Data">
+      {(participantLoading || specificDataLoading) && <Loader text="Fetching your record… Please wait." />}
+
+      {participant && !participantLoading && (
         <>
-          {`Hello ${participant.participant.title} ${participant.participant.first_name} ${participant.participant.last_name}`}
+          <p>{`Hello ${participant.participant.title} ${participant.participant.first_name} ${participant.participant.last_name},`}</p>
+          <p>
+            On this page, you have the option to update either your travel details or contributions (talks & posters).
+            If you need to make any other changes to your records, please{' '}
+            <Link aria-label="Contact" to="/contact" title="Contact">contact us</Link>.
+          </p>
+
+          <div className="d-flex gap-2">
+            <button
+              className={classNames('btn fw-bolder', activeSection === "arrival" ? 'btn-primary' : 'btn-outline-primary')}
+              onClick={() => setActiveSection(activeSection === "arrival" ? null : "arrival")}
+            >
+              Travel Details
+            </button>
+
+            <button
+              className={classNames('btn fw-bolder', activeSection === "contributions" ? 'btn-primary' : 'btn-outline-primary')}
+              onClick={() => setActiveSection(activeSection === "contributions" ? null : "contributions")}
+            >
+              Contributions
+            </button>
+          </div>
+
+          {errMsg && (
+            <div className="alert alert-danger fw-bolder mt-3">{errMsg}</div>
+          )}
+
+          {sucessMsg && (
+            <div className="alert alert-success fw-bolder mt-3">{sucessMsg}</div>
+          )}
+
+          {!!activeSection && (
+            <div className="mt-4 pt-2 position-relative">
+              <form onSubmit={handleSubmit(onSubmit)}>
+
+                {saving && <Loader isFixed={false}/>}
+
+                {activeSection === "arrival" && (
+                  <Arrival
+                    isEditing
+                    conferenceData={cd}
+                    register={register}
+                    errors={errors}
+                    setValue={setValue}
+                    trigger={trigger}
+                  />
+                )}
+
+                {activeSection === "contributions" && (
+                  <Contribution
+                    isEditing
+                    conferenceData={cd}
+                    control={control}
+                    register={register}
+                    errors={errors}
+                    getValues={getValues}
+                    setValue={setValue}
+                    watch={watch}
+                    trigger={trigger}
+                    sessions={sessions}
+                  />
+                )}
+
+                <div className="mt-4 d-flex justify-content-end">
+                  <button type="submit" className="btn btn-outline-primary fw-bolder" disabled={saving}>
+                    {saving ? "Saving..." : "Save Changes"}
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
         </>
-      ) : (
-        <>Participant not found</>
       )}
     </PageContain>
   );

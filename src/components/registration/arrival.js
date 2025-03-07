@@ -30,7 +30,8 @@ const minutes = Array.from({ length: 6 }, (_, i) =>
 );
 
 const ArrivalForm = ({
-  isAdmin,
+  isAdmin = false,
+  isEditing = false,
   conferenceData,
   register,
   errors,
@@ -38,7 +39,7 @@ const ArrivalForm = ({
   step,
   stepTotal,
   trigger,
-  setValue 
+  setValue
 }) => {
   const availableDates = getDateRange(
     conferenceData.dates.start,
@@ -63,13 +64,19 @@ const ArrivalForm = ({
 
   return (
     <>
-      {!isAdmin && (
+      {!isAdmin && !isEditing && (
         <h4 className="mb-3 border-bottom pb-2">
           <StepDislay step={step} stepTotal={stepTotal} />
           Travel Details
         </h4>
       )}
 
+      {isEditing && (
+        <h4 className="mb-3 border-bottom pb-2">
+          Update your Travel Details
+        </h4>
+      )}
+ 
 
       <div className={classNames(cssForm.smallW, "mx-auto position-relative")}>
         {isDebugMode && (
@@ -82,7 +89,7 @@ const ArrivalForm = ({
           </button>
         )}
 
-        {!isAdmin && (
+        {!isAdmin && !isEditing && (
           <p className="fw-bolder">
             If you plan to arrive before {availableDates[0].label}, you must
             arrange your own accommodation.

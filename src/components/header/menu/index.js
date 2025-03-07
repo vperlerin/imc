@@ -178,11 +178,11 @@ const Menu = ({ cd }) => {
                     <Link
                       aria-label="Edit your record"
                       className="btn btn-outline-tertiary px-3 fw-bolder"
-                      to="/register"
-                      onClick={() => goTo('/register')}
+                      to="/update-registration"
+                      onClick={() => goTo('/update-registration')}
                       title="Register"
                     >
-                      Edit your record
+                      Update Your Data
                     </Link>
                   )}
 

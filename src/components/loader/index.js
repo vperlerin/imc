@@ -2,7 +2,7 @@ import classNames from 'classnames';
 import css from './index.module.scss';
 import React, { useState, useEffect } from "react";
 
-const Loader = ({ hasOverlay = true, text = '' }) => {
+const Loader = ({ hasOverlay = true, text = '', isFixed = true }) => {
   const [isFirstText, setIsFirstText] = useState(true);
 
   // Split text if contains "|"
@@ -20,7 +20,7 @@ const Loader = ({ hasOverlay = true, text = '' }) => {
   return (
     <>
       {hasOverlay && (
-        <div className={classNames(css.overlay, 'position-fixed top-0 bottom-0 start-0 end-0 w-100 h-100')} />
+        <div className={classNames(css.overlay, 'top-0 bottom-0 start-0 end-0 w-100 h-100', isFixed ? 'position-fixed ' : 'position-absolute')} />
       )}
 
       <div className={classNames(css.universe, 'position-absolute top-0 bottom-0 start-0 end-0 w-100 h-100')}>

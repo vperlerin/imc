@@ -27,4 +27,32 @@ class ArrivalManager {
             $data['travelling'], $travellingDetails
         ]);
     }
+
+    public function updateArrival($participantId, $data) {
+        $travellingDetails = isset($data['travelling_details']) && trim($data['travelling_details']) !== '' 
+            ? $data['travelling_details'] 
+            : null;
+
+        $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM arrival WHERE participant_id = ?");
+        $stmt->execute([$participantId]);
+        $exists = $stmt->fetchColumn();
+
+        if ($exists) { 
+            $stmt = $this->pdo->prepare("
+                UPDATE arrival 
+                SET arrival_date = ?, arrival_hour = ?, arrival_minute = ?, 
+                    departure_date = ?, departure_hour = ?, departure_minute = ?, 
+                    travelling = ?, travelling_details = ?, updated_at = NOW()
+                WHERE participant_id = ?
+            ");
+            $stmt->execute([
+                $data['arrival_date'], $data['arrival_hour'], $data['arrival_minute'],
+                $data['departure_date'], $data['departure_hour'], $data['departure_minute'],
+                $data['travelling'], $travellingDetails,
+                $participantId
+            ]);
+        } else { 
+            $this->saveArrivalDetails($participantId, $data);
+        }
+    }
 }
