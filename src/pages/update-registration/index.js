@@ -12,8 +12,7 @@ const UpdateRegistration = () => {
   const isLoggedIn = useSelector(authSelectors.isLoggedIn);
   const user = useSelector(authSelectors.getUser);
 
-  console.log("isLoggedIn? ", isLoggedIn);
-
+  console.log("isLoggedIn? ", isLoggedIn); 
   console.log("USER? ", user);
 
   const { participant, loading: participantLoading, error: participantError } = useApiParticipant(participantId);
@@ -27,8 +26,7 @@ const UpdateRegistration = () => {
     setParticipantId(user.id);
   }, [user])
 
-
-
+  
   return (
     <PageContain title="Update your data">
       {isLoggedIn && !!user.user_id && (
@@ -36,10 +34,7 @@ const UpdateRegistration = () => {
           {(participantLoading || specificdataLoading) && <Loader text="We are fetching your record…|Please, wait." />}
         </>
       )}
-      {!participantLoading && !participant && (
-        <Navigate to="/login" replace />
-      )}
-
+      
       {!!participant && (
         <>
           {`Hello ${curParticipant.title} ${curParticipant.first_name} ${curParticipant.last_name}`}
