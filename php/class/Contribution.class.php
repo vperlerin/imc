@@ -66,7 +66,7 @@ class ContributionManager
                         $talk['title'],
                         $talk['authors'],
                         $talk['abstract'],
-                        isset($talk['session']) ? (int) $talk['session'] : NULL,
+                        isset($talk['session_id']) ? (int) $talk['session_id'] : NULL,
                         isset($talk['duration']) ? $talk['duration'] : NULL
                     ]);
                 }
@@ -84,7 +84,7 @@ class ContributionManager
                         $poster['title'],
                         $poster['authors'],
                         $poster['abstract'],
-                        isset($poster['session']) ? (int) $poster['session'] : NULL,
+                        isset($poster['session_id']) ? (int) $poster['session_id'] : NULL,
                         isset($poster['print']) ? (filter_var($poster['print'], FILTER_VALIDATE_BOOLEAN) ? 1 : 0) : 0
                     ]);
                 }

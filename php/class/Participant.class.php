@@ -153,7 +153,7 @@ class ParticipantManager
             // Insert talks
             if (!empty($data['talks']) && is_array($data['talks'])) {
                 foreach ($data['talks'] as $talk) {
-                    $sessionId = isset($talk['session']) ? (int) $talk['session'] : NULL;
+                    $sessionId = isset($talk['session_id']) ? (int) $talk['session_id'] : NULL;
                     $duration = isset($talk['duration']) ? $talk['duration'] : NULL;
 
                     $stmt->bindValue(':participant_id', $participantId, PDO::PARAM_INT);
@@ -172,7 +172,7 @@ class ParticipantManager
                 foreach ($data['posters'] as $poster) {
                     $printValue = isset($poster['print']) ? filter_var($poster['print'], FILTER_VALIDATE_BOOLEAN) : FALSE;
 
-                    $sessionId = isset($poster['session']) ? (int) $poster['session'] : NULL;
+                    $sessionId = isset($poster['session_id']) ? (int) $poster['session_id'] : NULL;
                     $duration = isset($poster['duration']) ? $poster['duration'] : NULL;
 
                     $stmt->bindValue(':participant_id', $participantId, PDO::PARAM_INT);

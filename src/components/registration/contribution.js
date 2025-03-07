@@ -58,7 +58,7 @@ const ContributionForm = ({
       title: "Meteor Observation Techniques",
       authors: "John Doe, Jane Smith",
       abstract: "A study on advanced meteor observation methods.",
-      session: meteorPhysicsSession,
+      session_id: meteorPhysicsSession,
       duration: "15min",
     });
 
@@ -67,7 +67,7 @@ const ContributionForm = ({
         title: "Radio Meteor Detection",
         authors: "Alice Brown, Bob White",
         abstract: "An overview of detecting meteors using radio waves.",
-        session: radioMeteorSession,
+        session_id: radioMeteorSession,
         print: "true",
       });
     }
@@ -85,13 +85,13 @@ const ContributionForm = ({
     // Populate talks if they exist
     if (existingTalks.length > 0) {
       removeTalk();
-      existingTalks.forEach((talk) => addTalk({ ...talk, session: talk.session_id })); // Ensure session ID is set
+      existingTalks.forEach((talk) => addTalk({ ...talk  })); 
     }
 
     // Populate posters if they exist
     if (existingPosters.length > 0 && !isOnline) {
       removePoster();
-      existingPosters.forEach((poster) => addPoster({ ...poster, session: poster.session_id }));
+      existingPosters.forEach((poster) => addPoster({ ...poster }));
     }
   }, [getValues, setValue, addTalk, addPoster, removeTalk, removePoster, isOnline]);
 

@@ -254,7 +254,7 @@ const MainForm = () => {
           {!participant || participantError ? (
 
             <div className="alert alert-danger fw-bolder">
-              Database access error. We are sorry, but we couldn't properly record your registration. Please try again or contact us
+              Database access error. We are sorry, but we couldn't properly record your registration. Please try again or  {' '}
               <Link
                 aria-label="Contact"
                 to="/contact"
@@ -268,7 +268,7 @@ const MainForm = () => {
               {
                 participantError ? (
                   <div className="alert alert-danger fw-bolder">
-                    Database access error. We are sorry, but we couldn't properly record your registration. Please try again or contact us
+                    Database access error. We are sorry, but we couldn't properly record your registration. Please try again or contact us {' '}
                     <Link
                       aria-label="Contact"
                       to="/contact"

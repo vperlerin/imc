@@ -53,9 +53,7 @@ try {
     $plain_password = bin2hex(random_bytes(4));
     $password_hash = password_hash($plain_password, PASSWORD_DEFAULT);
     $data['password'] = $plain_password;
-
-    echo(var_dump($data));
-    exit;
+ 
 
     // Initialize ParticipantManager using existing $pdo from Connect.class.php
     $participantManager = new ParticipantManager($pdo);
