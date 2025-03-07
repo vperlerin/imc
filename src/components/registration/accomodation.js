@@ -78,7 +78,7 @@ const AccomodationForm = ({
 
         {isOnline && (
           <p>
-            The price of the online participation is <b className="fw-bolder">{conferenceData.costs.online}€</b>.
+            The price for online participation in IMC {conferenceData.year} is <b className="fw-bolder">{conferenceData.costs.online}€</b>.
           </p>
         )}
 

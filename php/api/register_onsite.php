@@ -64,29 +64,7 @@ try {
 
     // Save participant
     $participant_id = $participantManager->saveParticipant($data, $password_hash);
-
-    $query = "
-        SELECT * FROM registration_types;
-        SELECT * FROM payment_methods;
-        SELECT * FROM workshops;
-        SELECT * FROM imc_sessions;
-    ";
-    $stmt = $pdo->prepare($query);
-    $stmt->execute();
-
-    $results = [];
-    $registrations_types = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    $stmt->nextRowset();
-    $payment_methods = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    $stmt->nextRowset();
-    $workshops = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    $stmt->nextRowset();
-    $sessions = $stmt->fetchAll(PDO::FETCH_ASSOC);
  
- 
-    $subject = "IMC " . getenv("YEAR") . " Registration";
-    $summary = SummaryFormatter::formatEmailContent($data, $workshops, $payment_methods, $registrations_types, $sessions, true);
-
     echo json_encode([
         "success" => true,
         "message" => "Registration successful",

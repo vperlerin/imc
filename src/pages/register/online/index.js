@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useLocation } from "react-router-dom";
 import { getPaymentMethodById } from "utils/payment_method";
-import Accommodation from "components/registration/accomodation.js"; 
+import Accomodation from "components/registration/accomodation.js";
 import Contribution from "components/registration/contribution.js";
 import Identity from "components/registration/identity.js";
 import Loader from "components/loader";
@@ -327,8 +327,26 @@ const MainForm = () => {
               />
             )}
 
+            {step === 4 &&
+              <Accomodation
+                isOnline={true}
+                conferenceData={cd}
+                control={control}
+                register={register}
+                isDebugMode={isDebugMode}
+                isEarlyBird={is_early_bird}
+                paymentMethods={paymentMethods}
+                errors={errors}
+                registrationTypes={registrationTypes}
+                step={step}
+                stepTotal={totalStep}
+                setValue={setValue}
+                trigger={trigger}
+              />
+            }
 
-            {step === 4 && !successMsg && (
+
+            {step === 5 && !successMsg && (
               <Summary
                 isOnline={true}
                 getValues={getValues}
@@ -343,7 +361,7 @@ const MainForm = () => {
                 watch={watch}
               />
             )}
-  
+
             <div className="mt-auto pt-3">
               <div className="d-flex gap-3 justify-content-end">
                 {step > 1 && (
