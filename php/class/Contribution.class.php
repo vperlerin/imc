@@ -1,19 +1,27 @@
 <?php
 
-class ContributionManager {
+class ContributionManager
+{
     private $pdo;
 
-    public function __construct(PDO $pdo) {
+    public function __construct(PDO $pdo)
+    {
         $this->pdo = $pdo;
     }
 
-    public function saveContributions($participantId, $talks, $posters) {
+    public function saveContributions($participantId, $talks, $posters)
+    {
         foreach ($talks as $talk) {
             $this->pdo->prepare("
                 INSERT INTO contributions (participant_id, type, title, authors, abstract, session_id, duration,  created_at, updated_at)
                 VALUES (?, 'talk', ?, ?, ?, (SELECT id FROM imc_sessions WHERE name = ? LIMIT 1), ?, ?, NOW(), NOW())
             ")->execute([
-                $participantId, $talk['title'], $talk['authors'], $talk['abstract'], $talk['session'], $talk['duration']
+                $participantId,
+                $talk['title'],
+                $talk['authors'],
+                $talk['abstract'],
+                $talk['session'],
+                $talk['duration']
             ]);
         }
 
@@ -22,15 +30,20 @@ class ContributionManager {
                 INSERT INTO contributions (participant_id, type, title, authors, abstract, session_id, duration,  created_at, updated_at)
                 VALUES (?, 'poster', ?, ?, ?, (SELECT id FROM imc_sessions WHERE name = ? LIMIT 1), NULL, ?, NOW(), NOW())
             ")->execute([
-                $participantId, $poster['title'], $poster['authors'], $poster['abstract'], $poster['session']
+                $participantId,
+                $poster['title'],
+                $poster['authors'],
+                $poster['abstract'],
+                $poster['session']
             ]);
         }
     }
 
 
-    public function updateContributions($participantId, $data) {
+    public function updateContributions($participantId, $data)
+    {
         try {
-            $this->pdo->beginTransaction();  
+            $this->pdo->beginTransaction();
 
             $stmt = $this->pdo->prepare("DELETE FROM contributions WHERE participant_id = ?");
             $stmt->execute([$participantId]);
@@ -46,11 +59,11 @@ class ContributionManager {
                     $duration = isset($talk['duration']) ? $talk['duration'] : NULL;
 
                     $stmtTalk->execute([
-                        $participantId, 
-                        $talk['title'], 
-                        $talk['authors'], 
-                        $talk['abstract'], 
-                        $sessionId, 
+                        $participantId,
+                        $talk['title'],
+                        $talk['authors'],
+                        $talk['abstract'],
+                        $sessionId,
                         $duration
                     ]);
                 }
@@ -67,19 +80,20 @@ class ContributionManager {
                     $sessionId = isset($poster['session']) ? (int) $poster['session'] : NULL;
 
                     $stmtPoster->execute([
-                        $participantId, 
-                        $poster['title'], 
-                        $poster['authors'], 
-                        $poster['abstract'], 
-                        $sessionId, 
+                        $participantId,
+                        $poster['title'],
+                        $poster['authors'],
+                        $poster['abstract'],
+                        $sessionId,
                         $printValue
                     ]);
                 }
             }
 
-            $this->pdo->commit(); 
+            $this->pdo->commit();
         } catch (Exception $e) {
             $this->pdo->rollBack();
             throw new Exception("Failed to update contributions: " . $e->getMessage());
         }
     }
+}
