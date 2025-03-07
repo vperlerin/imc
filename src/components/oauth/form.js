@@ -39,7 +39,7 @@ const Login = () => {
       // Fetch user details securely from backend
       await dispatch(authActions.fetchUser());  
       const user = response.data.user;
-      navigate(isAdmin ? "/admin/dashboard" : "/update-registration");
+      navigate(user?.is_admin ? "/admin/dashboard" : "/update-registration");
     } catch (err) {
       setError(err.response?.data?.message || err.message || "Something went wrong.");
     } finally {
