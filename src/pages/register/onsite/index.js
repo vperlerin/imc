@@ -60,8 +60,9 @@ const MainForm = () => {
   const [successMsg, setSuccessMsg] = useState(null);
   const [total, setTotal] = useState(0);
 
-  const { workshops, paymentMethods, registrationTypes, loading: specificdataLoading, sessions, error: errorGettingDataFromDB } = useApiSpecificData();
-  const { participant, loading: participantLoading, error: participantError } = useApiParticipant(participantId);
+  const { workshops, paymentMethods, registrationTypes, loading: specificdataLoading, sessions, error: specificDataError } = useApiSpecificData();
+  const { participant, loading: participantLoading, error: participantError } = useApiParticipant(participantId, 0, true);
+ 
 
   const {
     control,
@@ -198,11 +199,8 @@ const MainForm = () => {
     return <PageContain title="Register Onsite">Come back soon…</PageContain>;
   } 
 
-  if (errorGettingDataFromDB) {
-    return <div className="alert alert-danger fw-bolder">{errorGettingDataFromDB}</div>
-  }
-
-  if (specificdataLoading || participantLoading) {
+ 
+  if (isLoading) {
     return <Loader />;
   }
  
