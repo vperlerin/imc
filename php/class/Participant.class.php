@@ -460,7 +460,7 @@ class ParticipantManager
                 foreach ($data['posters'] as $poster) {
                     $printValue = isset($poster['print']) ? (filter_var($poster['print'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ? 1 : 0) : 0;
 
-                    $sessionId = isset($poster['session']) ? (int) $poster['session'] : NULL;
+                    $sessionId = isset($poster['session_id']) ? (int) $poster['session_id'] : NULL;
                     $duration = isset($poster['duration']) ? $poster['duration'] : NULL;
 
                     $stmt->bindValue(':participant_id', $participantId, PDO::PARAM_INT);
