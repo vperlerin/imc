@@ -459,22 +459,26 @@ class ParticipantManager
             if (!empty($data['posters']) && is_array($data['posters'])) {
                 foreach ($data['posters'] as $poster) {
                     $printValue = isset($poster['print']) ? (filter_var($poster['print'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ? 1 : 0) : 0;
-
+            
                     $sessionId = isset($poster['session_id']) ? (int) $poster['session_id'] : NULL;
                     $duration = isset($poster['duration']) ? $poster['duration'] : NULL;
-
+            
                     $stmt->bindValue(':participant_id', $participantId, PDO::PARAM_INT);
                     $stmt->bindValue(':type', 'poster', PDO::PARAM_STR);
                     $stmt->bindValue(':title', $poster['title'], PDO::PARAM_STR);
                     $stmt->bindValue(':authors', $poster['authors'], PDO::PARAM_STR);
                     $stmt->bindValue(':abstract', $poster['abstract'], PDO::PARAM_STR);
-                    $stmt->bindValue(':session_id', $sessionId, $sessionId !== NULL ? PDO::PARAM_INT : PDO::PARAM_NULL);
+                    $stmt->bindValue(
+                        ':session_id', 
+                        $sessionId !== null ? (int) $sessionId : null, 
+                        $sessionId !== null ? PDO::PARAM_INT : PDO::PARAM_NULL
+                    );
                     $stmt->bindValue(':duration', $duration, $duration !== NULL ? PDO::PARAM_STR : PDO::PARAM_NULL);
                     $stmt->bindValue(':print', $printValue, PDO::PARAM_INT);
                     $stmt->execute();
                 }
             }
-
+            
 
             $this->pdo->commit();
             return true;
