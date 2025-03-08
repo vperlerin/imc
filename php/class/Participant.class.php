@@ -448,10 +448,15 @@ class ParticipantManager
                 ':registration_type_id' => (int) $data['registration_type_id']
             ]);
 
-            // Insert extra options
+            // Prepare the UPDATE query
             $stmt = $this->pdo->prepare("
-                INSERT INTO extra_options (participant_id, excursion, buy_tshirt, tshirt_size, created_at, updated_at)
-                VALUES (:participant_id, :excursion, :buy_tshirt, :tshirt_size, NOW(), NOW())
+            UPDATE extra_options 
+            SET 
+                excursion = :excursion, 
+                buy_tshirt = :buy_tshirt, 
+                tshirt_size = :tshirt_size, 
+                updated_at = NOW()
+            WHERE participant_id = :participant_id
             ");
 
             // Ensure tshirt_size is NULL if buy_tshirt is 0
@@ -460,10 +465,11 @@ class ParticipantManager
             // Execute the prepared statement
             $stmt->execute([
                 ':participant_id' => $participantId,
-                ':excursion' => $data['excursion'],   
-                ':buy_tshirt' => $data['buy_tshirt'],  
+                ':excursion' => $data['excursion'],
+                ':buy_tshirt' => $data['buy_tshirt'],
                 ':tshirt_size' => $tshirtSize,
             ]);
+
 
             // Delete existing contributions
             $stmtDelete = $this->pdo->prepare("DELETE FROM contributions WHERE participant_id = :participant_id");

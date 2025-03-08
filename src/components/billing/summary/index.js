@@ -65,6 +65,7 @@ const Summary = ({
   const { selected: selectedWorkshops, totalPrice: workshopCost } = getSelectedWorkshops(selectedWorkshopIds, workshops, isOnline);
 
   // T-shirt Cost 
+  console.log("allValues.buy_tshirt? ", allValues.buy_tshirt);
   const tshirtCost = allValues.buy_tshirt ? parseFloat(conferenceData.costs.tshirts.price) : 0;
   // Printed Posters Cost
   const printedPosters = allValues.posters ? allValues.posters.filter(poster => poster.print === "true" || poster.print === "1") : [];
