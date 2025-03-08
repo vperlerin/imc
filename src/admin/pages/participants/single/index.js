@@ -28,7 +28,7 @@ const AdminParticipantsUser = () => {
   const [total, setTotal] = useState(0);
   const [paypalFee, setPaypalFee] = useState(0);
   const [talks, setTalks] = useState([]);
-  const [fetchParticipantTrigger, setFetchParticipantTrigger ] = useState(false);
+  const [fetchParticipantTrigger, setFetchParticipantTrigger] = useState(false);
   const [posters, setPosters] = useState([]);
   const activeTab = tab || "identity";
   const navigate = useNavigate();
@@ -208,10 +208,10 @@ const AdminParticipantsUser = () => {
   const isLoading = specificdataLoading || participantLoading || saving || !isSummaryReady;
   const hasError = participantError || specificDataError || error;
 
-  const hasAdminNotes =!!participant?.participant?.admin_notes;
+  const hasAdminNotes = !!participant?.participant?.admin_notes;
 
   console.log("vALUES ", getValues());
- 
+
 
   return (
     <PageContain
@@ -234,7 +234,7 @@ const AdminParticipantsUser = () => {
         )}
       </div>
 
-      {participant && isSummaryReady && !isLoading &&  (
+      {participant && isSummaryReady && !isLoading && (
         <form onSubmit={handleSubmit(onSubmit)}>
           <ul className={classNames('nav nav-tabs mb-3 mt-2', cssTabs.tab, 'flex-column flex-sm-row')}>
             {[
@@ -252,9 +252,8 @@ const AdminParticipantsUser = () => {
                 <a
                   className={
                     classNames(
-                       'nav-link',
-                       activeTab === key && cssTabs.active,
-                       key === 'admin_notes' && 'position-relative'
+                      'nav-link',
+                      activeTab === key && cssTabs.active,
                     )
                   }
                   href={`/admin/participants/onsite/${participantId}/${key}`}
@@ -263,9 +262,14 @@ const AdminParticipantsUser = () => {
                     navigate(`/admin/participants/onsite/${participantId}/${key}`);
                   }}
                 >
-                  {label}
-                  {hasAdminNotes && key === 'admin_notes' && (
-                     <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">!</span>
+
+                  {hasAdminNotes && key === 'admin_notes' ? (
+                    <span className="position-relative">
+                      <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">!</span>
+                      {label}
+                    </span>
+                  ) : (
+                     <>{ label }</>
                   )}
                 </a>
               </li>

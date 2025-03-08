@@ -128,20 +128,15 @@ class ParticipantManager
                 VALUES (:participant_id, :excursion, :buy_tshirt, :tshirt_size, NOW(), NOW())
             ");
 
-            // Normalize values safely
-            $excursionValue = isset($data['excursion'])
-                ? (filter_var($data['excursion'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) !== null ? 1 : 0)
-                : 0;
-
-            $buytshirtValue = isset($data['buy_tshirt'])
-                ? (filter_var($data['buy_tshirt'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) !== null ? 1 : 0)
-                : 0;
+            // Normalize boolean values (ensure only "1" or "0" is stored)
+            $excursionValue = !empty($data['excursion']) && $data['excursion'] === "1" ? 1 : 0;
+            $buytshirtValue = !empty($data['buy_tshirt']) && $data['buy_tshirt'] === "1" ? 1 : 0;
 
             // Execute the prepared statement
             $stmt->execute([
                 ':participant_id' => $participantId,
-                ':excursion' => $excursionValue, 
-                ':buy_tshirt' => $buytshirtValue,  
+                ':excursion' => $excursionValue,
+                ':buy_tshirt' => $buytshirtValue,
                 ':tshirt_size' => !empty($data['tshirt_size']) ? $data['tshirt_size'] : null, // Avoid inserting empty strings
             ]);
 
