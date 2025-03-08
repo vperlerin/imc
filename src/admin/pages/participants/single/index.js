@@ -28,6 +28,7 @@ const AdminParticipantsUser = () => {
   const [total, setTotal] = useState(0);
   const [paypalFee, setPaypalFee] = useState(0);
   const [talks, setTalks] = useState([]);
+  const [fetchParticipantTrigger, setFetchParticipantTrigger ] = useState(false);
   const [posters, setPosters] = useState([]);
   const activeTab = tab || "identity";
   const navigate = useNavigate();
@@ -35,7 +36,7 @@ const AdminParticipantsUser = () => {
   useBlockNavigation(unsavedChanges);
 
   const { workshops, paymentMethods, registrationTypes, loading: specificdataLoading, sessions, error: specificDataError } = useApiSpecificData();
-  const { participant, loading: participantLoading, error: participantError } = useApiParticipant(participantId, 0, true);
+  const { participant, loading: participantLoading, error: participantError } = useApiParticipant(participantId, fetchParticipantTrigger, true);
   const { control, register, handleSubmit, getValues, setValue, formState: { errors }, trigger, watch } = useForm();
 
   // Detect form changes
@@ -157,8 +158,8 @@ const AdminParticipantsUser = () => {
       return;
     }
 
-    formData.talks = talks;
-    formData.posters = posters;
+    formData.talks = getValues("talks") || [];
+    formData.posters = getValues("posters") || [];
 
     try {
       const response = await axios.post(
@@ -168,20 +169,8 @@ const AdminParticipantsUser = () => {
       );
 
       if (response.data.success) {
-        let countdown = 3; // Start countdown from 3 seconds
-      
-        setSuccessMsg(`Participant updated successfully! The page will reload in ${countdown} seconds to assure data integrity.`);
-        setUnsavedChanges(false);
-      
-        const interval = setInterval(() => {
-          countdown -= 1;
-          if (countdown > 0) {
-            setSuccessMsg(`Participant updated successfully! The page will reload in ${countdown} seconds to assure data integrity.`);
-          } else {
-            clearInterval(interval);
-            window.location.reload();
-          }
-        }, 1000);
+        setFetchParticipantTrigger(prev => !prev);
+        setSuccessMsg("Participant updated successfully!");
       } else {
         throw new Error(response.data.message || "Failed to update participant.");
       }
@@ -256,8 +245,8 @@ const AdminParticipantsUser = () => {
               { key: "accommodation", label: "Accommodation" },
               { key: "extras", label: "Extras" },
               { key: "comments", label: "Comments" },
-              { key: "summary", label: "Summary" },
               { key: "admin_notes", label: "Marc's notes" },
+              { key: "summary", label: "Summary" },
             ].map(({ key, label }) => (
               <li className="nav-item" key={key}>
                 <a
@@ -332,6 +321,7 @@ const AdminParticipantsUser = () => {
             {tab === "accommodation" && (
               <Accommodation
                 isAdmin
+                isEarlyBird={participant?.participant.is_early_bird}
                 conferenceData={cd}
                 control={control}
                 register={register}

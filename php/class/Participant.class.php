@@ -140,8 +140,8 @@ class ParticipantManager
             // Execute the prepared statement
             $stmt->execute([
                 ':participant_id' => $participantId,
-                ':excursion' => $excursionValue, // Always 1 or 0
-                ':buy_tshirt' => $buytshirtValue, // Always 1 or 0
+                ':excursion' => $excursionValue, 
+                ':buy_tshirt' => $buytshirtValue,  
                 ':tshirt_size' => !empty($data['tshirt_size']) ? $data['tshirt_size'] : null, // Avoid inserting empty strings
             ]);
 
