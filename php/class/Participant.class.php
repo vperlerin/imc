@@ -415,22 +415,27 @@ class ParticipantManager
                 ':registration_type_id' => (int) $data['registration_type_id']
             ]);
 
-            // Update Extra Options
+            // Insert extra options
             $stmt = $this->pdo->prepare("
-                UPDATE extra_options
-                SET excursion = :excursion, buy_tshirt = :buy_tshirt, tshirt_size = :tshirt_size,  updated_at = NOW()
-                WHERE participant_id = :participant_id
+                INSERT INTO extra_options (participant_id, excursion, buy_tshirt, tshirt_size, created_at, updated_at)
+                VALUES (:participant_id, :excursion, :buy_tshirt, :tshirt_size, NOW(), NOW())
             ");
 
-            $excursionValue = isset($data['excursion']) ? (filter_var($data['excursion'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ? 1 : 0) : 0;
-            $buytshirtValue = isset($data['buy_tshirt']) ? (filter_var($data['buy_tshirt'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ? 1 : 0) : 0;
+            // Normalize boolean values ("true" → 1, "false" → 0)
+            $excursionValue = isset($data['excursion']) && $data['excursion'] === "true" ? 1 : 0;
+            $buytshirtValue = isset($data['buy_tshirt']) && $data['buy_tshirt'] === "true" ? 1 : 0;
 
+            // Ensure tshirt_size is NULL if buy_tshirt is 0
+            $tshirtSize = ($buytshirtValue === 1 && !empty($data['tshirt_size'])) ? $data['tshirt_size'] : null;
+
+            // Execute the prepared statement
             $stmt->execute([
                 ':participant_id' => $participantId,
-                ':excursion' => $excursionValue,  // Already processed as 1 or 0
-                ':buy_tshirt' => $buytshirtValue,  // Already processed as 1 or 0
-                ':tshirt_size' => $data['tshirt_size'] ?? null,
+                ':excursion' => $excursionValue,
+                ':buy_tshirt' => $buytshirtValue,
+                ':tshirt_size' => $tshirtSize,
             ]);
+
 
             // Delete existing contributions
             $stmtDelete = $this->pdo->prepare("DELETE FROM contributions WHERE participant_id = :participant_id");
