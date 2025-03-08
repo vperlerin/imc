@@ -39,6 +39,7 @@ const AdminParticipantsUser = () => {
   const { participant, loading: participantLoading, error: participantError } = useApiParticipant(participantId, fetchParticipantTrigger, true);
   const { control, register, handleSubmit, getValues, setValue, formState: { errors }, trigger, watch } = useForm();
 
+ 
   // Detect form changes
   useEffect(() => {
     const subscription = watch(() => {
@@ -121,8 +122,7 @@ const AdminParticipantsUser = () => {
         setValue("wantsToContribute", "yes");
       }
     }
-
-
+ 
     // Handle Accommodation
     if (accommodation?.registration_type_id) {
       setValue("registration_type_id", String(accommodation.registration_type_id));
@@ -130,8 +130,8 @@ const AdminParticipantsUser = () => {
 
     // Handle Extra Options safely
     if (extra_options) {
-      setValue("excursion", Boolean(extra_options.excursion));
-      setValue("buy_tshirt", Boolean(extra_options.buy_tshirt));
+      setValue("excursion",  extra_options.excursion === "0" ? "false" : "true");
+      setValue("buy_tshirt",  extra_options.buy_tshirt === "0" ? "false" : "true");
       setValue("tshirt_size", extra_options.tshirt_size || "");
     }
 
@@ -150,16 +150,11 @@ const AdminParticipantsUser = () => {
       setError("Please fill in all required fields.");
       return;
     }
-
-    // isAdminStep 2: Check if the user selected a T-shirt but didn't choose a size
-    if (formData.buy_tshirt === "1" && !formData.tshirt_size) {
-      setSaving(false);
-      setError("You must select a T-shirt size if you choose to buy one.");
-      return;
-    }
-
+ 
     formData.talks = getValues("talks") || [];
     formData.posters = getValues("posters") || [];
+
+    console.log('FORM DATA ', formData); 
 
     try {
       const response = await axios.post(
