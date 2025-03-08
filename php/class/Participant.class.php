@@ -18,6 +18,17 @@ class ParticipantManager
     public function saveParticipant($data, $passwordHash)
     {
         try {
+            // 1. Handle boolean fields: convert "true"/"false" (or any truthy/falsy string) to 1 or 0.
+            $booleanFields = ['excursion', 'buy_tshirt', 'is_online', 'is_early_bird', 'confirmation_sent'];
+            foreach ($booleanFields as $field) {
+                if (!isset($data[$field])) {
+                    $data[$field] = 0;
+                } else {
+                    $flag = filter_var($data[$field], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+                    $data[$field] = ($flag === null ? 0 : ($flag ? 1 : 0));
+                }
+            }
+
             $this->pdo->beginTransaction();
 
             // Check if email exists
@@ -198,6 +209,17 @@ class ParticipantManager
         try {
             $this->pdo->beginTransaction();
 
+            // 1. Handle boolean fields: convert "true"/"false" (or any truthy/falsy string) to 1 or 0.
+            $booleanFields = ['is_online', 'confirmation_sent'];
+            foreach ($booleanFields as $field) {
+                if (!isset($data[$field])) {
+                    $data[$field] = 0;
+                } else {
+                    $flag = filter_var($data[$field], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+                    $data[$field] = ($flag === null ? 0 : ($flag ? 1 : 0));
+                }
+            }
+
             // Check if email exists
             if ($this->emailExists($data['email'])) {
                 throw new Exception("The email address '{$data['email']}' is already registered. Please use a different email or log in.");
@@ -255,9 +277,9 @@ class ParticipantManager
 
             // **Insert payment details**
             $stmt = $this->pdo->prepare("
-            INSERT INTO payments (participant_id, payment_date, amount, payment_method_id, created_at, updated_at)
-            VALUES (:participant_id, NULL, :amount, :payment_method_id, NOW(), NOW())
-        ");
+                INSERT INTO payments (participant_id, payment_date, amount, payment_method_id, created_at, updated_at)
+                VALUES (:participant_id, NULL, :amount, :payment_method_id, NOW(), NOW())
+            ");
             $stmt->execute([
                 ':participant_id' => $participantId,
                 ':amount' => 0,
@@ -296,6 +318,17 @@ class ParticipantManager
     {
         try {
             $this->pdo->beginTransaction();
+
+            // 1. Handle boolean fields: convert "true"/"false" (or any truthy/falsy string) to 1 or 0.
+            $booleanFields = ['excursion', 'buy_tshirt', 'is_online', 'is_early_bird', 'confirmation_sent'];
+            foreach ($booleanFields as $field) {
+                if (!isset($data[$field])) {
+                    $data[$field] = 0;
+                } else {
+                    $flag = filter_var($data[$field], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+                    $data[$field] = ($flag === null ? 0 : ($flag ? 1 : 0));
+                }
+            }
 
             // Check if participant exists
             $stmt = $this->pdo->prepare("SELECT id FROM participants WHERE id = :participant_id");
@@ -421,21 +454,16 @@ class ParticipantManager
                 VALUES (:participant_id, :excursion, :buy_tshirt, :tshirt_size, NOW(), NOW())
             ");
 
-            // Normalize boolean values ("true" → 1, "false" → 0)
-            $excursionValue = !empty($data['excursion']) && ($data['excursion'] === "1" || $data['excursion'] === "true") ? 1 : 0;
-            $buytshirtValue = !empty($data['buy_tshirt']) && ($data['buy_tshirt'] === "1" || $data['buy_tshirt'] === "true") ? 1 : 0;
-
             // Ensure tshirt_size is NULL if buy_tshirt is 0
-            $tshirtSize = ($buytshirtValue === 1 && !empty($data['tshirt_size'])) ? $data['tshirt_size'] : null;
+            $tshirtSize = ($data['buy_tshirt'] === 1 && !empty($data['tshirt_size'])) ? $data['tshirt_size'] : null;
 
             // Execute the prepared statement
             $stmt->execute([
                 ':participant_id' => $participantId,
-                ':excursion' => $excursionValue,
-                ':buy_tshirt' => $buytshirtValue,
+                ':excursion' => $data['excursion'],   
+                ':buy_tshirt' => $data['buy_tshirt'],  
                 ':tshirt_size' => $tshirtSize,
             ]);
-
 
             // Delete existing contributions
             $stmtDelete = $this->pdo->prepare("DELETE FROM contributions WHERE participant_id = :participant_id");
