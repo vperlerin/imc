@@ -17,8 +17,8 @@ const ExtrasForm = ({
   watch,
   control,
 }) => {
-  // Normalize watched values to always be "1" (true) or "0" (false)
-  const normalizeValue = (value) => (value === true || value === "1" ? "1" : "0");
+  // Normalize watched values to always be "true" or "false"
+  const normalizeValue = (value) => (value === true || value === "true" ? "true" : "false");
 
   const buyTShirt = normalizeValue(watch("buy_tshirt"));
   const tshirtSize = watch("tshirt_size");
@@ -28,7 +28,7 @@ const ExtrasForm = ({
   const { isSubmitted } = useFormState({ control });
 
   // State for UI updates
-  const [wantsTShirt, setWantsTShirt] = useState(buyTShirt === "1");
+  const [wantsTShirt, setWantsTShirt] = useState(buyTShirt === "true");
 
   // Available T-Shirt sizes
   const tshirt_sizes = conferenceData.costs.tshirts.models.flatMap((model) =>
@@ -37,16 +37,16 @@ const ExtrasForm = ({
 
   // Sync T-Shirt selection with state
   useEffect(() => {
-    setWantsTShirt(buyTShirt === "1");
+    setWantsTShirt(buyTShirt === "true");
 
-    if (buyTShirt !== "1") {
+    if (buyTShirt !== "true") {
       setValue("tshirt_size", "");
     }
   }, [buyTShirt, setValue]);
 
   // Sync T-Shirt size changes
   useEffect(() => {
-    if (buyTShirt === "1") {
+    if (buyTShirt === "true") {
       trigger("tshirt_size"); // Validate only if T-Shirt is selected
     }
   }, [tshirtSize, buyTShirt, trigger]);
@@ -60,8 +60,8 @@ const ExtrasForm = ({
   };
 
   const fillTestData = () => {
-    setValue("excursion", "1");
-    setValue("buy_tshirt", "1");
+    setValue("excursion", "true");
+    setValue("buy_tshirt", "true");
     setValue("tshirt_size", "Men L");
     trigger();
   };
@@ -88,7 +88,7 @@ const ExtrasForm = ({
             Do you want to participate in the excursion (at no extra cost)?
           </label>
           <div className="d-flex flex-column gap-2">
-            {["1", "0"].map((option) => (
+            {["true", "false"].map((option) => (
               <div key={option} className="form-check">
                 <input
                   type="radio"
@@ -99,7 +99,7 @@ const ExtrasForm = ({
                   checked={excursion === option}
                 />
                 <label className="form-check-label" htmlFor={`excursion-${option}`}>
-                  {option === "1" ? "Yes" : "No"}
+                  {option === "true" ? "Yes" : "No"}
                 </label>
               </div>
             ))}
@@ -113,7 +113,7 @@ const ExtrasForm = ({
             Do you want to buy the official IMC{conferenceData.year} T-Shirt for {conferenceData.costs.tshirts.price}€?
           </label>
           <div className="d-flex flex-column gap-2">
-            {["1", "0"].map((option) => (
+            {["true", "false"].map((option) => (
               <div key={option} className="form-check">
                 <input
                   type="radio"
@@ -125,7 +125,7 @@ const ExtrasForm = ({
                   onChange={(e) => handleTShirtSelection(e.target.value)}
                 />
                 <label className="form-check-label" htmlFor={`tshirt-${option}`}>
-                  {option === "1" ? "Yes" : "No"}
+                  {option === "true" ? "Yes" : "No"}
                 </label>
               </div>
             ))}
@@ -140,7 +140,7 @@ const ExtrasForm = ({
             <select
               className={classNames("form-select", { "is-invalid": isSubmitted && errors.tshirt_size })}
               {...register("tshirt_size", {
-                required: buyTShirt === "1" ? "Please select a T-Shirt size" : false,
+                required: buyTShirt === "true" ? "Please select a T-Shirt size" : false,
               })}
               onChange={(e) => handleTShirtSizeSelection(e.target.value)}
               value={tshirtSize || ""}

@@ -28,12 +28,12 @@ const ContributionForm = ({
   sessions,
   watch
 }) => {
-
- 
-  const [wantsToContribute, setWantsToContribute] = useState(null);
-
   const { fields: talks, append: addTalk, remove: removeTalk } = useFieldArray({ control, name: "talks" });
   const { fields: posters, append: addPoster, remove: removePoster } = useFieldArray({ control, name: "posters" });
+
+  const setWantsToContribute = (value) => {
+    setValue("wantsToContribute", value, { shouldDirty: true, shouldValidate: true });
+  };
 
   // Validate before adding new talk/poster
   const validateAndAdd = async (type) => {
@@ -45,15 +45,10 @@ const ContributionForm = ({
   };
 
   const fillTestData = () => {
-    setValue("wantsToContribute", "yes");
-    setWantsToContribute(true);
+    setValue("wantsToContribute", true);
     removeTalk();
+    if (!isOnline) removePoster();
 
-    if (!isOnline) {
-      removePoster();
-    }
-
-    // Find session IDs based on session names
     const meteorPhysicsSession = sessions.find(s => s.name === "Meteor physics and dynamics")?.id || sessions[0]?.id;
     const radioMeteorSession = sessions.find(s => s.name === "Radio meteor work")?.id || sessions[0]?.id;
 
@@ -71,27 +66,24 @@ const ContributionForm = ({
         authors: "Alice Brown, Bob White",
         abstract: "An overview of detecting meteors using radio waves.",
         session_id: radioMeteorSession,
-        print: "true",
+        print: true,
       });
     }
   };
 
+  /*
   useEffect(() => {
-    const wantsToContributeValue = watch("wantsToContribute");  
+    const wantsToContributeValue = watch("wantsToContribute");
     const existingTalks = getValues("talks") || [];
     const existingPosters = getValues("posters") || [];
-  
-    if ((existingTalks.length > 0 || existingPosters.length > 0) && wantsToContributeValue !== "yes") {
-      setValue("wantsToContribute", "yes", { shouldDirty: false, shouldValidate: false });
+
+    if ((existingTalks.length > 0 || existingPosters.length > 0) && wantsToContributeValue !== true) {
+      setValue("wantsToContribute", true, { shouldDirty: false, shouldValidate: false });
     }
-  
-    // Prevent infinite loops: Ensure we are only re-setting state when necessary
-    if (wantsToContributeValue === "yes" && wantsToContribute !== true) {
-      setWantsToContribute(true);
-    }
-  
-  }, [watch("wantsToContribute")]);  
-  
+  }, [watchWantsToContribute, getValues, setValue]);
+  */
+
+
 
   return (
     <div className="position-relative">
@@ -117,25 +109,29 @@ const ContributionForm = ({
       <div className={classNames(cssForm.smallW, 'mx-auto position-relative')}>
         <div className="mb-3 row">
           <label className={classNames('text-center fw-bold', cssForm.balance)}>
-          Would you like to contribute a{isOnline && 'n online '} talk
-          {!isOnline && (<>{' '}or a poster</>)}  to the main IMC {conferenceData.year} conference program?</label>
+            Would you like to contribute a{isOnline && 'n online '} talk
+            {!isOnline && (<>{' '}or a poster</>)}  to the main IMC {conferenceData.year} conference program?</label>
+
           <div className="text-center btn-group d-block mt-3" role="group">
             <input
               type="radio"
               className="btn-check"
               id="contributeYes"
-              value="yes"
-              {...register("wantsToContribute", { required: "Please select an option" })}
+              value="true"
+              {...register("wantsToContribute")}
               onChange={() => setWantsToContribute(true)}
             />
-            <label className="btn btn-outline-primary" htmlFor="contributeYes">Yes</label>
+            <label className={classNames("btn", {
+              "btn-primary": watch("wantsToContribute"),
+              "btn-outline-primary": !watch("wantsToContribute"),
+            })} htmlFor="contributeYes">Yes</label>
 
             <input
               type="radio"
               className="btn-check"
               id="contributeNo"
-              value="no"
-              {...register("wantsToContribute", { required: "Please select an option" })}
+              value="false"
+              {...register("wantsToContribute")}
               onChange={(e) => {
                 if (talks.length > 0 || posters.length > 0) {
                   const confirmDelete = window.confirm(
@@ -150,12 +146,14 @@ const ContributionForm = ({
                   removeTalk();
                   removePoster();
                 }
-
                 setWantsToContribute(false);
               }}
             />
 
-            <label className="btn btn-outline-primary" htmlFor="contributeNo">No</label>
+            <label className={classNames("btn", {
+              "btn-primary": !watch("wantsToContribute"),
+              "btn-outline-primary": watch("wantsToContribute"),
+            })} htmlFor="contributeNo">No</label>
           </div>
           {errors.wantsToContribute && <p className="text-danger fw-bold text-center"><small>{errors.wantsToContribute.message}</small></p>}
         </div>
@@ -163,7 +161,7 @@ const ContributionForm = ({
 
 
       {/* Contribution Fields */}
-      {wantsToContribute && (
+      {watch("wantsToContribute") && (
         <>
           {!isAdmin && (
             <div className="border border-2 p-3 rounded-2 bg-dark mb-3 mx-md-5">
