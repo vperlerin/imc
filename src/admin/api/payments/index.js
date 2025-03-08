@@ -18,6 +18,8 @@ export const useApiPayments = (participantId, fetchTrigger = 0) => {
         axios.get(`${process.env.REACT_APP_API_URL}/admin/api/get_payments.php?id=${participantId}`)
       );
 
+      console.log("REPONS ", response);
+
       if (response.data.success && response.data.data) {
         setPayments(response.data.data);
       } else {

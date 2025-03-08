@@ -33,6 +33,11 @@ const Payments = () => {
   const loading = specificdataLoading || participantLoading || submitting || paymenstLoading;
   const error = participantError || specificDataError || paymentsError || !!errorMsg;
 
+  
+
+
+
+
   const methods = useForm({
     defaultValues: {
       amount: totalDue?.toFixed(2) || "",
@@ -133,7 +138,6 @@ const Payments = () => {
     setEditingPayment(null);
   };
 
-  console.log("registrationTypes? ", registrationTypes);
 
   const isOnline = participant?.participant?.is_online === "1";
   const breadcrumb = [
@@ -236,7 +240,7 @@ const Payments = () => {
           </div >
           <div className="border p-3 rounded-2 mt-3">
             <h4 className="mb-3">Previous Payments</h4>
-            {payments.length > 0 ? (
+            {payments?.length > 0 ? (
               <table className="table table-bordered table-striped">
                 <thead>
                   <tr>
