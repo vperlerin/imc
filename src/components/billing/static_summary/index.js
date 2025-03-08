@@ -27,10 +27,10 @@ const StaticSummary = ({ isOnline, conferenceData, participantData, workshops, r
   const workshopCost = selectedWorkshops.reduce((sum, w) => sum + w.price, 0);
 
   // T-shirt Cost
-  const tshirtCost = extra_options?.buy_tshirt === "1" ? parseFloat(conferenceData.costs.tshirts.price) : 0;
+  const tshirtCost = extra_options?.buy_tshirt ? parseFloat(conferenceData.costs.tshirts.price) : 0;
 
   // Printed Posters Cost
-  const printedPosters = contributions.filter(contribution => contribution.print === "1");
+  const printedPosters = contributions.filter(contribution => (contribution.print === "1" || contribution.print === "true"));
   const printedPostersCost = printedPosters.length * conferenceData.poster_print.price;
 
   // Payment Method

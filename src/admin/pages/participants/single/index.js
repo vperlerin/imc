@@ -342,6 +342,7 @@ const AdminParticipantsUser = () => {
                 conferenceData={cd}
                 register={register}
                 errors={errors}
+                getValues={getValues}
                 setValue={setValue}
                 trigger={trigger}
                 watch={watch}

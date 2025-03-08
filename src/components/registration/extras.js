@@ -1,8 +1,7 @@
 import classNames from "classnames";
 import cssForm from "styles/components/form.module.scss";
 import React, { useEffect, useState } from "react";
-import StepDislay from "components/registration/stepDisplay";
-import { useFormState } from "react-hook-form";
+import StepDislay from "components/registration/stepDisplay"; 
 
 const ExtrasForm = ({
   isAdmin,
@@ -11,14 +10,18 @@ const ExtrasForm = ({
   errors,
   isDebugMode = false,
   step,
+  getValues,
   stepTotal,
   trigger,
   setValue,
-  watch,
-  control,
+  watch, 
 }) => {  
   // Normalize boolean values to always be "true" or "false"
-  const normalizeBoolean = (value) => (value === "true" || value === true ? "true" : "false");
+  const normalizeBoolean = (value) => ((value === "true" || value === true) ? "true" : "false");
+
+  console.log("GET VALUES ", getValues());
+  console.log("watch(buy_tshirt) ? ", watch("buy_tshirt"));
+  console.log("watch(excursion) ? ", watch("excursion"));
 
   // Ensure boolean values are correctly retrieved
   const buyTShirt = normalizeBoolean(watch("buy_tshirt") || "false");
