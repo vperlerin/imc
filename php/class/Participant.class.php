@@ -129,8 +129,8 @@ class ParticipantManager
             ");
 
             // Normalize boolean values (ensure only "1" or "0" is stored)
-            $excursionValue = !empty($data['excursion']) && $data['excursion'] === "1" ? 1 : 0;
-            $buytshirtValue = !empty($data['buy_tshirt']) && $data['buy_tshirt'] === "1" ? 1 : 0;
+            $excursionValue = !empty($data['excursion']) && ($data['excursion'] === "1" || $data['excursion'] === "true") ? 1 : 0;
+            $buytshirtValue = !empty($data['buy_tshirt']) && ($data['buy_tshirt'] === "1" || $data['buy_tshirt'] === "true") ? 1 : 0;
 
             // Execute the prepared statement
             $stmt->execute([
@@ -422,8 +422,8 @@ class ParticipantManager
             ");
 
             // Normalize boolean values ("true" → 1, "false" → 0)
-            $excursionValue = isset($data['excursion']) && $data['excursion'] === "true" ? 1 : 0;
-            $buytshirtValue = isset($data['buy_tshirt']) && $data['buy_tshirt'] === "true" ? 1 : 0;
+            $excursionValue = !empty($data['excursion']) && ($data['excursion'] === "1" || $data['excursion'] === "true") ? 1 : 0;
+            $buytshirtValue = !empty($data['buy_tshirt']) && ($data['buy_tshirt'] === "1" || $data['buy_tshirt'] === "true") ? 1 : 0;
 
             // Ensure tshirt_size is NULL if buy_tshirt is 0
             $tshirtSize = ($buytshirtValue === 1 && !empty($data['tshirt_size'])) ? $data['tshirt_size'] : null;

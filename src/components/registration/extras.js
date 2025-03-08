@@ -18,7 +18,7 @@ const ExtrasForm = ({
   control,
 }) => {
   // Normalize watched values to always be "true" or "false"
-  const normalizeValue = (value) => (value === true || value === "true" ? "true" : "false");
+  const normalizeValue = (value) => ((value === true || value === "true" || value === "1") ? "true" : "false");
 
   const buyTShirt = normalizeValue(watch("buy_tshirt"));
   const tshirtSize = watch("tshirt_size");

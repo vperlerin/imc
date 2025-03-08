@@ -70,21 +70,7 @@ const ContributionForm = ({
       });
     }
   };
-
-  /*
-  useEffect(() => {
-    const wantsToContributeValue = watch("wantsToContribute");
-    const existingTalks = getValues("talks") || [];
-    const existingPosters = getValues("posters") || [];
-
-    if ((existingTalks.length > 0 || existingPosters.length > 0) && wantsToContributeValue !== true) {
-      setValue("wantsToContribute", true, { shouldDirty: false, shouldValidate: false });
-    }
-  }, [watchWantsToContribute, getValues, setValue]);
-  */
-
-
-
+ 
   return (
     <div className="position-relative">
       {isDebugMode && (
