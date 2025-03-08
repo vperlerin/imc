@@ -16,22 +16,17 @@ const ExtrasForm = ({
   setValue,
   watch,
   control,
-}) => { 
+}) => {  
+  // Normalize boolean values to always be "true" or "false"
+  const normalizeBoolean = (value) => (value === "true" || value === true ? "true" : "false");
 
-  const buyTShirt = watch("buy_tshirt");
+  // Ensure boolean values are correctly retrieved
+  const buyTShirt = normalizeBoolean(watch("buy_tshirt") || "false");
   const tshirtSize = watch("tshirt_size");
-  const excursion = watch("excursion");
-
-
-  console.log("buyTShirt ", buyTShirt); 
-  console.log("tshirtSize ", tshirtSize);
-  console.log("excursion ", excursion);
-
-  // Get form state to check if it has been submitted
-  const { isSubmitted } = useFormState({ control });
-
+  const excursion = normalizeBoolean(watch("excursion") || "false");
+ 
   // State for UI updates
-  const [wantsTShirt, setWantsTShirt] = useState(buyTShirt);
+  const [wantsTShirt, setWantsTShirt] = useState(buyTShirt === "true");
 
   // Available T-Shirt sizes
   const tshirt_sizes = conferenceData.costs.tshirts.models.flatMap((model) =>
@@ -47,15 +42,16 @@ const ExtrasForm = ({
     }
   }, [buyTShirt, setValue]);
 
-  // Sync T-Shirt size changes
+  // Ensure `tshirt_size` validation is triggered when `buy_tshirt` changes
   useEffect(() => {
     if (buyTShirt === "true") {
-      trigger("tshirt_size"); // Validate only if T-Shirt is selected
+      trigger("tshirt_size");
     }
-  }, [tshirtSize, buyTShirt, trigger]);
+  }, [buyTShirt, trigger]);
 
   const handleTShirtSelection = (value) => {
-    setValue("buy_tshirt", value, { shouldDirty: true, shouldValidate: true });
+    setValue("buy_tshirt", normalizeBoolean(value), { shouldDirty: true, shouldValidate: true });
+    trigger("tshirt_size"); // Trigger validation when the value changes
   };
 
   const handleTShirtSizeSelection = (value) => {
@@ -91,23 +87,24 @@ const ExtrasForm = ({
             Do you want to participate in the excursion (at no extra cost)?
           </label>
           <div className="d-flex flex-column gap-2">
-            {[true, false].map((option) => (
+            {["true", "false"].map((option) => (
               <div key={option} className="form-check">
                 <input
                   type="radio"
                   id={`excursion-${option}`}
-                  className={classNames("form-check-input", { "is-invalid": isSubmitted && errors.excursion })}
+                  className={classNames("form-check-input", { "is-invalid": errors.excursion })}
                   value={option}
                   {...register("excursion", { required: "Please select an option" })}
                   checked={excursion === option}
+                  onChange={(e) => setValue("excursion", normalizeBoolean(e.target.value), { shouldDirty: true, shouldValidate: true })}
                 />
                 <label className="form-check-label" htmlFor={`excursion-${option}`}>
-                  {option  ? "Yes" : "No"}
+                  {option === "true" ? "Yes" : "No"}
                 </label>
               </div>
             ))}
           </div>
-          {isSubmitted && errors.excursion && <p className="text-danger"><small>{errors.excursion.message}</small></p>}
+          {errors.excursion && <p className="text-danger"><small>{errors.excursion.message}</small></p>}
         </div>
 
         {/* Buy T-Shirt */}
@@ -116,24 +113,24 @@ const ExtrasForm = ({
             Do you want to buy the official IMC{conferenceData.year} T-Shirt for {conferenceData.costs.tshirts.price}€?
           </label>
           <div className="d-flex flex-column gap-2">
-            {[true, false].map((option) => (
+            {["true", "false"].map((option) => (
               <div key={option} className="form-check">
                 <input
                   type="radio"
                   id={`tshirt-${option}`}
-                  className={classNames("form-check-input", { "is-invalid": isSubmitted && errors.buy_tshirt })}
+                  className={classNames("form-check-input", { "is-invalid": errors.buy_tshirt })}
                   value={option}
                   {...register("buy_tshirt", { required: "Please select an option" })}
                   checked={buyTShirt === option}
                   onChange={(e) => handleTShirtSelection(e.target.value)}
                 />
                 <label className="form-check-label" htmlFor={`tshirt-${option}`}>
-                  {option ? "Yes" : "No"}
+                  {option === "true" ? "Yes" : "No"}
                 </label>
               </div>
             ))}
           </div>
-          {isSubmitted && errors.buy_tshirt && <p className="text-danger"><small>{errors.buy_tshirt.message}</small></p>}
+          {errors.buy_tshirt && <p className="text-danger"><small>{errors.buy_tshirt.message}</small></p>}
         </div>
 
         {/* T-Shirt Size Dropdown */}
@@ -141,7 +138,7 @@ const ExtrasForm = ({
           <div className="mb-4">
             <label className="fw-bold mb-2">Select your T-Shirt size</label>
             <select
-              className={classNames("form-select", { "is-invalid": isSubmitted && errors.tshirt_size })}
+              className={classNames("form-select", { "is-invalid": errors.tshirt_size })}
               {...register("tshirt_size", {
                 required: buyTShirt === "true" ? "Please select a T-Shirt size" : false,
               })}
@@ -153,7 +150,7 @@ const ExtrasForm = ({
                 <option key={size} value={size}>{size}</option>
               ))}
             </select>
-            {isSubmitted && errors.tshirt_size && <p className="text-danger"><small>{errors.tshirt_size.message}</small></p>}
+            {errors.tshirt_size && <p className="text-danger"><small>{errors.tshirt_size.message}</small></p>}
           </div>
         )}
       </div>
