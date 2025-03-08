@@ -114,7 +114,7 @@ const AdminParticipantsOnsite = () => {
               <CiSearch className="position-absolute top-50 end-0 translate-middle-y me-2" />
             </div>
           </div>
-          <div className="table-responsive">
+          <div className="table-responsive" style={{maxWidth: 'calc(100vw - 2rem)'}}>
             <table className="table table-striped">
               <thead>
                 <tr>

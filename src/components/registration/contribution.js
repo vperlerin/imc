@@ -28,6 +28,8 @@ const ContributionForm = ({
   sessions,
   watch
 }) => {
+
+ 
   const [wantsToContribute, setWantsToContribute] = useState(null);
 
   const { fields: talks, append: addTalk, remove: removeTalk } = useFieldArray({ control, name: "talks" });
@@ -75,27 +77,21 @@ const ContributionForm = ({
   };
 
   useEffect(() => {
+    const wantsToContributeValue = watch("wantsToContribute");  
     const existingTalks = getValues("talks") || [];
     const existingPosters = getValues("posters") || [];
-
-    if (existingTalks.length > 0 || existingPosters.length > 0) {
-      setValue("wantsToContribute", "yes");
+  
+    if ((existingTalks.length > 0 || existingPosters.length > 0) && wantsToContributeValue !== "yes") {
+      setValue("wantsToContribute", "yes", { shouldDirty: false, shouldValidate: false });
+    }
+  
+    // Prevent infinite loops: Ensure we are only re-setting state when necessary
+    if (wantsToContributeValue === "yes" && wantsToContribute !== true) {
       setWantsToContribute(true);
     }
-
-    // Populate talks if they exist
-    if (existingTalks.length > 0) {
-      removeTalk();
-      existingTalks.forEach((talk) => addTalk({ ...talk  })); 
-    }
-
-    // Populate posters if they exist
-    if (existingPosters.length > 0 && !isOnline) {
-      removePoster();
-      existingPosters.forEach((poster) => addPoster({ ...poster }));
-    }
-  }, [getValues, setValue, addTalk, addPoster, removeTalk, removePoster, isOnline]);
-
+  
+  }, [watch("wantsToContribute")]);  
+  
 
   return (
     <div className="position-relative">

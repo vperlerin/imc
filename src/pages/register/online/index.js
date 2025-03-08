@@ -43,6 +43,9 @@ const MainForm = () => {
   const { workshops, paymentMethods, registrationTypes, loading: specificdataLoading, sessions, error: errorGettingDataFromDB } = useApiSpecificData();
   const { participant, loading: participantLoading, error: participantError } = useApiParticipant(participantId);
 
+  const loading = specificdataLoading || participantLoading || isSaving;
+  const error = participantError || specificDataError || !!errorMsg;
+ 
   const {
     control,
     register,

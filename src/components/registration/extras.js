@@ -17,48 +17,46 @@ const ExtrasForm = ({
   watch,
   control,
 }) => {
-  // Watch form values
-  const buyTShirt = watch("buy_tshirt");
+  // Normalize watched values to always be "1" (true) or "0" (false)
+  const normalizeValue = (value) => (value === true || value === "1" ? "1" : "0");
+
+  const buyTShirt = normalizeValue(watch("buy_tshirt"));
   const tshirtSize = watch("tshirt_size");
+  const excursion = normalizeValue(watch("excursion"));
 
   // Get form state to check if it has been submitted
   const { isSubmitted } = useFormState({ control });
 
-  // State for T-Shirt selection
-  const [wantsTShirt, setWantsTShirt] = useState(false);
+  // State for UI updates
+  const [wantsTShirt, setWantsTShirt] = useState(buyTShirt === "1");
 
+  // Available T-Shirt sizes
   const tshirt_sizes = conferenceData.costs.tshirts.models.flatMap((model) =>
     conferenceData.costs.tshirts.sizes.map((size) => `${model.charAt(0).toUpperCase() + model.slice(1)} ${size}`)
   );
 
-  // Ensure T-Shirt selection persists & Summary updates
+  // Sync T-Shirt selection with state
   useEffect(() => {
-    if (buyTShirt == null) return; // Prevent validation errors from showing on first load
+    setWantsTShirt(buyTShirt === "1");
 
-    const wants = buyTShirt === "1";
-    if (wantsTShirt !== wants) {
-      setWantsTShirt(wants);
-    }
-
-    if (!wants) {
+    if (buyTShirt !== "1") {
       setValue("tshirt_size", "");
     }
+  }, [buyTShirt, setValue]);
 
-    trigger();
-  }, [buyTShirt, wantsTShirt, setValue, trigger]);
-
-  // Ensure Summary updates when size changes
+  // Sync T-Shirt size changes
   useEffect(() => {
-    trigger();
-  }, [tshirtSize, trigger]);
+    if (buyTShirt === "1") {
+      trigger("tshirt_size"); // Validate only if T-Shirt is selected
+    }
+  }, [tshirtSize, buyTShirt, trigger]);
 
   const handleTShirtSelection = (value) => {
-    setValue("buy_tshirt", value, { shouldDirty: true, shouldTouch: true, shouldValidate: true });
-    trigger("tshirt_size"); // Re-validate the T-Shirt size
+    setValue("buy_tshirt", normalizeValue(value), { shouldDirty: true, shouldValidate: true });
   };
 
   const handleTShirtSizeSelection = (value) => {
-    setValue("tshirt_size", value, { shouldDirty: true, shouldTouch: true, shouldValidate: true });
+    setValue("tshirt_size", value, { shouldDirty: true, shouldValidate: true });
   };
 
   const fillTestData = () => {
@@ -98,7 +96,7 @@ const ExtrasForm = ({
                   className={classNames("form-check-input", { "is-invalid": isSubmitted && errors.excursion })}
                   value={option}
                   {...register("excursion", { required: "Please select an option" })}
-                  checked={watch("excursion") === option}
+                  checked={excursion === option}
                 />
                 <label className="form-check-label" htmlFor={`excursion-${option}`}>
                   {option === "1" ? "Yes" : "No"}
@@ -123,7 +121,7 @@ const ExtrasForm = ({
                   className={classNames("form-check-input", { "is-invalid": isSubmitted && errors.buy_tshirt })}
                   value={option}
                   {...register("buy_tshirt", { required: "Please select an option" })}
-                  checked={watch("buy_tshirt") === option}
+                  checked={buyTShirt === option}
                   onChange={(e) => handleTShirtSelection(e.target.value)}
                 />
                 <label className="form-check-label" htmlFor={`tshirt-${option}`}>

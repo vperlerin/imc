@@ -37,7 +37,6 @@ const AdminParticipantsUser = () => {
   const { workshops, paymentMethods, registrationTypes, loading: specificdataLoading, sessions, error: specificDataError } = useApiSpecificData();
   const { participant, loading: participantLoading, error: participantError } = useApiParticipant(participantId, 0, true);
   const { control, register, handleSubmit, getValues, setValue, formState: { errors }, trigger, watch } = useForm();
- 
 
   // Detect form changes
   useEffect(() => {
@@ -54,15 +53,16 @@ const AdminParticipantsUser = () => {
   }, [tab, participantId, navigate]);
 
 
-  // Create all the values for the forms 
   useEffect(() => {
-    if (!participant && sessions.length === 0) {
+    if (!participant || sessions.length === 0) {
       return;
     }
 
-    // Participant
-    const { dob, ...otherDetails } = participant.participant;
+    // Extract participant data safely
+    const { participant: participantDetails, workshops, arrival, contributions, accommodation, extra_options } = participant || {};
+    const { dob, ...otherDetails } = participantDetails || {};
 
+    // Handle Date of Birth
     if (dob) {
       const [year, month, day] = dob.split("-");
       setValue("dobDay", String(Number(day)));
@@ -70,38 +70,42 @@ const AdminParticipantsUser = () => {
       setValue("dobYear", year);
     }
 
-    // Set other participant details
-    Object.keys(otherDetails).forEach((key) => {
-      if (otherDetails[key]) {
-        setValue(key, otherDetails[key]);
-      }
-    });
+    // Set other participant details safely
+    if (otherDetails) {
+      Object.entries(otherDetails).forEach(([key, value]) => {
+        if (value !== null && value !== undefined) {
+          setValue(key, value);
+        }
+      });
+    }
 
+    // Handle Workshops
+    if (workshops && Array.isArray(workshops)) {
+      const participantWorkshops = workshops.map(workshop => String(workshop.id));
+      setValue("workshops", participantWorkshops);
+    }
 
-    // Workshops
-    const participantWorkshops = participant.workshops?.map(workshop => String(workshop.id)) || [];
-    setValue("workshops", participantWorkshops);
+    // Handle Arrival Details safely
+    if (arrival) {
+      Object.entries(arrival).forEach(([key, value]) => {
+        if (value !== null && value !== undefined) {
+          setValue(
+            key,
+            key.includes("hour") || key.includes("minute") ? String(value).padStart(2, "0") : value
+          );
+        }
+      });
+    }
 
-    // Arrival  
-    const participantArrival = participant.arrival || {};
-    Object.keys(participantArrival).forEach((key) => {
-      if (participantArrival[key] !== null) {
-        setValue(key, key.includes("hour") || key.includes("minute")
-          ? participantArrival[key].toString().padStart(2, "0")
-          : participantArrival[key]
-        );
-      }
-    });
+    // Handle Contributions (Talks & Posters)
+    if (contributions && Array.isArray(contributions) && sessions.length > 0) {
+      const updatedTalks = contributions
+        .filter(contribution => contribution.type === "talk")
+        .map(talk => ({ ...talk }));
 
-    // Contribution
-    const contributions = participant.contributions || [];
-    if (sessions.length > 0) {
-      const updatedTalks = contributions.filter(c => c.type === "talk").map(talk => ({
-        ...talk
-      }));
-      const updatedPosters = contributions.filter(c => c.type === "poster").map(poster => ({
-        ...poster
-      }));
+      const updatedPosters = contributions
+        .filter(contribution => contribution.type === "poster")
+        .map(poster => ({ ...poster }));
 
       // Store in state
       setTalks(updatedTalks);
@@ -110,21 +114,27 @@ const AdminParticipantsUser = () => {
       // Set values in form so they persist on submit
       setValue("talks", updatedTalks);
       setValue("posters", updatedPosters);
+
+      // Set wantsToContribute if at least one talk or poster exists
+      if (updatedTalks.length > 0 || updatedPosters.length > 0) {
+        setValue("wantsToContribute", "yes");
+      }
     }
 
 
-    // Accommodation
-    if (participant.accommodation?.registration_type_id) {
-      setValue("registration_type_id", String(participant.accommodation.registration_type_id));
+    // Handle Accommodation
+    if (accommodation?.registration_type_id) {
+      setValue("registration_type_id", String(accommodation.registration_type_id));
     }
 
-    // Extras
-    if (participant.extra_options) {
-      setValue("excursion", participant.extra_options.excursion);
-      setValue("buy_tshirt", participant.extra_options.buy_tshirt);
-      setValue("tshirt_size", participant.extra_options.tshirt_size);
+    // Handle Extra Options safely
+    if (extra_options) {
+      setValue("excursion", Boolean(extra_options.excursion));
+      setValue("buy_tshirt", Boolean(extra_options.buy_tshirt));
+      setValue("tshirt_size", extra_options.tshirt_size || "");
     }
-  }, [participant]);
+
+  }, [participant, sessions, setValue, setTalks, setPosters]);
 
   const onSubmit = async (formData) => {
     setSaving(true);
@@ -158,10 +168,19 @@ const AdminParticipantsUser = () => {
       );
 
       if (response.data.success) {
-        setSuccessMsg("Participant updated successfully! The page will now reload to assure data integrity.");
+        let countdown = 3; // Start countdown from 3 seconds
+      
+        setSuccessMsg(`Participant updated successfully! The page will reload in ${countdown} seconds to assure data integrity.`);
         setUnsavedChanges(false);
-        setTimeout(() => {
-          window.location.reload();
+      
+        const interval = setInterval(() => {
+          countdown -= 1;
+          if (countdown > 0) {
+            setSuccessMsg(`Participant updated successfully! The page will reload in ${countdown} seconds to assure data integrity.`);
+          } else {
+            clearInterval(interval);
+            window.location.reload();
+          }
         }, 1000);
       } else {
         throw new Error(response.data.message || "Failed to update participant.");
@@ -189,7 +208,7 @@ const AdminParticipantsUser = () => {
     }
   ];
 
- 
+
   const isSummaryReady = (
     participant &&
     paymentMethods.length > 0 &&
@@ -199,6 +218,11 @@ const AdminParticipantsUser = () => {
 
   const isLoading = specificdataLoading || participantLoading || saving || !isSummaryReady;
   const hasError = participantError || specificDataError || error;
+
+  const hasAdminNotes =!!participant?.participant?.admin_notes;
+
+  console.log("vALUES ", getValues());
+ 
 
   return (
     <PageContain
@@ -221,7 +245,7 @@ const AdminParticipantsUser = () => {
         )}
       </div>
 
-      {participant && isSummaryReady && (
+      {participant && isSummaryReady && !isLoading &&  (
         <form onSubmit={handleSubmit(onSubmit)}>
           <ul className={classNames('nav nav-tabs mb-3 mt-2', cssTabs.tab, 'flex-column flex-sm-row')}>
             {[
@@ -237,7 +261,13 @@ const AdminParticipantsUser = () => {
             ].map(({ key, label }) => (
               <li className="nav-item" key={key}>
                 <a
-                  className={`nav-link ${activeTab === key ? `active ${cssTabs.active}` : ""}`}
+                  className={
+                    classNames(
+                       'nav-link',
+                       activeTab === key && cssTabs.active,
+                       key === 'admin_notes' && 'position-relative'
+                    )
+                  }
                   href={`/admin/participants/onsite/${participantId}/${key}`}
                   onClick={(e) => {
                     e.preventDefault();
@@ -245,6 +275,9 @@ const AdminParticipantsUser = () => {
                   }}
                 >
                   {label}
+                  {hasAdminNotes && key === 'admin_notes' && (
+                     <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">!</span>
+                  )}
                 </a>
               </li>
             ))}
@@ -361,7 +394,7 @@ const AdminParticipantsUser = () => {
                   <div className="text-danger mt-1">{errors.admin_notes.message}</div>
                 )}
               </div>
-            )} 
+            )}
 
             <div className="mt-4 d-flex justify-content-end">
               <button type="submit" className="btn btn-outline-primary fw-bolder" disabled={saving}>{saving ? "Saving..." : "Save Changes"}</button>
