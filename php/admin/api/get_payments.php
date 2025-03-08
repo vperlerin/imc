@@ -19,8 +19,6 @@ require_once __DIR__ . "/config.php";
 require_once __DIR__ . "/class/Payment.class.php";
 require_once __DIR__ . "/class/Connect.class.php";
  
-
- 
 // Handle preflight OPTIONS request
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);

@@ -10,7 +10,8 @@ import { getPaymentMethodById } from 'utils/payment_method';
 import { useParams } from "react-router-dom";
 import { conferenceData as cd } from "data/conference-data";
 import { FormProvider, useForm } from "react-hook-form";
-import { useApiSpecificData } from "api/specific-data/index.js";
+import { useApiPayments  } from "@/admin/api/payments";
+import { useApiSpecificData } from "api/specific-data";
 import { useApiParticipant } from "api/participants";
 
 const Payments = () => {
@@ -28,13 +29,9 @@ const Payments = () => {
   const { workshops, paymentMethods, registrationTypes, loading: specificdataLoading, sessions, error: specificDataError } = useApiSpecificData();
   const { participant, loading: participantLoading, error: participantError } = useApiParticipant(participantId);
   const { payments, loading: paymenstLoading, error: paymentsError } = useApiPayments(participantId);
-
-  console.log("PAYMENTS ? ", payments);
-  return <></>;
-
   
-  const loading = specificdataLoading || participantLoading || submitting;
-  const error = participantError || specificDataError || !!errorMsg;
+  const loading = specificdataLoading || participantLoading || submitting || paymenstLoading;
+  const error = participantError || specificDataError || paymentsError || !!errorMsg;
 
   const methods = useForm({
     defaultValues: {
@@ -59,14 +56,7 @@ const Payments = () => {
     },
   });
 
-
-  useEffect(() => {
-    if (totalDue !== null && !editingPayment) {
-      setAmount(totalDue.toFixed(2)); // Ensure two decimal places
-    }
-  }, [totalDue, editingPayment]);
-
-
+ 
   const submitForm = async (data) => {
     setError(null);
     setSuccessMsg(null);
