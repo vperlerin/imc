@@ -1,48 +1,69 @@
-import classNames from "classnames";
-import css from "../summary/index.module.scss";
 import React from "react";
+import { getPaymentMethodById } from "utils/payment_method";
 
 const getPaypalPrice = (price) => {
   return Math.round((price + (0.034 * price + 0.35) / 0.966) * 100) / 100;
 };
 
-const StaticSummary = ({ isOnline, conferenceData, participantData, workshops, registrationTypes, paymentMethods }) => {
+const getRegInfo = (id, registrationTypes) => {
+  const registration = registrationTypes.find(item => item.id === id);
+  if (!registration) return "Description not found";
+
+  const isLastItem = registrationTypes[registrationTypes.length - 1].id === id;
+  return {
+    description: isLastItem ? "(no accommodation)" : "+ " + registration.description,
+    price: parseFloat(registration.price),
+  };
+};
+
+const getSelectedWorkshops = (participantWorkshops = [], isOnline) => {
+  if (!Array.isArray(participantWorkshops)) return { selected: [], totalPrice: 0 };
+
+  const selected = participantWorkshops
+    .filter(workshop => workshop.attending === "1") // Only include attended workshops
+    .map(workshop => ({
+      title: workshop.title,
+      price: isOnline ? parseFloat(workshop.price_online) : parseFloat(workshop.price),
+    }));
+
+  const totalPrice = selected.reduce((sum, workshop) => sum + workshop.price, 0);
+  return { selected, totalPrice };
+};
+
+const StaticSummary = ({ isOnline, conferenceData, participantData, registrationTypes, paymentMethods }) => {
   if (!participantData || !participantData.participant) {
     return <div className="alert alert-danger">No participant data available.</div>;
   }
 
-  const { participant, accommodation, extra_options, contributions = [], payments = [] } = participantData;
+  const { participant, accommodation, workshops: participantWorkshops, extra_options, contributions = [], payments = [] } = participantData;
 
   // Registration & Accommodation
-  const registrationType = accommodation?.registration_type || "Unknown";
-  const registrationPrice = parseFloat(accommodation?.registration_price || 0);
+  const { description: registration_description, price: registrationPrice } = getRegInfo(accommodation.registration_type_id, registrationTypes);
   const lateFee = participant.is_early_bird === "0" ? conferenceData.costs.after_early_birds : 0;
   const totalRoomCost = registrationPrice + lateFee;
 
   // Selected Workshops
-  const selectedWorkshops = workshops.map(workshop => ({
-    title: workshop.title,
-    price: isOnline ? parseFloat(workshop.price_online) : parseFloat(workshop.price)
-  }));
-  const workshopCost = selectedWorkshops.reduce((sum, w) => sum + w.price, 0);
+  const { selected: selectedWorkshops, totalPrice: workshopCost } = getSelectedWorkshops(participantWorkshops, isOnline);
 
   // T-shirt Cost
-  const tshirtCost = extra_options?.buy_tshirt ? parseFloat(conferenceData.costs.tshirts.price) : 0;
+  const buyTShirt = extra_options?.buy_tshirt === "1" || extra_options?.buy_tshirt === "true";
+  const tshirtCost = buyTShirt ? parseFloat(conferenceData.costs.tshirts.price) : 0;
 
   // Printed Posters Cost
-  const printedPosters = contributions.filter(contribution => (contribution.print === "1" || contribution.print === "true"));
-  const printedPostersCost = printedPosters.length * conferenceData.poster_print.price;
+  const printedPosters = contributions.filter(contribution => contribution.print === "1" || contribution.print === "true");
+  const numberOfPrintedPosters = printedPosters.length;
+  const printedPostersCost = numberOfPrintedPosters * conferenceData.poster_print.price;
 
-  // Payment Method
-  const paymentMethodName = payments.length > 0 ? payments[0].payment_method : "Unknown";
-  const isPaypal = paymentMethodName === "Paypal";
+  // Payment Method 
+  const paymentMethodName = payments.length > 0 ? getPaymentMethodById(accommodation.payment_method_id, paymentMethods) : "Unknown";
+  const isPaypal = paymentMethodName.toLowerCase() === "paypal"; 
 
   // Total Calculation
   let totalCost = totalRoomCost + workshopCost + tshirtCost + printedPostersCost;
   const paypalFee = isPaypal ? getPaypalPrice(totalCost) - totalCost : 0;
   totalCost += paypalFee;
 
-  // Online conference cost calculation
+  // Online Conference Cost Calculation
   const onlineConferenceCost = conferenceData.costs.online;
   let totalOnlineCost = workshopCost + onlineConferenceCost;
   const onlinePaypalFee = isPaypal ? getPaypalPrice(totalOnlineCost) - totalOnlineCost : 0;
@@ -63,7 +84,7 @@ const StaticSummary = ({ isOnline, conferenceData, participantData, workshops, r
           {!isOnline ? (
             <tr>
               <td className="ps-3 text-muted">
-                Conference Registration {registrationType !== "Unknown" ? `(${registrationType})` : ""}
+                Conference Registration {registration_description}
               </td>
               <td className="text-end">{totalRoomCost.toFixed(2)}€</td>
             </tr>
@@ -83,10 +104,10 @@ const StaticSummary = ({ isOnline, conferenceData, participantData, workshops, r
           ))}
 
           {/* Printed Posters */}
-          {printedPosters.length > 0 && (
+          {numberOfPrintedPosters > 0 && (
             <tr>
               <td className="ps-3 text-muted">
-                Printed Poster{printedPosters.length > 1 ? "s" : ""} x {printedPosters.length}
+                Printed Poster{numberOfPrintedPosters > 1 ? "s" : ""} x {numberOfPrintedPosters}
               </td>
               <td className="text-end">{printedPostersCost.toFixed(2)}€</td>
             </tr>

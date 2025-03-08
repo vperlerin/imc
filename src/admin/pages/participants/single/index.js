@@ -10,6 +10,7 @@ import { useForm } from "react-hook-form";
 import { conferenceData as cd } from "data/conference-data";
 import { useApiSpecificData } from "api/specific-data/index.js";
 import { useApiParticipant } from "api/participants";
+import { Link } from "react-router-dom";
 import Identitity from "components/registration/identity";
 import Workshops from "components/registration/workshops";
 import Arrival from "components/registration/arrival";
@@ -18,6 +19,8 @@ import Accommodation from "components/registration/accomodation";
 import Extras from "components/registration/extras";
 import Comments from "components/registration/comments";
 import Summary from "components/billing/summary";
+import { formatFullDate } from "utils/date";
+
 
 const AdminParticipantsUser = () => {
   const { participantId, tab } = useParams();
@@ -39,7 +42,8 @@ const AdminParticipantsUser = () => {
   const { participant, loading: participantLoading, error: participantError } = useApiParticipant(participantId, fetchParticipantTrigger, true);
   const { control, register, handleSubmit, getValues, setValue, formState: { errors }, trigger, watch } = useForm();
 
- 
+
+
   // Detect form changes
   useEffect(() => {
     const subscription = watch(() => {
@@ -50,7 +54,7 @@ const AdminParticipantsUser = () => {
 
   useEffect(() => {
     if (!tab) {
-      navigate(`/admin/participants/onsite/${participantId}/identity`, { replace: true });
+      navigate(`/admin/participants/onsite/${participantId}/summary`, { replace: true });
     }
   }, [tab, participantId, navigate]);
 
@@ -122,7 +126,7 @@ const AdminParticipantsUser = () => {
         setValue("wantsToContribute", "yes");
       }
     }
- 
+
     // Handle Accommodation
     if (accommodation?.registration_type_id) {
       setValue("registration_type_id", String(accommodation.registration_type_id));
@@ -130,8 +134,8 @@ const AdminParticipantsUser = () => {
 
     // Handle Extra Options safely
     if (extra_options) {
-      setValue("excursion",  extra_options.excursion === "0" ? "false" : "true");
-      setValue("buy_tshirt",  extra_options.buy_tshirt === "0" ? "false" : "true");
+      setValue("excursion", extra_options.excursion === "0" ? "false" : "true");
+      setValue("buy_tshirt", extra_options.buy_tshirt === "0" ? "false" : "true");
       setValue("tshirt_size", extra_options.tshirt_size || "");
     }
 
@@ -150,11 +154,9 @@ const AdminParticipantsUser = () => {
       setError("Please fill in all required fields.");
       return;
     }
- 
+
     formData.talks = getValues("talks") || [];
     formData.posters = getValues("posters") || [];
-
-    console.log('FORM DATA ', formData); 
 
     try {
       const response = await axios.post(
@@ -205,9 +207,6 @@ const AdminParticipantsUser = () => {
 
   const hasAdminNotes = !!participant?.participant?.admin_notes;
 
-  console.log("vALUES ", getValues());
-
-
   return (
     <PageContain
       breadcrumb={breadcrumb}
@@ -233,6 +232,7 @@ const AdminParticipantsUser = () => {
         <form onSubmit={handleSubmit(onSubmit)}>
           <ul className={classNames('nav nav-tabs mb-3 mt-2', cssTabs.tab, 'flex-column flex-sm-row')}>
             {[
+              { key: "summary", label: `Billing` },
               { key: "identity", label: "Identity" },
               { key: "workshops", label: "Workshops" },
               { key: "arrival", label: "Arrival" },
@@ -241,7 +241,7 @@ const AdminParticipantsUser = () => {
               { key: "extras", label: "Extras" },
               { key: "comments", label: "Comments" },
               { key: "admin_notes", label: "Marc's notes" },
-              { key: "summary", label: "Summary" },
+
             ].map(({ key, label }) => (
               <li className="nav-item" key={key}>
                 <a
@@ -264,12 +264,13 @@ const AdminParticipantsUser = () => {
                       {label}
                     </span>
                   ) : (
-                     <>{ label }</>
+                    <>{label}</>
                   )}
                 </a>
               </li>
             ))}
           </ul>
+ 
           {/* Tab Content */}
           <div className={classNames('tab-content mx-auto', cssTabs.contentMxw)}>
             {tab === "identity" && (
@@ -354,19 +355,56 @@ const AdminParticipantsUser = () => {
               />
             )}
             {tab === "summary" && isSummaryReady && (
-              <Summary
-                isAdmin
-                isEarlyBird={participant?.participant.is_early_bird}
-                conferenceData={cd}
-                getValues={getValues}
-                setValue={setValue}
-                setTotal={setTotal}
-                setPaypalFee={setPaypalFee}
-                workshops={workshops}
-                registrationTypes={registrationTypes}
-                paymentMethods={paymentMethods}
-                watch={watch}
-              />
+              <div className='mx-3'>
+                <div className="d-flex mt-3 align-items-center justify-content-between w-100 mb-3">
+                  <div>
+                    {participant?.participant?.first_name
+                      ? participant.participant.first_name.charAt(0).toUpperCase() +
+                      participant.participant.first_name.slice(1)
+                      : ""}
+
+                    {' '}{participant?.participant?.last_name || ""}
+
+                    {participant.confirmation_sent === "1" ? (
+                      <>
+                        ✅ {`has been confirmed on `} {participant.confirmation_date && formatFullDate(participant.confirmation_date)}
+
+                      </>
+                    ) : (
+                      <>
+                        ❌  has NOT been confirmed yet.
+                      </>
+                    )}
+                  </div>
+
+                  {participant.confirmation_sent !== "1" && (
+                    <div>
+                      <Link
+                        className="btn btn-outline-success fw-bolder"
+                        to={`/admin/participants/onsite/payment/${participantId}`}
+                      >
+                        Go to Payments to confirm
+                      </Link>
+                    </div>
+                  )}
+                </div>
+
+                <Summary
+                  isAdmin
+                  isEarlyBird={participant?.participant.is_early_bird}
+                  conferenceData={cd}
+                  getValues={getValues}
+                  setValue={setValue}
+                  setTotal={setTotal}
+                  setPaypalFee={setPaypalFee}
+                  workshops={workshops}
+                  registrationTypes={registrationTypes}
+                  paymentMethods={paymentMethods}
+                  watch={watch}
+                />
+              </div>
+
+
             )}
             {tab === "admin_notes" && (
               <div className="mb-3">

@@ -9,17 +9,13 @@ import WysiwygEditor from 'utils/wysiwyg-editor.js';
 import { getPaymentMethodById } from 'utils/payment_method';
 import { useParams } from "react-router-dom";
 import { conferenceData as cd } from "data/conference-data";
-import { useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
+import { useApiSpecificData } from "api/specific-data/index.js";
+import { useApiParticipant } from "api/participants";
 
 const Payments = () => {
-  const { participantId } = useParams();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [participant, setParticipant] = useState(null);
-  const [payments, setPayments] = useState([]);
-  const [paymentMethods, setPaymentMethods] = useState([]);
-  const [registrationTypes, setRegistrationTypes] = useState([]);
-  const [workshops, setWorkshops] = useState([]);
+  const { participantId } = useParams(); 
+  const [errorMsg, setErrorMsg] = useState(null); 
   const [amount, setAmount] = useState("");
   const [paymentMethodId, setPaymentMethodId] = useState("");
   const [paymentDate, setPaymentDate] = useState(new Date().toISOString().split("T")[0]);
@@ -29,9 +25,25 @@ const Payments = () => {
   const [editingPayment, setEditingPayment] = useState(null);
   const [totalDue, setTotalDue] = useState(null);
 
-  const hasFetchedData = useRef(false);
-  const hasFetchedParticipant = useRef(false);
-  const hasFetchedParticipantPayments = useRef(false);
+  const { workshops, paymentMethods, registrationTypes, loading: specificdataLoading, sessions, error: specificDataError } = useApiSpecificData();
+  const { participant, loading: participantLoading, error: participantError } = useApiParticipant(participantId);
+  const { payments, loading: paymenstLoading, error: paymentsError } = useApiPayments(participantId);
+
+  console.log("PAYMENTS ? ", payments);
+  return <></>;
+
+  
+  const loading = specificdataLoading || participantLoading || submitting;
+  const error = participantError || specificDataError || !!errorMsg;
+
+  const methods = useForm({
+    defaultValues: {
+      amount: totalDue?.toFixed(2) || "",
+      paymentMethodId: "",
+      paymentDate: new Date().toISOString().split("T")[0],
+      adminNote: "",
+    },
+  });
 
   const {
     register,
@@ -46,58 +58,8 @@ const Payments = () => {
       adminNote: "",
     },
   });
-  useEffect(() => {
-    const fetchData = async () => {
-      if (hasFetchedData.current) return;
-      hasFetchedData.current = true;
-      setLoading(true);
 
-      try {
-        // Step 1: Fetch Payment Methods, Workshops, and Registration Types
-        const specificDataResponse = await axios.get(`${process.env.REACT_APP_API_URL}/get_specific_data.php`);
-        if (!specificDataResponse.data.success) throw new Error(specificDataResponse.data.message || "Failed to fetch data.");
 
-        setWorkshops(specificDataResponse.data.data.workshops || []);
-        setPaymentMethods(specificDataResponse.data.data.payment_methods || []);
-        setRegistrationTypes(specificDataResponse.data.data.registration_types || []);
-
-        // Step 2: Fetch Participant Data (Only after Step 1 completes)
-        if (!participantId) return;
-        hasFetchedParticipant.current = true;
-
-        const participantResponse = await axios.get(`${process.env.REACT_APP_API_URL}/admin/api/participant.php?id=${participantId}`);
-        if (!participantResponse.data.success) throw new Error(participantResponse.data.message || "Failed to fetch participant data.");
-
-        setParticipant(participantResponse.data.data);
-
-        // Step 3: Set Default Payment Method (Only if accommodation data exists)
-        if (participantResponse.data.data?.accommodation?.payment_method_id) {
-          setPaymentMethodId(participantResponse.data.data.accommodation.payment_method_id);
-
-          const methodType = getPaymentMethodById(participantResponse.data.data.accommodation.payment_method_id, specificDataResponse.data.data.payment_methods);
-          const calculatedTotalDue = methodType === 'paypal'
-            ? parseFloat(participantResponse.data.data.participant.total_due) + parseFloat(participantResponse.data.data.participant.paypal_fee) - parseFloat(participantResponse.data.data.participant.total_paid)
-            : parseFloat(participantResponse.data.data.participant.total_due) - parseFloat(participantResponse.data.data.participant.total_paid);
-
-          setTotalDue(calculatedTotalDue);
-        }
-
-        // Step 4: Fetch Payments (Only after Participant Data is fetched)
-        const paymentsResponse = await axios.get(`${process.env.REACT_APP_API_URL}/get_participant_payments.php?id=${participantId}`);
-        if (!paymentsResponse.data.success) throw new Error(paymentsResponse.data.message || "Failed to fetch payments.");
-
-        setPayments(paymentsResponse.data.data.payments || []);
-      } catch (err) {
-        setError(err.message || "An error occurred while fetching data.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [participantId]);
-
-  // Step 5: Set default value for amount when totalDue is updated
   useEffect(() => {
     if (totalDue !== null && !editingPayment) {
       setAmount(totalDue.toFixed(2)); // Ensure two decimal places
@@ -181,6 +143,8 @@ const Payments = () => {
     setEditingPayment(null);
   };
 
+  console.log("registrationTypes? ", registrationTypes);
+
   const isOnline = participant?.participant?.is_online === "1";
   const breadcrumb = [
     { url: `/admin/participants/${isOnline ? 'online' : 'onsite'}`, name: isOnline ? "Online Participants" : "Onsite Participants" },
@@ -195,15 +159,16 @@ const Payments = () => {
       {!loading && error && <div className="alert alert-danger">{error}</div>}
       {successMsg && <div className="alert alert-success">{successMsg}</div>}
 
-      <form>
-        <WysiwygEditor />
+      <FormProvider {...methods}>
+        <form onSubmit={methods.handleSubmit(submitForm)}> 
+          <WysiwygEditor name="adminNote" />
+          <button type="submit" className="btn btn-primary">Submit</button>
+        </form>
+      </FormProvider>
 
-      </form>
-
-      {!loading && participant && (
+      {!loading && (
         <>
           <div className="d-flex flex-column flex-md-row gap-3 align-items-strecht">
-
             <div className="border p-3 rounded-2 flex-grow-1">
               <h4 className="mb-3">{editingPayment ? "Edit Payment" : "Add a New Payment"}</h4>
               <form onSubmit={handleSubmit}>
