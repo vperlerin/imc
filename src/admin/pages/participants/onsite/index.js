@@ -169,7 +169,7 @@ const AdminParticipantsOnsite = () => {
                         )}
                       </td>
                       <td>{participant.payment_method || "n/a"}</td>
-                      <td>
+                      <td> 
                         {participant.confirmation_sent === "1" ? (
                           <>
                             ✅

@@ -47,9 +47,9 @@ try {
 
   /*
   ex:
-  $participantManager->confirm(123, ['confirmation_sent' => true]);
-$participantManager->confirm(456, ['confirmation_sent' => true, 'confirmation_date' => true]);
-$participantManager->confirm(789, ['confirmation_date' => true]);
+    EMAIL ONLY:  $participantManager->confirm(123, ['confirmation_sent' => true]);
+    EMAIL + CONFIRM: $participantManager->confirm(456, ['confirmation_sent' => true, 'confirmation_date' => true]);
+    CONFIRM ONLY: $participantManager->confirm(789, ['confirmation_date' => true]);
 
   */
   

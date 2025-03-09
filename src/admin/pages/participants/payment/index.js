@@ -1,4 +1,5 @@
 import { IoIosMail } from "react-icons/io";
+import css from './index.module.scss';
 import classNames from "classnames";
 import PageContain from "@/admin/components/page-contain";
 import React, { useEffect, useState } from "react";
@@ -16,7 +17,10 @@ import { useApiConfirmParticipant } from '@/admin/api/participants/confirm';
 
 const Payments = ({ isCurOnline = false }) => {
   const { participantId } = useParams();
+  const [wantToAddMessage, setWantToAddMessage] = useState(false);
+  const [additionalMessage, setAdditionalMessage] = useState("");
   const [formErrors, setFormErrors] = useState(null);
+  const [_confirmError, set_ConfirmError] = useState(null);
   const [successMsg, setSuccessMsg] = useState(null);
   const [editingPayment, setEditingPayment] = useState(null);
   const [fetchParticipantTrigger, setFetchParticipantTrigger] = useState(false);
@@ -138,10 +142,11 @@ const Payments = ({ isCurOnline = false }) => {
   ];
 
   const confirmationMessage = `
-    Dear <strong>${participant?.participant?.first_name} ${participant?.participant?.last_name}</strong>,<br><br>
+    Dear ${participant?.participant?.first_name} ${participant?.participant?.last_name},<br><br>
     Your participation in the IMC ${cd.year} has now been confirmed.<br><br>
     Should your plans change, please contact us immediately: https://imc${cd.year}.imo.net/contact<br> 
     Notice that in such a case, the cancellation policy of the Disclaimer and Service Agreement applies: https://imc${cd.year}.imo.net/disclaimer<br><br>
+    ${additionalMessage}
     Thank you!<br>
     We look forward to meeting you at ${cd.location}.<br><br>
     The IMC ${cd.year} Team.
@@ -153,12 +158,29 @@ const Payments = ({ isCurOnline = false }) => {
   };
 
   const handleConfirmAndSend = async () => {
-    await confirmParticipant(participantId, { confirmation_sent: true, confirmation_date: true });
+    if (!wantToAddMessage) {
+      setWantToAddMessage(true);
+      return;
+    }
+
+    const finalMessage = `${confirmationMessage}<br><br>${additionalMessage}`;
+    try {
+      await confirmParticipant(participantId, { confirmation_sent: true, confirmation_date: true, message: finalMessage });
+    } catch (error) {
+      set_ConfirmError("Failed to send confirmation email.");
+    }
   };
 
   const handleSendOnly = async () => {
+
+
+    set_ConfirmError(null);
+
     await confirmParticipant(participantId, { confirmation_sent: true });
   };
+
+  const confirmationSent = participant?.participant.confirmation_sent !== "0";
+  const confirmationDate = !!participant?.participant.confirmation_date;
 
 
   return (
@@ -366,31 +388,67 @@ const Payments = ({ isCurOnline = false }) => {
                   </div>
                   <div className="modal-body">
                     {errorConfirm && <div className="text-danger fw-bolder">{errorConfirm}</div>}
+                    {_confirmError && !errorConfirm && <div className="text-danger fw-bolder">{_confirmError}</div>}
                     {isConfirming && <Loader />}
-                    <div className="d-flex w-100 gap-3">
-                      <button className="fw-bolder btn btn-outline-success" onClick={handleConfirm} disabled={isConfirming}>
-                        CONFIRM
-                      </button>
-                      or
-                      <button className="fw-bolder btn btn-outline-success" onClick={handleConfirmAndSend} disabled={isConfirming}>
-                        CONFIRM & SEND <IoIosMail />
-                      </button>
-                      or
-                      <button className="fw-bolder btn btn-outline-success" onClick={handleSendOnly} disabled={isConfirming}>
-                        SEND <IoIosMail />
-                      </button>
-                      {errorConfirm && <div className="text-danger">{errorConfirm}</div>}
-                    </div>
-                    <div className="bg-white text-black p-3 rounded-2" dangerouslySetInnerHTML={{ __html: confirmationMessage }} />
+                    {!wantToAddMessage && (
+                      <>
+                        <p className="fw-bolder">Marc, make your choice: </p>
+                        <div className="d-flex w-100 gap-3 mt-3">
+                          {!confirmationSent && !confirmationDate && (
+                            <button className="fw-bolder btn btn-outline-success" onClick={handleConfirmAndSend} disabled={isConfirming}>
+                              CONFIRM & SEND <IoIosMail />
+                            </button>
+                          )}
 
-                  </div>
-                  <div className="modal-footer">
-                    <button className="btn btn-outline-danger fw-bolder" onClick={() => setShowConfirmationModal(false)}>
-                      Cancel
-                    </button>
-                    <button className="btn btn-outline-success fw-bolder" onClick={() => { setShowConfirmationModal(false); }}>
-                      Yes
-                    </button>
+                          {!confirmationSent && !confirmationDate && (
+                            <button className="fw-bolder btn btn-outline-success" onClick={handleConfirm} disabled={isConfirming}>
+                              CONFIRM
+                            </button>
+                          )}
+
+                          {!confirmationSent && confirmationDate && (
+                            <button className="fw-bolder btn btn-outline-success" onClick={handleSendOnly} disabled={isConfirming}>
+                              SEND <IoIosMail />
+                            </button>
+                          )}
+                          {errorConfirm && <div className="text-danger">{errorConfirm}</div>}
+                        </div>
+                      </>
+                    )}
+
+                    {wantToAddMessage && (
+                      <>
+                        <div>
+                          <div className="my-3 d-flex gap-3 align-items-strecht">
+                            <div className={css.col}>
+                              Below is the email that is going to be sent:
+                              <div className="bg-white text-black p-3 rounded mt-2" dangerouslySetInnerHTML={{ __html: confirmationMessage }} />
+                            </div>
+
+                            <div className={css.col}>
+                              Use the input below if you want to add text
+                              <textarea
+                                className={`form-control mt-2 ${css.textarea}`}
+                                rows="3"
+                                value={additionalMessage.replace(/<br>$/, '').replace(/<br>/g, '\n')}  
+                                onChange={(e) => setAdditionalMessage(e.target.value.replace(/\n/g, '<br>') + '<br>')}  
+                                placeholder="Add extra message here..."
+                              />
+
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="d-flex gap-3 justify-content-end">
+                          <button className="btn btn-outline-neutral fw-bolder" onClick={() => setWantToAddMessage(false)}>
+                            Cancel
+                          </button>
+                          <button className="btn btn-outline-success fw-bolder" onClick={handleConfirmAndSend} disabled={isConfirming}>
+                            SEND NOW <IoIosMail />
+                          </button>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
