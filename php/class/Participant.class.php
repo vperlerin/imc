@@ -604,7 +604,38 @@ class ParticipantManager
     public function getOnsiteParticipants()
     {
         $stmt = $this->pdo->prepare("
-           SELECT 
+            SELECT 
+                p.id,
+                p.created_at,
+                p.title, 
+                p.first_name, 
+                p.last_name, 
+                p.email,
+                p.confirmation_sent, 
+                p.total_due, 
+                p.total_paid,
+                p.paypal_fee,
+                (SELECT pm.method 
+                 FROM payments pay 
+                 LEFT JOIN payment_methods pm ON pay.payment_method_id = pm.id
+                 WHERE pay.participant_id = p.id
+                 ORDER BY pay.created_at DESC 
+                 LIMIT 1) AS payment_method
+            FROM participants p
+            WHERE p.is_online = FALSE AND p.status = 'active'
+            GROUP BY p.id
+            ORDER BY p.created_at DESC;
+        ");
+    
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    
+
+    public function getOnlineParticipants()
+    {
+        $stmt = $this->pdo->prepare("
+        SELECT 
             p.id,
             p.created_at,
             p.title, 
@@ -615,43 +646,22 @@ class ParticipantManager
             p.total_due, 
             p.total_paid,
             p.paypal_fee,
-            pm.method AS payment_method
-            FROM participants p
-            LEFT JOIN payments pay ON p.id = pay.participant_id  
-            LEFT JOIN payment_methods pm ON pay.payment_method_id = pm.id  
-            WHERE p.is_online = FALSE AND p.status = 'active'
-            ORDER BY p.last_name, p.first_name;
-        ");
+            (SELECT pm.method 
+             FROM payments pay 
+             LEFT JOIN payment_methods pm ON pay.payment_method_id = pm.id
+             WHERE pay.participant_id = p.id
+             ORDER BY pay.created_at DESC 
+             LIMIT 1) AS payment_method
+        FROM participants p
+        WHERE p.is_online = TRUE AND p.status = 'active'
+        GROUP BY p.id
+        ORDER BY p.created_at DESC;
+    ");
 
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getOnlineParticipants()
-    {
-        $stmt = $this->pdo->prepare("
-        SELECT 
-         p.id,
-         p.created_at,
-         p.title, 
-         p.first_name, 
-         p.last_name, 
-         p.email,
-         p.confirmation_sent, 
-         p.total_due, 
-         p.total_paid,
-         p.paypal_fee,
-         pm.method AS payment_method
-         FROM participants p
-         LEFT JOIN payments pay ON p.id = pay.participant_id  
-         LEFT JOIN payment_methods pm ON pay.payment_method_id = pm.id  
-         WHERE p.is_online = TRUE AND p.status = 'active'
-         ORDER BY p.last_name, p.first_name;
-     ");
-
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
 
     /**
      * Hard delete a participant
