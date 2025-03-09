@@ -77,15 +77,12 @@ try {
     if (!$success) {
         throw new Exception("Failed to add payment.");
     }
-
-    $pdo->commit();
-
+ 
     echo json_encode([
         "success" => true,
         "message" => "Payment Added Successfully"
     ]);
-} catch (Exception $e) {
-    $pdo->rollBack();
+} catch (Exception $e) { 
     http_response_code(400);
     echo json_encode(["success" => false, "message" => $e->getMessage()]);
 }
