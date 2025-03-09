@@ -40,6 +40,7 @@ const lazyPages = {
   AdminDashboard: lazy(() => import("admin/pages/dashboard")),
   AdminParticipantsOnsite: lazy(() => import("admin/pages/participants/onsite")),
   AdminParticipantsOnline: lazy(() => import("admin/pages/participants/online")),
+  AdminParticipantsWorkshops: lazy(() => import("admin/pages/participants/workshops")),
   AdminParticipantsUser: lazy(() => import("admin/pages/participants/single")),
   AdminParticipantsPayment: lazy(() => import("admin/pages/participants/payment")),
 };
@@ -86,6 +87,7 @@ const routeConfig = [
   { path: "/admin/dashboard", element: <ProtectedRoute><lazyPages.AdminDashboard /></ProtectedRoute> },
   { path: "/admin/participants/online", element: <ProtectedRoute><lazyPages.AdminParticipantsOnline /></ProtectedRoute> },
   { path: "/admin/participants/onsite", element: <ProtectedRoute><lazyPages.AdminParticipantsOnsite /></ProtectedRoute> },
+  { path: "/admin/participants/workshops", element: <ProtectedRoute><lazyPages.AdminParticipantsWorkshops /></ProtectedRoute> },
   { path: "/admin/participants/onsite/:participantId/:tab?", element: (<ProtectedRoute><lazyPages.AdminParticipantsUser isCurOnline={false} /></ProtectedRoute>) },
   { path: "/admin/participants/online/:participantId/:tab?", element: (<ProtectedRoute><lazyPages.AdminParticipantsUser isCurOnline/></ProtectedRoute>) }, 
   { path: "/admin/participants/onsite/payment/:participantId", element: (<ProtectedRoute><lazyPages.AdminParticipantsPayment isCurOnline={false} /></ProtectedRoute>) },

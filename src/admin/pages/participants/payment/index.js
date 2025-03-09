@@ -14,6 +14,7 @@ import { useApiAddPayment } from "@/admin/api/payments/add";
 import { useApiSpecificData } from "api/specific-data";
 import { useApiParticipant } from "api/participants";
 import { useApiConfirmParticipant } from '@/admin/api/participants/confirm';
+import { formatFullDate } from "utils/date";
 
 const Payments = ({ isCurOnline = false }) => {
   const { participantId } = useParams();
@@ -201,9 +202,9 @@ const Payments = ({ isCurOnline = false }) => {
                     <th>Reg. Date</th>
                     <th>Name</th>
                     <th>Total</th>
-                    <th>Total Paid</th>
-                    <th>Amount due</th>
-                    <th>Pay. Method</th>
+                    <th>Paid</th>
+                    <th>Due</th>
+                    <th>Method</th>
                     <th>Confirmed</th>
                     <th>Conf. Email</th>
                     <th></th>
@@ -247,16 +248,16 @@ const Payments = ({ isCurOnline = false }) => {
                     </td>
                     <td>{participant.participant.payment_method_name || "n/a"}</td>
                     <td>
-                      {participant.participant.confirmation_sent === "1" ? (
+                      {confirmationSent ? (
                         <>
-                          ✅ {participant.participant.confirmation_date && formatFullDate(participant.participant.confirmation_date)}
+                          ✅  
                         </>
                       ) : (
                         "❌"
                       )}
                     </td>
-                    <td className={classNames(participant?.confirmation_date && "text-success")}>
-                      {participant.confirmation_date ? formatFullDate(participant.confirmation_date) : "❌"}
+                    <td className={classNames(confirmationDate && "text-success")}>
+                      {confirmationDate ? formatFullDate(participant.participant.confirmation_date) : "❌"}
                     </td>
                     <td>
                       <div className="d-flex gap-2 justify-content-end">

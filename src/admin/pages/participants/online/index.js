@@ -1,4 +1,5 @@
 import css from "./index.module.scss";
+import { FaRegTrashAlt } from "react-icons/fa";
 import { CiSearch } from "react-icons/ci";
 import PageContain from "@/admin/components/page-contain";
 import classNames from "classnames";
@@ -123,9 +124,9 @@ const AdminParticipantsOnline = () => {
                   <th>Reg. Date</th>
                   <th>Name</th>
                   <th>Total</th>
-                  <th>Total Paid</th>
-                  <th>Amount due</th>
-                  <th>Pay. Method</th>
+                  <th>Paid</th>
+                  <th>Due</th>
+                  <th>Method</th>
                   <th>Confirmed</th>
                   <th>Conf. Email</th>
                   <th></th>
@@ -190,7 +191,7 @@ const AdminParticipantsOnline = () => {
                             className={classNames(css.action, "btn btn-sm btn-outline-danger fw-bolder")}
                             onClick={() => handleDeleteClick(participant)}
                           >
-                            Cancel Registration
+                            <FaRegTrashAlt/>
                           </button>
                         </div>
                       </td>
