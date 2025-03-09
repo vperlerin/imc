@@ -63,14 +63,14 @@ const AdminParticipantsOnsite = () => {
   };
 
   const breadcrumb = [
-    { url: "/admin/participants/onsite", name: "Onsite Participants" },
+    { url: "/admin/participants/onsite", name: "On-site Participants" },
   ];
 
   return (
     <PageContain
       breadcrumb={breadcrumb}
       isMaxWidth
-      title="Onsite Participants"
+      title="ON-SITE Participants"
       rightContent={
         <>
           <strong>Confirmed:</strong> {totalConfirmed} / {totalParticipants}

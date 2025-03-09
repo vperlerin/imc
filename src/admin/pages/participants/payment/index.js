@@ -1,70 +1,68 @@
 import PageContain from "@/admin/components/page-contain";
 import axios from "axios";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect,  useState } from "react";
 import Loader from "components/loader";
 import cssForm from "styles/components/form.module.scss";
 import classNames from "classnames";
-import StaticSummary from "components/billing/static_summary";
-import WysiwygEditor from 'utils/wysiwyg-editor.js';
-import { getPaymentMethodById } from 'utils/payment_method';
+import StaticSummary from "components/billing/static_summary"; 
 import { useParams } from "react-router-dom";
 import { conferenceData as cd } from "data/conference-data";
-import { FormProvider, useForm } from "react-hook-form";
-import { useApiPayments  } from "@/admin/api/payments";
+import { useForm } from "react-hook-form";
+import { useApiPayments } from "@/admin/api/payments";
+import { useApiAddPayment } from "@/admin/api/payments/add"; 
 import { useApiSpecificData } from "api/specific-data";
 import { useApiParticipant } from "api/participants";
 
 const Payments = () => {
-  const { participantId } = useParams(); 
-  const [errorMsg, setErrorMsg] = useState(null); 
-  const [amount, setAmount] = useState("");
-  const [paymentMethodId, setPaymentMethodId] = useState("");
-  const [paymentDate, setPaymentDate] = useState(new Date().toISOString().split("T")[0]);
-  const [adminNote, setAdminNote] = useState("");
-  const [submitting, setSubmitting] = useState(false);
+  const { participantId } = useParams();  
+  const [ formErrors, setFormErrors ] = useState(null);
   const [successMsg, setSuccessMsg] = useState(null);
-  const [editingPayment, setEditingPayment] = useState(null);
-  const [totalDue, setTotalDue] = useState(null);
+  const [editingPayment, setEditingPayment] = useState(null); 
 
   const { workshops, paymentMethods, registrationTypes, loading: specificdataLoading, sessions, error: specificDataError } = useApiSpecificData();
   const { participant, loading: participantLoading, error: participantError } = useApiParticipant(participantId);
   const { payments, loading: paymenstLoading, error: paymentsError } = useApiPayments(participantId);
-  
-  const loading = specificdataLoading || participantLoading || submitting || paymenstLoading;
-  const error = participantError || specificDataError || paymentsError || !!errorMsg;
 
-  
-
-
-
-
-  const methods = useForm({
+  const {
+    formState: { errors },
+    register,
+    handleSubmit,
+    isSubmitting,
+    setValue,
+    watch,
+    reset,
+  } = useForm({
     defaultValues: {
-      amount: totalDue?.toFixed(2) || "",
+      amount: "",
       paymentMethodId: "",
       paymentDate: new Date().toISOString().split("T")[0],
       adminNote: "",
     },
   });
+  
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors, isSubmitting },
-  } = useForm({
-    defaultValues: {
-      amount: totalDue?.toFixed(2) || "",
-      paymentMethodId: paymentMethodId || "",
-      paymentDate: new Date().toISOString().split("T")[0],
-      adminNote: "",
-    },
-  });
+  const loading = specificdataLoading || participantLoading || isSubmitting || paymenstLoading;
+  const error = participantError || specificDataError || paymentsError || formErrors ;
+  const paymentMethodId = watch("paymentMethodId");
 
+  useEffect(() => {
+    if (participant && participant.accommodation) {
+      setValue("paymentMethodId", participant.accommodation.payment_method_id || "");
+    }
+  }, [paymentMethodId, participant, setValue]);
  
-  const submitForm = async (data) => {
-    setError(null);
+  useEffect(() => {
+    if (participant?.participant && paymentMethodId) {
+      const dueAmount = paymentMethodId === "1"
+        ? parseFloat(participant.participant.total_due) + parseFloat(participant.participant.paypal_fee) - parseFloat(participant.participant.total_paid)
+        : parseFloat(participant.participant.total_due) - parseFloat(participant.participant.total_paid);
+      setValue("amount", dueAmount.toFixed(2));
+    }
+  }, [paymentMethodId, participant,   setValue]);
+ 
+  const submitForm = async (data) => { 
     setSuccessMsg(null);
+    setFormErrors(null);
 
     try {
       let response;
@@ -102,31 +100,11 @@ const Payments = () => {
         throw new Error(response.data.message || "Failed to process payment.");
       }
     } catch (err) {
-      setError(err.message);
+      setFormErrors(err.message);
     }
   };
 
-  // Delete a payment
-  const handleDelete = async (paymentId) => {
-    if (!window.confirm("Are you sure you want to delete this payment?")) return;
-
-    try {
-      const response = await axios.delete(`${process.env.REACT_APP_API_URL}/delete_payment.php`, {
-        data: { payment_id: paymentId },
-        headers: { "Content-Type": "application/json" },
-      });
-
-      if (response.data.success) {
-        setSuccessMsg("Payment deleted successfully!");
-        setPayments(prev => prev.filter(p => p.id !== paymentId));
-      } else {
-        throw new Error(response.data.message || "Failed to delete payment.");
-      }
-    } catch (err) {
-      setError(err.message);
-    }
-  };
-
+ 
   // Reset form fields 
   const resetForm = () => {
     reset({
@@ -153,80 +131,50 @@ const Payments = () => {
       {!loading && error && <div className="alert alert-danger">{error}</div>}
       {successMsg && <div className="alert alert-success">{successMsg}</div>}
 
-      <FormProvider {...methods}>
-        <form onSubmit={methods.handleSubmit(submitForm)}> 
-          <WysiwygEditor name="adminNote" />
-          <button type="submit" className="btn btn-primary">Submit</button>
-        </form>
-      </FormProvider>
+
 
       {!loading && (
         <>
           <div className="d-flex flex-column flex-md-row gap-3 align-items-strecht">
             <div className="border p-3 rounded-2 flex-grow-1">
               <h4 className="mb-3">{editingPayment ? "Edit Payment" : "Add a New Payment"}</h4>
-              <form onSubmit={handleSubmit}>
+              <form onSubmit={handleSubmit(submitForm)}>
                 <div className="mb-3 row">
                   <label className="col-sm-3 col-form-label fw-bold">Amount (€)</label>
                   <div className="col-sm-5">
-                    <input
-                      type="text"
-                      className={classNames('form-control', cssForm.md50)}
-                      value={amount.replace(",", ".")}  // Ensure `.` is always displayed
-                      inputMode="decimal"
-                      pattern="[0-9]*[.]?[0-9]*"
-                      onChange={(e) => {
-                        let value = e.target.value.replace(",", ".");
-                        if (/^[0-9]*[.]?[0-9]*$/.test(value)) {
-                          setAmount(value);
-                        }
-                      }}
-                      min="0"
-                      required
-                    />
+                    <input type="number" className={classNames('form-control', cssForm.md50)} {...register("amount", { required: true, min: 0 })} step="0.01" />
+                    {errors.amount && <span className="text-danger">Amount is required and must be positive.</span>}
                   </div>
                 </div>
                 <div className="mb-3 row">
-                  <label className="col-sm-3 col-form-label fw-bold">Pay. Method</label>
+                  <label className="col-sm-3 col-form-label fw-bold">Payment Method</label>
                   <div className="col-sm-6">
-                    <select
-                      className="form-select"
-                      value={paymentMethodId}
-                      onChange={(e) => setPaymentMethodId(e.target.value)}
-                      required
-                    >
+                    <select className="form-select" {...register("paymentMethodId", { required: true })}>
                       <option value="">Select a payment method</option>
                       {paymentMethods.map((method) => (
-                        <option key={method.id} value={method.id}>
-                          {method.method}
-                        </option>
+                        <option key={method.id} value={method.id}>{method.method}</option>
                       ))}
                     </select>
+                    {errors.paymentMethodId && <span className="text-danger">Payment method is required.</span>}
                   </div>
                 </div>
                 <div className="mb-3 row">
                   <label className="col-sm-3 col-form-label fw-bold">Payment Date</label>
                   <div className="col-sm-6">
-                    <input type="date" className="form-control" value={paymentDate} onChange={(e) => setPaymentDate(e.target.value)} required />
+                    <input type="date" className="form-control" {...register("paymentDate", { required: true })} />
                   </div>
                 </div>
                 <div className="mb-3 row">
-                  <label className="col-sm-3 col-form-label fw-bold">Marc's Note (Optional)</label>
+                  <label className="col-sm-3 col-form-label fw-bold">Admin Note (Optional)</label>
                   <div className="col-sm-9">
-                    <textarea
-                      className="form-control"
-                      value={adminNote}
-                      onChange={(e) => setAdminNote(e.target.value)}
-                      rows="2"
-                    />
+                    <textarea className="form-control" {...register("adminNote")} rows="2" />
                   </div>
                 </div>
                 <div className="text-end">
-                  <button type="submit" className="btn btn-outline-primary fw-bolder">{submitting ? "Processing..." : editingPayment ? "Update Payment" : "Add Payment"}</button>
+                  <button type="submit" className="btn btn-outline-primary fw-bolder" disabled={isSubmitting}>{isSubmitting ? "Processing..." : editingPayment ? "Update Payment" : "Add Payment"}</button>
                 </div>
               </form>
             </div>
-
 
             <StaticSummary
               isOnline={isOnline}
@@ -236,11 +184,12 @@ const Payments = () => {
               registrationTypes={registrationTypes}
               paymentMethods={paymentMethods}
             />
-
           </div >
-          <div className="border p-3 rounded-2 mt-3">
-            <h4 className="mb-3">Previous Payments</h4>
-            {payments?.length > 0 ? (
+
+          {payments && payments.length > 0 && !(payments.length === 1 && parseFloat(payments[0].amount) === 0) && (
+            <div className="border p-3 rounded-2 mt-3">
+              <h4 className="mb-3">Previous Payments</h4>
+
               <table className="table table-bordered table-striped">
                 <thead>
                   <tr>
@@ -252,19 +201,21 @@ const Payments = () => {
                 </thead>
                 <tbody>
                   {payments.map((payment) => (
-                    <tr key={payment.id}>
-                      <td>{payment.payment_date || "N/A"}</td>
-                      <td>{parseFloat(payment.amount).toFixed(2)}</td>
-                      <td>{payment.payment_method}</td>
-                      <td>{payment.admin_note || "No note"}</td>
-                    </tr>
+                    <>
+                      {parseFloat(payment.amount) !== 0 && (
+                        <tr key={payment.id}>
+                          <td>{payment.payment_date || "N/A"}</td>
+                          <td>{parseFloat(payment.amount).toFixed(2)}</td>
+                          <td>{payment.payment_method}</td>
+                          <td>{payment.admin_note || "No note"}</td>
+                        </tr>
+                      )}
+                    </>
                   ))}
                 </tbody>
               </table>
-            ) : (
-              <p><i className="text-muted">No payments recorded.</i></p>
-            )}
-          </div>
+            </div>
+          )}
         </>
       )}
     </PageContain >

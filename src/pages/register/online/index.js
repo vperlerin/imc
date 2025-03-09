@@ -82,8 +82,8 @@ const MainForm = () => {
         is_early_bird: is_early_bird.toString(),
         is_online: "true",
         talks: formData.talks || [],
-        total_due: total.toFixed(2),
-        paypal_fee: paypalFee.toFixed(2),
+        total_due: total,
+        paypal_fee: paypalFee,
       };
 
       const response = await axios.post(apiUrl, formattedData, {

@@ -10,7 +10,6 @@ import { useForm } from "react-hook-form";
 import { conferenceData as cd } from "data/conference-data";
 import { useApiSpecificData } from "api/specific-data/index.js";
 import { useApiParticipant } from "api/participants";
-import { useApiPayments } from "@/admin/api/payments";
 import { Link } from "react-router-dom";
 import Identitity from "components/registration/identity";
 import Workshops from "components/registration/workshops";
@@ -41,11 +40,6 @@ const AdminParticipantsUser = () => {
 
   const { workshops, paymentMethods, registrationTypes, loading: specificdataLoading, sessions, error: specificDataError } = useApiSpecificData();
   const { participant, loading: participantLoading, error: participantError } = useApiParticipant(participantId, fetchParticipantTrigger, true);
-  const { payments, loading: paymentsLoading, error: paymentError } =  useApiPayments(participantId);
-  console.log("PAYMENTS? ", payments);
-  return <></>;
-
-
   const { control, register, handleSubmit, getValues, setValue, formState: { errors }, trigger, watch } = useForm();
 
  
@@ -164,10 +158,17 @@ const AdminParticipantsUser = () => {
     formData.talks = getValues("talks") || [];
     formData.posters = getValues("posters") || [];
 
+    const formattedData = {
+      ...formData, 
+      total_due: total,
+      paypal_fee: paypalFee,
+    };
+
+
     try {
       const response = await axios.post(
         `${process.env.REACT_APP_API_URL}/admin/api/update_participant.php?id=${participantId}`,
-        formData,
+        formattedData,
         { headers: { "Content-Type": "application/json" } }
       );
 

@@ -160,7 +160,7 @@ const Summary = ({
       )}
 
       <div className={classNames(!isAdmin && css.maxW, "p-2 border rounded")}>
-        <h4 className="mb-3">Billing Summary</h4>
+        <h4 className="mb-3">Invoice Summary</h4>
         <table className="table table-striped table-hover">
           <thead>
             <tr>

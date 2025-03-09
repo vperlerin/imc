@@ -70,7 +70,7 @@ const AdminParticipantsOnline = () => {
     <PageContain
       breadcrumb={breadcrumb}
       isMaxWidth
-      title="Onsite Participants"
+      title="ONLINE Participants"
       rightContent={
         <>
           <strong>Confirmed:</strong> {totalConfirmed} / {totalParticipants}

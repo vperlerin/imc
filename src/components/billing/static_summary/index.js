@@ -71,7 +71,7 @@ const StaticSummary = ({ isOnline, conferenceData, participantData, registration
 
   return (
     <div className="p-2 border rounded flex-shrink-0">
-      <h4 className="mb-3">Billing Summary</h4>
+      <h4 className="mb-3">Invoice Summary</h4>
       <table className="table table-striped table-hover">
         <thead>
           <tr>
