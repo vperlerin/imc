@@ -570,6 +570,144 @@ class ParticipantManager
         }
     }
 
+    public function updateOnlineParticipant($participantId, $data)
+    {
+        try {
+            $this->pdo->beginTransaction();
+    
+            // Handle boolean fields (convert "true"/"false" to 1 or 0)
+            $booleanFields = ['is_online', 'is_early_bird', 'confirmation_sent'];
+            foreach ($booleanFields as $field) {
+                if (!isset($data[$field])) {
+                    $data[$field] = 0;
+                } else {
+                    $flag = filter_var($data[$field], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+                    $data[$field] = ($flag === null ? 0 : ($flag ? 1 : 0));
+                }
+            }
+    
+            // Check if participant exists
+            $stmt = $this->pdo->prepare("SELECT id FROM participants WHERE id = :participant_id");
+            $stmt->execute([':participant_id' => $participantId]);
+    
+            if ($stmt->rowCount() === 0) {
+                throw new Exception("Online participant with ID {$participantId} does not exist.");
+            }
+    
+            // Prepare fields for update
+            $fields = [
+                'title = :title',
+                'first_name = :first_name',
+                'last_name = :last_name',
+                'gender = :gender',
+                'dob = :dob',
+                'email = :email',
+                'country = :country',
+                'organization = :organization',
+                'is_online = :is_online',
+                'is_early_bird = :is_early_bird',
+                'paypal_fee = :paypal_fee',
+                'total_due = :total_due',
+                'comments = :comments',
+                'payment_method_id = :payment_method_id',
+                'updated_at = NOW()'
+            ];
+    
+            if (isset($data['admin_notes'])) {
+                $fields[] = 'admin_notes = :admin_notes';
+            }
+    
+            $sql = "UPDATE participants SET " . implode(', ', $fields) . " WHERE id = :participant_id";
+            $stmt = $this->pdo->prepare($sql);
+    
+            // Bind parameters
+            $params = [
+                ':participant_id' => $participantId,
+                ':title' => $data['title'],
+                ':first_name' => $data['first_name'],
+                ':last_name' => $data['last_name'],
+                ':gender' => $data['gender'],
+                ':dob' => "{$data['dobYear']}-{$data['dobMonth']}-{$data['dobDay']}",
+                ':email' => $data['email'],
+                ':country' => $data['country'],
+                ':organization' => $data['organization'] ?? null,
+                ':is_online' => filter_var($data['is_online'], FILTER_VALIDATE_BOOLEAN),
+                ':is_early_bird' => filter_var($data['is_early_bird'], FILTER_VALIDATE_BOOLEAN),
+                ':paypal_fee' => $data['paypal_fee'],
+                ':total_due' => $data['total_due'],
+                ':comments' => $data['comments'] ?? null,
+                ':payment_method_id' => (int) ($data['payment_method_id'] ?? 0),
+            ];
+    
+            if (isset($data['admin_notes'])) {
+                $params[':admin_notes'] = $data['admin_notes'];
+            }
+    
+            $stmt->execute($params);
+    
+            // Delete existing workshop selections for the participant
+            $stmt = $this->pdo->prepare("DELETE FROM participant_workshops WHERE participant_id = :participant_id");
+            $stmt->execute([':participant_id' => $participantId]);
+    
+            // Insert new online workshop selections (only if price_online > 0)
+            if (!empty($data['workshops']) && is_array($data['workshops'])) {
+                $stmt = $this->pdo->prepare("
+                    INSERT INTO participant_workshops (participant_id, workshop_id, attending) 
+                    SELECT :participant_id, id, TRUE FROM workshops WHERE id = :workshop_id AND price_online > 0
+                ");
+    
+                foreach ($data['workshops'] as $workshopId) {
+                    $stmt->execute([
+                        ':participant_id' => $participantId,
+                        ':workshop_id' => (int) $workshopId
+                    ]);
+                }
+            }
+    
+            // Update **Payments** (set to 0 if no payment method is selected)
+            $stmt = $this->pdo->prepare("
+                UPDATE payments 
+                SET amount = :amount, payment_method_id = :payment_method_id, updated_at = NOW()
+                WHERE participant_id = :participant_id
+            ");
+            $stmt->execute([
+                ':participant_id' => $participantId,
+                ':amount' => 0, // Online participants don't have an initial payment
+                ':payment_method_id' => (int) ($data['payment_method_id'] ?? 0)
+            ]);
+    
+            // Delete existing contributions (talks)
+            $stmtDelete = $this->pdo->prepare("DELETE FROM contributions WHERE participant_id = :participant_id");
+            $stmtDelete->execute([':participant_id' => $participantId]);
+    
+            // Insert **only online contributions (talks)**
+            if (!empty($data['talks']) && is_array($data['talks'])) {
+                $stmtInsert = $this->pdo->prepare("
+                    INSERT INTO contributions (participant_id, type, title, authors, abstract, session_id, duration, print, created_at, updated_at)
+                    VALUES (:participant_id, 'talk', :title, :authors, :abstract, :session_id, :duration, 0, NOW(), NOW())
+                ");
+    
+                foreach ($data['talks'] as $talk) {
+                    $stmtInsert->execute([
+                        ':participant_id' => $participantId,
+                        ':title' => $talk['title'],
+                        ':authors' => $talk['authors'],
+                        ':abstract' => $talk['abstract'],
+                        ':session_id' => (int) $talk['session_id'],
+                        ':duration' => $talk['duration']
+                    ]);
+                }
+            }
+    
+            $this->pdo->commit();
+            return true;
+        } catch (Exception $e) {
+            $this->pdo->rollBack();
+            throw new Exception("Error updating online participant: " . $e->getMessage());
+        }
+    }
+    
+
     /**
      * Retrieve participant statistics for a given workshop or all workshops.
      */

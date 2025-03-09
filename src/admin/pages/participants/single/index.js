@@ -22,7 +22,7 @@ import Summary from "components/billing/summary";
 import { formatFullDate } from "utils/date";
 
 
-const AdminParticipantsUser = ({isCurOnline = false}) => {
+const AdminParticipantsUser = ({ isCurOnline = false }) => {
   const { participantId, tab } = useParams();
   const [errorMsg, setErrorMsg] = useState('');
   const [isSaving, setIsSaving] = useState(false);
@@ -35,7 +35,7 @@ const AdminParticipantsUser = ({isCurOnline = false}) => {
   const [posters, setPosters] = useState([]);
   const activeTab = tab || "identity";
   const navigate = useNavigate();
- 
+
   useBlockNavigation(unsavedChanges);
 
   const { workshops, paymentMethods, registrationTypes, loading: specificdataLoading, sessions, error: specificDataError } = useApiSpecificData();
@@ -151,7 +151,7 @@ const AdminParticipantsUser = ({isCurOnline = false}) => {
 
   const onSubmit = async (formData) => {
     setIsSaving(true);
-    setError(null);
+    setErrorMsg(null);
     setSuccessMsg(null);
 
     // isAdminStep 1: Validate the entire form
@@ -159,7 +159,7 @@ const AdminParticipantsUser = ({isCurOnline = false}) => {
 
     if (!isValid) {
       setIsSaving(false);
-      setError("Please fill in all required fields.");
+      setErrorMsg("Please fill in all required fields.");
       return;
     }
 
@@ -175,7 +175,7 @@ const AdminParticipantsUser = ({isCurOnline = false}) => {
 
     try {
       const response = await axios.post(
-        `${process.env.REACT_APP_API_URL}/admin/api/update_participant.php?id=${participantId}`,
+        `${process.env.REACT_APP_API_URL}/admin/api/update_${isOnline ? 'online' : 'onsite'}_participant.php?id=${participantId}`,
         formattedData,
         { headers: { "Content-Type": "application/json" } }
       );
@@ -187,7 +187,7 @@ const AdminParticipantsUser = ({isCurOnline = false}) => {
         throw new Error(response.data.message || "Failed to update participant.");
       }
     } catch (err) {
-      setError(err.message);
+      setErrorMsg(err.message);
     } finally {
       setIsSaving(false);
     }
@@ -257,16 +257,15 @@ const AdminParticipantsUser = ({isCurOnline = false}) => {
         <form onSubmit={handleSubmit(onSubmit)}>
           <ul className={classNames('nav nav-tabs mb-3 mt-2', cssTabs.tab, 'flex-column flex-sm-row')}>
             {[
-              { key: "summary", label: `Billing` },
+              { key: "summary", label: "Billing" },
               { key: "identity", label: "Identity" },
               { key: "workshops", label: "Workshops" },
-              { key: "arrival", label: "Arrival" },
+              ...(!isOnline ? [{ key: "arrival", label: "Arrival" }] : []),
               { key: "contribution", label: "Contribution" },
-              { key: "accommodation", label: "Accommodation" },
-              { key: "extras", label: "Extras" },
+              { key: "accommodation", label: "Accommodation" },               
+              ...(!isOnline ? [{ key: "extras", label: "Extras" }] : []),
               { key: "comments", label: "Comments" },
               { key: "admin_notes", label: "Marc's notes" },
-
             ].map(({ key, label }) => (
               <li className="nav-item" key={key}>
                 <a
@@ -301,6 +300,7 @@ const AdminParticipantsUser = ({isCurOnline = false}) => {
             {tab === "identity" && (
               <Identitity
                 isAdmin
+                isOnline
                 register={register}
                 errors={errors}
                 setValue={setValue}
@@ -310,6 +310,7 @@ const AdminParticipantsUser = ({isCurOnline = false}) => {
             {tab === "workshops" && (
               <Workshops
                 isAdmin
+                isOnline
                 conferenceData={cd}
                 register={register}
                 errors={errors}
@@ -319,7 +320,7 @@ const AdminParticipantsUser = ({isCurOnline = false}) => {
                 workshops={workshops}
               />
             )}
-            {tab === "arrival" && (
+            {tab === "arrival" && !isOnline && (
               <Arrival
                 isAdmin
                 conferenceData={cd}
@@ -332,6 +333,7 @@ const AdminParticipantsUser = ({isCurOnline = false}) => {
             {tab === "contribution" && (
               <Contribution
                 isAdmin
+                isOnline
                 conferenceData={cd}
                 control={control}
                 register={register}
@@ -346,6 +348,7 @@ const AdminParticipantsUser = ({isCurOnline = false}) => {
             {tab === "accommodation" && (
               <Accommodation
                 isAdmin
+                isOnline
                 isEarlyBird={participant?.participant.is_early_bird}
                 conferenceData={cd}
                 control={control}
@@ -357,7 +360,7 @@ const AdminParticipantsUser = ({isCurOnline = false}) => {
                 trigger={trigger}
               />
             )}
-            {tab === "extras" && (
+            {tab === "extras" && !isOnline && (
               <Extras
                 isAdmin
                 conferenceData={cd}
@@ -373,6 +376,7 @@ const AdminParticipantsUser = ({isCurOnline = false}) => {
             {tab === "comments" && (
               <Comments
                 isAdmin
+                isOnline
                 register={register}
                 errors={errors}
                 setValue={setValue}
@@ -416,6 +420,7 @@ const AdminParticipantsUser = ({isCurOnline = false}) => {
 
                 <Summary
                   isAdmin
+                  isOnline
                   isEarlyBird={participant?.participant.is_early_bird}
                   conferenceData={cd}
                   getValues={getValues}

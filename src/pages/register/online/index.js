@@ -89,7 +89,7 @@ const MainForm = () => {
         is_online: "true",
         talks: formData.talks || [],
         total_due: total,
-        paypal_fee: paypalFee,
+        paypal_fee: paypalFee?.toFixed(2) || 0,
       }; 
 
       const response = await axios.post(apiUrl, formattedData, {

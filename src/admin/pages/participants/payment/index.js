@@ -172,7 +172,7 @@ const Payments = ({ isCurOnline = false }) => {
       const emailResponse = await sendEmail({
         subject: `IMC ${cd.year} Confirmation`,
         message: finalMessage,
-        to: participant.parseFloat.email,
+        to: participant.participant.email,
         toName: "IMC Confirmed Participant",
         fromName: "IMC 2025",
         replyTo: "no-reply@imc2025.imo.net",
@@ -186,6 +186,7 @@ const Payments = ({ isCurOnline = false }) => {
 
       await confirmParticipant(participantId, { confirmation_sent: true, confirmation_date: true, message: finalMessage });
     } catch (error) {
+      console.log("ERROR ", error);
       set_ConfirmError("Failed to confirm the participant. Pleaase, try again later.");
     }
   };

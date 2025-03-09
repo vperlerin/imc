@@ -114,10 +114,7 @@ const MainForm = () => {
         total_due: total.toFixed(2),
         paypal_fee: paypalFee?.toFixed(2) || 0,
       };
-
-
-      console.log("formattedData, ", formattedData);
-
+ 
       const response = await axios.post(apiUrl, formattedData, {
         headers: { "Content-Type": "application/json" },
       });
