@@ -22,7 +22,7 @@ import Summary from "components/billing/summary";
 import { formatFullDate } from "utils/date";
 
 
-const AdminParticipantsUser = () => {
+const AdminParticipantsUser = ({isCurOnline = false}) => {
   const { participantId, tab } = useParams();
   const [errorMsg, setErrorMsg] = useState('');
   const [isSaving, setIsSaving] = useState(false);
@@ -39,7 +39,7 @@ const AdminParticipantsUser = () => {
   useBlockNavigation(unsavedChanges);
 
   const { workshops, paymentMethods, registrationTypes, loading: specificdataLoading, sessions, error: specificDataError } = useApiSpecificData();
-  const { participant, loading: participantLoading, error: participantError } = useApiParticipant(participantId, isOnline = false, fetchParticipantTrigger, true);
+  const { participant, loading: participantLoading, error: participantError } = useApiParticipant(participantId, isCurOnline, fetchParticipantTrigger, true);
   const { control, register, handleSubmit, getValues, setValue, formState: { errors }, trigger, watch } = useForm();
 
   const isOnline = participant?.participant?.is_online === "1";
@@ -248,12 +248,12 @@ const AdminParticipantsUser = () => {
 
 
 
-        {successMsg && !isLoading && (
+        {successMsg && !loading && (
           <div className="alert alert-success">{successMsg}</div>
         )}
       </div>
 
-      {participant && isSummaryReady && !isLoading && (
+      {participant && isSummaryReady && !loading && (
         <form onSubmit={handleSubmit(onSubmit)}>
           <ul className={classNames('nav nav-tabs mb-3 mt-2', cssTabs.tab, 'flex-column flex-sm-row')}>
             {[
@@ -406,7 +406,7 @@ const AdminParticipantsUser = () => {
                     <div>
                       <Link
                         className="btn btn-outline-success fw-bolder"
-                        to={`/admin/participants/onsite/payment/${participantId}`}
+                        to={`/admin/participants/${isOnline ? 'online' : 'onsite'}/payment/${participantId}`}
                       >
                         Go to Payments to confirm
                       </Link>

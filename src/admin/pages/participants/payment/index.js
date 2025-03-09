@@ -12,15 +12,17 @@ import { useApiAddPayment } from "@/admin/api/payments/add";
 import { useApiSpecificData } from "api/specific-data";
 import { useApiParticipant } from "api/participants";
 
-const Payments = () => {
+const Payments = ({ isCurOnline = false }) => {
   const { participantId } = useParams();
   const [formErrors, setFormErrors] = useState(null);
   const [successMsg, setSuccessMsg] = useState(null);
   const [editingPayment, setEditingPayment] = useState(null);
   const [fetchParticipantTrigger, setFetchParticipantTrigger] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [modalContent, setModalContent] = useState("");
 
   const { workshops, paymentMethods, registrationTypes, loading: specificdataLoading, sessions, error: specificDataError } = useApiSpecificData();
-  const { participant, loading: participantLoading, error: participantError } = useApiParticipant(participantId, fetchParticipantTrigger);
+  const { participant, loading: participantLoading, error: participantError } = useApiParticipant(participantId, isCurOnline, fetchParticipantTrigger);
   const { payments, loading: paymenstLoading, error: paymentsError, refetchPayments } = useApiPayments(participantId);
   const { addPayment } = useApiAddPayment(participantId);
 
@@ -61,9 +63,6 @@ const Payments = () => {
     }
   }, [paymentMethodId, participant, setValue]);
 
-  useEffect(() => {
-    setFetchParticipantTrigger(prev => !prev);   
-  }, [payments]);
 
   const submitForm = async (data) => {
     setSuccessMsg(null);
@@ -84,12 +83,35 @@ const Payments = () => {
       resetForm();
 
       await refetchPayments();
-      // Fetch updated participant data
-      setFetchParticipantTrigger(prev => !prev);
     } else {
       setFormErrors(result.message);
     }
   };
+
+  useEffect(() => {
+    setFetchParticipantTrigger(prev => !prev);
+  }, [payments]);
+
+  // Confirm
+  const handleConfirmClick = () => {
+    const amountDue = (() => {
+      if (!participant?.participant) return 0;
+      const totalDue = parseFloat(participant.participant.total_due);
+      const totalPaid = parseFloat(participant.participant.total_paid);
+      return totalDue - totalPaid;
+    })();
+    const name = `${participant?.participant?.first_name} ${participant?.participant?.last_name}`;
+    let message = `Marc, you are about to confirm ${name} <strong>${isOnline ? "ONLINE" : "ONSITE"}</strong> registration.`;
+
+    if (amountDue > 0) {
+      message += ` <div class="text-danger fw-bolder">${participant?.participant?.first_name} still needs to pay ${amountDue.toFixed(2)}€</div>.`;
+    }
+
+    message += `Are you sure you want to continue?`;
+    setModalContent(message);
+    setShowModal(true);
+  };
+
 
   // Reset form fields 
   const resetForm = () => {
@@ -132,6 +154,7 @@ const Payments = () => {
                     <th>Amount due</th>
                     <th>Pay. Method</th>
                     <th>Confirmed</th>
+                    <th>Conf. Email</th>
                     <th></th>
                   </tr>
                 </thead>
@@ -181,13 +204,12 @@ const Payments = () => {
                         "❌"
                       )}
                     </td>
+                    <td className={classNames(participant?.confirmation_date && "text-success fw-bolder")}>
+                      {participant.confirmation_date ? formatFullDate(participant.confirmation_date) : "❌"}
+                    </td>
                     <td>
                       <div className="d-flex gap-2 justify-content-end">
-
-                        <button
-                          className="btn btn-sm btn-outline-success fw-bolder"
-                        //onClick={() => handleDeleteClick(participant)}
-                        >
+                        <button className="btn btn-outline-success" onClick={handleConfirmClick}>
                           CONFIRM
                         </button>
                       </div>
@@ -197,8 +219,6 @@ const Payments = () => {
               </table>
             </div>
           )}
-
-
 
           <div className="d-flex flex-column flex-md-row gap-3 align-items-strecht">
             <div className="border p-3 rounded-2 flex-grow-1">
@@ -277,6 +297,30 @@ const Payments = () => {
                   )}
                 </tbody>
               </table>
+            </div>
+          )}
+
+
+
+          {showModal && (
+            <div className="modal show d-block">
+              <div className="modal-dialog">
+                <div className="modal-content">
+                  <div className="modal-header">
+                    <h5 className="modal-title">CONFIRMATION</h5>
+                    <button type="button" className="btn-close" onClick={() => setShowModal(false)}></button>
+                  </div>
+                  <div className="modal-body">
+                    <div dangerouslySetInnerHTML={{ __html: modalContent }} />
+                  </div>
+                  <button className="btn btn-danger" onClick={() => setShowModal(false)}>
+                    Cancel
+                  </button>
+                  <button className="btn btn-success" onClick={() => setShowModal(false)}>
+                    Confirm
+                  </button>
+                </div>
+              </div>
             </div>
           )}
         </>

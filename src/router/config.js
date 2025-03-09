@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import Loader from "components/loader";
 import ProtectedRoute from "hooks/protected-route";
 
- 
+
 
 // Lazy-load pages using relative paths (Webpack resolves them correctly)
 const lazyPages = {
@@ -32,7 +32,7 @@ const lazyPages = {
   Surroundings: lazy(() => import("pages/community/surroundings")),
   Travel: lazy(() => import("pages/location/travel")),
   Topics: lazy(() => import("pages/submission/topics")),
-  UpdateRegistration: lazy(() => import("pages/update-registration")), 
+  UpdateRegistration: lazy(() => import("pages/update-registration")),
   Venue: lazy(() => import("pages/location/venue")),
   WorkshopRadio: lazy(() => import("pages/program/workshops/radio")),
   WorkshopSpectro: lazy(() => import("pages/program/workshops/spectro")),
@@ -83,12 +83,15 @@ const routeConfig = [
   { path: "/submission/guidelines", element: <lazyPages.Guidelines /> },
   { path: "/submission/topics", element: <lazyPages.Topics /> },
   // ADMIN (protected routes)
-  { path: "/admin/dashboard", element: <ProtectedRoute><lazyPages.AdminDashboard /></ProtectedRoute>},
+  { path: "/admin/dashboard", element: <ProtectedRoute><lazyPages.AdminDashboard /></ProtectedRoute> },
   { path: "/admin/participants/online", element: <ProtectedRoute><lazyPages.AdminParticipantsOnline /></ProtectedRoute> },
-  { path: "/admin/participants/onsite", element: <ProtectedRoute><lazyPages.AdminParticipantsOnsite/></ProtectedRoute>},
-  { path: "/admin/participants/onsite/:participantId/:tab?", element: (<ProtectedRoute><lazyPages.AdminParticipantsUser/></ProtectedRoute>) },
-  { path: "/admin/participants/onsite/payment/:participantId", element: (<ProtectedRoute><lazyPages.AdminParticipantsPayment/></ProtectedRoute>) },
-  
+  { path: "/admin/participants/onsite", element: <ProtectedRoute><lazyPages.AdminParticipantsOnsite /></ProtectedRoute> },
+  { path: "/admin/participants/onsite/:participantId/:tab?", element: (<ProtectedRoute><lazyPages.AdminParticipantsUser isCurOnline={false} /></ProtectedRoute>) },
+  { path: "/admin/participants/online/:participantId/:tab?", element: (<ProtectedRoute><lazyPages.AdminParticipantsUser isCurOnline/></ProtectedRoute>) }, 
+  { path: "/admin/participants/onsite/payment/:participantId", element: (<ProtectedRoute><lazyPages.AdminParticipantsPayment isCurOnline={false} /></ProtectedRoute>) },
+  { path: "/admin/participants/online/payment/:participantId", element: (<ProtectedRoute><lazyPages.AdminParticipantsPayment isCurOnline /></ProtectedRoute>) },
+
+
   // 404
   { path: "*", element: <Placeholder title="Oops! Looks like you’ve taken a wrong turn into the meteor shower. This page has burned up in the atmosphere!" /> },
 ];

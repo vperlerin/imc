@@ -184,8 +184,8 @@ const AdminParticipantsOnline = () => {
                       </td>
                       <td>
                         <div className="d-flex gap-2 justify-content-end">
-                          <a href={`/admin/participants/onsite/payment/${participant.id}`} className={classNames(css.action, "btn btn-sm btn-outline-success fw-bolder")}>Payments</a>
-                          <a href={`/admin/participants/onsite/${participant.id}`} className={classNames(css.action, "btn btn-sm btn-outline-primary fw-bolder")}>Edit</a>
+                          <a href={`/admin/participants/online/payment/${participant.id}`} className={classNames(css.action, "btn btn-sm btn-outline-success fw-bolder")}>Payments</a>
+                          <a href={`/admin/participants/online/${participant.id}`} className={classNames(css.action, "btn btn-sm btn-outline-primary fw-bolder")}>Edit</a>
                           <button
                             className={classNames(css.action, "btn btn-sm btn-outline-danger fw-bolder")}
                             onClick={() => handleDeleteClick(participant)}
@@ -198,7 +198,7 @@ const AdminParticipantsOnline = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="7" className="text-center">No onsite participants found.</td>
+                    <td colSpan="7" className="text-center">No online participants found.</td>
                   </tr>
                 )}
               </tbody>

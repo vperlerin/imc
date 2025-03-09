@@ -688,8 +688,8 @@ class ParticipantManager
      */
     public function getParticipantDetails($participantId, $withAdminNotes = false)
     {
-        $columns = $withAdminNotes ? '*' : '
-        p.id,
+        $columns = $withAdminNotes ? 'p.*, pm.method AS payment_method_name' :
+        'p.id,
         p.title,
         p.first_name,
         p.last_name,
