@@ -5,7 +5,7 @@ export const menuItems = [
     title: "Participants",
     link: "/admin/participants",
     subLinks: [
-      { title: "Onsite", link: "/admin/participants/onsite" },
+      { title: "On-site", link: "/admin/participants/onsite" },
       { title: "Online", link: "/admin/participants/online" },
       { title: "Workshops", link: "/admin/participants/workshops" },
     ],
