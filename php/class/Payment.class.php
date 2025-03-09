@@ -64,13 +64,13 @@ class PaymentManager
             if ($this->pdo->inTransaction()) {
                 $this->pdo->rollBack();
             }
-            error_log("Database Error in addPayment: " . $e->getMessage());
+            echo("Database Error in addPayment: " . $e->getMessage());
             return false;
         } catch (Exception $e) {
             if ($this->pdo->inTransaction()) {
                 $this->pdo->rollBack();
             }
-            error_log("General Error in addPayment: " . $e->getMessage());
+            echo("General Error in addPayment: " . $e->getMessage());
             return false;
         }
     }
