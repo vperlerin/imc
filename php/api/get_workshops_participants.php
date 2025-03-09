@@ -1,4 +1,4 @@
-<?php 
+<?php
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -32,12 +32,10 @@ if (!$workshopId || !is_numeric($workshopId)) {
 }
 
 try {
-  $participantManager = new ParticipantManager($pdo);
-  $participant = $participantManager->getParticipantsByWorkshop($pdo, $workshopId);
-
+    $participantManager = new ParticipantManager($pdo);
+    $participants = $participantManager->getParticipantsByWorkshop($pdo, $workshopId);
 
     echo json_encode(["success" => true, "data" => $participants]);
 } catch (Exception $e) {
     echo json_encode(["success" => false, "message" => $e->getMessage()]);
 }
-?>
