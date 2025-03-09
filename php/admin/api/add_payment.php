@@ -4,9 +4,9 @@ ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
 
 require_once __DIR__ . "/../../config.php";
-require_once __DIR__ . "/../../PaymentManager.php";
+require_once __DIR__ . "/../../class/PaymentManager.php";
 require_once __DIR__ . "/../../class/Connect.class.php";
-
+ 
 header("Content-Type: application/json");
 header("Access-Control-Allow-Methods: DELETE, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
