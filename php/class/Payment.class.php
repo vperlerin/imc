@@ -37,7 +37,7 @@ class PaymentManager
             if ($amount > 0) {
                 $updateStmt = $this->pdo->prepare("
                     UPDATE participants 
-                    SET total_paid = total_paid + :amount,  
+                    SET total_paid = total_paid + :amount
                     WHERE id = :participant_id
                 ");
             } else {
