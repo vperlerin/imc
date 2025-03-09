@@ -22,6 +22,7 @@ const Payments = () => {
   const { workshops, paymentMethods, registrationTypes, loading: specificdataLoading, sessions, error: specificDataError } = useApiSpecificData();
   const { participant, loading: participantLoading, error: participantError } = useApiParticipant(participantId);
   const { payments, loading: paymenstLoading, error: paymentsError } = useApiPayments(participantId);
+  const { addPayment } = useApiAddPayment(participantId);
 
   const {
     formState: { errors },
@@ -63,39 +64,22 @@ const Payments = () => {
   const submitForm = async (data) => { 
     setSuccessMsg(null);
     setFormErrors(null);
-
-    try {
-      let response;
-      const payload = {
-        participant_id: participantId,
-        amount: parseFloat(data.amount),
-        payment_method_id: data.paymentMethodId,
-        payment_date: data.paymentDate,
-        admin_note: data.adminNote || null,
-      };
-
-      if (editingPayment) {
-        response = await axios.put(
-          `${process.env.REACT_APP_API_URL}/admin/api/update_payment.php`,
-          { payment_id: editingPayment.id, ...payload },
-          { headers: { "Content-Type": "application/json" } }
-        );
-      } else {
-        response = await axios.post(
-          `${process.env.REACT_APP_API_URL}/admin/api/add_payment.php`,
-          payload,
-          { headers: { "Content-Type": "application/json" } }
-        );
-      }
-
-      if (response.data.success) {
-        setSuccessMsg(editingPayment ? "Payment updated successfully!" : "Payment added successfully!");
-        resetForm();
-      } else {
-        throw new Error(response.data.message || "Failed to process payment.");
-      }
-    } catch (err) {
-      setFormErrors(err.message);
+  
+    const payload = {
+      participant_id: participantId,
+      amount: parseFloat(data.amount),
+      payment_method_id: data.paymentMethodId,
+      payment_date: data.paymentDate,
+      admin_note: data.adminNote || null,
+    };
+  
+    const result = await addPayment(payload);
+  
+    if (result.success) {
+      setSuccessMsg("Payment added successfully!");
+      resetForm();
+    } else {
+      setFormErrors(result.message);
     }
   };
 
@@ -199,7 +183,7 @@ const Payments = () => {
                     <>
                       {parseFloat(payment.amount) !== 0 && (
                         <tr key={payment.id}>
-                          <td>{payment.created_at || "N/A"}</td>
+                          <td>{payment.payment_date || "N/A"}</td>
                           <td>{parseFloat(payment.amount).toFixed(2)}</td>
                           <td>{payment.payment_method}</td>
                           <td>{payment.admin_note || "No note"}</td>

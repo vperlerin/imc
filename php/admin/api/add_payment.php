@@ -47,15 +47,24 @@ if (!$input || !isset($input['participant_id'], $input['amount'], $input['paymen
 try {
     $participantId = (int) $input['participant_id'];
     $amount = floatval($input['amount']);
-    $paymentMethodId = intval($input['payment_method_id']); 
+    $paymentMethodId = intval($input['payment_method_id']);
+    $paymentDate = trim($input['payment_date']);
     $adminNote = isset($input['admin_note']) ? trim($input['admin_note']) : null;
 
     // Validate numerical values
-    if ($participantId <= 0 || $amount <= 0 || $paymentMethodId <= 0) {
-        throw new Exception("Invalid values provided. Participant ID, amount, and payment method ID must be positive numbers.");
+    if ($participantId <= 0 || $paymentMethodId <= 0) {
+        throw new Exception("Invalid values provided. Participant ID and payment method ID must be positive numbers.");
     }
-   // Initialize PaymentManager using $pdo
+
+    // Ensure the date format is valid (YYYY-MM-DD)
+    if (!preg_match("/^\d{4}-\d{2}-\d{2}$/", $paymentDate)) {
+        throw new Exception("Invalid payment date format. Expected YYYY-MM-DD.");
+    }
+
+    // Initialize PaymentManager
     $paymentManager = new PaymentManager($pdo);
+    
+    // Add payment using PaymentManager's method
     $success = $paymentManager->addPayment(
         $participantId,
         $amount,
@@ -63,12 +72,14 @@ try {
         $adminNote
     );
 
+    if (!$success) {
+        throw new Exception("Failed to add payment.");
+    }
+
     echo json_encode([
-        "success" => $success,
-        "message" => $success ? "Payment Added" : "Failed to add payment"
+        "success" => true,
+        "message" => "Payment Added Successfully"
     ]);
 } catch (Exception $e) {
     http_response_code(400);
-    echo json_encode(["success" => false, "message" => $e->getMessage()]);
-}
-?>
+    echo json_encode(["success" => false
