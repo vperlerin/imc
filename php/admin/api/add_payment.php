@@ -37,15 +37,17 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $rawInput = file_get_contents("php://input");
 $input = json_decode($rawInput, true);
 
+
+var_dump($input);
+return;
+
+
 // Validate input
 if (!$input || !isset($input['participant_id'], $input['amount'], $input['payment_method_id'], $input['payment_date'])) {
     http_response_code(400);
     echo json_encode(["success" => false, "message" => "Invalid input. Required fields: participant_id, amount, payment_method_id, payment_date."]);
     exit;
 }
-
-var_dump($input);
-return;
 
 try {
     $pdo->beginTransaction();
