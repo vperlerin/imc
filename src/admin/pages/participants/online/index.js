@@ -147,7 +147,7 @@ const AdminParticipantsOnline = () => {
                       <td>{participant.total_paid}€</td>
                       <td
                         className={classNames({
-                          "text-success fw-bolder": (() => {
+                          "text-success": (() => {
                             const totalDue = Number(participant.total_due);
                             const totalPaid = Number(participant.total_paid);
                             const paypalFee = Number(participant.paypal_fee || 0);
@@ -179,7 +179,7 @@ const AdminParticipantsOnline = () => {
                           "❌"
                         )}
                       </td>
-                      <td className={classNames(participant?.confirmation_date && "text-success fw-bolder")}>
+                      <td className={classNames(participant?.confirmation_date && "text-success")}>
                         {participant.confirmation_date ? formatFullDate(participant.confirmation_date) : "❌"}
                       </td>
                       <td>

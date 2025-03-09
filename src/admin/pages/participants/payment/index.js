@@ -223,7 +223,7 @@ const Payments = ({ isCurOnline = false }) => {
                     <td>{participant.participant.total_paid}€</td>
                     <td
                       className={classNames({
-                        "text-success fw-bolder": (() => {
+                        "text-success": (() => {
                           const totalDue = Number(participant.participant.total_due);
                           const totalPaid = Number(participant.participant.total_paid);
                           const isPaypal = participant.participant.payment_method_name?.toLowerCase() === "paypal";
@@ -255,7 +255,7 @@ const Payments = ({ isCurOnline = false }) => {
                         "❌"
                       )}
                     </td>
-                    <td className={classNames(participant?.confirmation_date && "text-success fw-bolder")}>
+                    <td className={classNames(participant?.confirmation_date && "text-success")}>
                       {participant.confirmation_date ? formatFullDate(participant.confirmation_date) : "❌"}
                     </td>
                     <td>
