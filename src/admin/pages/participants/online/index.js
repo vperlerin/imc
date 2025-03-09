@@ -1,7 +1,7 @@
 import css from "./index.module.scss";
 import { CiSearch } from "react-icons/ci";
 import PageContain from "@/admin/components/page-contain";
-import classNames from "classnames"; 
+import classNames from "classnames";
 import Loader from "components/loader";
 import React, { useEffect, useState } from "react";
 import { useApiOnlineParticipants } from "api/participants/online.js";
@@ -116,10 +116,10 @@ const AdminParticipantsOnline = () => {
               <CiSearch className="position-absolute top-50 end-0 translate-middle-y me-2" />
             </div>
           </div>
-          <div className="table-responsive" style={{maxWidth: 'calc(100vw - 2rem)'}}>
+          <div className="table-responsive" style={{ maxWidth: 'calc(100vw - 2rem)' }}>
             <table className="table table-striped">
               <thead>
-              <tr>
+                <tr>
                   <th>Reg. Date</th>
                   <th>Name</th>
                   <th>Total</th>
@@ -145,15 +145,42 @@ const AdminParticipantsOnline = () => {
                         )}
                       </td>
                       <td>{participant.total_paid}€</td>
+                      <td
+                        className={classNames({
+                          "text-success fw-bolder": (() => {
+                            const totalDue = Number(participant.total_due);
+                            const totalPaid = Number(participant.total_paid);
+                            const paypalFee = Number(participant.paypal_fee || 0);
+
+                            const isPaypal = participant.payment_method?.toLowerCase() === "paypal";
+                            const amountDue = isPaypal ? totalDue + paypalFee - totalPaid : totalDue - totalPaid;
+
+                            return amountDue === 0;
+                          })(),
+                        })}
+                      >
+                        {participant.payment_method?.toLowerCase() === "paypal" ? (
+                          <>
+                            {(Number(participant.total_due) + Number(participant.paypal_fee) - Number(participant.total_paid)).toFixed(2)}€
+                          </>
+                        ) : (
+                          <>
+                            {(Number(participant.total_due) - Number(participant.total_paid)).toFixed(2)}€
+                          </>
+                        )}
+                      </td>
                       <td>{participant.payment_method || "n/a"}</td>
                       <td>
                         {participant.confirmation_sent === "1" ? (
                           <>
-                            ✅ {participant.confirmation_date && formatFullDate(participant.confirmation_date)}
+                            ✅
                           </>
                         ) : (
                           "❌"
                         )}
+                      </td>
+                      <td className={classNames(participant?.confirmation_date && "text-success fw-bolder")}>
+                        {participant.confirmation_date ? formatFullDate(participant.confirmation_date) : "❌"}
                       </td>
                       <td>
                         <div className="d-flex gap-2 justify-content-end">
@@ -202,7 +229,7 @@ const AdminParticipantsOnline = () => {
               <div className="modal-footer">
                 <button className="btn btn-outline-secondary fw-bolder" onClick={() => setShowDeleteModal(false)}>Cancel</button>
                 <button className="btn btn-outline-warning fw-bolder" onClick={() => onDeleteParticipant("soft")}>Soft Delete</button>
-                <button className="btn btn-outline-danger fw-bolder ms-auto" onClick={() => { setShowDeleteModal(false); setShowHardDeleteConfirm(true);  }}>Hard Delete</button>
+                <button className="btn btn-outline-danger fw-bolder ms-auto" onClick={() => { setShowDeleteModal(false); setShowHardDeleteConfirm(true); }}>Hard Delete</button>
               </div>
             </div>
           </div>

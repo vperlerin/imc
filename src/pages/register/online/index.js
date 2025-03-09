@@ -50,6 +50,7 @@ const MainForm = () => {
     participantError,
     specificDataError,
   ].filter(Boolean);
+ 
 
   const {
     control,
@@ -117,7 +118,6 @@ const MainForm = () => {
       try {
         const emailToTeam = registrationEmailToTeam(participant, workshops, paymentMethods, registrationTypes, sessions);
         const emailToParticipant = registrationEmailToParticipant(participant, workshops, paymentMethods, registrationTypes, sessions, password);
-
         const attendingWorkshops = participant.workshops?.filter((workshop) => workshop.attending === "1") || [];
 
         const bccRecipients = process.env.REACT_APP_BCC_ALL

@@ -61,6 +61,10 @@ const Payments = () => {
     }
   }, [paymentMethodId, participant, setValue]);
 
+  useEffect(() => {
+    setFetchParticipantTrigger(prev => !prev);   
+  }, [payments]);
+
   const submitForm = async (data) => {
     setSuccessMsg(null);
     setFormErrors(null);
@@ -78,14 +82,14 @@ const Payments = () => {
     if (result.success) {
       setSuccessMsg("Payment added successfully!");
       resetForm();
-      setFetchParticipantTrigger(prev => !prev);
+
       await refetchPayments();
+      // Fetch updated participant data
+      setFetchParticipantTrigger(prev => !prev);
     } else {
       setFormErrors(result.message);
     }
   };
-
-
 
   // Reset form fields 
   const resetForm = () => {
@@ -116,81 +120,83 @@ const Payments = () => {
 
       {!loading && (
         <>
-          <div className="table-responsive" style={{ maxWidth: 'calc(100vw - 2rem)' }}>
-            <table className="table table-striped">
-              <thead>
-                <tr>
-                  <th>Reg. Date</th>
-                  <th>Name</th>
-                  <th>Total</th>
-                  <th>Total Paid</th>
-                  <th>Amount due</th>
-                  <th>Pay. Method</th>
-                  <th>Confirmed</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr key={participant.participant.id}>
-                  <td>{participant.participant.created_at.split(' ')[0]}</td>
-                  <td>{participant.participant.title} {participant.participant.first_name} {participant.participant.last_name}</td>
-                  <td>
-                    {participant.participant.payment_method_name.toLowerCase() === 'paypal' ? (
-                      <>{(parseFloat(participant.participant.total_due) + parseFloat(participant.participant.paypal_fee))}€</>
-                    ) : (
-                      <>{participant.participant.total_due}€</>
-                    )}
-                  </td>
-                  <td>{participant.participant.total_paid}€</td>
-                  <td
-                    className={classNames({
-                      "text-success fw-bolder": (() => {
-                        const totalDue = Number(participant.participant.total_due);
-                        const totalPaid = Number(participant.participant.total_paid);
-                        const paypalFee = Number(participant.participant.paypal_fee || 0);
+          {!participantLoading && (
+            <div className="table-responsive" style={{ maxWidth: 'calc(100vw - 2rem)' }}>
+              <table className="table table-striped">
+                <thead>
+                  <tr>
+                    <th>Reg. Date</th>
+                    <th>Name</th>
+                    <th>Total</th>
+                    <th>Total Paid</th>
+                    <th>Amount due</th>
+                    <th>Pay. Method</th>
+                    <th>Confirmed</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr key={participant.participant.id}>
+                    <td>{participant.participant.created_at.split(' ')[0]}</td>
+                    <td>{participant.participant.title} {participant.participant.first_name} {participant.participant.last_name}</td>
+                    <td>
+                      {participant.participant.payment_method_name.toLowerCase() === 'paypal' ? (
+                        <>{(parseFloat(participant.participant.total_due) + parseFloat(participant.participant.paypal_fee))}€</>
+                      ) : (
+                        <>{participant.participant.total_due}€</>
+                      )}
+                    </td>
+                    <td>{participant.participant.total_paid}€</td>
+                    <td
+                      className={classNames({
+                        "text-success fw-bolder": (() => {
+                          const totalDue = Number(participant.participant.total_due);
+                          const totalPaid = Number(participant.participant.total_paid);
+                          const isPaypal = participant.participant.payment_method_name?.toLowerCase() === "paypal";
+                          const paypalFee = isPaypal
+                            ? (parseFloat(participant?.participant?.total_due || 0) * 0.034 + 0.35).toFixed(2)
+                            : 0;
+                          const amountDue = isPaypal ? totalDue + paypalFee - totalPaid : totalDue - totalPaid;
+                          return amountDue === 0;
+                        })(),
+                      })}
+                    >
+                      {participant.participant.payment_method_name?.toLowerCase() === "paypal" ? (
+                        <>
+                          {(Number(participant.participant.total_due) + Number(participant.participant.paypal_fee) - Number(participant.participant.total_paid)).toFixed(2)}€
+                        </>
+                      ) : (
+                        <>
+                          {(Number(participant.participant.total_due) - Number(participant.participant.total_paid)).toFixed(2)}€
+                        </>
+                      )}
+                    </td>
+                    <td>{participant.participant.payment_method_name || "n/a"}</td>
+                    <td>
+                      {participant.participant.confirmation_sent === "1" ? (
+                        <>
+                          ✅ {participant.participant.confirmation_date && formatFullDate(participant.participant.confirmation_date)}
+                        </>
+                      ) : (
+                        "❌"
+                      )}
+                    </td>
+                    <td>
+                      <div className="d-flex gap-2 justify-content-end">
 
-                        const isPaypal = participant.participant.payment_method_name?.toLowerCase() === "paypal";
-                        const amountDue = isPaypal ? totalDue + paypalFee - totalPaid : totalDue - totalPaid;
-
-                        return amountDue === 0;
-                      })(),
-                    })}
-                  >
-                    {participant.participant.payment_method_name?.toLowerCase() === "paypal" ? (
-                      <>
-                        {(Number(participant.participant.total_due) + Number(participant.participant.paypal_fee) - Number(participant.participant.total_paid)).toFixed(2)}€
-                      </>
-                    ) : (
-                      <>
-                        {(Number(participant.participant.total_due) - Number(participant.participant.total_paid)).toFixed(2)}€
-                      </>
-                    )}
-                  </td>
-                  <td>{participant.participant.payment_method_name || "n/a"}</td>
-                  <td>
-                    {participant.participant.confirmation_sent === "1" ? (
-                      <>
-                        ✅ {participant.participant.confirmation_date && formatFullDate(participant.participant.confirmation_date)}
-                      </>
-                    ) : (
-                      "❌"
-                    )}
-                  </td>
-                  <td>
-                    <div className="d-flex gap-2 justify-content-end">
-
-                      <button
-                        className="btn btn-sm btn-outline-success fw-bolder"
-                      //onClick={() => handleDeleteClick(participant)}
-                      >
-                        CONFIRM
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+                        <button
+                          className="btn btn-sm btn-outline-success fw-bolder"
+                        //onClick={() => handleDeleteClick(participant)}
+                        >
+                          CONFIRM
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          )}
 
 
 
@@ -259,18 +265,16 @@ const Payments = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {payments.map((payment) => (
-                    <>
-                      {parseFloat(payment.amount) !== 0 && (
-                        <tr key={payment.id}>
-                          <td>{payment.payment_date.split(' ')[0] || "N/A"}</td>
-                          <td>{parseFloat(payment.amount).toFixed(2)}</td>
-                          <td>{payment.payment_method}</td>
-                          <td>{payment.admin_note || "No note"}</td>
-                        </tr>
-                      )}
-                    </>
-                  ))}
+                  {payments.map((payment) =>
+                    parseFloat(payment.amount) !== 0 ? (
+                      <tr key={payment.id}>
+                        <td>{payment.payment_date.split(' ')[0] || "N/A"}</td>
+                        <td>{parseFloat(payment.amount).toFixed(2)}</td>
+                        <td>{payment.payment_method}</td>
+                        <td>{payment.admin_note || "No note"}</td>
+                      </tr>
+                    ) : null
+                  )}
                 </tbody>
               </table>
             </div>

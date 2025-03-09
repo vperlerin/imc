@@ -37,10 +37,17 @@ const StaticSummary = ({ isOnline, conferenceData, participantData, registration
 
   const { participant, accommodation, workshops: participantWorkshops, extra_options, contributions = [], payments = [] } = participantData;
 
-  // Registration & Accommodation
-  const { description: registration_description, price: registrationPrice } = getRegInfo(accommodation.registration_type_id, registrationTypes);
-  const lateFee = participant.is_early_bird === "0" ? conferenceData.costs.after_early_birds : 0;
-  const totalRoomCost = registrationPrice + lateFee;
+  // Initialize totalRoomCost
+  let totalRoomCost = 0;
+  let registrationDescription = "";
+
+  // Only calculate registration cost if NOT online
+  if (!isOnline) {
+    const regInfo = getRegInfo(accommodation.registration_type_id, registrationTypes);
+    registrationDescription = regInfo.description;
+    const lateFee = participant.is_early_bird === "0" ? conferenceData.costs.after_early_birds : 0;
+    totalRoomCost = regInfo.price + lateFee;
+  }
 
   // Selected Workshops
   const { selected: selectedWorkshops, totalPrice: workshopCost } = getSelectedWorkshops(participantWorkshops, isOnline);
@@ -55,8 +62,9 @@ const StaticSummary = ({ isOnline, conferenceData, participantData, registration
   const printedPostersCost = numberOfPrintedPosters * conferenceData.poster_print.price;
 
   // Payment Method 
-  const paymentMethodName = payments.length > 0 ? getPaymentMethodById(accommodation.payment_method_id, paymentMethods) : "Unknown";
-  const isPaypal = paymentMethodName.toLowerCase() === "paypal"; 
+  const paymentMethodName = participant.payment_method_name || "Unknown";
+  const isPaypal = paymentMethodName.toLowerCase() === "paypal";
+
 
   // Total Calculation
   let totalCost = totalRoomCost + workshopCost + tshirtCost + printedPostersCost;
@@ -84,7 +92,7 @@ const StaticSummary = ({ isOnline, conferenceData, participantData, registration
           {!isOnline ? (
             <tr>
               <td className="ps-3 text-muted">
-                Conference Registration {registration_description}
+                Conference Registration {registrationDescription}
               </td>
               <td className="text-end">{totalRoomCost.toFixed(2)}€</td>
             </tr>
@@ -143,5 +151,6 @@ const StaticSummary = ({ isOnline, conferenceData, participantData, registration
     </div>
   );
 };
+
 
 export default StaticSummary;

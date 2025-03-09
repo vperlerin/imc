@@ -22,7 +22,7 @@ export const useApiAddPayment = (participantId) => {
       );
 
       if (response.data.success) {
-        await refetchPayments(); // Refresh payments list after success
+        await refetchPayments();  
         return { success: true, message: "Payment added successfully!" };
       } else {
         throw new Error(response.data.message || "Failed to add payment.");

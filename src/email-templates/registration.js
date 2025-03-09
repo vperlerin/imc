@@ -158,14 +158,13 @@ export const registrationEmailToTeam = (participant, workshops, paymentMethods, 
     const isOnline = curParticipant.is_online === '1';
     return `
         Hey the IMC ${year} Team, <br><br>
-        Good news: a new Participant has just registered for <strong>${isOnline ? 'ONLINE' : 'ON SITE'}</strong> IMC ${year}!<br><br>
+        Good news: a new Participant has just registered for <strong>${isOnline ? 'ONLINE' : 'ON-SITE'}</strong> IMC ${year}!<br><br>
         <br>
         Below are the details of the registration: <hr>
     ` + registrationDetails(curParticipant, curParticipantAccomodation, curParticipantWorkshops, curParticipantContributions, curPariticipantOptions, curParticipantArrival, workshops, paymentMethods, registrationTypes, sessions);
 };
 
 export const registrationEmailToParticipant = (participant, workshops, paymentMethods, registrationTypes, sessions, password) => {
-
     const {
         participant: curParticipant,
         workshops: curParticipantWorkshops,
@@ -174,6 +173,9 @@ export const registrationEmailToParticipant = (participant, workshops, paymentMe
         extra_options: curPariticipantOptions,
         contributions: curParticipantContributions
     } = participant;
+
+    const isOnline = curParticipant.is_online === '1';
+    const version = isOnline ? 'ONLINE version' : 'ON SITE version';
 
     const paymentInstructions = curParticipant.payment_method_id === "1"
         ? `<strong>${(parseFloat(curParticipant.total_due) + parseFloat(curParticipant.paypal_fee)).toFixed(2)}€</strong> 
@@ -184,8 +186,25 @@ export const registrationEmailToParticipant = (participant, workshops, paymentMe
             : `<strong>${parseFloat(curParticipant.total_due).toFixed(2)}€</strong><br>
            Since you haven't selected a payment method, <strong>please contact the IMO Treasurer Marc Gyssens immediately</strong>.<br>`;
 
-    const isOnline = curParticipant.is_online === '1';
-    const version = isOnline ? 'ONLINE version' : 'ON SITE version';
+    const paymentInstructionsMessage = curParticipant.payment_method_id === "1"
+        ? `If you have not paid immediately after submitting your registration, you can find the necessary payment instructions <a href="https://${year}.imo.net/register/payment">on our website</a>.<br>`
+        : `The necessary payment instructions can be found <a href="https://${year}.imo.net/register/payment">on our website</a>.<br>`;
+
+    let summarySection = "";
+    if (!isOnline) {
+        summarySection = `
+            <h3 style="margin-bottom:5px;">Summary</h3>
+            ${participantIntro(
+                curParticipant,
+                curParticipantAccomodation,
+                curParticipantWorkshops,
+                curParticipantContributions,
+                curPariticipantOptions,
+                sessions,
+                true
+            )}
+        `;
+    }
 
     return `
         Dear ${curParticipant.title} ${curParticipant.first_name} ${curParticipant.last_name},<br><br>
@@ -195,11 +214,7 @@ export const registrationEmailToParticipant = (participant, workshops, paymentMe
 
         ${paymentInstructions} 
 
-        ${curParticipant.payment_method_id === "1" ? (
-            `If you have not paid immediately after submitting your registration, you can find the necessary payment instructions <a href="https://${year}.imo.net/register/payment">on our website</a>.<br>`
-        ) : (
-            ` The necessary payment instructions can be found <a href="https://${year}.imo.net/register/payment">on our website</a>.<br>`
-        )}
+        ${paymentInstructionsMessage}
         
         The registration fee must be sent to the IMO Treasurer <strong>IMMEDIATELY</strong>. Failure to make payment will result in the <strong>cancellation of your registration</strong>.<br><br>
 
@@ -211,14 +226,23 @@ export const registrationEmailToParticipant = (participant, workshops, paymentMe
 
         Below are the details you provided during registration. If you notice any discrepancies, please contact us immediately.<br>
 
-        <h3 style="margin-bottom:5px;">Summary</h3>
-        ${participantIntro(
-            curParticipant, curParticipantAccomodation, curParticipantWorkshops, curParticipantContributions, curPariticipantOptions, sessions, true
-        )}
+        ${summarySection}
         <hr>
-        ${registrationDetails(curParticipant, curParticipantAccomodation, curParticipantWorkshops, curParticipantContributions, curPariticipantOptions, curParticipantArrival, workshops, paymentMethods, registrationTypes, sessions)}
+        ${registrationDetails(
+            curParticipant,
+            curParticipantAccomodation,
+            curParticipantWorkshops,
+            curParticipantContributions,
+            curPariticipantOptions,
+            curParticipantArrival,
+            workshops,
+            paymentMethods,
+            registrationTypes,
+            sessions
+        )}
     `;
 };
+
 
 
 const participantIntro = (curParticipant, curParticipantAccomodation, curParticipantWorkshops, curParticipantContributions, curParticipantOptions, sessions, you = false) => {
