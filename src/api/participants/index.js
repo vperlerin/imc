@@ -2,7 +2,7 @@ import { retry } from "utils/retry.js";
 import { useState, useEffect, useCallback } from "react";
 import axios from "axios"; 
 
-export const useApiParticipant = (participantId, fetchTrigger = 0, withAdminNotes = false) => {
+export const useApiParticipant = (participantId, isOnline = false, fetchTrigger = 0, withAdminNotes = false) => {
   const [participant, setParticipant] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -14,8 +14,14 @@ export const useApiParticipant = (participantId, fetchTrigger = 0, withAdminNote
     setError(null);
 
     try {
+      const endpoint = isOnline ? "get_online_participant" : "get_onsite_participant";
       const response = await retry(() =>
-        axios.get(`${process.env.REACT_APP_API_URL}/api/get_participant.php?id=${participantId}&admin_notes=${withAdminNotes}`)
+        axios.get(`${process.env.REACT_APP_API_URL}/api/${endpoint}.php`, {
+          params: {
+            id: participantId,
+            admin_notes: withAdminNotes,
+          },
+        })
       );
 
       if (response.data.success && response.data.data) {
@@ -28,7 +34,7 @@ export const useApiParticipant = (participantId, fetchTrigger = 0, withAdminNote
     } finally {
       setLoading(false);
     }
-  }, [participantId]);
+  }, [participantId, isOnline, withAdminNotes]);
 
   useEffect(() => {
     fetchParticipant();

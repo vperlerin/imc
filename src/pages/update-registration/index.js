@@ -27,6 +27,10 @@ const UpdateRegistration = () => {
 
   const user = useSelector(authSelectors.getUser);
   const { control, register, handleSubmit, getValues, setValue, formState: { errors }, reset, trigger, watch } = useForm();
+// TODO
+
+  console.log("UPDATE isOnline on useApiParticipant");
+
 
   const { participant, loading: participantLoading } = useApiParticipant(participantId, fetchTrigger);
   const { loading: specificDataLoading, sessions } = useApiSpecificData();

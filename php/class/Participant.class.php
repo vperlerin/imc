@@ -207,9 +207,6 @@ class ParticipantManager
     public function saveOnlineParticipant($data, $passwordHash)
     {
         try {
-
-            echo "SAVING ONLINE PARTICIPANT ";
-
             $this->pdo->beginTransaction();
 
             // 1. Handle boolean fields: convert "true"/"false" (or any truthy/falsy string) to 1 or 0.
@@ -260,8 +257,6 @@ class ParticipantManager
                 ':comments' => $data['comments'] ?? null,
                 ':payment_method_id' => (int) ($data['payment_method_id'] ?? 0),
             ]);
-
-            echo "PAYMENT ID " . (int) ($data['payment_method_id'] ?? 0);
 
             $participantId = $this->pdo->lastInsertId();
 
@@ -689,7 +684,7 @@ class ParticipantManager
 
 
     /**
-     * Get participants INFO
+     * Get participant INFO
      */
     public function getParticipantDetails($participantId, $withAdminNotes = false)
     {
@@ -818,4 +813,88 @@ class ParticipantManager
 
         return $details;
     }
+
+
+    /**
+     * Get details of an online participant
+     */
+    public function getOnlineParticipantDetails($participantId)
+    {
+        $stmt = $this->pdo->prepare("  
+            SELECT 
+                p.id,
+                p.title,
+                p.first_name,
+                p.last_name,
+                p.gender,
+                p.email,
+                p.country,
+                p.organization,
+                p.is_online,
+                p.is_early_bird,
+                p.confirmation_sent,
+                p.confirmation_date,
+                p.total_due,
+                p.total_paid,
+                p.total_reimbursed,
+                p.status,
+                p.comments,
+                p.payment_method_id,
+                pm.method AS payment_method_name,
+                p.created_at,
+                p.updated_at
+            FROM participants p
+            LEFT JOIN payment_methods pm ON p.payment_method_id = pm.id
+            WHERE p.id = :participant_id AND p.is_online = 1
+        ");
+
+        $stmt->execute([':participant_id' => $participantId]);
+        $participant = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$participant) {
+            return null;
+        }
+
+        // Fetch only workshops where price_online > 0
+        $stmt = $this->pdo->prepare("  
+            SELECT w.*
+            FROM participant_workshops pw
+            INNER JOIN workshops w ON pw.workshop_id = w.id
+            WHERE pw.participant_id = :participant_id AND w.price_online > 0
+        ");
+        $stmt->execute([':participant_id' => $participantId]);
+        $workshops = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Fetch payments
+        $stmt = $this->pdo->prepare("  
+            SELECT pay.*, pm.method AS payment_method
+            FROM payments pay
+            INNER JOIN payment_methods pm ON pay.payment_method_id = pm.id
+            WHERE pay.participant_id = :participant_id
+            ORDER BY pay.payment_date DESC
+        ");
+        $stmt->execute([':participant_id' => $participantId]);
+        $payments = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Fetch only online contributions (talks)
+        $stmt = $this->pdo->prepare("  
+            SELECT c.*, s.name AS session_name
+            FROM contributions c
+            INNER JOIN imc_sessions s ON c.session_id = s.id
+            WHERE c.participant_id = :participant_id AND c.type = 'talk'
+        ");
+        $stmt->execute([':participant_id' => $participantId]);
+        $contributions = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Combine everything into a structured array
+        $details = [
+            'participant'    => $participant,
+            'workshops'      => $workshops,
+            'payments'       => $payments,
+            'contributions'  => $contributions,
+        ];
+
+        return $details;
+    }
 }
+    

@@ -60,7 +60,7 @@ const MainForm = () => {
   const [total, setTotal] = useState(0);
 
   const { workshops, paymentMethods, registrationTypes, loading: specificdataLoading, sessions, error: specificDataError } = useApiSpecificData();
-  const { participant, loading: participantLoading, error: participantError } = useApiParticipant(participantId, 0, true);
+  const { participant, loading: participantLoading, error: participantError } = useApiParticipant(participantId);
 
   const loading = specificdataLoading || participantLoading || isSaving;
   const error = [

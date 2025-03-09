@@ -35,22 +35,23 @@ const AdminParticipantsUser = () => {
   const [posters, setPosters] = useState([]);
   const activeTab = tab || "identity";
   const navigate = useNavigate();
-
  
   useBlockNavigation(unsavedChanges);
 
   const { workshops, paymentMethods, registrationTypes, loading: specificdataLoading, sessions, error: specificDataError } = useApiSpecificData();
-  const { participant, loading: participantLoading, error: participantError } = useApiParticipant(participantId, fetchParticipantTrigger, true);
+  const { participant, loading: participantLoading, error: participantError } = useApiParticipant(participantId, isOnline = false, fetchParticipantTrigger, true);
   const { control, register, handleSubmit, getValues, setValue, formState: { errors }, trigger, watch } = useForm();
+
+  const isOnline = participant?.participant?.is_online === "1";
 
   const loading = specificdataLoading || participantLoading || isSaving;
   const error = [
-    errorMsg, 
+    errorMsg,
     participantError,
     specificDataError,
   ].filter(Boolean);
 
-  
+
   // Detect form changes
   useEffect(() => {
     const subscription = watch(() => {
@@ -192,7 +193,7 @@ const AdminParticipantsUser = () => {
     }
   };
 
-  const isOnline = participant?.participant?.is_online === "1";
+
   const breadcrumb = [
     {
       url: `/admin/participants/${isOnline ? 'online' : 'onsite'}`,
@@ -216,7 +217,7 @@ const AdminParticipantsUser = () => {
     registrationTypes.length > 0
   );
 
-   const hasAdminNotes = !!participant?.participant?.admin_notes;
+  const hasAdminNotes = !!participant?.participant?.admin_notes;
 
   return (
     <PageContain
@@ -226,26 +227,26 @@ const AdminParticipantsUser = () => {
       <div className="position-relative fw-bolder">
         {loading && <Loader />}
 
-              {error.length > 0 && (
-                <div className="alert alert-danger fw-bolder">
-                  <ul className="mb-0">
-                    {error.map((err, index) => (
-                      <li key={index}>{err}</li>
-                    ))}
-                  </ul>
-                  <div className="mt-2">
-                    If you think this is a mistake please try again or {' '} <Link
-                      aria-label="Contact"
-                      to="/contact"
-                      title="Contact"
-                    >
-                      contact us
-                    </Link>.
-                  </div>
-                </div>
-              )}
+        {error.length > 0 && (
+          <div className="alert alert-danger fw-bolder">
+            <ul className="mb-0">
+              {error.map((err, index) => (
+                <li key={index}>{err}</li>
+              ))}
+            </ul>
+            <div className="mt-2">
+              If you think this is a mistake please try again or {' '} <Link
+                aria-label="Contact"
+                to="/contact"
+                title="Contact"
+              >
+                contact us
+              </Link>.
+            </div>
+          </div>
+        )}
 
-     
+
 
         {successMsg && !isLoading && (
           <div className="alert alert-success">{successMsg}</div>
