@@ -25,7 +25,7 @@ import { SlArrowLeft, SlArrowRight } from "react-icons/sl";
 import { useApiParticipant } from "api/participants";
 import { useApiSpecificData } from "api/specific-data/index.js";
 import { registrationEmailToTeam, registrationEmailToParticipant } from "email-templates/registration";
- 
+
 const totalStep = 8;
 
 const calculateAge = (dob) => {
@@ -64,7 +64,7 @@ const MainForm = () => {
 
   const loading = specificdataLoading || participantLoading || isSaving;
   const error = participantError || specificDataError || !!errorMsg;
- 
+
   const {
     control,
     register,
@@ -97,7 +97,7 @@ const MainForm = () => {
     setErrorMsg(null);
     setSuccessMsg(null);
 
-    try {  
+    try {
       const apiUrl = `${process.env.REACT_APP_API_URL}/api/register_onsite.php`;
 
       const formattedData = {
@@ -136,7 +136,7 @@ const MainForm = () => {
       try {
         const emailToTeam = registrationEmailToTeam(participant, workshops, paymentMethods, registrationTypes, sessions);
         const emailToParticipant = registrationEmailToParticipant(participant, workshops, paymentMethods, registrationTypes, sessions, password);
-  
+
         const attendingWorkshops = participant.workshops?.filter((workshop) => workshop.attending === "1") || [];
 
         const bccRecipients = process.env.REACT_APP_BCC_ALL
@@ -156,7 +156,7 @@ const MainForm = () => {
             replyName: participant.participant.first_name + " " + participant.participant.last_name,
             bcc: bccRecipients,
           });
-        }); 
+        });
 
         const responseEmailTeam = await sendEmail({
           subject: "New Onsite IMC Registration",
@@ -187,31 +187,31 @@ const MainForm = () => {
           participantEmailSent: responseEmailParticipant,
           error: null,
         });
-      } catch (error) { 
+      } catch (error) {
         setEmailStatus({ teamEmailSent: null, participantEmailSent: null, error: error.message || "Failed to send emails" });
       }
     };
 
     sendEmails();
   }, [participant, workshops, password]);
- 
- 
+
+
   if (!isDebugMode && false) {
     return <PageContain title="Register Onsite">Come back soon…</PageContain>;
-  } 
-   
+  }
+
   if (loading) return <Loader />;
- 
+
 
   return (
     <PageContain title="Register On site" showRegBtn={false}>
       {error && (
         <div className="alert alert-danger">{error}</div>
       )}
-       
-      {step === totalStep  &&  (
+
+      {step === totalStep && (
         <>
-          {participantError && !loading && ( 
+          {participantError && !loading && (
             <div className="alert alert-danger fw-bolder">
               Database access error. We are sorry, but we couldn't properly record your registration. Please try again or  {' '}
               <Link
@@ -223,222 +223,222 @@ const MainForm = () => {
               </Link>{' '} for assistance.
             </div>
           )}
-          
+
           {participant && (
-                 <>
-                 <h2>{cd.thank_you}</h2>
-                 {successMsg && !errorMsg && <div className="alert alert-success fw-bolder">{successMsg}</div>}
-                 <p>
-                   We just sent you an email with some instructions. This email contains a summary of your information as well as the password
-                   required to eventually update your travel details and your contributions (talks & posters).<br />
-                   If you do not receive this email within the next 20 minutes{' '}
-                   <Link
-                     aria-label="Contact"
-                     to="/contact"
-                     title="Contact"
-                   >
-                     contact us
-                   </Link>{' '} immediately.
-                 </p>
+            <>
+              <h2>{cd.thank_you}</h2>
+              {successMsg && !errorMsg && <div className="alert alert-success fw-bolder">{successMsg}</div>}
+              <p className="fw-bolder">
+                We just sent you an email with some instructions. This email contains a summary of your information as well as the password
+                required to eventually update your travel details and your contributions (talks & posters).
+                If you do not receive this email within the next 20 minutes{' '}
+                <Link
+                  aria-label="Contact"
+                  to="/contact"
+                  title="Contact"
+                >
+                  contact us
+                </Link>{' '} immediately.
+              </p>
 
-                 <div className="d-flex flex-column flex-md-row gap-3">
-                   <div className="flex-grow-1">
-                     <p className="fw-bolder text-danger">The IMC fee is due without any delay.</p>
+              <div className="d-flex flex-column flex-md-row gap-3">
+                <div className="flex-grow-1">
+                  <p className="fw-bolder text-danger">The IMC fee is due without any delay.</p>
 
-                     {getPaymentMethodById(participant.participant.payment_method_id, paymentMethods) === "paypal" ? (
-                       <div className="mb-3">
-                         <p >Click the button below to pay immediately with Paypal.</p>
-                         <PayPalForm amount={(total + paypalFee)} year={cd.year} />
-                       </div>
-                     ) : (
-                       <>
-                         <p><strong>  Please, transfer the total amount of {total}€ to confirm your registration immediately.</strong></p>
-                         <blockquote className="border rounded-2 p-3">
-                           International Meteor Organization, Jozef Mattheessensstraat 60, 2540 Hove, Belgium<br />
-                           Bank account at BNP Paribas Fortis Bank Belgium<br />
-                           BIC bank code: GEBABEBB<br />
-                           IBAN account number: BE30 0014 7327 5911<br />
-                           e-mail: treasurer@imo.net
-                         </blockquote>
-                       </>
-                     )}
-                   </div>
+                  {getPaymentMethodById(participant.participant.payment_method_id, paymentMethods) === "paypal" ? (
+                    <div className="mb-3">
+                      <p >Click the button below to pay immediately with Paypal.</p>
+                      <PayPalForm amount={(total + paypalFee)} year={cd.year} />
+                    </div>
+                  ) : (
+                    <>
+                      <p><strong>  Please, transfer the total amount of {total}€ to confirm your registration immediately.</strong></p>
+                      <blockquote className="border rounded-2 p-3">
+                        International Meteor Organization, Jozef Mattheessensstraat 60, 2540 Hove, Belgium<br />
+                        Bank account at BNP Paribas Fortis Bank Belgium<br />
+                        BIC bank code: GEBABEBB<br />
+                        IBAN account number: BE30 0014 7327 5911<br />
+                        e-mail: treasurer@imo.net
+                      </blockquote>
+                    </>
+                  )}
+                </div>
 
-                   <StaticSummary
-                     isOnline={false}
-                     conferenceData={cd}
-                     participantData={participant}
-                     workshops={workshops}
-                     registrationTypes={registrationTypes}
-                     paymentMethods={paymentMethods}
-                   />
+                <StaticSummary
+                  isOnline={false}
+                  conferenceData={cd}
+                  participantData={participant}
+                  workshops={workshops}
+                  registrationTypes={registrationTypes}
+                  paymentMethods={paymentMethods}
+                />
 
-                 </div>
-               </>
+              </div>
+            </>
           )}
         </>
       )}
-    
+
       {!participant && !loading && (
         <form onSubmit={handleSubmit(onSubmit)} className="d-flex flex-grow-1 flex-column position-relative">
-        {isSaving && <Loader />}
+          {isSaving && <Loader />}
 
-        <input name="is_early_bird" type="hidden" value={is_early_bird} {...register("is_early_bird")} />
-        <input name="is_online" type="hidden" value="false" {...register("is_online")} />
+          <input name="is_early_bird" type="hidden" value={is_early_bird} {...register("is_early_bird")} />
+          <input name="is_online" type="hidden" value="false" {...register("is_online")} />
 
-        {step === 1 && (
-          <>
-            <p className="border rounded-2 p-3">
-              <b>People who need an invitation letter for Visa</b> must send their request without any delay to imc{cd.year}@imo.net. Please, provide your legal private domicile or professional address, passport number and the address of the {cd.consulate} where your visa application will be submitted.
-            </p>
-
-            {new Date() < new Date(cd.deadlines.early_birds) && (
-              <p className="d-flex border rounded-2 p-3 border-info text-info gap-2 mb-5">
-                <CiWarning className={css.warning} />
-                <span>
-                  <span className="d-block fw-bolder">Hurry up! After {formatFullDate(cd.deadlines.early_birds)}, a late booking fee of {cd.costs.after_early_birds}€ is added to the registration fee</span>
-                  <small>— because the early birds got the discount, and the latecomers just get the worms (and a fee :).</small>
-                </span>
+          {step === 1 && (
+            <>
+              <p className="border rounded-2 p-3">
+                <b>People who need an invitation letter for Visa</b> must send their request without any delay to imc{cd.year}@imo.net. Please, provide your legal private domicile or professional address, passport number and the address of the {cd.consulate} where your visa application will be submitted.
               </p>
-            )}
-          </>
-        )}
 
-        {step === 1 && (
-          <Identity
-            register={register}
-            errors={errors}
-            isDebugMode={isDebugMode}
-            step={step}
-            stepTotal={totalStep}
-            setValue={setValue}
-            trigger={trigger}
-          />
-        )}
+              {new Date() < new Date(cd.deadlines.early_birds) && (
+                <p className="d-flex border rounded-2 p-3 border-info text-info gap-2 mb-5">
+                  <CiWarning className={css.warning} />
+                  <span>
+                    <span className="d-block fw-bolder">Hurry up! After {formatFullDate(cd.deadlines.early_birds)}, a late booking fee of {cd.costs.after_early_birds}€ is added to the registration fee</span>
+                    <small>— because the early birds got the discount, and the latecomers just get the worms (and a fee :).</small>
+                  </span>
+                </p>
+              )}
+            </>
+          )}
 
-        {step === 2 && cd?.workshops?.length > 0 && (
-          <Workshops
-            conferenceData={cd}
-            register={register}
-            errors={errors}
-            isDebugMode={isDebugMode}
-            step={step}
-            stepTotal={totalStep}
-            setValue={setValue}
-            trigger={trigger}
-            watch={watch}
-            workshops={workshops}
-          />
-        )}
-        {step === 3 &&
-          <Arrival
-            conferenceData={cd}
-            register={register}
-            errors={errors}
-            isDebugMode={isDebugMode}
-            step={step}
-            stepTotal={totalStep}
-            setValue={setValue}
-            trigger={trigger}
-          />
-        }
-        {step === 4 &&
-          <Contribution
-            conferenceData={cd}
-            control={control}
-            register={register}
-            isDebugMode={isDebugMode}
-            errors={errors}
-            step={step}
-            stepTotal={totalStep}
-            getValues={getValues}
-            setValue={setValue}
-            sessions={sessions}
-            trigger={trigger}
-            watch={watch}
-          />
-        }
-        {step === 5 &&
-          <Accomodation
-            conferenceData={cd}
-            control={control}
-            register={register}
-            isDebugMode={isDebugMode}
-            isEarlyBird={is_early_bird}
-            paymentMethods={paymentMethods}
-            errors={errors}
-            registrationTypes={registrationTypes}
-            step={step}
-            stepTotal={totalStep}
-            setValue={setValue}
-            trigger={trigger}
-          />
-        }
+          {step === 1 && (
+            <Identity
+              register={register}
+              errors={errors}
+              isDebugMode={isDebugMode}
+              step={step}
+              stepTotal={totalStep}
+              setValue={setValue}
+              trigger={trigger}
+            />
+          )}
 
-        {step === 6 && (
-          <Extras
-            conferenceData={cd}
-            register={register}
-            errors={errors}
-            isDebugMode={isDebugMode}
-            step={step}
-            stepTotal={totalStep}
-            setValue={setValue}
-            trigger={trigger}
-            watch={watch}
-            control={control}
-          />
-        )}
+          {step === 2 && cd?.workshops?.length > 0 && (
+            <Workshops
+              conferenceData={cd}
+              register={register}
+              errors={errors}
+              isDebugMode={isDebugMode}
+              step={step}
+              stepTotal={totalStep}
+              setValue={setValue}
+              trigger={trigger}
+              watch={watch}
+              workshops={workshops}
+            />
+          )}
+          {step === 3 &&
+            <Arrival
+              conferenceData={cd}
+              register={register}
+              errors={errors}
+              isDebugMode={isDebugMode}
+              step={step}
+              stepTotal={totalStep}
+              setValue={setValue}
+              trigger={trigger}
+            />
+          }
+          {step === 4 &&
+            <Contribution
+              conferenceData={cd}
+              control={control}
+              register={register}
+              isDebugMode={isDebugMode}
+              errors={errors}
+              step={step}
+              stepTotal={totalStep}
+              getValues={getValues}
+              setValue={setValue}
+              sessions={sessions}
+              trigger={trigger}
+              watch={watch}
+            />
+          }
+          {step === 5 &&
+            <Accomodation
+              conferenceData={cd}
+              control={control}
+              register={register}
+              isDebugMode={isDebugMode}
+              isEarlyBird={is_early_bird}
+              paymentMethods={paymentMethods}
+              errors={errors}
+              registrationTypes={registrationTypes}
+              step={step}
+              stepTotal={totalStep}
+              setValue={setValue}
+              trigger={trigger}
+            />
+          }
 
-        {step === 7 && (
-          <Comments
-            register={register}
-            errors={errors}
-            isDebugMode={isDebugMode}
-            isUnder16={isUnder16}
-            showGdpr={true}
-            step={step}
-            stepTotal={totalStep}
-            setValue={setValue}
-            trigger={trigger}
-          />
-        )}
+          {step === 6 && (
+            <Extras
+              conferenceData={cd}
+              register={register}
+              errors={errors}
+              isDebugMode={isDebugMode}
+              step={step}
+              stepTotal={totalStep}
+              setValue={setValue}
+              trigger={trigger}
+              watch={watch}
+              control={control}
+            />
+          )}
 
-        {step === 8 && !successMsg && (
-          <Summary
-            isOnline={false}
-            getValues={getValues}
-            isEarlyBird={is_early_bird}
-            conferenceData={cd}
-            setTotal={setTotal}
-            setPaypalFee={setPaypalFee}
-            showInfo={!successMsg}
-            workshops={workshops}
-            registrationTypes={registrationTypes}
-            paymentMethods={paymentMethods}
-            watch={watch}
-          />
-        )}
+          {step === 7 && (
+            <Comments
+              register={register}
+              errors={errors}
+              isDebugMode={isDebugMode}
+              isUnder16={isUnder16}
+              showGdpr={true}
+              step={step}
+              stepTotal={totalStep}
+              setValue={setValue}
+              trigger={trigger}
+            />
+          )}
 
-        <div className="mt-auto pt-3">
-          <div className="d-flex gap-3 justify-content-end">
-            {step > 1 && (
-              <button className="btn btn-outline-primary fw-bolder d-inline-flex align-items-center gap-2" type="button" onClick={prevStep}>
-                <SlArrowLeft style={{ strokeWidth: "110px" }} /> Back
-              </button>
-            )}
-            {step < totalStep && (
-              <button className="btn btn-outline-primary fw-bolder d-inline-flex align-items-center gap-2" type="button" onClick={nextStep}>
-                Continue <SlArrowRight style={{ strokeWidth: "110px" }} />
-              </button>
-            )}
+          {step === 8 && !successMsg && (
+            <Summary
+              isOnline={false}
+              getValues={getValues}
+              isEarlyBird={is_early_bird}
+              conferenceData={cd}
+              setTotal={setTotal}
+              setPaypalFee={setPaypalFee}
+              showInfo={!successMsg}
+              workshops={workshops}
+              registrationTypes={registrationTypes}
+              paymentMethods={paymentMethods}
+              watch={watch}
+            />
+          )}
 
-            {step === totalStep && <button className="btn btn-primary fw-bolder" type="submit">Submit</button>}
+          <div className="mt-auto pt-3">
+            <div className="d-flex gap-3 justify-content-end">
+              {step > 1 && (
+                <button className="btn btn-outline-primary fw-bolder d-inline-flex align-items-center gap-2" type="button" onClick={prevStep}>
+                  <SlArrowLeft style={{ strokeWidth: "110px" }} /> Back
+                </button>
+              )}
+              {step < totalStep && (
+                <button className="btn btn-outline-primary fw-bolder d-inline-flex align-items-center gap-2" type="button" onClick={nextStep}>
+                  Continue <SlArrowRight style={{ strokeWidth: "110px" }} />
+                </button>
+              )}
+
+              {step === totalStep && <button className="btn btn-primary fw-bolder" type="submit">Submit</button>}
+            </div>
           </div>
-        </div>
-        </form> 
+        </form>
       )}
-  
+
     </PageContain >
   );
 };

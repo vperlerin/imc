@@ -1,9 +1,8 @@
+import classNames from "classnames";
 import PageContain from "@/admin/components/page-contain";
-import axios from "axios";
 import React, { useEffect, useState } from "react";
 import Loader from "components/loader";
 import cssForm from "styles/components/form.module.scss";
-import classNames from "classnames";
 import StaticSummary from "components/billing/static_summary";
 import { useParams } from "react-router-dom";
 import { conferenceData as cd } from "data/conference-data";
@@ -54,8 +53,8 @@ const Payments = () => {
   }, [paymentMethodId, participant, setValue]);
 
   useEffect(() => {
-    if (participant?.participant && paymentMethodId) {
-      const dueAmount = paymentMethodId === "1"
+    if (participant?.participant) {
+      const dueAmount = participant.participant.payment_method_name
         ? parseFloat(participant.participant.total_due) + parseFloat(participant.participant.paypal_fee) - parseFloat(participant.participant.total_paid)
         : parseFloat(participant.participant.total_due) - parseFloat(participant.participant.total_paid);
       setValue("amount", dueAmount.toFixed(2));
@@ -107,7 +106,6 @@ const Payments = () => {
   ];
 
 
-
   return (
     <PageContain breadcrumb={breadcrumb} isMaxWidth>
 
@@ -137,22 +135,38 @@ const Payments = () => {
                   <td>{participant.participant.created_at.split(' ')[0]}</td>
                   <td>{participant.participant.title} {participant.participant.first_name} {participant.participant.last_name}</td>
                   <td>
-                    {participant.participant.payment_method_id === '1' ? (
+                    {participant.participant.payment_method_name.toLowerCase() === 'paypal' ? (
                       <>{(parseFloat(participant.participant.total_due) + parseFloat(participant.participant.paypal_fee))}€</>
                     ) : (
                       <>{participant.participant.total_due}€</>
                     )}
                   </td>
                   <td>{participant.participant.total_paid}€</td>
-                  <td>
-                    {participant.participant.payment_method_id === '1' ? (
-                      <>{(parseFloat(participant.participant.total_due) + parseFloat(participant.participant.paypal_fee) - parseFloat(participant.participant.total_paid))}€</>
-                    ) : (
-                      <>{parseFloat(participant.participant.total_due) - - parseFloat(participant.participant.total_paid)}€</>
-                    )}
+                  <td
+  className={classNames({
+    "text-success fw-bolder": (() => {
+      const totalDue = Number(participant.participant.total_due);
+      const totalPaid = Number(participant.participant.total_paid);
+      const paypalFee = Number(participant.participant.paypal_fee || 0);
 
-                  </td>
-                  <td>{participant.participant.payment_method || "n/a"}</td>
+      const isPaypal = participant.participant.payment_method_name?.toLowerCase() === "paypal";
+      const amountDue = isPaypal ? totalDue + paypalFee - totalPaid : totalDue - totalPaid;
+
+      return amountDue === 0;
+    })(),
+  })}
+>
+  {participant.participant.payment_method_name?.toLowerCase() === "paypal" ? (
+    <>
+      {(Number(participant.participant.total_due) + Number(participant.participant.paypal_fee) - Number(participant.participant.total_paid)).toFixed(2)}€
+    </>
+  ) : (
+    <>
+      {(Number(participant.participant.total_due) - Number(participant.participant.total_paid)).toFixed(2)}€
+    </>
+  )}
+</td>
+                  <td>{participant.participant.payment_method_name || "n/a"}</td>
                   <td>
                     {participant.participant.confirmation_sent === "1" ? (
                       <>
@@ -233,7 +247,7 @@ const Payments = () => {
 
           {payments && payments.length > 0 && !(payments.length === 1 && parseFloat(payments[0].amount) === 0) && (
             <div className="border p-3 rounded-2 mt-3">
-              <h4 className="mb-3">Previous Payments</h4>
+              <h4 className="mb-3">Payments in record</h4>
 
               <table className="table table-bordered table-striped">
                 <thead>
@@ -249,7 +263,7 @@ const Payments = () => {
                     <>
                       {parseFloat(payment.amount) !== 0 && (
                         <tr key={payment.id}>
-                          <td>{payment.payment_date || "N/A"}</td>
+                          <td>{payment.payment_date.split(' ')[0] || "N/A"}</td>
                           <td>{parseFloat(payment.amount).toFixed(2)}</td>
                           <td>{payment.payment_method}</td>
                           <td>{payment.admin_note || "No note"}</td>
