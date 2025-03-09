@@ -119,13 +119,15 @@ const AdminParticipantsOnline = () => {
           <div className="table-responsive" style={{maxWidth: 'calc(100vw - 2rem)'}}>
             <table className="table table-striped">
               <thead>
-                <tr>
+              <tr>
                   <th>Reg. Date</th>
                   <th>Name</th>
-                  <th>Total Due</th>
+                  <th>Total</th>
                   <th>Total Paid</th>
+                  <th>Amount due</th>
                   <th>Pay. Method</th>
                   <th>Confirmed</th>
+                  <th>Conf. Email</th>
                   <th></th>
                 </tr>
               </thead>

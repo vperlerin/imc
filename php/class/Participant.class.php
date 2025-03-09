@@ -534,9 +534,7 @@ class ParticipantManager
             throw new Exception("Error updating participant: " . $e->getMessage());
         }
     }
-
-
-
+ 
     /**
      * Retrieve participant statistics for a given workshop or all workshops.
      */
@@ -581,7 +579,6 @@ class ParticipantManager
         // Otherwise, return all workshops' statistics
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-
 
     /**
      * Marks confirmation_sent as TRUE and sets confirmation_date to current timestamp.
@@ -770,6 +767,8 @@ class ParticipantManager
         ");
         $stmt->execute([':participant_id' => $participantId]);
         $accommodation = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        var_dump($participant);
     
         // Add payment_method_id and payment_method_name to accommodation
         $accommodation['payment_method_id'] = $participant['payment_method_id'];

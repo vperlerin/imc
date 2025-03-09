@@ -143,29 +143,29 @@ const Payments = () => {
                   </td>
                   <td>{participant.participant.total_paid}€</td>
                   <td
-  className={classNames({
-    "text-success fw-bolder": (() => {
-      const totalDue = Number(participant.participant.total_due);
-      const totalPaid = Number(participant.participant.total_paid);
-      const paypalFee = Number(participant.participant.paypal_fee || 0);
+                    className={classNames({
+                      "text-success fw-bolder": (() => {
+                        const totalDue = Number(participant.participant.total_due);
+                        const totalPaid = Number(participant.participant.total_paid);
+                        const paypalFee = Number(participant.participant.paypal_fee || 0);
 
-      const isPaypal = participant.participant.payment_method_name?.toLowerCase() === "paypal";
-      const amountDue = isPaypal ? totalDue + paypalFee - totalPaid : totalDue - totalPaid;
+                        const isPaypal = participant.participant.payment_method_name?.toLowerCase() === "paypal";
+                        const amountDue = isPaypal ? totalDue + paypalFee - totalPaid : totalDue - totalPaid;
 
-      return amountDue === 0;
-    })(),
-  })}
->
-  {participant.participant.payment_method_name?.toLowerCase() === "paypal" ? (
-    <>
-      {(Number(participant.participant.total_due) + Number(participant.participant.paypal_fee) - Number(participant.participant.total_paid)).toFixed(2)}€
-    </>
-  ) : (
-    <>
-      {(Number(participant.participant.total_due) - Number(participant.participant.total_paid)).toFixed(2)}€
-    </>
-  )}
-</td>
+                        return amountDue === 0;
+                      })(),
+                    })}
+                  >
+                    {participant.participant.payment_method_name?.toLowerCase() === "paypal" ? (
+                      <>
+                        {(Number(participant.participant.total_due) + Number(participant.participant.paypal_fee) - Number(participant.participant.total_paid)).toFixed(2)}€
+                      </>
+                    ) : (
+                      <>
+                        {(Number(participant.participant.total_due) - Number(participant.participant.total_paid)).toFixed(2)}€
+                      </>
+                    )}
+                  </td>
                   <td>{participant.participant.payment_method_name || "n/a"}</td>
                   <td>
                     {participant.participant.confirmation_sent === "1" ? (

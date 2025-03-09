@@ -63,7 +63,12 @@ const MainForm = () => {
   const { participant, loading: participantLoading, error: participantError } = useApiParticipant(participantId, 0, true);
 
   const loading = specificdataLoading || participantLoading || isSaving;
-  const error = participantError || specificDataError || !!errorMsg;
+  const error = [
+    errorMsg,
+    emailStatus.error,
+    participantError,
+    specificDataError,
+  ].filter(Boolean);
 
   const {
     control,
@@ -205,25 +210,26 @@ const MainForm = () => {
 
   return (
     <PageContain title="Register On site" showRegBtn={false}>
-      {error && (
-        <div className="alert alert-danger">{error}</div>
+      {error.length > 0 && (
+        <div className="alert alert-danger fw-bolder">
+          <ul className="mb-0">
+            {error.map((err, index) => (
+              <li key={index}>{err}</li>
+            ))}
+          </ul>
+          <div className="mt-2">
+            If you think this is a mistake please try again or {' '} <Link
+              aria-label="Contact"
+              to="/contact"
+              title="Contact"
+            >
+              contact us
+            </Link>.
+          </div>
+        </div>
       )}
-
       {step === totalStep && (
         <>
-          {participantError && !loading && (
-            <div className="alert alert-danger fw-bolder">
-              Database access error. We are sorry, but we couldn't properly record your registration. Please try again or  {' '}
-              <Link
-                aria-label="Contact"
-                to="/contact"
-                title="Contact"
-              >
-                contact us
-              </Link>{' '} for assistance.
-            </div>
-          )}
-
           {participant && (
             <>
               <h2>{cd.thank_you}</h2>
