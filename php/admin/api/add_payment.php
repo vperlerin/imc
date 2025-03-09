@@ -30,6 +30,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 $rawInput = file_get_contents("php://input");
 $input = json_decode($rawInput, true);
 
+var_dump($input);
+exit;
+
 if (!$input || empty($input['payment_id'])) {
     http_response_code(400);
     echo json_encode(["success" => false, "message" => "Invalid input. Payment ID is required."]);

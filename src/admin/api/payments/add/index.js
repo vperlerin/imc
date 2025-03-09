@@ -16,13 +16,7 @@ export const useApiAddPayment = (participantId) => {
 
     try {
       const response = await retry(() =>
-        axios.post(`${process.env.REACT_APP_API_URL}/admin/api/add_payment.php`, {
-          participant_id: participantId,
-          amount: parseFloat(paymentData.amount),
-          payment_method_id: paymentData.paymentMethodId,
-          payment_date: paymentData.paymentDate,
-          admin_note: paymentData.adminNote || null,
-        }, {
+        axios.post(`${process.env.REACT_APP_API_URL}/admin/api/add_payment.php`, { paymentData }, {
           headers: { "Content-Type": "application/json" }
         })
       );
