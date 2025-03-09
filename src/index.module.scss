@@ -7,7 +7,6 @@
   --bs-border-color: rgb(88, 88, 88);
   --bs-link-color-rgb: 233, 162, 47; // primary rgb
 
-
   --imc-primary: #{$primary};
 
   // Main
@@ -26,7 +25,7 @@
   --imc-header: var(--imc);
 
   // Loader overlay 
-  --imc-loader-overlay: #cacaca; 
+  --imc-loader-overlay: #cacaca;
   --imc-loader-overlay-bg: #14161891;
 
 
@@ -65,19 +64,23 @@ html {
   @include scrollY();
   @include scrollStyledDark();
 }
- 
+
 .fw-bolder {
   font-weight: 900;
 }
 
 :global {
-  a { 
+  .modal-backdrop {
+    --bs-backdrop-bg: #CCCCCC; // modal overlay
+  }
+
+  a {
     text-decoration: none;
-  
+
     &:hover {
       text-decoration: underline;
     }
-  
+
     &.btn {
       &:hover {
         text-decoration: none;

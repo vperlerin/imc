@@ -8,6 +8,37 @@ class ParticipantManager
         $this->pdo = $pdo;
     }
 
+    public function confirm($participantId, $data) {
+        try {
+            $this->pdo->beginTransaction();
+    
+            $query = "UPDATE participants SET ";
+            $params = [];
+            
+            if (isset($data['confirmation_sent'])) {
+                $query .= "confirmation_sent = :confirmation_sent, ";
+                $params[':confirmation_sent'] = (int) $data['confirmation_sent'];
+            }
+            
+            if (isset($data['confirmation_date']) || (isset($data['confirmation_sent']) && $data['confirmation_sent'])) {
+                $query .= "confirmation_date = NOW(), ";
+            }
+    
+            $query = rtrim($query, ', ') . " WHERE id = :participant_id";
+            $params[':participant_id'] = $participantId;
+    
+            $stmt = $this->pdo->prepare($query);
+            $stmt->execute($params);
+    
+            $this->pdo->commit();
+            return true;
+        } catch (Exception $e) {
+            $this->pdo->rollBack();
+            error_log("Error updating confirmation status: " . $e->getMessage());
+            return false;
+        }
+    }
+
     public function emailExists($email)
     {
         $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM participants WHERE email = ?");

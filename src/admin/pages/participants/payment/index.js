@@ -1,3 +1,4 @@
+import { IoIosMail } from "react-icons/io";
 import classNames from "classnames";
 import PageContain from "@/admin/components/page-contain";
 import React, { useEffect, useState } from "react";
@@ -11,6 +12,7 @@ import { useApiPayments } from "@/admin/api/payments";
 import { useApiAddPayment } from "@/admin/api/payments/add";
 import { useApiSpecificData } from "api/specific-data";
 import { useApiParticipant } from "api/participants";
+import { useApiConfirmParticipant } from '@/admin/api/participants/confirm';
 
 const Payments = ({ isCurOnline = false }) => {
   const { participantId } = useParams();
@@ -18,13 +20,15 @@ const Payments = ({ isCurOnline = false }) => {
   const [successMsg, setSuccessMsg] = useState(null);
   const [editingPayment, setEditingPayment] = useState(null);
   const [fetchParticipantTrigger, setFetchParticipantTrigger] = useState(false);
-  const [showModal, setShowModal] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [modalContent, setModalContent] = useState("");
 
   const { workshops, paymentMethods, registrationTypes, loading: specificdataLoading, sessions, error: specificDataError } = useApiSpecificData();
   const { participant, loading: participantLoading, error: participantError } = useApiParticipant(participantId, isCurOnline, fetchParticipantTrigger);
   const { payments, loading: paymenstLoading, error: paymentsError, refetchPayments } = useApiPayments(participantId);
   const { addPayment } = useApiAddPayment(participantId);
+  const { confirmParticipant, isConfirming, errorConfirm } = useApiConfirmParticipant();
 
   const {
     formState: { errors },
@@ -100,16 +104,18 @@ const Payments = ({ isCurOnline = false }) => {
       const totalPaid = parseFloat(participant.participant.total_paid);
       return totalDue - totalPaid;
     })();
-    const name = `${participant?.participant?.first_name} ${participant?.participant?.last_name}`;
-    let message = `Marc, you are about to confirm ${name} <strong>${isOnline ? "ONLINE" : "ONSITE"}</strong> registration.`;
 
     if (amountDue > 0) {
-      message += ` <div class="text-danger fw-bolder">${participant?.participant?.first_name} still needs to pay ${amountDue.toFixed(2)}€</div>.`;
+      const name = `${participant?.participant?.first_name} ${participant?.participant?.last_name}`;
+      let message = `Marc, you are about to confirm ${name} <strong>${isOnline ? "ONLINE" : "ONSITE"}</strong> registration.`;
+      message += ` <div class="text-danger fw-bolder border rounded-2 p-2 m-3 border-danger">${participant?.participant?.first_name} still needs to pay ${amountDue.toFixed(2)}€</div>`;
+      message += `<p>Are you sure you want to continue?</p>`;
+      setModalContent(message);
+      setShowConfirmModal(true);
+    } else {
+      setShowConfirmationModal(true);
     }
 
-    message += `Are you sure you want to continue?`;
-    setModalContent(message);
-    setShowModal(true);
   };
 
 
@@ -130,6 +136,29 @@ const Payments = ({ isCurOnline = false }) => {
     { url: `/admin/participants/${isOnline ? 'online' : 'onsite'}`, name: isOnline ? "Online Participants" : "Onsite Participants" },
     { url: `/admin/participants/${isOnline ? 'online' : 'onsite'}/payment/${participantId}`, name: `${participant?.participant?.first_name || "Participant"} ${participant?.participant?.last_name || ""}'s Payments` }
   ];
+
+  const confirmationMessage = `
+    Dear <strong>${participant?.participant?.first_name} ${participant?.participant?.last_name}</strong>,<br><br>
+    Your participation in the IMC ${cd.year} has now been confirmed.<br><br>
+    Should your plans change, please contact us immediately: https://imc${cd.year}.imo.net/contact<br> 
+    Notice that in such a case, the cancellation policy of the Disclaimer and Service Agreement applies: https://imc${cd.year}.imo.net/disclaimer<br><br>
+    Thank you!<br>
+    We look forward to meeting you at ${cd.location}.<br><br>
+    The IMC ${cd.year} Team.
+  `;
+
+
+  const handleConfirm = async () => {
+    await confirmParticipant(participantId, { confirmation_date: true });
+  };
+
+  const handleConfirmAndSend = async () => {
+    await confirmParticipant(participantId, { confirmation_sent: true, confirmation_date: true });
+  };
+
+  const handleSendOnly = async () => {
+    await confirmParticipant(participantId, { confirmation_sent: true });
+  };
 
 
   return (
@@ -209,7 +238,7 @@ const Payments = ({ isCurOnline = false }) => {
                     </td>
                     <td>
                       <div className="d-flex gap-2 justify-content-end">
-                        <button className="btn btn-outline-success" onClick={handleConfirmClick}>
+                        <button className="btn btn-outline-success fw-bolder" onClick={handleConfirmClick}>
                           CONFIRM
                         </button>
                       </div>
@@ -301,24 +330,68 @@ const Payments = ({ isCurOnline = false }) => {
           )}
 
 
+          {(showConfirmModal || showConfirmationModal) && <div className="modal-backdrop fade show"></div>}
 
-          {showModal && (
-            <div className="modal show d-block">
+          {showConfirmModal && (
+            <div className="modal modal-lg show d-block">
               <div className="modal-dialog">
                 <div className="modal-content">
                   <div className="modal-header">
                     <h5 className="modal-title">CONFIRMATION</h5>
-                    <button type="button" className="btn-close" onClick={() => setShowModal(false)}></button>
+                    <button type="button" className="btn-close" onClick={() => setShowConfirmModal(false)}></button>
                   </div>
                   <div className="modal-body">
                     <div dangerouslySetInnerHTML={{ __html: modalContent }} />
                   </div>
-                  <button className="btn btn-danger" onClick={() => setShowModal(false)}>
-                    Cancel
-                  </button>
-                  <button className="btn btn-success" onClick={() => setShowModal(false)}>
-                    Confirm
-                  </button>
+                  <div className="modal-footer">
+                    <button className="btn btn-outline-danger fw-bolder" onClick={() => setShowConfirmModal(false)}>
+                      Cancel
+                    </button>
+                    <button className="btn btn-outline-success fw-bolder" onClick={() => { setShowConfirmModal(false); setShowConfirmationModal(true) }}>
+                      Yes
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {showConfirmationModal && (
+            <div className="modal modal-lg show d-block">
+              <div className="modal-dialog">
+                <div className="modal-content">
+                  <div className="modal-header">
+                    <h5 className="modal-title">CONFIRMATION</h5>
+                    <button type="button" className="btn-close" onClick={() => setShowConfirmationModal(false)}></button>
+                  </div>
+                  <div className="modal-body">
+                    {errorConfirm && <div className="text-danger fw-bolder">{errorConfirm}</div>}
+                    {isConfirming && <Loader />}
+                    <div className="d-flex w-100 gap-3">
+                      <button className="fw-bolder btn btn-outline-success" onClick={handleConfirm} disabled={isConfirming}>
+                        CONFIRM
+                      </button>
+                      or
+                      <button className="fw-bolder btn btn-outline-success" onClick={handleConfirmAndSend} disabled={isConfirming}>
+                        CONFIRM & SEND <IoIosMail />
+                      </button>
+                      or
+                      <button className="fw-bolder btn btn-outline-success" onClick={handleSendOnly} disabled={isConfirming}>
+                        SEND <IoIosMail />
+                      </button>
+                      {errorConfirm && <div className="text-danger">{errorConfirm}</div>}
+                    </div>
+                    <div className="bg-white text-black p-3 rounded-2" dangerouslySetInnerHTML={{ __html: confirmationMessage }} />
+
+                  </div>
+                  <div className="modal-footer">
+                    <button className="btn btn-outline-danger fw-bolder" onClick={() => setShowConfirmationModal(false)}>
+                      Cancel
+                    </button>
+                    <button className="btn btn-outline-success fw-bolder" onClick={() => { setShowConfirmationModal(false); }}>
+                      Yes
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
