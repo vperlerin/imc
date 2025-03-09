@@ -15,11 +15,14 @@ class PaymentManager
     public function addPayment($participantId, $amount, $paymentMethodId, $paymentDate, $adminNote = null)
     {
         try {
+            // Start transaction
             $this->pdo->beginTransaction();
-
+    
             // Insert payment record
-            $stmt = $this->pdo->prepare("INSERT INTO payments (participant_id, amount, payment_method_id, payment_date, admin_note, created_at, updated_at)
-                                        VALUES (:participant_id, :amount, :payment_method_id, :payment_date, :admin_note, NOW(), NOW())");
+            $stmt = $this->pdo->prepare("
+                INSERT INTO payments (participant_id, amount, payment_method_id, payment_date, admin_note, created_at, updated_at)
+                VALUES (:participant_id, :amount, :payment_method_id, :payment_date, :admin_note, NOW(), NOW())
+            ");
             $stmt->execute([
                 ':participant_id' => $participantId,
                 ':amount' => $amount,
@@ -27,34 +30,40 @@ class PaymentManager
                 ':payment_date' => $paymentDate,
                 ':admin_note' => $adminNote
             ]);
-
-            // Update participant financials
+    
+            // Update participant financials based on payment amount
             if ($amount > 0) {
-                $updateStmt = $this->pdo->prepare("UPDATE participants 
-                                                 SET total_paid = total_paid + :amount, 
-                                                     total_due = total_due - :amount 
-                                                 WHERE id = :participant_id");
+                $updateStmt = $this->pdo->prepare("
+                    UPDATE participants 
+                    SET total_paid = total_paid + :amount, 
+                        total_due = total_due - :amount 
+                    WHERE id = :participant_id
+                ");
             } else {
-                $updateStmt = $this->pdo->prepare("UPDATE participants 
-                                                 SET total_paid = total_paid - :amount, 
-                                                     total_due = total_due + :amount, 
-                                                     total_reimbursed = total_reimbursed + ABS(:amount) 
-                                                 WHERE id = :participant_id");
+                $updateStmt = $this->pdo->prepare("
+                    UPDATE participants 
+                    SET total_paid = total_paid - :amount, 
+                        total_due = total_due + :amount, 
+                        total_reimbursed = total_reimbursed + ABS(:amount) 
+                    WHERE id = :participant_id
+                ");
             }
-
+    
             $updateStmt->execute([
                 ':amount' => abs($amount),
                 ':participant_id' => $participantId
             ]);
-
+    
+            // Commit transaction
             $this->pdo->commit();
             return true;
         } catch (Exception $e) {
+            // Rollback transaction on failure
             $this->pdo->rollBack();
             return false;
         }
     }
-
+    
 
     /**
      * Get a list of payments made by a participant.

@@ -46,8 +46,6 @@ if (!$input || !isset($input['participant_id'], $input['amount'], $input['paymen
 }
 
 try {
-    $pdo->beginTransaction();
-
     $participantId = (int) $input['participant_id'];
     $amount = floatval($input['amount']);
     $paymentMethodId = intval($input['payment_method_id']);
