@@ -45,6 +45,8 @@ if (!$input || !isset($input['participant_id'], $input['amount'], $input['paymen
 }
 
 try {
+    $pdo->beginTransaction();
+
     $participantId = (int) $input['participant_id'];
     $amount = floatval($input['amount']);
     $paymentMethodId = intval($input['payment_method_id']);
@@ -68,7 +70,8 @@ try {
     $success = $paymentManager->addPayment(
         $participantId,
         $amount,
-        $paymentMethodId, 
+        $paymentMethodId,
+        $paymentDate,
         $adminNote
     );
 
@@ -76,10 +79,15 @@ try {
         throw new Exception("Failed to add payment.");
     }
 
+    $pdo->commit();
+
     echo json_encode([
         "success" => true,
         "message" => "Payment Added Successfully"
     ]);
 } catch (Exception $e) {
+    $pdo->rollBack();
     http_response_code(400);
-    echo json_encode(["success" => false
+    echo json_encode(["success" => false, "message" => $e->getMessage()]);
+}
+?>
