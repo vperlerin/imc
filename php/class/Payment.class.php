@@ -15,8 +15,10 @@ class PaymentManager
     public function addPayment($participantId, $amount, $paymentMethodId, $paymentDate, $adminNote = null)
     {
         try {
-            // Start transaction
-            $this->pdo->beginTransaction();
+            // Start transaction only if not already started
+            if (!$this->pdo->inTransaction()) {
+                $this->pdo->beginTransaction();
+            }
     
             // Insert payment record
             $stmt = $this->pdo->prepare("
@@ -31,7 +33,7 @@ class PaymentManager
                 ':admin_note' => $adminNote
             ]);
     
-            // Update participant financials based on payment amount
+            // Update participant financials
             if ($amount > 0) {
                 $updateStmt = $this->pdo->prepare("
                     UPDATE participants 
@@ -57,9 +59,18 @@ class PaymentManager
             // Commit transaction
             $this->pdo->commit();
             return true;
+        } catch (PDOException $e) {
+            // Check if a transaction is active before rolling back
+            if ($this->pdo->inTransaction()) {
+                $this->pdo->rollBack();
+            }
+            error_log("Database Error in addPayment: " . $e->getMessage());
+            return false;
         } catch (Exception $e) {
-            // Rollback transaction on failure
-            $this->pdo->rollBack();
+            if ($this->pdo->inTransaction()) {
+                $this->pdo->rollBack();
+            }
+            error_log("General Error in addPayment: " . $e->getMessage());
             return false;
         }
     }
