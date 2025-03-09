@@ -8,7 +8,6 @@ import { useApiOnsiteParticipants } from "api/participants/onsite.js";
 import { useApiDeleteParticipant } from "@/admin/api/participants/delete";
 import { formatFullDate } from "utils/date";
 
-
 const AdminParticipantsOnsite = () => {
   const [filteredParticipants, setFilteredParticipants] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -21,7 +20,7 @@ const AdminParticipantsOnsite = () => {
 
   const { participants, loading, error, setParticipants } = useApiOnsiteParticipants();
   const { deleteParticipant, errorDelete, isDeleting } = useApiDeleteParticipant(setParticipants, setFilteredParticipants);
-
+ 
   useEffect(() => {
     if (!searchQuery) {
       setFilteredParticipants(participants);

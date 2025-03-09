@@ -692,66 +692,66 @@ class ParticipantManager
     public function getParticipantDetails($participantId, $withAdminNotes = false)
     {
         $columns = $withAdminNotes ? '*' : '
-        id,
-        title,
-        first_name,
-        last_name,
-        gender,
-        phone,
-        email,
-        address,
-        postal_code,
-        city,
-        country,
-        organization,
-        dob,
-        is_online,
-        is_early_bird,
-        confirmation_sent,
-        confirmation_date,
-        password_hash,
-        paypal_fee,
-        payment_method_id,
-        total_due,
-        total_paid,
-        total_reimbursed,
-        status,
-        deleted_at,
-        comments,
-        guardian_name,
-        guardian_contact,
-        guardian_email,
-        created_at,
-        updated_at';
-
-        // 1. Fetch participant’s primary details
-        $stmt = $this->pdo->prepare("
+        p.id,
+        p.title,
+        p.first_name,
+        p.last_name,
+        p.gender,
+        p.phone,
+        p.email,
+        p.address,
+        p.postal_code,
+        p.city,
+        p.country,
+        p.organization,
+        p.dob,
+        p.is_online,
+        p.is_early_bird,
+        p.confirmation_sent,
+        p.confirmation_date,
+        p.password_hash,
+        p.paypal_fee,
+        p.payment_method_id,
+        pm.method AS payment_method_name,
+        p.total_due,
+        p.total_paid,
+        p.total_reimbursed,
+        p.status,
+        p.deleted_at,
+        p.comments,
+        p.guardian_name,
+        p.guardian_contact,
+        p.guardian_email,
+        p.created_at,
+        p.updated_at';
+    
+        // 1. Fetch participant’s primary details with payment method name
+        $stmt = $this->pdo->prepare("  
             SELECT {$columns}
-            FROM participants
-            WHERE id = :participant_id
+            FROM participants p
+            LEFT JOIN payment_methods pm ON p.payment_method_id = pm.id
+            WHERE p.id = :participant_id
         ");
-
+    
         $stmt->execute([':participant_id' => $participantId]);
         $participant = $stmt->fetch(PDO::FETCH_ASSOC);
-
+    
         if (!$participant) {
             return null;
         }
-
+    
         // 2. Fetch workshops the participant is registered for
-        $stmt = $this->pdo->prepare("
+        $stmt = $this->pdo->prepare("  
             SELECT *
             FROM participant_workshops pw
             INNER JOIN workshops w ON pw.workshop_id = w.id
             WHERE pw.participant_id = :participant_id
-            ");
+        ");
         $stmt->execute([':participant_id' => $participantId]);
         $workshops = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-
+    
         // 3. Fetch payments by this participant
-        //    (including payment method name via JOIN)
-        $stmt = $this->pdo->prepare("
+        $stmt = $this->pdo->prepare("  
             SELECT pay.*, pm.method AS payment_method
             FROM payments pay
             INNER JOIN payment_methods pm ON pay.payment_method_id = pm.id
@@ -760,10 +760,9 @@ class ParticipantManager
         ");
         $stmt->execute([':participant_id' => $participantId]);
         $payments = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
+    
         // 4. Fetch accommodation info
-        //    (combining both accommodation and registration_types)
-        $stmt = $this->pdo->prepare("
+        $stmt = $this->pdo->prepare("  
             SELECT pa.*, rt.type AS registration_type, rt.price AS registration_price
             FROM accommodation pa
             INNER JOIN registration_types rt ON pa.registration_type_id = rt.id
@@ -771,31 +770,31 @@ class ParticipantManager
         ");
         $stmt->execute([':participant_id' => $participantId]);
         $accommodation = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        // Add payment_method_id to accomodation since we deal with it on the accomodation page
+    
+        // Add payment_method_id and payment_method_name to accommodation
         $accommodation['payment_method_id'] = $participant['payment_method_id'];
-
+        $accommodation['payment_method_name'] = $participant['payment_method_name'];
+    
         // 5. Fetch arrival/departure info
-        $stmt = $this->pdo->prepare("
+        $stmt = $this->pdo->prepare("  
             SELECT *
             FROM arrival
             WHERE participant_id = :participant_id
         ");
         $stmt->execute([':participant_id' => $participantId]);
         $arrivalInfo = $stmt->fetch(PDO::FETCH_ASSOC);
-
+    
         // 6. Fetch extra options (excursion, T-shirt, proceedings, etc.)
-        $stmt = $this->pdo->prepare("
+        $stmt = $this->pdo->prepare("  
             SELECT *
             FROM extra_options
             WHERE participant_id = :participant_id
         ");
         $stmt->execute([':participant_id' => $participantId]);
         $extraOptions = $stmt->fetch(PDO::FETCH_ASSOC);
-
+    
         // 7. Fetch contributions
-        //    (including the IMC session name, if you want to join that table)
-        $stmt = $this->pdo->prepare("
+        $stmt = $this->pdo->prepare("  
             SELECT c.*, s.name AS session_name
             FROM contributions c
             INNER JOIN imc_sessions s ON c.session_id = s.id
@@ -803,7 +802,7 @@ class ParticipantManager
         ");
         $stmt->execute([':participant_id' => $participantId]);
         $contributions = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
+    
         // Combine everything into a structured array
         $details = [
             'participant'    => $participant,
@@ -814,7 +813,8 @@ class ParticipantManager
             'extra_options'  => $extraOptions,
             'contributions'  => $contributions,
         ];
-
+    
         return $details;
     }
+    
 }

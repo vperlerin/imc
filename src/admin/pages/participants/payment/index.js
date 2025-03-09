@@ -18,9 +18,10 @@ const Payments = () => {
   const [formErrors, setFormErrors] = useState(null);
   const [successMsg, setSuccessMsg] = useState(null);
   const [editingPayment, setEditingPayment] = useState(null);
+  const [fetchParticipantTrigger, setFetchParticipantTrigger] = useState(false);
 
   const { workshops, paymentMethods, registrationTypes, loading: specificdataLoading, sessions, error: specificDataError } = useApiSpecificData();
-  const { participant, loading: participantLoading, error: participantError } = useApiParticipant(participantId);
+  const { participant, loading: participantLoading, error: participantError } = useApiParticipant(participantId, fetchParticipantTrigger);
   const { payments, loading: paymenstLoading, error: paymentsError, refetchPayments } = useApiPayments(participantId);
   const { addPayment } = useApiAddPayment(participantId);
 
@@ -78,11 +79,13 @@ const Payments = () => {
     if (result.success) {
       setSuccessMsg("Payment added successfully!");
       resetForm();
+      setFetchParticipantTrigger(prev => !prev);
       await refetchPayments();
     } else {
       setFormErrors(result.message);
     }
   };
+
 
 
   // Reset form fields 
@@ -121,8 +124,9 @@ const Payments = () => {
                 <tr>
                   <th>Reg. Date</th>
                   <th>Name</th>
-                  <th>Total Due</th>
+                  <th>Total</th>
                   <th>Total Paid</th>
+                  <th>Amount due</th>
                   <th>Pay. Method</th>
                   <th>Confirmed</th>
                   <th></th>
@@ -134,12 +138,20 @@ const Payments = () => {
                   <td>{participant.participant.title} {participant.participant.first_name} {participant.participant.last_name}</td>
                   <td>
                     {participant.participant.payment_method_id === '1' ? (
-                      <>{(parseFloat(participant.participant.total_due) + parseFloat( participant.participant.paypal_fee))}€</>
+                      <>{(parseFloat(participant.participant.total_due) + parseFloat(participant.participant.paypal_fee))}€</>
                     ) : (
                       <>{participant.participant.total_due}€</>
                     )}
                   </td>
                   <td>{participant.participant.total_paid}€</td>
+                  <td>
+                    {participant.participant.payment_method_id === '1' ? (
+                      <>{(parseFloat(participant.participant.total_due) + parseFloat(participant.participant.paypal_fee) - parseFloat(participant.participant.total_paid))}€</>
+                    ) : (
+                      <>{parseFloat(participant.participant.total_due) - - parseFloat(participant.participant.total_paid)}€</>
+                    )}
+
+                  </td>
                   <td>{participant.participant.payment_method || "n/a"}</td>
                   <td>
                     {participant.participant.confirmation_sent === "1" ? (
