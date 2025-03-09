@@ -47,8 +47,7 @@ if (!$input || !isset($input['participant_id'], $input['amount'], $input['paymen
 try {
     $participantId = (int) $input['participant_id'];
     $amount = floatval($input['amount']);
-    $paymentMethodId = intval($input['payment_method_id']);
-    $paymentDate = trim($input['payment_date']);
+    $paymentMethodId = intval($input['payment_method_id']); 
     $adminNote = isset($input['admin_note']) ? trim($input['admin_note']) : null;
 
     // Validate numerical values
@@ -66,8 +65,7 @@ try {
     $success = $paymentManager->addPayment(
         $participantId,
         $amount,
-        $paymentMethodId,
-        $paymentDate,
+        $paymentMethodId, 
         $adminNote
     );
 

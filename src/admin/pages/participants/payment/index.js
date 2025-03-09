@@ -90,11 +90,6 @@ const Payments = () => {
 
       if (response.data.success) {
         setSuccessMsg(editingPayment ? "Payment updated successfully!" : "Payment added successfully!");
-        setPayments(prev =>
-          editingPayment
-            ? prev.map(p => (p.id === editingPayment.id ? response.data.new_payment : p))
-            : [...prev, response.data.new_payment]
-        );
         resetForm();
       } else {
         throw new Error(response.data.message || "Failed to process payment.");
@@ -204,7 +199,7 @@ const Payments = () => {
                     <>
                       {parseFloat(payment.amount) !== 0 && (
                         <tr key={payment.id}>
-                          <td>{payment.payment_date || "N/A"}</td>
+                          <td>{payment.created_at || "N/A"}</td>
                           <td>{parseFloat(payment.amount).toFixed(2)}</td>
                           <td>{payment.payment_method}</td>
                           <td>{payment.admin_note || "No note"}</td>
