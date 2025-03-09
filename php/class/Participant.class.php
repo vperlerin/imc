@@ -732,6 +732,10 @@ class ParticipantManager
     
         $stmt->execute([':participant_id' => $participantId]);
         $participant = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        var_dump("PARTICIPANT");
+        var_dump("ID " . $participantId);
+        var_dump($participant);
     
         if (!$participant) {
             return null;
@@ -767,8 +771,6 @@ class ParticipantManager
         ");
         $stmt->execute([':participant_id' => $participantId]);
         $accommodation = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        var_dump($participant);
     
         // Add payment_method_id and payment_method_name to accommodation
         $accommodation['payment_method_id'] = $participant['payment_method_id'];

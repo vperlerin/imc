@@ -24,8 +24,8 @@ import { formatFullDate } from "utils/date";
 
 const AdminParticipantsUser = () => {
   const { participantId, tab } = useParams();
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState(null);
+  const [errorMsg, setErrorMsg] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
   const [successMsg, setSuccessMsg] = useState(null);
   const [unsavedChanges, setUnsavedChanges] = useState(false);
   const [total, setTotal] = useState(0);
@@ -36,14 +36,21 @@ const AdminParticipantsUser = () => {
   const activeTab = tab || "identity";
   const navigate = useNavigate();
 
+ 
   useBlockNavigation(unsavedChanges);
 
   const { workshops, paymentMethods, registrationTypes, loading: specificdataLoading, sessions, error: specificDataError } = useApiSpecificData();
   const { participant, loading: participantLoading, error: participantError } = useApiParticipant(participantId, fetchParticipantTrigger, true);
   const { control, register, handleSubmit, getValues, setValue, formState: { errors }, trigger, watch } = useForm();
 
- 
+  const loading = specificdataLoading || participantLoading || isSaving;
+  const error = [
+    errorMsg, 
+    participantError,
+    specificDataError,
+  ].filter(Boolean);
 
+  
   // Detect form changes
   useEffect(() => {
     const subscription = watch(() => {
@@ -142,7 +149,7 @@ const AdminParticipantsUser = () => {
   }, [participant, sessions, setValue, setTalks, setPosters]);
 
   const onSubmit = async (formData) => {
-    setSaving(true);
+    setIsSaving(true);
     setError(null);
     setSuccessMsg(null);
 
@@ -150,7 +157,7 @@ const AdminParticipantsUser = () => {
     const isValid = await trigger(); // Triggers validation on all fields
 
     if (!isValid) {
-      setSaving(false);
+      setIsSaving(false);
       setError("Please fill in all required fields.");
       return;
     }
@@ -159,7 +166,7 @@ const AdminParticipantsUser = () => {
     formData.posters = getValues("posters") || [];
 
     const formattedData = {
-      ...formData, 
+      ...formData,
       total_due: total,
       paypal_fee: paypalFee,
     };
@@ -181,7 +188,7 @@ const AdminParticipantsUser = () => {
     } catch (err) {
       setError(err.message);
     } finally {
-      setSaving(false);
+      setIsSaving(false);
     }
   };
 
@@ -209,10 +216,7 @@ const AdminParticipantsUser = () => {
     registrationTypes.length > 0
   );
 
-  const isLoading = specificdataLoading || participantLoading || saving || !isSummaryReady;
-  const hasError = participantError || specificDataError || error;
-
-  const hasAdminNotes = !!participant?.participant?.admin_notes;
+   const hasAdminNotes = !!participant?.participant?.admin_notes;
 
   return (
     <PageContain
@@ -220,15 +224,28 @@ const AdminParticipantsUser = () => {
       isMaxWidth
     >
       <div className="position-relative fw-bolder">
-        {isLoading && <Loader />}
+        {loading && <Loader />}
 
-        {!isLoading && hasError && (
-          <div className="alert alert-danger">{participantError || specificDataError || error}</div>
-        )}
+              {error.length > 0 && (
+                <div className="alert alert-danger fw-bolder">
+                  <ul className="mb-0">
+                    {error.map((err, index) => (
+                      <li key={index}>{err}</li>
+                    ))}
+                  </ul>
+                  <div className="mt-2">
+                    If you think this is a mistake please try again or {' '} <Link
+                      aria-label="Contact"
+                      to="/contact"
+                      title="Contact"
+                    >
+                      contact us
+                    </Link>.
+                  </div>
+                </div>
+              )}
 
-        {!participant && !isLoading && (
-          <div className="alert alert-danger">No participant data available for this ID - please try again.</div>
-        )}
+     
 
         {successMsg && !isLoading && (
           <div className="alert alert-success">{successMsg}</div>
@@ -277,7 +294,7 @@ const AdminParticipantsUser = () => {
               </li>
             ))}
           </ul>
- 
+
           {/* Tab Content */}
           <div className={classNames('tab-content mx-auto', cssTabs.contentMxw)}>
             {tab === "identity" && (
@@ -432,7 +449,7 @@ const AdminParticipantsUser = () => {
             )}
 
             <div className="mt-4 d-flex justify-content-end">
-              <button type="submit" className="btn btn-outline-primary fw-bolder" disabled={saving}>{saving ? "Saving..." : "Save Changes"}</button>
+              <button type="submit" className="btn btn-outline-primary fw-bolder" disabled={isSaving}>{isSaving ? "Saving..." : "Save Changes"}</button>
             </div>
           </div>
         </form>
