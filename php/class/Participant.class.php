@@ -353,8 +353,8 @@ class ParticipantManager
     {
         try {
             $this->pdo->beginTransaction();
-
-            // 1. Handle boolean fields: convert "true"/"false" (or any truthy/falsy string) to 1 or 0.
+    
+            // Handle boolean fields (convert "true"/"false" to 1 or 0)
             $booleanFields = ['excursion', 'buy_tshirt', 'is_online', 'is_early_bird', 'confirmation_sent'];
             foreach ($booleanFields as $field) {
                 if (!isset($data[$field])) {
@@ -364,15 +364,15 @@ class ParticipantManager
                     $data[$field] = ($flag === null ? 0 : ($flag ? 1 : 0));
                 }
             }
-
+    
             // Check if participant exists
             $stmt = $this->pdo->prepare("SELECT id FROM participants WHERE id = :participant_id");
             $stmt->execute([':participant_id' => $participantId]);
-
+    
             if ($stmt->rowCount() === 0) {
                 throw new Exception("Participant with ID {$participantId} does not exist.");
             }
-
+    
             // Prepare fields for update
             $fields = [
                 'title = :title',
@@ -389,19 +389,23 @@ class ParticipantManager
                 'organization = :organization',
                 'is_online = :is_online',
                 'paypal_fee = :paypal_fee',
-                'total_due = :total_due',
                 'comments = :comments',
                 'payment_method_id = :payment_method_id',
                 'updated_at = NOW()'
             ];
-
+    
+            // Exclude `total_due` if it's not set or zero
+            if (isset($data['total_due']) && floatval($data['total_due']) > 0) {
+                $fields[] = 'total_due = :total_due';
+            }
+    
             if (isset($data['admin_notes'])) {
                 $fields[] = 'admin_notes = :admin_notes';
             }
-
+    
             $sql = "UPDATE participants SET " . implode(', ', $fields) . " WHERE id = :participant_id";
             $stmt = $this->pdo->prepare($sql);
-
+    
             // Bind parameters
             $params = [
                 ':participant_id' => $participantId,
@@ -419,28 +423,32 @@ class ParticipantManager
                 ':organization' => $data['organization'] ?? null,
                 ':is_online' => filter_var($data['is_online'], FILTER_VALIDATE_BOOLEAN),
                 ':paypal_fee' => $data['paypal_fee'],
-                ':total_due' => $data['total_due'],
                 ':comments' => $data['comments'] ?? null,
                 ':payment_method_id' => (int) ($data['payment_method_id'] ?? 0),
             ];
-
+    
+            // Bind `total_due` only if it was included
+            if (isset($data['total_due']) && floatval($data['total_due']) > 0) {
+                $params[':total_due'] = $data['total_due'];
+            }
+    
             if (isset($data['admin_notes'])) {
                 $params[':admin_notes'] = $data['admin_notes'];
             }
-
+    
             $stmt->execute($params);
-
+    
             // Delete existing workshop selections for the participant
             $stmt = $this->pdo->prepare("DELETE FROM participant_workshops WHERE participant_id = :participant_id");
             $stmt->execute([':participant_id' => $participantId]);
-
+    
             // Insert new workshop selections
             if (!empty($data['workshops']) && is_array($data['workshops'])) {
                 $stmt = $this->pdo->prepare("
                     INSERT INTO participant_workshops (participant_id, workshop_id, attending) 
                     VALUES (:participant_id, :workshop_id, TRUE)
                 ");
-
+    
                 foreach ($data['workshops'] as $workshopId) {
                     $stmt->execute([
                         ':participant_id' => $participantId,
@@ -448,8 +456,7 @@ class ParticipantManager
                     ]);
                 }
             }
-
-
+    
             // Update Arrival Details
             $stmt = $this->pdo->prepare("
                 UPDATE arrival
@@ -458,7 +465,7 @@ class ParticipantManager
                     travelling = :travelling, travelling_details = :travelling_details, updated_at = NOW()
                 WHERE participant_id = :participant_id
             ");
-
+    
             $stmt->execute([
                 ':participant_id' => $participantId,
                 ':arrival_date' => $data['arrival_date'],
@@ -470,98 +477,82 @@ class ParticipantManager
                 ':travelling' => $data['travelling'],
                 ':travelling_details' => $data['travelling_details'] ?? null
             ]);
-
+    
             // Update Accommodation
             $stmt = $this->pdo->prepare("
                 UPDATE accommodation
                 SET registration_type_id = :registration_type_id, updated_at = NOW()
                 WHERE participant_id = :participant_id
             ");
-
+    
             $stmt->execute([
                 ':participant_id' => $participantId,
                 ':registration_type_id' => (int) $data['registration_type_id']
             ]);
-
-            // Prepare the UPDATE query
+    
+            // Update Extra Options
             $stmt = $this->pdo->prepare("
-            UPDATE extra_options 
-            SET 
-                excursion = :excursion, 
-                buy_tshirt = :buy_tshirt, 
-                tshirt_size = :tshirt_size, 
-                updated_at = NOW()
-            WHERE participant_id = :participant_id
+                UPDATE extra_options 
+                SET 
+                    excursion = :excursion, 
+                    buy_tshirt = :buy_tshirt, 
+                    tshirt_size = :tshirt_size, 
+                    updated_at = NOW()
+                WHERE participant_id = :participant_id
             ");
-
+    
             // Ensure tshirt_size is NULL if buy_tshirt is 0
             $tshirtSize = ($data['buy_tshirt'] === 1 && !empty($data['tshirt_size'])) ? $data['tshirt_size'] : null;
-
-            // Execute the prepared statement
+    
             $stmt->execute([
                 ':participant_id' => $participantId,
                 ':excursion' => $data['excursion'],
                 ':buy_tshirt' => $data['buy_tshirt'],
                 ':tshirt_size' => $tshirtSize,
             ]);
-
-
+    
             // Delete existing contributions
             $stmtDelete = $this->pdo->prepare("DELETE FROM contributions WHERE participant_id = :participant_id");
             $stmtDelete->execute([':participant_id' => $participantId]);
-
+    
             // Insert contributions (talks & posters)
             $stmtInsert = $this->pdo->prepare("
                 INSERT INTO contributions (participant_id, type, title, authors, abstract, session_id, duration, print, created_at, updated_at)
                 VALUES (:participant_id, :type, :title, :authors, :abstract, :session_id, :duration, :print, NOW(), NOW())
             ");
-
+    
             // Insert talks
             if (!empty($data['talks']) && is_array($data['talks'])) {
                 foreach ($data['talks'] as $talk) {
-                    $sessionId = isset($talk['session_id']) ? (int) $talk['session_id'] : null;
-                    $duration = isset($talk['duration']) ? $talk['duration'] : null;
-
-                    $stmtInsert->bindValue(':participant_id', $participantId, PDO::PARAM_INT);
-                    $stmtInsert->bindValue(':type', 'talk', PDO::PARAM_STR);
-                    $stmtInsert->bindValue(':title', $talk['title'], PDO::PARAM_STR);
-                    $stmtInsert->bindValue(':authors', $talk['authors'], PDO::PARAM_STR);
-                    $stmtInsert->bindValue(':abstract', $talk['abstract'], PDO::PARAM_STR);
-                    $stmtInsert->bindValue(
-                        ':session_id',
-                        $sessionId !== null ? (int) $sessionId : null,
-                        $sessionId !== null ? PDO::PARAM_INT : PDO::PARAM_NULL
-                    );
-                    $stmtInsert->bindValue(':duration', $talk['duration'] ?? null, PDO::PARAM_STR);
-                    $stmtInsert->bindValue(':print', 0, PDO::PARAM_BOOL);
-                    $stmtInsert->execute();
+                    $stmtInsert->execute([
+                        ':participant_id' => $participantId,
+                        ':type' => 'talk',
+                        ':title' => $talk['title'],
+                        ':authors' => $talk['authors'],
+                        ':abstract' => $talk['abstract'],
+                        ':session_id' => (int) $talk['session_id'],
+                        ':duration' => $talk['duration'],
+                        ':print' => 0
+                    ]);
                 }
             }
-
+    
             // Insert posters
             if (!empty($data['posters']) && is_array($data['posters'])) {
                 foreach ($data['posters'] as $poster) {
-                    $printValue = isset($poster['print']) ? (filter_var($poster['print'], FILTER_VALIDATE_BOOLEAN) ? 1 : 0) : 0;
-                    $sessionId = isset($poster['session_id']) ? (int) $poster['session_id'] : null;
-                    $duration = isset($poster['duration']) ? $poster['duration'] : null;
-
-                    $stmtInsert->bindValue(':participant_id', $participantId, PDO::PARAM_INT);
-                    $stmtInsert->bindValue(':type', 'poster', PDO::PARAM_STR);
-                    $stmtInsert->bindValue(':title', $poster['title'], PDO::PARAM_STR);
-                    $stmtInsert->bindValue(':authors', $poster['authors'], PDO::PARAM_STR);
-                    $stmtInsert->bindValue(':abstract', $poster['abstract'], PDO::PARAM_STR);
-                    $stmtInsert->bindValue(
-                        ':session_id',
-                        $sessionId !== null ? (int) $sessionId : null,
-                        $sessionId !== null ? PDO::PARAM_INT : PDO::PARAM_NULL
-                    );
-                    $stmtInsert->bindValue(':duration', $duration, $duration !== null ? PDO::PARAM_STR : PDO::PARAM_NULL);
-                    $stmtInsert->bindValue(':print', $printValue, PDO::PARAM_INT);
-                    $stmtInsert->execute();
+                    $stmtInsert->execute([
+                        ':participant_id' => $participantId,
+                        ':type' => 'poster',
+                        ':title' => $poster['title'],
+                        ':authors' => $poster['authors'],
+                        ':abstract' => $poster['abstract'],
+                        ':session_id' => (int) $poster['session_id'],
+                        ':duration' => $poster['duration'],
+                        ':print' => filter_var($poster['print'], FILTER_VALIDATE_BOOLEAN) ? 1 : 0
+                    ]);
                 }
             }
-
-
+    
             $this->pdo->commit();
             return true;
         } catch (Exception $e) {
@@ -569,6 +560,7 @@ class ParticipantManager
             throw new Exception("Error updating participant: " . $e->getMessage());
         }
     }
+    
 
     public function updateOnlineParticipant($participantId, $data)
     {
@@ -607,11 +599,15 @@ class ParticipantManager
                 'is_online = :is_online',
                 'is_early_bird = :is_early_bird',
                 'paypal_fee = :paypal_fee',
-                'total_due = :total_due',
                 'comments = :comments',
                 'payment_method_id = :payment_method_id',
                 'updated_at = NOW()'
             ];
+    
+            // Exclude `total_due` if it's not set or zero
+            if (isset($data['total_due']) && floatval($data['total_due']) > 0) {
+                $fields[] = 'total_due = :total_due';
+            }
     
             if (isset($data['admin_notes'])) {
                 $fields[] = 'admin_notes = :admin_notes';
@@ -634,10 +630,14 @@ class ParticipantManager
                 ':is_online' => filter_var($data['is_online'], FILTER_VALIDATE_BOOLEAN),
                 ':is_early_bird' => filter_var($data['is_early_bird'], FILTER_VALIDATE_BOOLEAN),
                 ':paypal_fee' => $data['paypal_fee'],
-                ':total_due' => $data['total_due'],
                 ':comments' => $data['comments'] ?? null,
                 ':payment_method_id' => (int) ($data['payment_method_id'] ?? 0),
             ];
+    
+            // Bind `total_due` only if it was included
+            if (isset($data['total_due']) && floatval($data['total_due']) > 0) {
+                $params[':total_due'] = $data['total_due'];
+            }
     
             if (isset($data['admin_notes'])) {
                 $params[':admin_notes'] = $data['admin_notes'];
@@ -706,6 +706,7 @@ class ParticipantManager
             throw new Exception("Error updating online participant: " . $e->getMessage());
         }
     }
+    
     
 
     /**

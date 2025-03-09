@@ -29,6 +29,7 @@ const Payments = ({ isCurOnline = false }) => {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [modalContent, setModalContent] = useState("");
+  const [confirmingEmail, setIsConfirmingEmail] = useState(false);
 
   const { workshops, paymentMethods, registrationTypes, loading: specificdataLoading, sessions, error: specificDataError } = useApiSpecificData();
   const { participant, loading: participantLoading, error: participantError } = useApiParticipant(participantId, isCurOnline, fetchParticipantTrigger);
@@ -167,6 +168,7 @@ const Payments = ({ isCurOnline = false }) => {
     }
 
     const finalMessage = `${confirmationMessage}<br><br>${additionalMessage}`;
+    setIsConfirmingEmail(true);
 
     try {
       const emailResponse = await sendEmail({
@@ -186,8 +188,9 @@ const Payments = ({ isCurOnline = false }) => {
 
       await confirmParticipant(participantId, { confirmation_sent: true, confirmation_date: true, message: finalMessage });
     } catch (error) {
-      console.log("ERROR ", error);
       set_ConfirmError("Failed to confirm the participant. Pleaase, try again later.");
+    } finally {
+      setIsConfirmingEmail(false);
     }
   };
 
@@ -202,6 +205,10 @@ const Payments = ({ isCurOnline = false }) => {
   const confirmationSent = participant?.participant.confirmation_sent !== "0";
   const confirmationDate = !!participant?.participant.confirmation_date;
 
+
+  console.log("participant.participant.total_du? ", participant?.participant.total_due);
+  
+  console.log("participant.participant.total_paid? ", participant?.participant.total_paid);
 
   return (
     <PageContain breadcrumb={breadcrumb} isMaxWidth>
@@ -279,11 +286,21 @@ const Payments = ({ isCurOnline = false }) => {
                       {confirmationDate ? formatFullDate(participant.participant.confirmation_date) : "❌"}
                     </td>
                     <td>
-                      <div className="d-flex gap-2 justify-content-end">
-                        <button className="btn btn-outline-success fw-bolder" onClick={handleConfirmClick}>
-                          CONFIRM
-                        </button>
-                      </div>
+                      {!confirmationSent && !confirmationDate && (
+                        <div className="d-flex gap-2 justify-content-end">
+                          <button className="btn btn-outline-success fw-bolder" onClick={handleConfirmClick}>
+                            CONFIRM
+                          </button>
+                        </div>
+                      )}
+
+                      {confirmationSent && !confirmationDate && (
+                        <div className="d-flex gap-2 justify-content-end">
+                          <button className="btn btn-outline-success fw-bolder" onClick={handleConfirmClick}>
+                            SEND <IoIosMail />
+                          </button>
+                        </div>
+                      )}
                     </td>
                   </tr>
                 </tbody>
@@ -409,7 +426,7 @@ const Payments = ({ isCurOnline = false }) => {
                   <div className="modal-body">
                     {errorConfirm && <div className="text-danger fw-bolder">{errorConfirm}</div>}
                     {_confirmError && !errorConfirm && <div className="text-danger fw-bolder">{_confirmError}</div>}
-                    {isConfirming && <Loader />}
+                    {isConfirming || isConfirmingEmail && <Loader />}
                     {!wantToAddMessage && (
                       <>
                         <p className="fw-bolder">Marc, make your choice: </p>
