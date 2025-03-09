@@ -115,6 +115,9 @@ const MainForm = () => {
         paypal_fee: paypalFee?.toFixed(2) || 0,
       };
 
+
+      console.log("formattedData, ", formattedData);
+
       const response = await axios.post(apiUrl, formattedData, {
         headers: { "Content-Type": "application/json" },
       });
@@ -251,7 +254,7 @@ const MainForm = () => {
                 <div className="flex-grow-1">
                   <p className="fw-bolder text-danger">The IMC fee is due without any delay.</p>
 
-                  {participant.participant.payment_method_name.toLowerCase() === "paypal" ? (
+                  {participant.participant.payment_method_name.toLowerCase === "paypal" ? (
                     <div className="mb-3">
                       <p >Click the button below to pay immediately with Paypal.</p>
                       <PayPalForm amount={(total + paypalFee)} year={cd.year} />
