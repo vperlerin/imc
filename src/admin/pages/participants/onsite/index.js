@@ -198,7 +198,7 @@ const AdminParticipantsOnsite = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="7" className="text-center">No onsite participants found.</td>
+                    <td colSpan="9" className="text-center">No onsite participants found.</td>
                   </tr>
                 )}
               </tbody>

@@ -15,6 +15,7 @@ import { useApiSpecificData } from "api/specific-data";
 import { useApiParticipant } from "api/participants";
 import { useApiConfirmParticipant } from '@/admin/api/participants/confirm';
 import { formatFullDate } from "utils/date";
+import { sendEmail } from "hooks/send-email";
 
 const Payments = ({ isCurOnline = false }) => {
   const { participantId } = useParams();
@@ -34,6 +35,7 @@ const Payments = ({ isCurOnline = false }) => {
   const { payments, loading: paymenstLoading, error: paymentsError, refetchPayments } = useApiPayments(participantId);
   const { addPayment } = useApiAddPayment(participantId);
   const { confirmParticipant, isConfirming, errorConfirm } = useApiConfirmParticipant();
+
 
   const {
     formState: { errors },
@@ -165,10 +167,26 @@ const Payments = ({ isCurOnline = false }) => {
     }
 
     const finalMessage = `${confirmationMessage}<br><br>${additionalMessage}`;
+
     try {
+      const emailResponse = await sendEmail({
+        subject: `IMC ${cd.year} Confirmation`,
+        message: finalMessage,
+        to: participant.parseFloat.email,
+        toName: "IMC Confirmed Participant",
+        fromName: "IMC 2025",
+        replyTo: "no-reply@imc2025.imo.net",
+        replyName: "no-reply",
+      });
+
+      if (!emailResponse.success) {
+        set_ConfirmError("Impossible to send the an email for the moment. Please, try again later");
+        return;
+      }
+
       await confirmParticipant(participantId, { confirmation_sent: true, confirmation_date: true, message: finalMessage });
     } catch (error) {
-      set_ConfirmError("Failed to send confirmation email.");
+      set_ConfirmError("Failed to confirm the participant. Pleaase, try again later.");
     }
   };
 
@@ -250,7 +268,7 @@ const Payments = ({ isCurOnline = false }) => {
                     <td>
                       {confirmationSent ? (
                         <>
-                          ✅  
+                          ✅
                         </>
                       ) : (
                         "❌"
@@ -431,8 +449,8 @@ const Payments = ({ isCurOnline = false }) => {
                               <textarea
                                 className={`form-control mt-2 ${css.textarea}`}
                                 rows="3"
-                                value={additionalMessage.replace(/<br>$/, '').replace(/<br>/g, '\n')}  
-                                onChange={(e) => setAdditionalMessage(e.target.value.replace(/\n/g, '<br>') + '<br>')}  
+                                value={additionalMessage.replace(/<br>$/, '').replace(/<br>/g, '\n')}
+                                onChange={(e) => setAdditionalMessage(e.target.value.replace(/\n/g, '<br>') + '<br>')}
                                 placeholder="Add extra message here..."
                               />
 

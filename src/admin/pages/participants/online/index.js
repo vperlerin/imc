@@ -199,7 +199,7 @@ const AdminParticipantsOnline = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="7" className="text-center">No online participants found.</td>
+                    <td colSpan="9" className="text-center">No online participants found.</td>
                   </tr>
                 )}
               </tbody>

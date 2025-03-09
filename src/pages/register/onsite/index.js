@@ -112,7 +112,7 @@ const MainForm = () => {
         talks: formData.talks || [],
         posters: formData.posters || [],
         total_due: total.toFixed(2),
-        paypal_fee: paypalFee.toFixed(2),
+        paypal_fee: paypalFee?.toFixed(2) || 0,
       };
 
       const response = await axios.post(apiUrl, formattedData, {
@@ -251,7 +251,7 @@ const MainForm = () => {
                 <div className="flex-grow-1">
                   <p className="fw-bolder text-danger">The IMC fee is due without any delay.</p>
 
-                  {getPaymentMethodById(participant.participant.payment_method_id, paymentMethods) === "paypal" ? (
+                  {participant.participant.payment_method_name.toLowerCase() === "paypal" ? (
                     <div className="mb-3">
                       <p >Click the button below to pay immediately with Paypal.</p>
                       <PayPalForm amount={(total + paypalFee)} year={cd.year} />
