@@ -1,27 +1,27 @@
 import PageContain from "@/admin/components/page-contain";
 import axios from "axios";
-import React, { useEffect,  useState } from "react";
+import React, { useEffect, useState } from "react";
 import Loader from "components/loader";
 import cssForm from "styles/components/form.module.scss";
 import classNames from "classnames";
-import StaticSummary from "components/billing/static_summary"; 
+import StaticSummary from "components/billing/static_summary";
 import { useParams } from "react-router-dom";
 import { conferenceData as cd } from "data/conference-data";
 import { useForm } from "react-hook-form";
 import { useApiPayments } from "@/admin/api/payments";
-import { useApiAddPayment } from "@/admin/api/payments/add"; 
+import { useApiAddPayment } from "@/admin/api/payments/add";
 import { useApiSpecificData } from "api/specific-data";
 import { useApiParticipant } from "api/participants";
 
 const Payments = () => {
-  const { participantId } = useParams();  
-  const [ formErrors, setFormErrors ] = useState(null);
+  const { participantId } = useParams();
+  const [formErrors, setFormErrors] = useState(null);
   const [successMsg, setSuccessMsg] = useState(null);
-  const [editingPayment, setEditingPayment] = useState(null); 
+  const [editingPayment, setEditingPayment] = useState(null);
 
   const { workshops, paymentMethods, registrationTypes, loading: specificdataLoading, sessions, error: specificDataError } = useApiSpecificData();
   const { participant, loading: participantLoading, error: participantError } = useApiParticipant(participantId);
-  const { payments, loading: paymenstLoading, error: paymentsError } = useApiPayments(participantId);
+  const { payments, loading: paymenstLoading, error: paymentsError, refetchPayments } = useApiPayments(participantId);
   const { addPayment } = useApiAddPayment(participantId);
 
   const {
@@ -40,10 +40,10 @@ const Payments = () => {
       adminNote: "",
     },
   });
-  
+
 
   const loading = specificdataLoading || participantLoading || isSubmitting || paymenstLoading;
-  const error = participantError || specificDataError || paymentsError || formErrors ;
+  const error = participantError || specificDataError || paymentsError || formErrors;
   const paymentMethodId = watch("paymentMethodId");
 
   useEffect(() => {
@@ -51,7 +51,7 @@ const Payments = () => {
       setValue("paymentMethodId", participant.accommodation.payment_method_id || "");
     }
   }, [paymentMethodId, participant, setValue]);
- 
+
   useEffect(() => {
     if (participant?.participant && paymentMethodId) {
       const dueAmount = paymentMethodId === "1"
@@ -59,12 +59,12 @@ const Payments = () => {
         : parseFloat(participant.participant.total_due) - parseFloat(participant.participant.total_paid);
       setValue("amount", dueAmount.toFixed(2));
     }
-  }, [paymentMethodId, participant,   setValue]);
- 
-  const submitForm = async (data) => { 
+  }, [paymentMethodId, participant, setValue]);
+
+  const submitForm = async (data) => {
     setSuccessMsg(null);
     setFormErrors(null);
-  
+
     const payload = {
       participant_id: participantId,
       amount: parseFloat(data.amount),
@@ -72,22 +72,23 @@ const Payments = () => {
       payment_date: data.paymentDate,
       admin_note: data.adminNote || null,
     };
-  
+
     const result = await addPayment(payload);
-  
+
     if (result.success) {
       setSuccessMsg("Payment added successfully!");
       resetForm();
+      await refetchPayments();
     } else {
       setFormErrors(result.message);
     }
   };
 
- 
+
   // Reset form fields 
   const resetForm = () => {
     reset({
-      amount: totalDue?.toFixed(2) || "",
+      amount: "",
       paymentMethodId: "",
       paymentDate: new Date().toISOString().split("T")[0],
       adminNote: "",
@@ -102,18 +103,71 @@ const Payments = () => {
     { url: `/admin/participants/${isOnline ? 'online' : 'onsite'}/payment/${participantId}`, name: `${participant?.participant?.first_name || "Participant"} ${participant?.participant?.last_name || ""}'s Payments` }
   ];
 
+
+
   return (
     <PageContain breadcrumb={breadcrumb} isMaxWidth>
 
 
       {loading && <Loader />}
-      {!loading && error && <div className="alert alert-danger">{error}</div>}
-      {successMsg && <div className="alert alert-success">{successMsg}</div>}
-
-
+      {error && <div className="alert alert-danger fw-bolder">{error}</div>}
+      {successMsg && <div className="alert alert-success fw-bolder">{successMsg}</div>}
 
       {!loading && (
         <>
+          <div className="table-responsive" style={{ maxWidth: 'calc(100vw - 2rem)' }}>
+            <table className="table table-striped">
+              <thead>
+                <tr>
+                  <th>Reg. Date</th>
+                  <th>Name</th>
+                  <th>Total Due</th>
+                  <th>Total Paid</th>
+                  <th>Pay. Method</th>
+                  <th>Confirmed</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr key={participant.participant.id}>
+                  <td>{participant.participant.created_at.split(' ')[0]}</td>
+                  <td>{participant.participant.title} {participant.participant.first_name} {participant.participant.last_name}</td>
+                  <td>
+                    {participant.participant.payment_method_id === '1' ? (
+                      <>{(parseFloat(participant.participant.total_due) + parseFloat( participant.participant.paypal_fee))}€</>
+                    ) : (
+                      <>{participant.participant.total_due}€</>
+                    )}
+                  </td>
+                  <td>{participant.participant.total_paid}€</td>
+                  <td>{participant.participant.payment_method || "n/a"}</td>
+                  <td>
+                    {participant.participant.confirmation_sent === "1" ? (
+                      <>
+                        ✅ {participant.participant.confirmation_date && formatFullDate(participant.participant.confirmation_date)}
+                      </>
+                    ) : (
+                      "❌"
+                    )}
+                  </td>
+                  <td>
+                    <div className="d-flex gap-2 justify-content-end">
+
+                      <button
+                        className="btn btn-sm btn-outline-success fw-bolder"
+                      //onClick={() => handleDeleteClick(participant)}
+                      >
+                        CONFIRM
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+
+
           <div className="d-flex flex-column flex-md-row gap-3 align-items-strecht">
             <div className="border p-3 rounded-2 flex-grow-1">
               <h4 className="mb-3">{editingPayment ? "Edit Payment" : "Add a New Payment"}</h4>
