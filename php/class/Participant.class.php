@@ -207,6 +207,9 @@ class ParticipantManager
     public function saveOnlineParticipant($data, $passwordHash)
     {
         try {
+
+            echo "SAVING ONLINE PARTICIPANT ";
+
             $this->pdo->beginTransaction();
 
             // 1. Handle boolean fields: convert "true"/"false" (or any truthy/falsy string) to 1 or 0.
@@ -257,6 +260,8 @@ class ParticipantManager
                 ':comments' => $data['comments'] ?? null,
                 ':payment_method_id' => (int) ($data['payment_method_id'] ?? 0),
             ]);
+
+            echo "PAYMENT ID " . (int) ($data['payment_method_id'] ?? 0);
 
             $participantId = $this->pdo->lastInsertId();
 
@@ -534,7 +539,7 @@ class ParticipantManager
             throw new Exception("Error updating participant: " . $e->getMessage());
         }
     }
- 
+
     /**
      * Retrieve participant statistics for a given workshop or all workshops.
      */
@@ -623,11 +628,11 @@ class ParticipantManager
             GROUP BY p.id
             ORDER BY p.created_at DESC;
         ");
-    
+
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    
+
 
     public function getOnlineParticipants()
     {
@@ -721,7 +726,7 @@ class ParticipantManager
         p.guardian_email,
         p.created_at,
         p.updated_at';
-    
+
         // 1. Fetch participant’s primary details with payment method name
         $stmt = $this->pdo->prepare("  
             SELECT {$columns}
@@ -729,18 +734,14 @@ class ParticipantManager
             LEFT JOIN payment_methods pm ON p.payment_method_id = pm.id
             WHERE p.id = :participant_id
         ");
-    
+
         $stmt->execute([':participant_id' => $participantId]);
         $participant = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        var_dump("PARTICIPANT");
-        var_dump("ID " . $participantId);
-        var_dump($participant);
-    
         if (!$participant) {
             return null;
         }
-    
+
         // 2. Fetch workshops the participant is registered for
         $stmt = $this->pdo->prepare("  
             SELECT *
@@ -750,7 +751,7 @@ class ParticipantManager
         ");
         $stmt->execute([':participant_id' => $participantId]);
         $workshops = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
+
         // 3. Fetch payments by this participant
         $stmt = $this->pdo->prepare("  
             SELECT pay.*, pm.method AS payment_method
@@ -761,7 +762,7 @@ class ParticipantManager
         ");
         $stmt->execute([':participant_id' => $participantId]);
         $payments = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
+
         // 4. Fetch accommodation info
         $stmt = $this->pdo->prepare("  
             SELECT pa.*, rt.type AS registration_type, rt.price AS registration_price
@@ -771,11 +772,11 @@ class ParticipantManager
         ");
         $stmt->execute([':participant_id' => $participantId]);
         $accommodation = $stmt->fetch(PDO::FETCH_ASSOC);
-    
+
         // Add payment_method_id and payment_method_name to accommodation
         $accommodation['payment_method_id'] = $participant['payment_method_id'];
         $accommodation['payment_method_name'] = $participant['payment_method_name'];
-    
+
         // 5. Fetch arrival/departure info
         $stmt = $this->pdo->prepare("  
             SELECT *
@@ -784,7 +785,7 @@ class ParticipantManager
         ");
         $stmt->execute([':participant_id' => $participantId]);
         $arrivalInfo = $stmt->fetch(PDO::FETCH_ASSOC);
-    
+
         // 6. Fetch extra options (excursion, T-shirt, proceedings, etc.)
         $stmt = $this->pdo->prepare("  
             SELECT *
@@ -793,7 +794,7 @@ class ParticipantManager
         ");
         $stmt->execute([':participant_id' => $participantId]);
         $extraOptions = $stmt->fetch(PDO::FETCH_ASSOC);
-    
+
         // 7. Fetch contributions
         $stmt = $this->pdo->prepare("  
             SELECT c.*, s.name AS session_name
@@ -803,7 +804,7 @@ class ParticipantManager
         ");
         $stmt->execute([':participant_id' => $participantId]);
         $contributions = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
+
         // Combine everything into a structured array
         $details = [
             'participant'    => $participant,
@@ -814,8 +815,7 @@ class ParticipantManager
             'extra_options'  => $extraOptions,
             'contributions'  => $contributions,
         ];
-    
+
         return $details;
     }
-    
 }
