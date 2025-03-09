@@ -44,6 +44,9 @@ if (!$input || !isset($input['participant_id'], $input['amount'], $input['paymen
     exit;
 }
 
+var_dump($input);
+return;
+
 try {
     $pdo->beginTransaction();
 
