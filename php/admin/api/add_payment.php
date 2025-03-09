@@ -54,13 +54,7 @@ try {
     if ($participantId <= 0 || $amount <= 0 || $paymentMethodId <= 0) {
         throw new Exception("Invalid values provided. Participant ID, amount, and payment method ID must be positive numbers.");
     }
-
-    // Ensure the date format is valid (YYYY-MM-DD)
-    if (!preg_match("/^\d{4}-\d{2}-\d{2}$/", $paymentDate)) {
-        throw new Exception("Invalid payment date format. Expected YYYY-MM-DD.");
-    }
-
-    // Initialize PaymentManager using $pdo
+   // Initialize PaymentManager using $pdo
     $paymentManager = new PaymentManager($pdo);
     $success = $paymentManager->addPayment(
         $participantId,
