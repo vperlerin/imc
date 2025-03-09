@@ -36,12 +36,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 // Capture and decode JSON input
 $rawInput = file_get_contents("php://input");
 $input = json_decode($rawInput, true);
-
-
-var_dump($input);
-return;
-
-
+$input = $input['paymentData'];
+ 
 // Validate input
 if (!$input || !isset($input['participant_id'], $input['amount'], $input['payment_method_id'], $input['payment_date'])) {
     http_response_code(400);
