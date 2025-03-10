@@ -17,7 +17,12 @@ require_once __DIR__ . "/../../class/Participant.class.php";
 
 try {
     $participantManager = new ParticipantManager($pdo);
-    $participants = $participantManager->getOnlineParticipants();
+
+    // Check if "confirmed_only" is set in the GET request
+    $confirmedOnly = isset($_GET['confirmed_only']) && $_GET['confirmed_only'] == '1';
+
+    // Fetch participants with optional filter
+    $participants = $participantManager->getOnlineParticipants($confirmedOnly);
 
     echo json_encode([
         "success" => true,

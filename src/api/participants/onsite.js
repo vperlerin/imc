@@ -2,7 +2,7 @@ import { retry } from "utils/retry.js";
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-export const useApiOnsiteParticipants = () => {
+export const useApiOnsiteParticipants = (confirmedOnly = false) => {
   const [participants, setParticipants] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -10,8 +10,9 @@ export const useApiOnsiteParticipants = () => {
   useEffect(() => {  
     const fetchParticipants = async () => {
       try {
+        const queryParam = confirmedOnly ? "?confirmed_only=1" : "";
         const response =  await retry(() =>
-          axios.get(`${process.env.REACT_APP_API_URL}/admin/api/onsite_participants.php`) 
+          axios.get(`${process.env.REACT_APP_API_URL}/admin/api/onsite_participants.php${queryParam}`) 
         );
 
         if (response.data.success && Array.isArray(response.data.data)) {

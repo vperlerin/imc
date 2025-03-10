@@ -795,44 +795,57 @@ class ParticipantManager
         return $stmt->rowCount() > 0;
     }
 
+
     /**
      * Retrieve all on-site active participants with payment method.
+     * If `$confirmedOnly` is true, only return confirmed participants.
      */
-    public function getOnsiteParticipants()
+    public function getOnsiteParticipants($confirmedOnly = false)
     {
-        $stmt = $this->pdo->prepare("
-            SELECT 
-                p.id,
-                p.created_at,
-                p.title, 
-                p.first_name, 
-                p.last_name, 
-                p.email,
-                p.confirmation_sent, 
-                p.confirmation_date,
-                p.total_due, 
-                p.total_paid,
-                p.paypal_fee,
-                (SELECT pm.method 
-                 FROM payments pay 
-                 LEFT JOIN payment_methods pm ON pay.payment_method_id = pm.id
-                 WHERE pay.participant_id = p.id
-                 ORDER BY pay.created_at DESC 
-                 LIMIT 1) AS payment_method_name
-            FROM participants p
-            WHERE p.is_online = FALSE AND p.status = 'active'
-            GROUP BY p.id
-            ORDER BY p.created_at DESC;
-        ");
+        $query = "
+        SELECT 
+            p.id,
+            p.created_at,
+            p.title, 
+            p.first_name, 
+            p.last_name, 
+            p.email,
+            p.confirmation_sent, 
+            p.confirmation_date,
+            p.total_due, 
+            p.total_paid,
+            p.paypal_fee,
+            (SELECT pm.method 
+             FROM payments pay 
+             LEFT JOIN payment_methods pm ON pay.payment_method_id = pm.id
+             WHERE pay.participant_id = p.id
+             ORDER BY pay.created_at DESC 
+             LIMIT 1) AS payment_method_name
+        FROM participants p
+        WHERE p.is_online = FALSE 
+          AND p.status = 'active'
+    ";
 
+        // Apply filtering for confirmed participants if needed
+        if ($confirmedOnly) {
+            $query .= " AND p.confirmation_sent = 1";
+        }
+
+        $query .= " GROUP BY p.id ORDER BY p.created_at DESC";
+
+        $stmt = $this->pdo->prepare($query);
         $stmt->execute();
+
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-
-    public function getOnlineParticipants()
+    /**
+     * Retrieve all online active participants with payment method.
+     * If `$confirmedOnly` is true, only return confirmed participants.
+     */
+    public function getOnlineParticipants($confirmedOnly = false)
     {
-        $stmt = $this->pdo->prepare("
+        $query = "
         SELECT 
             p.id,
             p.created_at,
@@ -852,15 +865,22 @@ class ParticipantManager
              ORDER BY pay.created_at DESC 
              LIMIT 1) AS payment_method_name
         FROM participants p
-        WHERE p.is_online = TRUE AND p.status = 'active'
-        GROUP BY p.id
-        ORDER BY p.created_at DESC;
-    ");
+        WHERE p.is_online = TRUE 
+          AND p.status = 'active'
+    ";
 
+        // Apply filtering for confirmed participants if needed
+        if ($confirmedOnly) {
+            $query .= " AND p.confirmation_sent = 1";
+        }
+
+        $query .= " GROUP BY p.id ORDER BY p.created_at DESC";
+
+        $stmt = $this->pdo->prepare($query);
         $stmt->execute();
+
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-
 
     /**
      * Hard delete a participant

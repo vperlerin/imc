@@ -88,8 +88,8 @@ const AdminTable = ({ participants, withActions = true, customActions= null, onD
                   {withActions && onDelete && (
                     <td>
                       <div className="d-flex gap-2 justify-content-end">
-                        <a href={`/admin/participants/online/payment/${participant.id}`} className="btn btn-sm btn-outline-success fw-bolder">Payments</a>
-                        <a href={`/admin/participants/online/${participant.id}`} className="btn btn-sm btn-outline-primary fw-bolder">Edit</a>
+                        <a href={`/admin/participants/${participant.is_online ? 'online': 'onsite'}/payment/${participant.id}`} className="btn btn-sm btn-outline-success fw-bolder">Payments</a>
+                        <a href={`/admin/participants/${participant.is_online ? 'online': 'onsite'}/${participant.id}`} className="btn btn-sm btn-outline-primary fw-bolder">Edit</a>
                         <button
                           className="btn btn-sm btn-outline-danger fw-bolder"
                           onClick={() => handleDeleteClick(participant)}

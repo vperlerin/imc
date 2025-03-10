@@ -39,7 +39,7 @@ const Payments = ({ isCurOnline = false }) => {
   const { payments, loading: paymenstLoading, error: paymentsError, refetchPayments } = useApiPayments(participantId);
   const { addPayment } = useApiAddPayment(participantId);
   const { confirmParticipant, isConfirming, errorConfirm } = useApiConfirmParticipant();
-
+ 
 
   const {
     formState: { errors },
@@ -115,11 +115,19 @@ const Payments = ({ isCurOnline = false }) => {
 
   // Confirm
   const handleConfirmClick = () => {
+    setSuccessMsg(null);
+    setFormErrors(null);
     const amountDue = (() => {
       if (!participant?.participant) return 0;
-      const totalDue = parseFloat(participant.participant.total_due);
-      const totalPaid = parseFloat(participant.participant.total_paid);
-      return totalDue - totalPaid;
+      const totalDue = parseFloat(participant.participant.total_due || 0);
+      const paypalFee = parseFloat(participant.participant.paypal_fee || 0);
+      const totalPaid = parseFloat(participant.participant.total_paid || 0);
+
+      const dueAmount = participant.participant.payment_method_name
+        ? totalDue + paypalFee - totalPaid
+        : totalDue - totalPaid;
+
+      return dueAmount;
     })();
 
     if (amountDue > 0) {
