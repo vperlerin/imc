@@ -116,7 +116,7 @@ const AdminParticipantsOnline = () => {
               <CiSearch className="position-absolute top-50 end-0 translate-middle-y me-2" />
             </div>
           </div>
-          <AdminTable participants={filteredParticipants} onDelete={onDeleteParticipant}/>
+          <AdminTable participants={filteredParticipants} onDelete={handleDeleteClick}/>
         </>
       )}
 

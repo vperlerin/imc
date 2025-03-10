@@ -793,7 +793,7 @@ class ParticipantManager
                  LEFT JOIN payment_methods pm ON pay.payment_method_id = pm.id
                  WHERE pay.participant_id = p.id
                  ORDER BY pay.created_at DESC 
-                 LIMIT 1) AS payment_method
+                 LIMIT 1) AS payment_method_name
             FROM participants p
             WHERE p.is_online = FALSE AND p.status = 'active'
             GROUP BY p.id
@@ -825,7 +825,7 @@ class ParticipantManager
              LEFT JOIN payment_methods pm ON pay.payment_method_id = pm.id
              WHERE pay.participant_id = p.id
              ORDER BY pay.created_at DESC 
-             LIMIT 1) AS payment_method
+             LIMIT 1) AS payment_method_name
         FROM participants p
         WHERE p.is_online = TRUE AND p.status = 'active'
         GROUP BY p.id
@@ -926,7 +926,7 @@ class ParticipantManager
 
         // 3. Fetch payments by this participant
         $stmt = $this->pdo->prepare("  
-            SELECT pay.*, pm.method AS payment_method
+            SELECT pay.*, pm.method AS payment_method_name
             FROM payments pay
             INNER JOIN payment_methods pm ON pay.payment_method_id = pm.id
             WHERE pay.participant_id = :participant_id
@@ -1044,7 +1044,7 @@ class ParticipantManager
 
         // Fetch payments
         $stmt = $this->pdo->prepare("  
-            SELECT pay.*, pm.method AS payment_method
+            SELECT pay.*, pm.method AS payment_method_name
             FROM payments pay
             INNER JOIN payment_methods pm ON pay.payment_method_id = pm.id
             WHERE pay.participant_id = :participant_id

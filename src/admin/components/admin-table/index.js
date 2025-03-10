@@ -4,12 +4,12 @@ import { FaRegTrashAlt } from "react-icons/fa";
 import React, { useState } from "react";
 import { formatFullDate } from "utils/date";
 
-const AdminTable = ({ participants, withActions = true, onDelete }) => {
+const AdminTable = ({ participants, withActions = true, onDelete = null }) => {
   const [sortColumn, setSortColumn] = useState(null);
   const [sortOrder, setSortOrder] = useState("asc");
 
   const handleDeleteClick = (participant) => {
-    onDelete(participant);
+    onDelete?.(participant);
   };
 
   const handleSort = (column) => {
@@ -68,8 +68,8 @@ const AdminTable = ({ participants, withActions = true, onDelete }) => {
               const totalPaid = parseFloat(participant.total_paid) || 0;
               const paypalFee = parseFloat(participant.paypal_fee || 0);
               const isPaypal = participant.payment_method?.toLowerCase() === "paypal";
-              console.log("IS PAYPAL ", isPaypal);
-              console.log("participant.payment_method ", participant.payment_method);
+              console.log("ADMIN  PAYPAL ", isPaypal);
+              console.log("ADMIN participant.payment_method ", participant);
               const amountDue = isPaypal ? totalDue + paypalFee - totalPaid : totalDue - totalPaid;
 
               return (

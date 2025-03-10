@@ -22,7 +22,6 @@ import Comments from "components/registration/comments";
 import Summary from "components/billing/summary";
 import { formatFullDate } from "utils/date";
 
-
 const AdminParticipantsUser = ({ isCurOnline = false }) => {
   const { participantId, tab } = useParams();
   const [errorMsg, setErrorMsg] = useState('');
@@ -44,6 +43,7 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
   const { control, register, handleSubmit, getValues, setValue, formState: { errors }, trigger, watch } = useForm();
   const isOnline = participant?.participant?.is_online === "1";
 
+  console.log("PART SINGE ", participant);
 
   const loading = specificdataLoading || participantLoading || isSaving;
   const error = [
@@ -263,7 +263,7 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
               { key: "workshops", label: "Workshops" },
               ...(!isOnline ? [{ key: "arrival", label: "Arrival" }] : []),
               { key: "contribution", label: "Contribution" },
-              { key: "accommodation", label: "Accommodation" },
+              ...(!isOnline ? [{ key: "accommodation", label: "Acc. & Pay. Method" }] : [{ key: "accommodation", label: "Pay. Method" }]),
               ...(!isOnline ? [{ key: "extras", label: "Extras" }] : []),
               { key: "comments", label: "Comments" },
               { key: "admin_notes", label: "Marc's notes" },
