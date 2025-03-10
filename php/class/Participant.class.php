@@ -835,7 +835,7 @@ class ParticipantManager
         // Apply ORDER BY only when retrieving full data
         if (!$confirmedOnly) {
             $query .= " GROUP BY p.id ORDER BY p.created_at DESC";
-        } else  {
+        } else {
             $query .= " GROUP BY p.country ORDER BY p.first_name DESC";
         }
 
@@ -886,6 +886,8 @@ class ParticipantManager
         // Apply ORDER BY only when retrieving full data
         if (!$confirmedOnly) {
             $query .= " GROUP BY p.id ORDER BY p.created_at DESC";
+        } else {
+            $query .= " GROUP BY p.country ORDER BY p.first_name DESC";
         }
 
         $stmt = $this->pdo->prepare($query);
