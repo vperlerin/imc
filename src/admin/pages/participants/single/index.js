@@ -42,15 +42,21 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
   const { participant, loading: participantLoading, error: participantError } = useApiParticipant(participantId, isCurOnline, fetchParticipantTrigger, true);
   const { control, register, handleSubmit, getValues, setValue, formState: { errors }, trigger, watch } = useForm();
   const isOnline = participant?.participant?.is_online === "1";
-
-  console.log("PART SINGE ", participant);
-
+ 
   const loading = specificdataLoading || participantLoading || isSaving;
   const error = [
     errorMsg,
     participantError,
     specificDataError,
   ].filter(Boolean);
+
+  console.log(getValues());
+  console.log("paypalFee ", paypalFee, " p ", participant?.participant.paypal_fee);
+
+  // Paypal fess
+  useEffect(() => {
+    setPaypalFee(paypalFee);
+  }, [paypalFee])
 
 
   // Detect form changes
@@ -150,7 +156,6 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
 
   }, [participant, sessions, setValue, setTalks, setPosters]);
 
-  console.log("participant.paypal_fee ", participant?.paypal_fee , " vs ", paypalFee);
 
   const onSubmit = async (formData) => {
     setIsSaving(true);
@@ -248,9 +253,7 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
             </div>
           </div>
         )}
-
-
-
+ 
         {successMsg && !loading && (
           <div className="alert alert-success">{successMsg}</div>
         )}
@@ -388,8 +391,8 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
                 />
               </div>
             )}
-            {tab === "summary" && isSummaryReady && (
-              <div className={classNames(css.mxW, 'mx-auto')}>
+            
+              <div className={classNames(css.mxW, 'mx-auto', tab === "summary" && isSummaryReady ? 'visible': "invisible")}>
                 <div className="d-flex mt-3 align-items-center justify-content-between w-100 mb-3">
                   <div>
                     {participant?.participant?.first_name
@@ -438,8 +441,7 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
                   watch={watch}
                 />
               </div>
-
-            )}
+ 
             {tab === "admin_notes" && (
               <div className={classNames(css.mxW, 'mx-auto mb-3')}>
                 <label htmlFor="admin_notes" className="form-label fw-bold">

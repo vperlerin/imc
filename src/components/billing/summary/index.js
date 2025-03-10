@@ -93,11 +93,6 @@ const Summary = ({
     const numberOfPrintedPosters = printedPosters.length;
     const printedPostersCost = numberOfPrintedPosters * conferenceData.poster_print.price;
 
-    // Payment Method
-    const paymentMethodName = getPaymentMethodById(paymentMethodId, paymentMethods);
-    const isPaypal = paymentMethodName === "paypal";
- 
-
     let totalCost = totalRoomCost + workshopCost + tshirtCost + printedPostersCost;
     const paypalFee = isPaypal ? getPaypalPrice(totalCost) - totalCost : 0;
     totalCost += paypalFee;
@@ -112,7 +107,7 @@ const Summary = ({
     if (isOnline) {
       if (isPaypal) {
         setTotal(totalOnlineCost - onlinePaypalFee);
-        setPaypalFee(onlinePaypalFee);
+        setPaypalFee(onlinePaypalFee); 
       } else {
         setTotal(totalOnlineCost);
         setPaypalFee(0);
@@ -120,10 +115,10 @@ const Summary = ({
     } else {
       if (isPaypal) {
         setTotal(totalCost - paypalFee);
-        setPaypalFee(paypalFee);
+        setPaypalFee(paypalFee); 
       } else {
         setTotal(totalCost);
-        setPaypalFee(0);
+        setPaypalFee(0); 
       }
     }
   }, [
@@ -141,7 +136,9 @@ const Summary = ({
     selectedWorkshopIds,
     posters,
     paymentMethods,
+    paymentMethodId
   ]);
+ 
 
   return (
     <>

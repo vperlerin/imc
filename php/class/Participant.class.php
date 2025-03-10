@@ -1014,6 +1014,7 @@ class ParticipantManager
                 p.total_due,
                 p.total_paid,
                 p.total_reimbursed,
+                p.paypal_fee,
                 p.status,
                 p.comments,
                 p.payment_method_id,

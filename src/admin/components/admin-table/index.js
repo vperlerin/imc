@@ -72,7 +72,7 @@ const AdminTable = ({ participants, withActions = true, onDelete = null }) => {
 
               return (
                 <tr key={participant.id}>
-                  <td>(#{participant.id})</td>
+                  <td>{participant.id}</td>
                   <td>{participant.created_at.split(" ")[0]}</td>
                   <td>{participant.title} {participant.first_name} {participant.last_name}</td>
                   <td>{isPaypal ? (totalDue + paypalFee).toFixed(2) : totalDue.toFixed(2)}€</td>
