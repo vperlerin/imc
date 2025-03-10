@@ -804,7 +804,7 @@ class ParticipantManager
     {
         // Select fields based on confirmedOnly
         $selectFields = $confirmedOnly
-            ? "p.title, p.first_name, p.last_name, p.organization, p.country"
+            ? "p.id, p.title, p.first_name, p.last_name, p.organization, p.country"
             : "
             p.id,
             p.created_at,
@@ -855,7 +855,7 @@ class ParticipantManager
 
         // Select fields based on confirmedOnly
         $selectFields = $confirmedOnly
-            ? "p.title, p.first_name, p.last_name, p.organization, p.country"
+            ? "p.id, p.title, p.first_name, p.last_name, p.organization, p.country"
             : "
             p.id,
             p.created_at,
