@@ -170,7 +170,7 @@ const AdminParticipantsOnsite = () => {
                         )}
                       </td>
                       <td>{participant.payment_method || "n/a"}</td>
-                      <td> 
+                      <td>
                         {participant.confirmation_sent === "1" ? (
                           <>
                             ✅
@@ -190,7 +190,7 @@ const AdminParticipantsOnsite = () => {
                             className={classNames(css.action, "btn btn-sm btn-outline-danger fw-bolder")}
                             onClick={() => handleDeleteClick(participant)}
                           >
-                             <FaRegTrashAlt/>
+                            <FaRegTrashAlt />
                           </button>
                         </div>
                       </td>
@@ -219,16 +219,24 @@ const AdminParticipantsOnsite = () => {
                 <button type="button" className="btn-close" onClick={() => setShowDeleteModal(false)}></button>
               </div>
               <div className="modal-body">
-                <p>Are you sure you want to cancel <b>{selectedParticipant.first_name} {selectedParticipant.last_name}</b>'s registration?</p>
-                <p><strong>Choose:</strong></p>
-                <ul>
-                  <li><strong className="text-warning">Soft Delete:</strong> Keeps record but marks as 'cancelled' - so we can keep track of the reimbursement.</li>
-                  <li><strong className="text-danger">Hard Delete:</strong> Permanently removes data.</li>
-                </ul>
+                {false && (
+                  <>
+                    <p>Are you sure you want to cancel <b>{selectedParticipant.first_name} {selectedParticipant.last_name}</b>'s registration?</p>
+                    <p><strong>Choose:</strong></p>
+                    <ul>
+                      <li><strong className="text-warning">Soft Delete:</strong> Keeps record but marks as 'cancelled' - so we can keep track of the reimbursement.</li>
+                      <li><strong className="text-danger">Hard Delete:</strong> Permanently removes data.</li>
+                    </ul>
+                  </>
+                )}
+                Are you sure you want to permanently delete all data related to this participant?
               </div>
               <div className="modal-footer">
                 <button className="btn btn-outline-secondary fw-bolder" onClick={() => setShowDeleteModal(false)}>Cancel</button>
-                <button className="btn btn-outline-warning fw-bolder" onClick={() => onDeleteParticipant("soft")}>Soft Delete</button>
+                {false && (
+                  <button className="btn btn-outline-warning fw-bolder" onClick={() => onDeleteParticipant("soft")}>Soft Delete</button>
+                )}
+
                 <button className="btn btn-outline-danger fw-bolder ms-auto" onClick={() => { setShowDeleteModal(false); setShowHardDeleteConfirm(true); }}>Hard Delete</button>
               </div>
             </div>
@@ -249,8 +257,8 @@ const AdminParticipantsOnsite = () => {
                 <p><strong>Are you absolutely sure?</strong> This action cannot be undone.</p>
               </div>
               <div className="modal-footer">
-                <button className="btn btn-outline-secondary fw-bolder" onClick={() => setShowHardDeleteConfirm(false)}>No</button>
                 <button className="btn btn-outline-danger  fw-bolder" onClick={() => { onDeleteParticipant("hard"); setShowHardDeleteConfirm(false); }}>Yes, Delete</button>
+                <button className="btn btn-outline-secondary fw-bolder" onClick={() => setShowHardDeleteConfirm(false)}>No</button>
               </div>
             </div>
           </div>

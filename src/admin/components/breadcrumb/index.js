@@ -23,7 +23,7 @@ const BreadCrumb = ({ links = [] }) => {
             aria-current={index === links.length - 1 ? "page" : undefined}
           >
             {index === links.length - 1 ? (
-              link.name  
+              <b>{link.name}</b>  
             ) : (
               <Link to={link.url}>{link.name}</Link>
             )}

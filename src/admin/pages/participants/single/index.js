@@ -1,9 +1,10 @@
 import classNames from 'classnames';
+import css from './index.module.scss';
 import cssTabs from 'styles/components/tabs.module.scss';
 import axios from "axios";
 import PageContain from "@/admin/components/page-contain";
 import Loader from "components/loader";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useBlockNavigation } from "hooks/block-navigation.js";
 import { useParams, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -41,8 +42,8 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
   const { workshops, paymentMethods, registrationTypes, loading: specificdataLoading, sessions, error: specificDataError } = useApiSpecificData();
   const { participant, loading: participantLoading, error: participantError } = useApiParticipant(participantId, isCurOnline, fetchParticipantTrigger, true);
   const { control, register, handleSubmit, getValues, setValue, formState: { errors }, trigger, watch } = useForm();
-
   const isOnline = participant?.participant?.is_online === "1";
+
 
   const loading = specificdataLoading || participantLoading || isSaving;
   const error = [
@@ -262,7 +263,7 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
               { key: "workshops", label: "Workshops" },
               ...(!isOnline ? [{ key: "arrival", label: "Arrival" }] : []),
               { key: "contribution", label: "Contribution" },
-              { key: "accommodation", label: "Accommodation" },               
+              { key: "accommodation", label: "Accommodation" },
               ...(!isOnline ? [{ key: "extras", label: "Extras" }] : []),
               { key: "comments", label: "Comments" },
               { key: "admin_notes", label: "Marc's notes" },
@@ -300,7 +301,7 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
             {tab === "identity" && (
               <Identitity
                 isAdmin
-                isOnline
+                isOnline={isOnline}
                 register={register}
                 errors={errors}
                 setValue={setValue}
@@ -310,7 +311,7 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
             {tab === "workshops" && (
               <Workshops
                 isAdmin
-                isOnline
+                isOnline={isOnline}
                 conferenceData={cd}
                 register={register}
                 errors={errors}
@@ -333,7 +334,7 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
             {tab === "contribution" && (
               <Contribution
                 isAdmin
-                isOnline
+                isOnline={isOnline}
                 conferenceData={cd}
                 control={control}
                 register={register}
@@ -348,7 +349,7 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
             {tab === "accommodation" && (
               <Accommodation
                 isAdmin
-                isOnline
+                isOnline={isOnline}
                 isEarlyBird={participant?.participant.is_early_bird}
                 conferenceData={cd}
                 control={control}
@@ -374,17 +375,19 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
               />
             )}
             {tab === "comments" && (
-              <Comments
-                isAdmin
-                isOnline
-                register={register}
-                errors={errors}
-                setValue={setValue}
-                trigger={trigger}
-              />
+              <div className={classNames(css.mxW, 'mx-auto')}>
+                <Comments
+                  isAdmin
+                  isOnline={isOnline}
+                  register={register}
+                  errors={errors}
+                  setValue={setValue}
+                  trigger={trigger}
+                />
+              </div>
             )}
             {tab === "summary" && isSummaryReady && (
-              <div className='mx-3'>
+              <div className={classNames(css.mxW, 'mx-auto')}>
                 <div className="d-flex mt-3 align-items-center justify-content-between w-100 mb-3">
                   <div>
                     {participant?.participant?.first_name
@@ -420,7 +423,7 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
 
                 <Summary
                   isAdmin
-                  isOnline
+                  isOnline={isOnline}
                   isEarlyBird={participant?.participant.is_early_bird}
                   conferenceData={cd}
                   getValues={getValues}
@@ -434,10 +437,9 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
                 />
               </div>
 
-
             )}
             {tab === "admin_notes" && (
-              <div className="mb-3">
+              <div className={classNames(css.mxW, 'mx-auto mb-3')}>
                 <label htmlFor="admin_notes" className="form-label fw-bold">
                   Admin Notes
                 </label>

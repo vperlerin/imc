@@ -1,4 +1,5 @@
 import { IoIosMail } from "react-icons/io";
+import AdminTable from "@/admin/components/admin-table";
 import css from './index.module.scss';
 import classNames from "classnames";
 import PageContain from "@/admin/components/page-contain";
@@ -16,6 +17,8 @@ import { useApiParticipant } from "api/participants";
 import { useApiConfirmParticipant } from '@/admin/api/participants/confirm';
 import { formatFullDate } from "utils/date";
 import { sendEmail } from "hooks/send-email";
+
+
 
 const Payments = ({ isCurOnline = false }) => {
   const { participantId } = useParams();
@@ -59,6 +62,8 @@ const Payments = ({ isCurOnline = false }) => {
   const loading = specificdataLoading || participantLoading || isSubmitting || paymenstLoading;
   const error = participantError || specificDataError || paymentsError || formErrors;
   const paymentMethodId = watch("paymentMethodId");
+
+  
 
   useEffect(() => {
     if (participant && participant.accommodation) {
@@ -158,7 +163,17 @@ const Payments = ({ isCurOnline = false }) => {
 
 
   const handleConfirm = async () => {
-    await confirmParticipant(participantId, { confirmation_date: true });
+    setIsConfirmingEmail(true);
+
+    try {
+      await confirmParticipant(participantId, { confirmation_date: true });
+      setShowConfirmModal(false);
+      setShowConfirmationModal(false);
+    } catch (error) {
+      set_ConfirmError("Failed to confirm the participant. Pleaase, try again later.");
+    } finally {
+      setIsConfirmingEmail(false);
+    }
   };
 
   const handleConfirmAndSend = async () => {
@@ -179,6 +194,7 @@ const Payments = ({ isCurOnline = false }) => {
         fromName: "IMC 2025",
         replyTo: "no-reply@imc2025.imo.net",
         replyName: "no-reply",
+        bcc: process.env.REACT_APP_BCC_ALL ? process.env.REACT_APP_BCC_ALL.split(',').map(email => ({ email, name: 'BCC Recipient' })) : [],
       });
 
       if (!emailResponse.success) {
@@ -186,7 +202,9 @@ const Payments = ({ isCurOnline = false }) => {
         return;
       }
 
-      await confirmParticipant(participantId, { confirmation_sent: true, confirmation_date: true, message: finalMessage });
+      await confirmParticipant(participantId, { confirmation_sent: true, confirmation_date: true });
+      setShowConfirmModal(false);
+      setShowConfirmationModal(false);
     } catch (error) {
       set_ConfirmError("Failed to confirm the participant. Pleaase, try again later.");
     } finally {
@@ -195,21 +213,52 @@ const Payments = ({ isCurOnline = false }) => {
   };
 
   const handleSendOnly = async () => {
+    if (!wantToAddMessage) {
+      setWantToAddMessage(true);
+      return;
+    }
 
+    const finalMessage = `${confirmationMessage}<br><br>${additionalMessage}`;
+    setIsConfirmingEmail(true);
 
-    set_ConfirmError(null);
+    try {
+      const emailResponse = await sendEmail({
+        subject: `IMC ${cd.year} Confirmation`,
+        message: finalMessage,
+        to: participant.participant.email,
+        toName: "IMC Confirmed Participant",
+        fromName: "IMC 2025",
+        replyTo: "no-reply@imc2025.imo.net",
+        replyName: "no-reply",
+        bcc: process.env.REACT_APP_BCC_ALL ? process.env.REACT_APP_BCC_ALL.split(',').map(email => ({ email, name: 'BCC Recipient' })) : [],
+      });
 
-    await confirmParticipant(participantId, { confirmation_sent: true });
+      if (!emailResponse.success) {
+        set_ConfirmError("Impossible to send the an email for the moment. Please, try again later");
+        return;
+      }
+
+      await confirmParticipant(participantId, { confirmation_date: true });
+      setShowConfirmModal(false);
+      setShowConfirmationModal(false);
+    } catch (error) {
+      set_ConfirmError("Failed to confirm the participant. Pleaase, try again later.");
+    } finally {
+      setIsConfirmingEmail(false);
+    }
   };
-
-  const confirmationSent = participant?.participant.confirmation_sent !== "0";
+  
+  
+  const confirmationSent = (participant?.participant.confirmation_sent !== "0" && participant?.participant.confirmation_sent !== 0);
   const confirmationDate = !!participant?.participant.confirmation_date;
 
+  /*
+  confirmation_sent => CONFIRMED
+  confirmation_date => EMAILED
+  */
 
-  console.log("participant.participant.total_du? ", participant?.participant.total_due);
+  console.log("PARTICIPANT ", participant);
   
-  console.log("participant.participant.total_paid? ", participant?.participant.total_paid);
-
   return (
     <PageContain breadcrumb={breadcrumb} isMaxWidth>
 
@@ -220,6 +269,10 @@ const Payments = ({ isCurOnline = false }) => {
 
       {!loading && (
         <>
+          {!participantLoading && (
+            <AdminTable participants={[participant?.participant]} />
+          )}
+
           {!participantLoading && (
             <div className="table-responsive" style={{ maxWidth: 'calc(100vw - 2rem)' }}>
               <table className="table table-striped">
@@ -426,7 +479,7 @@ const Payments = ({ isCurOnline = false }) => {
                   <div className="modal-body">
                     {errorConfirm && <div className="text-danger fw-bolder">{errorConfirm}</div>}
                     {_confirmError && !errorConfirm && <div className="text-danger fw-bolder">{_confirmError}</div>}
-                    {isConfirming || isConfirmingEmail && <Loader />}
+                    {isConfirming || confirmingEmail && <Loader />}
                     {!wantToAddMessage && (
                       <>
                         <p className="fw-bolder">Marc, make your choice: </p>
@@ -437,7 +490,7 @@ const Payments = ({ isCurOnline = false }) => {
                             </button>
                           )}
 
-                          {!confirmationSent && !confirmationDate && (
+                          {confirmationSent && !confirmationDate && (
                             <button className="fw-bolder btn btn-outline-success" onClick={handleConfirm} disabled={isConfirming}>
                               CONFIRM
                             </button>

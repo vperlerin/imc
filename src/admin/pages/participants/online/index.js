@@ -1,13 +1,10 @@
-import css from "./index.module.scss";
-import { FaRegTrashAlt } from "react-icons/fa";
 import { CiSearch } from "react-icons/ci";
 import PageContain from "@/admin/components/page-contain";
-import classNames from "classnames";
 import Loader from "components/loader";
 import React, { useEffect, useState } from "react";
 import { useApiOnlineParticipants } from "api/participants/online.js";
 import { useApiDeleteParticipant } from "@/admin/api/participants/delete";
-import { formatFullDate } from "utils/date";
+import AdminTable from "@/admin/components/admin-table";
 
 
 const AdminParticipantsOnline = () => {
@@ -67,6 +64,8 @@ const AdminParticipantsOnline = () => {
     { url: "/admin/participants/onsite", name: "Onsite Participants" },
   ];
 
+  console.log("PARTICIPANTS IN ADMIN TABLE ", participants);
+
   return (
     <PageContain
       breadcrumb={breadcrumb}
@@ -117,94 +116,7 @@ const AdminParticipantsOnline = () => {
               <CiSearch className="position-absolute top-50 end-0 translate-middle-y me-2" />
             </div>
           </div>
-          <div className="table-responsive" style={{ maxWidth: 'calc(100vw - 2rem)' }}>
-            <table className="table table-striped">
-              <thead>
-                <tr>
-                  <th>Reg. Date</th>
-                  <th>Name</th>
-                  <th>Total</th>
-                  <th>Paid</th>
-                  <th>Due</th>
-                  <th>Method</th>
-                  <th>Confirmed</th>
-                  <th>Conf. Email</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredParticipants.length > 0 ? (
-                  filteredParticipants.map((participant) => (
-                    <tr key={participant.id}>
-                      <td>{participant.created_at.split(' ')[0]}</td>
-                      <td>{participant.title} {participant.first_name} {participant.last_name}</td>
-                      <td>
-                        {participant.payment_method.toLowerCase() === 'paypal' ? (
-                          <>{(parseFloat(participant.total_due) + parseFloat(participant.paypal_fee))}€</>
-                        ) : (
-                          <>{participant.total_due}€</>
-                        )}
-                      </td>
-                      <td>{participant.total_paid}€</td>
-                      <td
-                        className={classNames({
-                          "text-success": (() => {
-                            const totalDue = Number(participant.total_due);
-                            const totalPaid = Number(participant.total_paid);
-                            const paypalFee = Number(participant.paypal_fee || 0);
-
-                            const isPaypal = participant.payment_method?.toLowerCase() === "paypal";
-                            const amountDue = isPaypal ? totalDue + paypalFee - totalPaid : totalDue - totalPaid;
-
-                            return amountDue === 0;
-                          })(),
-                        })}
-                      >
-                        {participant.payment_method?.toLowerCase() === "paypal" ? (
-                          <>
-                            {(Number(participant.total_due) + Number(participant.paypal_fee) - Number(participant.total_paid)).toFixed(2)}€
-                          </>
-                        ) : (
-                          <>
-                            {(Number(participant.total_due) - Number(participant.total_paid)).toFixed(2)}€
-                          </>
-                        )}
-                      </td>
-                      <td>{participant.payment_method || "n/a"}</td>
-                      <td>
-                        {participant.confirmation_sent === "1" ? (
-                          <>
-                            ✅
-                          </>
-                        ) : (
-                          "❌"
-                        )}
-                      </td>
-                      <td className={classNames(participant?.confirmation_date && "text-success")}>
-                        {participant.confirmation_date ? formatFullDate(participant.confirmation_date) : "❌"}
-                      </td>
-                      <td>
-                        <div className="d-flex gap-2 justify-content-end">
-                          <a href={`/admin/participants/online/payment/${participant.id}`} className={classNames(css.action, "btn btn-sm btn-outline-success fw-bolder")}>Payments</a>
-                          <a href={`/admin/participants/online/${participant.id}`} className={classNames(css.action, "btn btn-sm btn-outline-primary fw-bolder")}>Edit</a>
-                          <button
-                            className={classNames(css.action, "btn btn-sm btn-outline-danger fw-bolder")}
-                            onClick={() => handleDeleteClick(participant)}
-                          >
-                            <FaRegTrashAlt/>
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="9" className="text-center">No online participants found.</td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+          <AdminTable participants={filteredParticipants} onDelete={onDeleteParticipant}/>
         </>
       )}
 
@@ -220,16 +132,24 @@ const AdminParticipantsOnline = () => {
                 <button type="button" className="btn-close" onClick={() => setShowDeleteModal(false)}></button>
               </div>
               <div className="modal-body">
-                <p>Are you sure you want to cancel <b>{selectedParticipant.first_name} {selectedParticipant.last_name}</b>'s registration?</p>
-                <p><strong>Choose:</strong></p>
-                <ul>
-                  <li><strong className="text-warning">Soft Delete:</strong> Keeps record but marks as 'cancelled' - so we can keep track of the reimbursement.</li>
-                  <li><strong className="text-danger">Hard Delete:</strong> Permanently removes data.</li>
-                </ul>
+                {false && (
+                  <>
+                    <p>Are you sure you want to cancel <b>{selectedParticipant.first_name} {selectedParticipant.last_name}</b>'s registration?</p>
+                    <p><strong>Choose:</strong></p>
+                    <ul>
+                      <li><strong className="text-warning">Soft Delete:</strong> Keeps record but marks as 'cancelled' - so we can keep track of the reimbursement.</li>
+                      <li><strong className="text-danger">Hard Delete:</strong> Permanently removes data.</li>
+                    </ul>*
+                  </>
+                )}
+                Are you sure you want to permanently delete all data related to this participant?
               </div>
               <div className="modal-footer">
                 <button className="btn btn-outline-secondary fw-bolder" onClick={() => setShowDeleteModal(false)}>Cancel</button>
-                <button className="btn btn-outline-warning fw-bolder" onClick={() => onDeleteParticipant("soft")}>Soft Delete</button>
+                {false && (
+                  <button className="btn btn-outline-warning fw-bolder" onClick={() => onDeleteParticipant("soft")}>Soft Delete</button>
+                )}
+
                 <button className="btn btn-outline-danger fw-bolder ms-auto" onClick={() => { setShowDeleteModal(false); setShowHardDeleteConfirm(true); }}>Hard Delete</button>
               </div>
             </div>
@@ -250,8 +170,9 @@ const AdminParticipantsOnline = () => {
                 <p><strong>Are you absolutely sure?</strong> This action cannot be undone.</p>
               </div>
               <div className="modal-footer">
-                <button className="btn btn-outline-secondary fw-bolder" onClick={() => setShowHardDeleteConfirm(false)}>No</button>
+
                 <button className="btn btn-outline-danger  fw-bolder" onClick={() => { onDeleteParticipant("hard"); setShowHardDeleteConfirm(false); }}>Yes, Delete</button>
+                <button className="btn btn-outline-secondary fw-bolder" onClick={() => setShowHardDeleteConfirm(false)}>No</button>
               </div>
             </div>
           </div>
