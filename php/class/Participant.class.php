@@ -104,7 +104,7 @@ class ParticipantManager
                 ':is_online' => filter_var($data['is_online'], FILTER_VALIDATE_BOOLEAN),
                 ':is_early_bird' => filter_var($data['is_early_bird'], FILTER_VALIDATE_BOOLEAN),
                 ':password_hash' => $passwordHash,
-                ':paypal_fee' => $data['paypal_fee' ?? 0],
+                ':paypal_fee' => $data['paypal_fee'] ?? 0,
                 ':total_due' => $data['total_due'],
                 ':comments' => $data['comments'] ?? null,
                 ':guardian_name' => $data['guardian_name'] ?? null,

@@ -150,6 +150,8 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
 
   }, [participant, sessions, setValue, setTalks, setPosters]);
 
+  console.log("participant.paypal_fee ", participant?.paypal_fee , " vs ", paypalFee);
+
   const onSubmit = async (formData) => {
     setIsSaving(true);
     setErrorMsg(null);

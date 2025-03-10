@@ -66,10 +66,8 @@ const AdminTable = ({ participants, withActions = true, onDelete = null }) => {
             sortedParticipants.map((participant) => {
               const totalDue = parseFloat(participant.total_due) || 0;
               const totalPaid = parseFloat(participant.total_paid) || 0;
-              const paypalFee = parseFloat(participant.paypal_fee || 0);
-              const isPaypal = participant.payment_method?.toLowerCase() === "paypal";
-              console.log("ADMIN  PAYPAL ", isPaypal);
-              console.log("ADMIN participant.payment_method ", participant);
+              const paypalFee = parseFloat(participant.paypal_fee || 0); 
+              const isPaypal = participant.payment_method_name?.toLowerCase() === "paypal"; 
               const amountDue = isPaypal ? totalDue + paypalFee - totalPaid : totalDue - totalPaid;
 
               return (
@@ -82,7 +80,7 @@ const AdminTable = ({ participants, withActions = true, onDelete = null }) => {
                   <td className={classNames({ "text-success": amountDue === 0 })}>
                     {amountDue.toFixed(2)}€
                   </td>
-                  <td>{participant.payment_method || "n/a"}</td>
+                  <td>{participant.payment_method_name || "n/a"}</td>
                   <td>{participant.confirmation_sent === "1" ? "✅" : "❌"}</td>
                   <td className={classNames(participant?.confirmation_date && "text-success")}>
                     {participant.confirmation_date ? formatFullDate(participant.confirmation_date) : "❌"}

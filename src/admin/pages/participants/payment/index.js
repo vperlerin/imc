@@ -257,7 +257,7 @@ const Payments = ({ isCurOnline = false }) => {
   confirmation_date => EMAILED
   */
 
-  console.log("PARTICIPANT ", participant);
+  console.log("PARTICIPANT in payment ", participant);
   
   return (
     <PageContain breadcrumb={breadcrumb} isMaxWidth>
