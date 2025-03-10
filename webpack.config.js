@@ -137,8 +137,8 @@ module.exports = (env, argv) => {
                 new TerserPlugin({
                     parallel: true,
                     terserOptions: {
-                        compress: { drop_console: false },
-                        output: { comments: false },
+                        compress: { drop_console: true },
+                        output: { comments: true },
                     }
                 }),
                 new CssMinimizerPlugin(),
