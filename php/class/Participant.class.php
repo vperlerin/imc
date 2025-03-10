@@ -99,7 +99,7 @@ class ParticipantManager
                     :title, :first_name, :last_name, :gender, :dob, :email, :phone, :address, :postal_code, :city, :country, 
                     :organization, NULL, :is_online, :is_early_bird, FALSE, NULL, 
                     :password_hash, :paypal_fee, :total_due, 0.00, 0.00, 'active', NULL, 
-                    :comments, :guardian_name, :guardian_contact, :guardian_email, :payment_method_id, :payment_method_name, NOW(), NOW()
+                    :comments, :guardian_name, :guardian_contact, :guardian_email, :payment_method_id, NOW(), NOW()
                 )
             ");
 
@@ -125,8 +125,7 @@ class ParticipantManager
                 ':guardian_name' => $data['guardian_name'] ?? null,
                 ':guardian_contact' => $data['guardian_contact'] ?? null,
                 ':guardian_email' => $data['guardian_email'] ?? null,
-                ':payment_method_id' => (int) ($data['payment_method_id'] ?? 0),
-                ':payment_method_name' => $data['payment_method_name'] ?? '',
+                ':payment_method_id' => (int) ($data['payment_method_id'] ?? 0), 
             ]);
 
             $participantId = $this->pdo->lastInsertId();

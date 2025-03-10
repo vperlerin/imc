@@ -40,10 +40,7 @@ const calculateAge = (dob) => {
   }
   return age;
 };
-
-const capitalizeWords = (str) => {
-  return str.replace(/\b\w/g, char => char.toUpperCase());
-}
+ 
 
 const MainForm = () => {
   const location = useLocation();
@@ -116,8 +113,7 @@ const MainForm = () => {
         talks: formData.talks || [],
         posters: formData.posters || [],
         total_due: total.toFixed(2),
-        paypal_fee: paypalFee?.toFixed(2) || 0,
-        payment_method_name: capitalizeWords(getPaymentMethodById(formData.payment_method_id, paymentMethods))
+        paypal_fee: paypalFee?.toFixed(2) || 0, 
       };
  
       const response = await axios.post(apiUrl, formattedData, {
