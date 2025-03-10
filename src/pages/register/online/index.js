@@ -43,8 +43,6 @@ const MainForm = () => {
   const { workshops, paymentMethods, registrationTypes, loading: specificdataLoading, sessions, error: specificDataError } = useApiSpecificData();
   const { participant, loading: participantLoading, error: participantError } = useApiParticipant(participantId);
 
-  console.log("PARTICIPANT FROM DB ", participant);
-
   const loading = specificdataLoading || participantLoading || isSaving;
   const error = [
     errorMsg,
@@ -178,6 +176,10 @@ const MainForm = () => {
     sendEmails();
   }, [participant, workshops, password]);
 
+
+    if (!isDebugMode ) {
+      return <PageContain title="Register Onsite">Come back soon…</PageContain>;
+    }
 
   if (loading) return <Loader />;
 
