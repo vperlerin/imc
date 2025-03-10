@@ -20,7 +20,6 @@ const getSelectedWorkshops = (participantWorkshops = [], isOnline) => {
   if (!Array.isArray(participantWorkshops)) return { selected: [], totalPrice: 0 };
 
   const selected = participantWorkshops
-    .filter(workshop => workshop.attending === "1") // Only include attended workshops
     .map(workshop => ({
       title: workshop.title,
       price: isOnline ? parseFloat(workshop.price_online) : parseFloat(workshop.price),

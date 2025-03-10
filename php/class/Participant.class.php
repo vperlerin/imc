@@ -17,25 +17,30 @@ class ParticipantManager
     {
         try {
             $this->pdo->beginTransaction();
-
+    
             $query = "UPDATE participants SET ";
             $params = [];
-
-            if (isset($data['confirmation_sent'])) {
+    
+            $confirmationSent = filter_var($data['confirmation_sent'] ?? null, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+            $confirmationDate = filter_var($data['confirmation_date'] ?? null, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+    
+            if (!is_null($confirmationSent)) {
                 $query .= "confirmation_sent = :confirmation_sent, ";
-                $params[':confirmation_sent'] = (int) $data['confirmation_sent'];
+                $params[':confirmation_sent'] = $confirmationSent ? 1 : 0;
             }
-
-            if (isset($data['confirmation_date']) || (isset($data['confirmation_sent']) && $data['confirmation_sent'])) {
+    
+            // Only update confirmation_date if confirmation_sent is true
+            if (!is_null($confirmationDate)) {
                 $query .= "confirmation_date = NOW(), ";
             }
-
+    
+            // Remove trailing comma and add WHERE clause
             $query = rtrim($query, ', ') . " WHERE id = :participant_id";
-            $params[':participant_id'] = $participantId;
-
+            $params[':participant_id'] = (int) $participantId;
+    
             $stmt = $this->pdo->prepare($query);
             $stmt->execute($params);
-
+    
             $this->pdo->commit();
             return true;
         } catch (Exception $e) {
@@ -44,6 +49,7 @@ class ParticipantManager
             return false;
         }
     }
+    
 
     public function emailExists($email)
     {

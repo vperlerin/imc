@@ -4,7 +4,7 @@ import { FaRegTrashAlt } from "react-icons/fa";
 import React, { useState } from "react";
 import { formatFullDate } from "utils/date";
 
-const AdminTable = ({ participants, withActions = true, onDelete = null }) => {
+const AdminTable = ({ participants, withActions = true, customActions= null, onDelete = null }) => {
   const [sortColumn, setSortColumn] = useState(null);
   const [sortOrder, setSortOrder] = useState("asc");
 
@@ -58,7 +58,7 @@ const AdminTable = ({ participants, withActions = true, onDelete = null }) => {
             <th className={css.cursor} onClick={() => handleSort("payment_method")}>Method</th>
             <th className={css.cursor} onClick={() => handleSort("confirmation_sent")}>Confirmed</th>
             <th className={css.cursor} onClick={() => handleSort("confirmation_date")}>Conf. Email</th>
-            {withActions && <th></th>}
+            {(withActions || customActions) && <th></th>}
           </tr>
         </thead>
         <tbody>
@@ -98,6 +98,9 @@ const AdminTable = ({ participants, withActions = true, onDelete = null }) => {
                         </button>
                       </div>
                     </td>
+                  )}
+                  {customActions && (
+                    <>{customActions}</>
                   )}
                 </tr>
               );
