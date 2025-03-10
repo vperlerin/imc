@@ -20,18 +20,27 @@ class ParticipantManager
     
             $query = "UPDATE participants SET ";
             $params = [];
+            $hasUpdates = false; // Track if any updates are made
     
-            $confirmationSent = filter_var($data['confirmation_sent'] ?? null, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-            $confirmationDate = filter_var($data['confirmation_date'] ?? null, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-    
-            if (!is_null($confirmationSent)) {
+            // Update confirmation_sent if provided
+            if (isset($data['confirmation_sent'])) {
+                $confirmationSent = filter_var($data['confirmation_sent'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
                 $query .= "confirmation_sent = :confirmation_sent, ";
                 $params[':confirmation_sent'] = $confirmationSent ? 1 : 0;
+                $hasUpdates = true;
             }
     
-            // Only update confirmation_date if confirmation_sent is true
-            if (!is_null($confirmationDate)) {
+            // Update confirmation_date if provided  
+            if (isset($data['confirmation_date'])) {
                 $query .= "confirmation_date = NOW(), ";
+                $hasUpdates = true;
+            }
+    
+            // Prevent executing an empty update query
+            if (!$hasUpdates) {
+                $this->pdo->rollBack();
+                //error_log("No valid fields provided for update.");
+                return false;
             }
     
             // Remove trailing comma and add WHERE clause
@@ -49,6 +58,8 @@ class ParticipantManager
             return false;
         }
     }
+    
+    
     
 
     public function emailExists($email)
