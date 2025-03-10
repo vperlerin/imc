@@ -3,11 +3,14 @@ import React from "react";
 import { useApiOnlineParticipants } from "api/participants/online.js";
 import { useApiOnsiteParticipants } from "api/participants/onsite.js";
 
-
-
 const Participants = () => {
-    const { onlineParticipants, loading: loadingOnline, error: errorOnline } = useApiOnlineParticipants();
-    const { onsiteParticipants, loading: loadingOnsite, error: errorOnsite } = useApiOnsiteParticipants();
+    const { participants: onlineParticipants, loading: loadingOnline, error: errorOnline } = useApiOnlineParticipants();
+    const { participants: onsiteParticipants, loading: loadingOnsite, error: errorOnsite } = useApiOnsiteParticipants();
+
+    console.log("onlineParticipants? ", onlineParticipants);
+    console.log("onsiteParticipants? ", onsiteParticipants);
+
+
 
   return (
     <PageContain title="Participants">

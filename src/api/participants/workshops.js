@@ -27,7 +27,7 @@ export const useApiWorkshopsParticipants = (workshopId) => {
           setParticipants(response.data.data);
         } else {
           throw new Error(
-            response.data.message || "Unexpected API response format."
+            response.data.message || "Database access error, please try again."
           );
         }
       } catch (err) {

@@ -802,8 +802,10 @@ class ParticipantManager
      */
     public function getOnsiteParticipants($confirmedOnly = false)
     {
-        $query = "
-        SELECT 
+        // Select fields based on confirmedOnly
+        $selectFields = $confirmedOnly
+            ? "p.title, p.first_name, p.last_name, p.organization, p.country"
+            : "
             p.id,
             p.created_at,
             p.title, 
@@ -821,17 +823,19 @@ class ParticipantManager
              WHERE pay.participant_id = p.id
              ORDER BY pay.created_at DESC 
              LIMIT 1) AS payment_method_name
-        FROM participants p
-        WHERE p.is_online = FALSE 
-          AND p.status = 'active'
-    ";
+        ";
+
+        $query = "SELECT $selectFields FROM participants p WHERE p.is_online = FALSE AND p.status = 'active'";
 
         // Apply filtering for confirmed participants if needed
         if ($confirmedOnly) {
             $query .= " AND p.confirmation_sent = 1";
         }
 
-        $query .= " GROUP BY p.id ORDER BY p.created_at DESC";
+        // Apply ORDER BY only when retrieving full data
+        if (!$confirmedOnly) {
+            $query .= " GROUP BY p.id ORDER BY p.created_at DESC";
+        }
 
         $stmt = $this->pdo->prepare($query);
         $stmt->execute();
@@ -839,14 +843,18 @@ class ParticipantManager
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+
     /**
      * Retrieve all online active participants with payment method.
      * If `$confirmedOnly` is true, only return confirmed participants.
      */
     public function getOnlineParticipants($confirmedOnly = false)
     {
-        $query = "
-        SELECT 
+
+        // Select fields based on confirmedOnly
+        $selectFields = $confirmedOnly
+            ? "p.title, p.first_name, p.last_name, p.organization, p.country"
+            : "
             p.id,
             p.created_at,
             p.title, 
@@ -864,17 +872,19 @@ class ParticipantManager
              WHERE pay.participant_id = p.id
              ORDER BY pay.created_at DESC 
              LIMIT 1) AS payment_method_name
-        FROM participants p
-        WHERE p.is_online = TRUE 
-          AND p.status = 'active'
-    ";
+        ";
+
+        $query = "SELECT $selectFields FROM participants p WHERE p.is_online = TRUE AND p.status = 'active'";
 
         // Apply filtering for confirmed participants if needed
         if ($confirmedOnly) {
             $query .= " AND p.confirmation_sent = 1";
         }
 
-        $query .= " GROUP BY p.id ORDER BY p.created_at DESC";
+        // Apply ORDER BY only when retrieving full data
+        if (!$confirmedOnly) {
+            $query .= " GROUP BY p.id ORDER BY p.created_at DESC";
+        }
 
         $stmt = $this->pdo->prepare($query);
         $stmt->execute();
