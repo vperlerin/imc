@@ -37,6 +37,7 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
   const navigate = useNavigate();
 
   useBlockNavigation(unsavedChanges);
+ 
 
   const { workshops, paymentMethods, registrationTypes, loading: specificdataLoading, sessions, error: specificDataError } = useApiSpecificData();
   const { participant, loading: participantLoading, error: participantError } = useApiParticipant(participantId, isCurOnline, fetchParticipantTrigger, true);
@@ -49,8 +50,7 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
     participantError,
     specificDataError,
   ].filter(Boolean);
-
-  console.log(getValues());
+ 
   console.log("paypalFee ", paypalFee, " p ", participant?.participant.paypal_fee);
 
   // Paypal fess

@@ -125,7 +125,7 @@ class ParticipantManager
                 ':guardian_name' => $data['guardian_name'] ?? null,
                 ':guardian_contact' => $data['guardian_contact'] ?? null,
                 ':guardian_email' => $data['guardian_email'] ?? null,
-                ':payment_method_id' => (int) ($data['payment_method_id'] ?? 0), 
+                ':payment_method_id' => (int) ($data['payment_method_id'] ?? 0),
             ]);
 
             $participantId = $this->pdo->lastInsertId();
@@ -436,7 +436,7 @@ class ParticipantManager
                 ':city' => $data['city'],
                 ':country' => $data['country'],
                 ':organization' => $data['organization'] ?? null,
-                ':is_online' => filter_var($data['is_online'], FILTER_VALIDATE_BOOLEAN),
+                ':is_online' => 'FALSE',
                 ':paypal_fee' => $data['paypal_fee'],
                 ':comments' => $data['comments'] ?? null,
                 ':payment_method_id' => (int) ($data['payment_method_id'] ?? 0),
@@ -503,6 +503,18 @@ class ParticipantManager
             $stmt->execute([
                 ':participant_id' => $participantId,
                 ':registration_type_id' => (int) $data['registration_type_id']
+            ]);
+
+            // Update **Payments** (set to 0 if no payment method is selected)
+            $stmt = $this->pdo->prepare("
+                UPDATE payments 
+                SET amount = 0, payment_method_id = :payment_method_id, updated_at = NOW()
+                WHERE participant_id = :participant_id AND amount =  0
+            ");
+
+            $stmt->execute([
+                ':participant_id' => $participantId,
+                ':payment_method_id' => (int) ($data['payment_method_id'] ?? 0)
             ]);
 
             // Update Extra Options
@@ -682,15 +694,14 @@ class ParticipantManager
             // Update **Payments** (set to 0 if no payment method is selected)
             $stmt = $this->pdo->prepare("
                 UPDATE payments 
-                SET amount = :amount, payment_method_id = :payment_method_id, updated_at = NOW()
-                WHERE participant_id = :participant_id
+                SET amount = 0, payment_method_id = :payment_method_id, updated_at = NOW()
+                WHERE participant_id = :participant_id AND amount =  0
             ");
+
             $stmt->execute([
                 ':participant_id' => $participantId,
-                ':amount' => 0, // Online participants don't have an initial payment
                 ':payment_method_id' => (int) ($data['payment_method_id'] ?? 0)
             ]);
-
             // Delete existing contributions (talks)
             $stmtDelete = $this->pdo->prepare("DELETE FROM contributions WHERE participant_id = :participant_id");
             $stmtDelete->execute([':participant_id' => $participantId]);

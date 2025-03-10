@@ -1,13 +1,10 @@
-import css from "./index.module.scss";
-import { FaRegTrashAlt } from "react-icons/fa";
 import { CiSearch } from "react-icons/ci";
+import AdminTable from '@/admin/components/admin-table';
 import PageContain from "@/admin/components/page-contain";
-import classNames from "classnames";
 import Loader from "components/loader";
 import React, { useEffect, useState } from "react";
 import { useApiOnsiteParticipants } from "api/participants/onsite.js";
 import { useApiDeleteParticipant } from "@/admin/api/participants/delete";
-import { formatFullDate } from "utils/date";
 
 const AdminParticipantsOnsite = () => {
   const [filteredParticipants, setFilteredParticipants] = useState([]);
@@ -22,6 +19,7 @@ const AdminParticipantsOnsite = () => {
   const { participants, loading, error, setParticipants } = useApiOnsiteParticipants();
   const { deleteParticipant, errorDelete, isDeleting } = useApiDeleteParticipant(setParticipants, setFilteredParticipants);
 
+ 
   useEffect(() => {
     if (!searchQuery) {
       setFilteredParticipants(participants);
@@ -116,94 +114,7 @@ const AdminParticipantsOnsite = () => {
               <CiSearch className="position-absolute top-50 end-0 translate-middle-y me-2" />
             </div>
           </div>
-          <div className="table-responsive" style={{ maxWidth: 'calc(100vw - 2rem)' }}>
-            <table className="table table-striped">
-              <thead>
-                <tr>
-                  <th>Reg. Date</th>
-                  <th>Name</th>
-                  <th>Total</th>
-                  <th>Paid</th>
-                  <th>Due</th>
-                  <th>Method</th>
-                  <th>Confirmed</th>
-                  <th>Conf. Email</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredParticipants.length > 0 ? (
-                  filteredParticipants.map((participant) => (
-                    <tr key={participant.id}>
-                      <td>{participant.created_at.split(' ')[0]}</td>
-                      <td>{participant.title} {participant.first_name} {participant.last_name}</td>
-                      <td>
-                        {participant.payment_method.toLowerCase() === 'paypal' ? (
-                          <>{(parseFloat(participant.total_due) + parseFloat(participant.paypal_fee))}€</>
-                        ) : (
-                          <>{participant.total_due}€</>
-                        )}
-                      </td>
-                      <td>{participant.total_paid}€</td>
-                      <td
-                        className={classNames({
-                          "text-success": (() => {
-                            const totalDue = Number(participant.total_due);
-                            const totalPaid = Number(participant.total_paid);
-                            const paypalFee = Number(participant.paypal_fee || 0);
-
-                            const isPaypal = participant.payment_method?.toLowerCase() === "paypal";
-                            const amountDue = isPaypal ? totalDue + paypalFee - totalPaid : totalDue - totalPaid;
-
-                            return amountDue === 0;
-                          })(),
-                        })}
-                      >
-                        {participant.payment_method?.toLowerCase() === "paypal" ? (
-                          <>
-                            {(Number(participant.total_due) + Number(participant.paypal_fee) - Number(participant.total_paid)).toFixed(2)}€
-                          </>
-                        ) : (
-                          <>
-                            {(Number(participant.total_due) - Number(participant.total_paid)).toFixed(2)}€
-                          </>
-                        )}
-                      </td>
-                      <td>{participant.payment_method || "n/a"}</td>
-                      <td>
-                        {participant.confirmation_sent === "1" ? (
-                          <>
-                            ✅
-                          </>
-                        ) : (
-                          "❌"
-                        )}
-                      </td>
-                      <td className={classNames(participant?.confirmation_date && "text-success")}>
-                        {participant.confirmation_date ? formatFullDate(participant.confirmation_date) : "❌"}
-                      </td>
-                      <td>
-                        <div className="d-flex gap-2 justify-content-end">
-                          <a href={`/admin/participants/onsite/payment/${participant.id}`} className={classNames(css.action, "btn btn-sm btn-outline-success fw-bolder")}>Payments</a>
-                          <a href={`/admin/participants/onsite/${participant.id}`} className={classNames(css.action, "btn btn-sm btn-outline-primary fw-bolder")}>Edit</a>
-                          <button
-                            className={classNames(css.action, "btn btn-sm btn-outline-danger fw-bolder")}
-                            onClick={() => handleDeleteClick(participant)}
-                          >
-                            <FaRegTrashAlt />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="9" className="text-center">No onsite participants found.</td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+          <AdminTable participants={filteredParticipants} onDelete={handleDeleteClick}/>
         </>
       )}
 
