@@ -17,11 +17,11 @@ class ParticipantManager
     {
         try {
             $this->pdo->beginTransaction();
-    
+
             $query = "UPDATE participants SET ";
             $params = [];
             $hasUpdates = false; // Track if any updates are made
-    
+
             // Update confirmation_sent if provided
             if (isset($data['confirmation_sent'])) {
                 $confirmationSent = filter_var($data['confirmation_sent'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
@@ -29,27 +29,27 @@ class ParticipantManager
                 $params[':confirmation_sent'] = $confirmationSent ? 1 : 0;
                 $hasUpdates = true;
             }
-    
+
             // Update confirmation_date if provided  
             if (isset($data['confirmation_date'])) {
                 $query .= "confirmation_date = NOW(), ";
                 $hasUpdates = true;
             }
-    
+
             // Prevent executing an empty update query
             if (!$hasUpdates) {
                 $this->pdo->rollBack();
                 //error_log("No valid fields provided for update.");
                 return false;
             }
-    
+
             // Remove trailing comma and add WHERE clause
             $query = rtrim($query, ', ') . " WHERE id = :participant_id";
             $params[':participant_id'] = (int) $participantId;
-    
+
             $stmt = $this->pdo->prepare($query);
             $stmt->execute($params);
-    
+
             $this->pdo->commit();
             return true;
         } catch (Exception $e) {
@@ -58,9 +58,7 @@ class ParticipantManager
             return false;
         }
     }
-    
-    
-    
+
 
     public function emailExists($email)
     {
@@ -96,7 +94,7 @@ class ParticipantManager
                     title, first_name, last_name, gender, dob, email, phone, address, postal_code, city, country, 
                     organization, admin_notes, is_online, is_early_bird, confirmation_sent, confirmation_date, 
                     password_hash, paypal_fee, total_due, total_paid, total_reimbursed, status, deleted_at, 
-                    comments, guardian_name, guardian_contact, guardian_email, payment_method_id, :payment_method_name, created_at, updated_at
+                    comments, guardian_name, guardian_contact, guardian_email, payment_method_id, created_at, updated_at
                 ) VALUES (
                     :title, :first_name, :last_name, :gender, :dob, :email, :phone, :address, :postal_code, :city, :country, 
                     :organization, NULL, :is_online, :is_early_bird, FALSE, NULL, 
@@ -371,7 +369,7 @@ class ParticipantManager
     {
         try {
             $this->pdo->beginTransaction();
-    
+
             // Handle boolean fields (convert "true"/"false" to 1 or 0)
             $booleanFields = ['excursion', 'buy_tshirt', 'is_online', 'is_early_bird', 'confirmation_sent'];
             foreach ($booleanFields as $field) {
@@ -382,15 +380,15 @@ class ParticipantManager
                     $data[$field] = ($flag === null ? 0 : ($flag ? 1 : 0));
                 }
             }
-    
+
             // Check if participant exists
             $stmt = $this->pdo->prepare("SELECT id FROM participants WHERE id = :participant_id");
             $stmt->execute([':participant_id' => $participantId]);
-    
+
             if ($stmt->rowCount() === 0) {
                 throw new Exception("Participant with ID {$participantId} does not exist.");
             }
-    
+
             // Prepare fields for update
             $fields = [
                 'title = :title',
@@ -411,19 +409,19 @@ class ParticipantManager
                 'payment_method_id = :payment_method_id',
                 'updated_at = NOW()'
             ];
-    
+
             // Exclude `total_due` if it's not set or zero
             if (isset($data['total_due']) && floatval($data['total_due']) > 0) {
                 $fields[] = 'total_due = :total_due';
             }
-    
+
             if (isset($data['admin_notes'])) {
                 $fields[] = 'admin_notes = :admin_notes';
             }
-    
+
             $sql = "UPDATE participants SET " . implode(', ', $fields) . " WHERE id = :participant_id";
             $stmt = $this->pdo->prepare($sql);
-    
+
             // Bind parameters
             $params = [
                 ':participant_id' => $participantId,
@@ -444,29 +442,29 @@ class ParticipantManager
                 ':comments' => $data['comments'] ?? null,
                 ':payment_method_id' => (int) ($data['payment_method_id'] ?? 0),
             ];
-    
+
             // Bind `total_due` only if it was included
             if (isset($data['total_due']) && floatval($data['total_due']) > 0) {
                 $params[':total_due'] = $data['total_due'];
             }
-    
+
             if (isset($data['admin_notes'])) {
                 $params[':admin_notes'] = $data['admin_notes'];
             }
-    
+
             $stmt->execute($params);
-    
+
             // Delete existing workshop selections for the participant
             $stmt = $this->pdo->prepare("DELETE FROM participant_workshops WHERE participant_id = :participant_id");
             $stmt->execute([':participant_id' => $participantId]);
-    
+
             // Insert new workshop selections
             if (!empty($data['workshops']) && is_array($data['workshops'])) {
                 $stmt = $this->pdo->prepare("
                     INSERT INTO participant_workshops (participant_id, workshop_id, attending) 
                     VALUES (:participant_id, :workshop_id, TRUE)
                 ");
-    
+
                 foreach ($data['workshops'] as $workshopId) {
                     $stmt->execute([
                         ':participant_id' => $participantId,
@@ -474,7 +472,7 @@ class ParticipantManager
                     ]);
                 }
             }
-    
+
             // Update Arrival Details
             $stmt = $this->pdo->prepare("
                 UPDATE arrival
@@ -483,7 +481,7 @@ class ParticipantManager
                     travelling = :travelling, travelling_details = :travelling_details, updated_at = NOW()
                 WHERE participant_id = :participant_id
             ");
-    
+
             $stmt->execute([
                 ':participant_id' => $participantId,
                 ':arrival_date' => $data['arrival_date'],
@@ -495,19 +493,19 @@ class ParticipantManager
                 ':travelling' => $data['travelling'],
                 ':travelling_details' => $data['travelling_details'] ?? null
             ]);
-    
+
             // Update Accommodation
             $stmt = $this->pdo->prepare("
                 UPDATE accommodation
                 SET registration_type_id = :registration_type_id, updated_at = NOW()
                 WHERE participant_id = :participant_id
             ");
-    
+
             $stmt->execute([
                 ':participant_id' => $participantId,
                 ':registration_type_id' => (int) $data['registration_type_id']
             ]);
-    
+
             // Update Extra Options
             $stmt = $this->pdo->prepare("
                 UPDATE extra_options 
@@ -518,27 +516,27 @@ class ParticipantManager
                     updated_at = NOW()
                 WHERE participant_id = :participant_id
             ");
-    
+
             // Ensure tshirt_size is NULL if buy_tshirt is 0
             $tshirtSize = ($data['buy_tshirt'] === 1 && !empty($data['tshirt_size'])) ? $data['tshirt_size'] : null;
-    
+
             $stmt->execute([
                 ':participant_id' => $participantId,
                 ':excursion' => $data['excursion'],
                 ':buy_tshirt' => $data['buy_tshirt'],
                 ':tshirt_size' => $tshirtSize,
             ]);
-    
+
             // Delete existing contributions
             $stmtDelete = $this->pdo->prepare("DELETE FROM contributions WHERE participant_id = :participant_id");
             $stmtDelete->execute([':participant_id' => $participantId]);
-    
+
             // Insert contributions (talks & posters)
             $stmtInsert = $this->pdo->prepare("
                 INSERT INTO contributions (participant_id, type, title, authors, abstract, session_id, duration, print, created_at, updated_at)
                 VALUES (:participant_id, :type, :title, :authors, :abstract, :session_id, :duration, :print, NOW(), NOW())
             ");
-    
+
             // Insert talks
             if (!empty($data['talks']) && is_array($data['talks'])) {
                 foreach ($data['talks'] as $talk) {
@@ -554,7 +552,7 @@ class ParticipantManager
                     ]);
                 }
             }
-    
+
             // Insert posters
             if (!empty($data['posters']) && is_array($data['posters'])) {
                 foreach ($data['posters'] as $poster) {
@@ -570,7 +568,7 @@ class ParticipantManager
                     ]);
                 }
             }
-    
+
             $this->pdo->commit();
             return true;
         } catch (Exception $e) {
@@ -578,13 +576,13 @@ class ParticipantManager
             throw new Exception("Error updating participant: " . $e->getMessage());
         }
     }
-    
+
 
     public function updateOnlineParticipant($participantId, $data)
     {
         try {
             $this->pdo->beginTransaction();
-    
+
             // Handle boolean fields (convert "true"/"false" to 1 or 0)
             $booleanFields = ['is_online', 'is_early_bird', 'confirmation_sent'];
             foreach ($booleanFields as $field) {
@@ -595,15 +593,15 @@ class ParticipantManager
                     $data[$field] = ($flag === null ? 0 : ($flag ? 1 : 0));
                 }
             }
-    
+
             // Check if participant exists
             $stmt = $this->pdo->prepare("SELECT id FROM participants WHERE id = :participant_id");
             $stmt->execute([':participant_id' => $participantId]);
-    
+
             if ($stmt->rowCount() === 0) {
                 throw new Exception("Online participant with ID {$participantId} does not exist.");
             }
-    
+
             // Prepare fields for update
             $fields = [
                 'title = :title',
@@ -621,19 +619,19 @@ class ParticipantManager
                 'payment_method_id = :payment_method_id',
                 'updated_at = NOW()'
             ];
-    
+
             // Exclude `total_due` if it's not set or zero
             if (isset($data['total_due']) && floatval($data['total_due']) > 0) {
                 $fields[] = 'total_due = :total_due';
             }
-    
+
             if (isset($data['admin_notes'])) {
                 $fields[] = 'admin_notes = :admin_notes';
             }
-    
+
             $sql = "UPDATE participants SET " . implode(', ', $fields) . " WHERE id = :participant_id";
             $stmt = $this->pdo->prepare($sql);
-    
+
             // Bind parameters
             $params = [
                 ':participant_id' => $participantId,
@@ -651,29 +649,29 @@ class ParticipantManager
                 ':comments' => $data['comments'] ?? null,
                 ':payment_method_id' => (int) ($data['payment_method_id'] ?? 0),
             ];
-    
+
             // Bind `total_due` only if it was included
             if (isset($data['total_due']) && floatval($data['total_due']) > 0) {
                 $params[':total_due'] = $data['total_due'];
             }
-    
+
             if (isset($data['admin_notes'])) {
                 $params[':admin_notes'] = $data['admin_notes'];
             }
-    
+
             $stmt->execute($params);
-    
+
             // Delete existing workshop selections for the participant
             $stmt = $this->pdo->prepare("DELETE FROM participant_workshops WHERE participant_id = :participant_id");
             $stmt->execute([':participant_id' => $participantId]);
-    
+
             // Insert new online workshop selections (only if price_online > 0)
             if (!empty($data['workshops']) && is_array($data['workshops'])) {
                 $stmt = $this->pdo->prepare("
                     INSERT INTO participant_workshops (participant_id, workshop_id, attending) 
                     SELECT :participant_id, id, TRUE FROM workshops WHERE id = :workshop_id AND price_online > 0
                 ");
-    
+
                 foreach ($data['workshops'] as $workshopId) {
                     $stmt->execute([
                         ':participant_id' => $participantId,
@@ -681,7 +679,7 @@ class ParticipantManager
                     ]);
                 }
             }
-    
+
             // Update **Payments** (set to 0 if no payment method is selected)
             $stmt = $this->pdo->prepare("
                 UPDATE payments 
@@ -693,18 +691,18 @@ class ParticipantManager
                 ':amount' => 0, // Online participants don't have an initial payment
                 ':payment_method_id' => (int) ($data['payment_method_id'] ?? 0)
             ]);
-    
+
             // Delete existing contributions (talks)
             $stmtDelete = $this->pdo->prepare("DELETE FROM contributions WHERE participant_id = :participant_id");
             $stmtDelete->execute([':participant_id' => $participantId]);
-    
+
             // Insert **only online contributions (talks)**
             if (!empty($data['talks']) && is_array($data['talks'])) {
                 $stmtInsert = $this->pdo->prepare("
                     INSERT INTO contributions (participant_id, type, title, authors, abstract, session_id, duration, print, created_at, updated_at)
                     VALUES (:participant_id, 'talk', :title, :authors, :abstract, :session_id, :duration, 0, NOW(), NOW())
                 ");
-    
+
                 foreach ($data['talks'] as $talk) {
                     $stmtInsert->execute([
                         ':participant_id' => $participantId,
@@ -716,7 +714,7 @@ class ParticipantManager
                     ]);
                 }
             }
-    
+
             $this->pdo->commit();
             return true;
         } catch (Exception $e) {
@@ -724,8 +722,8 @@ class ParticipantManager
             throw new Exception("Error updating online participant: " . $e->getMessage());
         }
     }
-    
-    
+
+
 
     /**
      * Retrieve participant statistics for a given workshop or all workshops.
@@ -1093,7 +1091,8 @@ class ParticipantManager
     }
 
 
-    public function getParticipantsByWorkshop($pdo, $workshopId) {
+    public function getParticipantsByWorkshop($pdo, $workshopId)
+    {
         $sql = "
             SELECT 
                 p.*, 
@@ -1104,11 +1103,10 @@ class ParticipantManager
             WHERE pw.workshop_id = :workshop_id
             AND p.is_online = 0
         ";
-    
+
         $stmt = $pdo->prepare($sql);
         $stmt->bindParam(':workshop_id', $workshopId, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    
 }

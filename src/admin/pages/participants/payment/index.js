@@ -74,11 +74,11 @@ const Payments = ({ isCurOnline = false }) => {
       const totalDue = parseFloat(participant.participant.total_due || 0);
       const paypalFee = parseFloat(participant.participant.paypal_fee || 0);
       const totalPaid = parseFloat(participant.participant.total_paid || 0);
-  
+
       const dueAmount = participant.participant.payment_method_name
         ? totalDue + paypalFee - totalPaid
         : totalDue - totalPaid;
-   
+
       setValue("amount", dueAmount.toFixed(2));
     }
   }, [participant, setValue]);
@@ -168,7 +168,7 @@ const Payments = ({ isCurOnline = false }) => {
     setIsConfirmingEmail(true);
 
     try {
-      await confirmParticipant(participantId, { confirmation_sent: true, confirmation_date : false });
+      await confirmParticipant(participantId, { confirmation_sent: true });
       setShowConfirmModal(false);
       setShowConfirmationModal(false);
       // Refecht participant
@@ -186,14 +186,13 @@ const Payments = ({ isCurOnline = false }) => {
       setWantToAddMessage(true);
       return;
     }
-
-    const finalMessage = `${confirmationMessage}<br><br>${additionalMessage}`;
+ 
     setIsConfirmingEmail(true);
 
     try {
       const emailResponse = await sendEmail({
         subject: `IMC ${cd.year} Confirmation`,
-        message: finalMessage,
+        message: confirmationMessage,
         to: participant.participant.email,
         toName: "IMC Confirmed Participant",
         fromName: "IMC 2025",
@@ -210,6 +209,9 @@ const Payments = ({ isCurOnline = false }) => {
       await confirmParticipant(participantId, { confirmation_sent: true, confirmation_date: true });
       setShowConfirmModal(false);
       setShowConfirmationModal(false);
+
+      // Refecht participant
+      setFetchParticipantTrigger(prev => !prev);
     } catch (error) {
       set_ConfirmError("Failed to confirm the participant. Pleaase, try again later.");
     } finally {
@@ -224,13 +226,12 @@ const Payments = ({ isCurOnline = false }) => {
       return;
     }
 
-    const finalMessage = `${confirmationMessage}<br><br>${additionalMessage}`;
     setIsConfirmingEmail(true);
 
     try {
       const emailResponse = await sendEmail({
         subject: `IMC ${cd.year} Confirmation`,
-        message: finalMessage,
+        message: confirmationMessage,
         to: participant.participant.email,
         toName: "IMC Confirmed Participant",
         fromName: "IMC 2025",
@@ -247,6 +248,8 @@ const Payments = ({ isCurOnline = false }) => {
       await confirmParticipant(participantId, { confirmation_date: true });
       setShowConfirmModal(false);
       setShowConfirmationModal(false);
+      // Refecht participant
+      setFetchParticipantTrigger(prev => !prev);
     } catch (error) {
       set_ConfirmError("Failed to confirm the participant. Pleaase, try again later.");
     } finally {
@@ -264,7 +267,7 @@ const Payments = ({ isCurOnline = false }) => {
   console.log("CONFIRMATION SENT (confirmed)  ", participant?.participant.confirmation_sent ,  ' BOOLEAN:',  confirmationSent);
   console.log("CONFIRMATION DATE (email sent) ", participant?.participant.confirmation_date ,  ' BOOLEAN:',  confirmationDate);
   */
-  
+
 
   const customActions = (
     <>
@@ -288,210 +291,210 @@ const Payments = ({ isCurOnline = false }) => {
     </>
   );
 
-return (
-  <PageContain breadcrumb={breadcrumb} isMaxWidth>
+  return (
+    <PageContain breadcrumb={breadcrumb} isMaxWidth>
 
 
-    {loading && <Loader />}
-    {error && <div className="alert alert-danger fw-bolder">{error}</div>}
-    {successMsg && <div className="alert alert-success fw-bolder">{successMsg}</div>}
+      {loading && <Loader />}
+      {error && <div className="alert alert-danger fw-bolder">{error}</div>}
+      {successMsg && <div className="alert alert-success fw-bolder">{successMsg}</div>}
 
-    {!loading && (
-      <>
-        {!participantLoading && (
-          <AdminTable 
-            participants={[participant?.participant]} 
-            customActions={customActions} 
-          />
-        )}
- 
-        <div className="d-flex flex-column flex-md-row gap-3 align-items-strecht">
-          <div className="border p-3 rounded-2 flex-grow-1">
-            <h4 className="mb-3">{editingPayment ? "Edit Payment" : "Add a New Payment"}</h4>
-            <form onSubmit={handleSubmit(submitForm)}>
-              <div className="mb-3 row">
-                <label className="col-sm-3 col-form-label fw-bold">Amount (€)</label>
-                <div className="col-sm-5">
-                  <input type="number" className={classNames('form-control', cssForm.md50)} {...register("amount", { required: true, min: 0 })} step="0.01" />
-                  {errors.amount && <span className="text-danger">Amount is required and must be positive.</span>}
+      {!loading && (
+        <>
+          {!participantLoading && (
+            <AdminTable
+              participants={[participant?.participant]}
+              customActions={customActions}
+            />
+          )}
+
+          <div className="d-flex flex-column flex-md-row gap-3 align-items-strecht">
+            <div className="border p-3 rounded-2 flex-grow-1">
+              <h4 className="mb-3">{editingPayment ? "Edit Payment" : "Add a New Payment"}</h4>
+              <form onSubmit={handleSubmit(submitForm)}>
+                <div className="mb-3 row">
+                  <label className="col-sm-3 col-form-label fw-bold">Amount (€)</label>
+                  <div className="col-sm-5">
+                    <input type="number" className={classNames('form-control', cssForm.md50)} {...register("amount", { required: true, min: 0 })} step="0.01" />
+                    {errors.amount && <span className="text-danger">Amount is required and must be positive.</span>}
+                  </div>
                 </div>
-              </div>
-              <div className="mb-3 row">
-                <label className="col-sm-3 col-form-label fw-bold">Payment Method</label>
-                <div className="col-sm-6">
-                  <select className="form-select" {...register("paymentMethodId", { required: true })}>
-                    <option value="">Select a payment method</option>
-                    {paymentMethods.map((method) => (
-                      <option key={method.id} value={method.id}>{method.method}</option>
-                    ))}
-                  </select>
-                  {errors.paymentMethodId && <span className="text-danger">Payment method is required.</span>}
+                <div className="mb-3 row">
+                  <label className="col-sm-3 col-form-label fw-bold">Payment Method</label>
+                  <div className="col-sm-6">
+                    <select className="form-select" {...register("paymentMethodId", { required: true })}>
+                      <option value="">Select a payment method</option>
+                      {paymentMethods.map((method) => (
+                        <option key={method.id} value={method.id}>{method.method}</option>
+                      ))}
+                    </select>
+                    {errors.paymentMethodId && <span className="text-danger">Payment method is required.</span>}
+                  </div>
                 </div>
-              </div>
-              <div className="mb-3 row">
-                <label className="col-sm-3 col-form-label fw-bold">Payment Date</label>
-                <div className="col-sm-6">
-                  <input type="date" className="form-control" {...register("paymentDate", { required: true })} />
+                <div className="mb-3 row">
+                  <label className="col-sm-3 col-form-label fw-bold">Payment Date</label>
+                  <div className="col-sm-6">
+                    <input type="date" className="form-control" {...register("paymentDate", { required: true })} />
+                  </div>
                 </div>
-              </div>
-              <div className="mb-3 row">
-                <label className="col-sm-3 col-form-label fw-bold">Admin Note (Optional)</label>
-                <div className="col-sm-9">
-                  <textarea className="form-control" {...register("adminNote")} rows="2" />
+                <div className="mb-3 row">
+                  <label className="col-sm-3 col-form-label fw-bold">Admin Note (Optional)</label>
+                  <div className="col-sm-9">
+                    <textarea className="form-control" {...register("adminNote")} rows="2" />
+                  </div>
                 </div>
-              </div>
-              <div className="text-end">
-                <button type="submit" className="btn btn-outline-primary fw-bolder" disabled={isSubmitting}>{isSubmitting ? "Processing..." : editingPayment ? "Update Payment" : "Add Payment"}</button>
-              </div>
-            </form>
-          </div>
-
-          <StaticSummary
-            isOnline={isOnline}
-            conferenceData={cd}
-            participantData={participant}
-            workshops={workshops}
-            registrationTypes={registrationTypes}
-            paymentMethods={paymentMethods}
-          />
-        </div >
-
-        {payments && payments.length > 0 && !(payments.length === 1 && parseFloat(payments[0].amount) === 0) && (
-          <div className="border p-3 rounded-2 mt-3">
-            <h4 className="mb-3">Payments in record</h4>
-
-            <table className="table table-bordered table-striped">
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Amount (€)</th>
-                  <th>Method</th>
-                  <th>Admin Note</th>
-                </tr>
-              </thead>
-              <tbody>
-                {payments.map((payment) =>
-                  parseFloat(payment.amount) !== 0 ? (
-                    <tr key={payment.id}>
-                      <td>{payment.payment_date.split(' ')[0] || "N/A"}</td>
-                      <td>{parseFloat(payment.amount).toFixed(2)}</td>
-                      <td>{payment.payment_method}</td>
-                      <td>{payment.admin_note || "No note"}</td>
-                    </tr>
-                  ) : null
-                )}
-              </tbody>
-            </table>
-          </div>
-        )}
-
-
-        {(showConfirmModal || showConfirmationModal) && <div className="modal-backdrop fade show"></div>}
-
-        {showConfirmModal && (
-          <div className="modal modal-lg show d-block">
-            <div className="modal-dialog">
-              <div className="modal-content">
-                <div className="modal-header">
-                  <h5 className="modal-title">CONFIRMATION</h5>
-                  <button type="button" className="btn-close" onClick={() => setShowConfirmModal(false)}></button>
+                <div className="text-end">
+                  <button type="submit" className="btn btn-outline-primary fw-bolder" disabled={isSubmitting}>{isSubmitting ? "Processing..." : editingPayment ? "Update Payment" : "Add Payment"}</button>
                 </div>
-                <div className="modal-body">
-                  <div dangerouslySetInnerHTML={{ __html: modalContent }} />
-                </div>
-                <div className="modal-footer">
-                  <button className="btn btn-outline-danger fw-bolder" onClick={() => setShowConfirmModal(false)}>
-                    Cancel
-                  </button>
-                  <button className="btn btn-outline-success fw-bolder" onClick={() => { setShowConfirmModal(false); setShowConfirmationModal(true) }}>
-                    Yes
-                  </button>
+              </form>
+            </div>
+
+            <StaticSummary
+              isOnline={isOnline}
+              conferenceData={cd}
+              participantData={participant}
+              workshops={workshops}
+              registrationTypes={registrationTypes}
+              paymentMethods={paymentMethods}
+            />
+          </div >
+
+          {payments && payments.length > 0 && !(payments.length === 1 && parseFloat(payments[0].amount) === 0) && (
+            <div className="border p-3 rounded-2 mt-3">
+              <h4 className="mb-3">Payments in record</h4>
+
+              <table className="table table-bordered table-striped">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Amount (€)</th>
+                    <th>Method</th>
+                    <th>Admin Note</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {payments.map((payment) =>
+                    parseFloat(payment.amount) !== 0 ? (
+                      <tr key={payment.id}>
+                        <td>{payment.payment_date.split(' ')[0] || "N/A"}</td>
+                        <td>{parseFloat(payment.amount).toFixed(2)}</td>
+                        <td>{payment.payment_method}</td>
+                        <td>{payment.admin_note || "No note"}</td>
+                      </tr>
+                    ) : null
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+
+          {(showConfirmModal || showConfirmationModal) && <div className="modal-backdrop fade show"></div>}
+
+          {showConfirmModal && (
+            <div className="modal modal-lg show d-block">
+              <div className="modal-dialog">
+                <div className="modal-content">
+                  <div className="modal-header">
+                    <h5 className="modal-title">CONFIRMATION</h5>
+                    <button type="button" className="btn-close" onClick={() => setShowConfirmModal(false)}></button>
+                  </div>
+                  <div className="modal-body">
+                    <div dangerouslySetInnerHTML={{ __html: modalContent }} />
+                  </div>
+                  <div className="modal-footer">
+                    <button className="btn btn-outline-danger fw-bolder" onClick={() => setShowConfirmModal(false)}>
+                      Cancel
+                    </button>
+                    <button className="btn btn-outline-success fw-bolder" onClick={() => { setShowConfirmModal(false); setShowConfirmationModal(true) }}>
+                      Yes
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {showConfirmationModal && (
-          <div className="modal modal-lg show d-block">
-            <div className="modal-dialog">
-              <div className="modal-content">
-                <div className="modal-header">
-                  <h5 className="modal-title">CONFIRMATION</h5>
-                  <button type="button" className="btn-close" onClick={() => setShowConfirmationModal(false)}></button>
-                </div>
-                <div className="modal-body">
-                  {errorConfirm && <div className="text-danger fw-bolder">{errorConfirm}</div>}
-                  {_confirmError && !errorConfirm && <div className="text-danger fw-bolder">{_confirmError}</div>}
-                  {isConfirming || confirmingEmail && <Loader />}
-                  {!wantToAddMessage && (
-                    <>
-                      <p className="fw-bolder">Marc, make your choice: </p>
-                      <div className="d-flex w-100 gap-3 mt-3">
-                        {!confirmationSent && !confirmationDate && (
-                          <button className="fw-bolder btn btn-outline-success" onClick={handleConfirmAndSend} disabled={isConfirming}>
-                            CONFIRM & SEND <IoIosMail />
-                          </button>
-                        )}
+          {showConfirmationModal && (
+            <div className="modal modal-lg show d-block">
+              <div className="modal-dialog">
+                <div className="modal-content">
+                  <div className="modal-header">
+                    <h5 className="modal-title">CONFIRMATION</h5>
+                    <button type="button" className="btn-close" onClick={() => setShowConfirmationModal(false)}></button>
+                  </div>
+                  <div className="modal-body">
+                    {errorConfirm && <div className="text-danger fw-bolder">{errorConfirm}</div>}
+                    {_confirmError && !errorConfirm && <div className="text-danger fw-bolder">{_confirmError}</div>}
+                    {isConfirming || confirmingEmail && <Loader />}
+                    {!wantToAddMessage && (
+                      <>
+                        <p className="fw-bolder">Marc, make your choice: </p>
+                        <div className="d-flex w-100 gap-3 mt-3">
+                          {!confirmationSent && !confirmationDate && (
+                            <button className="fw-bolder btn btn-outline-success" onClick={handleConfirmAndSend} disabled={isConfirming}>
+                              CONFIRM & SEND <IoIosMail />
+                            </button>
+                          )}
 
-                        {(confirmationSent && !confirmationDate) || (!confirmationSent && !confirmationDate) && (
-                          <button className="fw-bolder btn btn-outline-success" onClick={handleConfirm} disabled={isConfirming}>
-                            CONFIRM
-                          </button>
-                        )}
+                          {(confirmationSent && !confirmationDate) || (!confirmationSent && !confirmationDate) && (
+                            <button className="fw-bolder btn btn-outline-success" onClick={handleConfirm} disabled={isConfirming}>
+                              CONFIRM
+                            </button>
+                          )}
 
-                        {!confirmationSent && confirmationDate && (
-                          <button className="fw-bolder btn btn-outline-success" onClick={handleSendOnly} disabled={isConfirming}>
-                            SEND <IoIosMail />
-                          </button>
-                        )}
-                        {errorConfirm && <div className="text-danger">{errorConfirm}</div>}
-                      </div>
-                    </>
-                  )}
+                          {confirmationSent && !confirmationDate && (
+                            <button className="fw-bolder btn btn-outline-success" onClick={handleSendOnly} disabled={isConfirming}>
+                              SEND <IoIosMail />
+                            </button>
+                          )}
+                          {errorConfirm && <div className="text-danger">{errorConfirm}</div>}
+                        </div>
+                      </>
+                    )}
 
-                  {wantToAddMessage && (
-                    <>
-                      <div>
-                        <div className="my-3 d-flex gap-3 align-items-strecht">
-                          <div className={css.col}>
-                            Below is the email that is going to be sent:
-                            <div className="bg-white text-black p-3 rounded mt-2" dangerouslySetInnerHTML={{ __html: confirmationMessage }} />
-                          </div>
+                    {wantToAddMessage && (
+                      <>
+                        <div>
+                          <div className="my-3 d-flex gap-3 align-items-strecht">
+                            <div className={css.col}>
+                              Below is the email that is going to be sent:
+                              <div className="bg-white text-black p-3 rounded mt-2" dangerouslySetInnerHTML={{ __html: confirmationMessage }} />
+                            </div>
 
-                          <div className={css.col}>
-                            Use the input below if you want to add text
-                            <textarea
-                              className={`form-control mt-2 ${css.textarea}`}
-                              rows="3"
-                              value={additionalMessage.replace(/<br>$/, '').replace(/<br>/g, '\n')}
-                              onChange={(e) => setAdditionalMessage(e.target.value.replace(/\n/g, '<br>') + '<br>')}
-                              placeholder="Add extra message here..."
-                            />
+                            <div className={css.col}>
+                              Use the input below if you want to add text
+                              <textarea
+                                className={`form-control mt-2 ${css.textarea}`}
+                                rows="3"
+                                value={additionalMessage.replace(/<br>$/, '').replace(/<br>/g, '\n')}
+                                onChange={(e) => setAdditionalMessage(e.target.value.replace(/\n/g, '<br>') + '<br>')}
+                                placeholder="Add extra message here..."
+                              />
 
+                            </div>
                           </div>
                         </div>
-                      </div>
 
-                      <div className="d-flex gap-3 justify-content-end">
-                        <button className="btn btn-outline-neutral fw-bolder" onClick={() => setWantToAddMessage(false)}>
-                          Cancel
-                        </button>
-                        <button className="btn btn-outline-success fw-bolder" onClick={handleConfirmAndSend} disabled={isConfirming}>
-                          SEND NOW <IoIosMail />
-                        </button>
-                      </div>
-                    </>
-                  )}
+                        <div className="d-flex gap-3 justify-content-end">
+                          <button className="btn btn-outline-neutral fw-bolder" onClick={() => setWantToAddMessage(false)}>
+                            Cancel
+                          </button>
+                          <button className="btn btn-outline-success fw-bolder" onClick={handleConfirmAndSend} disabled={isConfirming}>
+                            SEND NOW <IoIosMail />
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        )}
-      </>
-    )}
-  </PageContain >
-);
+          )}
+        </>
+      )}
+    </PageContain >
+  );
 };
 
 export default Payments;
