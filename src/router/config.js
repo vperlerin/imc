@@ -35,6 +35,7 @@ const lazyPages = {
   WorkshopRadio: lazy(() => import("pages/program/workshops/radio")),
   WorkshopSpectro: lazy(() => import("pages/program/workshops/spectro")),
   // ADMIN
+  AdminAccomodations: lazy(() => import("admin/pages/accomodations")),
   AdminDashboard: lazy(() => import("admin/pages/dashboard")),
   AdminDownloads: lazy(() => import("admin/pages/downloads")),
   AdminParticipantsOnsite: lazy(() => import("admin/pages/participants/onsite")),
@@ -87,6 +88,8 @@ const routeConfig = [
   { path: "/submission/guidelines", element: <lazyPages.Guidelines /> },
   { path: "/submission/topics", element: <lazyPages.Topics /> },
   // ADMIN (protected routes)
+
+  { path: "/admin/accomodations", element: <ProtectedRoute><lazyPages.AdminAccomodations /></ProtectedRoute> },
   { path: "/admin/dashboard", element: <ProtectedRoute><lazyPages.AdminDashboard /></ProtectedRoute> },
   { path: "/admin/participants/online", element: <ProtectedRoute><lazyPages.AdminParticipantsOnline /></ProtectedRoute> },
   { path: "/admin/participants/onsite", element: <ProtectedRoute><lazyPages.AdminParticipantsOnsite /></ProtectedRoute> },
