@@ -49,20 +49,29 @@ $spreadsheet->getProperties()
 // Define column headers
 $headers = ["Registered On", "Name", "Registration Type"];
 
-// Function to populate sheets
-function populateSheet($sheet, $title, $data, $headers)
-{
+/**
+ * Populates an Excel sheet with participant data.
+ * @param \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet $sheet
+ * @param string $title
+ * @param array $data
+ * @param array $headers
+ */
+function populateSheet($sheet, $title, $data, $headers) {
     $sheet->setTitle($title);
     $sheet->fromArray([$headers], NULL, 'A1');
 
     $row = 2;
     foreach ($data as $participant) {
-        $fullName = trim("{$participant['title']} {$participant['first_name']} {$participant['last_name']}");
+        $fullName = trim(
+            (isset($participant['title']) ? $participant['title'] . ' ' : '') .
+            (isset($participant['first_name']) ? $participant['first_name'] . ' ' : '') .
+            (isset($participant['last_name']) ? $participant['last_name'] : '')
+        );
 
         $sheet->fromArray([
-            $participant["created_at"] ?? "N/A",
+            isset($participant["created_at"]) ? $participant["created_at"] : "N/A",
             $fullName,
-            $participant["description"] ?? "N/A"
+            isset($participant["description"]) ? $participant["description"] : "N/A"
         ], NULL, "A$row");
 
         $row++;
@@ -85,7 +94,7 @@ function populateSheet($sheet, $title, $data, $headers)
 }
 
 // Create and populate first sheet for "Staying at the hostel"
-$sheet1 = $spreadsheet->setActiveSheetIndex(0);
+$sheet1 = $spreadsheet->getActiveSheet();
 populateSheet($sheet1, "Staying at the hostel", $stayingAtHostel, $headers);
 
 // Create and populate second sheet for "No Accommodation"
