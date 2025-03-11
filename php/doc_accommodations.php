@@ -84,25 +84,25 @@ function populateSheet($spreadsheet, $title, $data, $headers)
         $country = isset($participant["country"]) ? $participant["country"] : "N/A";
         $organization = isset($participant["organization"]) && !empty($participant["organization"]) 
             ? $participant["organization"] 
-            : "No organization";
+            : " - ";
         
         // Get comments (handle empty)
         $comments = isset($participant["comments"]) && !empty($participant["comments"]) 
             ? $participant["comments"] 
-            : "No comments";
+            : " - ";
 
         // Get confirmed status
         $confirmedStatus = isset($participant["confirmation_sent"]) && $participant["confirmation_sent"] == "1" 
-            ? "confirmed" 
+            ? "YES" 
             : "NO";
 
         // Insert row data
         $sheet->fromArray([
-            isset($participant["created_at"]) ? $participant["created_at"] : "N/A",
+            isset($participant["created_at"]) ? $participant["created_at"] : "n/a",
             $fullName,
             $country,
             $organization,
-            isset($participant["description"]) ? $participant["description"] : "N/A",
+            isset($participant["description"]) ? $participant["description"] : "n/a",
             $comments,
             $confirmedStatus
         ], NULL, "A$row");

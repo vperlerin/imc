@@ -1,13 +1,13 @@
-<?php 
+<?php
 
 // Allow CORS for local development & production
 $allowed_origins = [
-  "https://imc2025.imo.net",
-  "http://localhost:3000"
+    "https://imc2025.imo.net",
+    "http://localhost:3000"
 ];
 
 if (isset($_SERVER['HTTP_ORIGIN']) && in_array($_SERVER['HTTP_ORIGIN'], $allowed_origins)) {
-  header("Access-Control-Allow-Origin: " . $_SERVER['HTTP_ORIGIN']);
+    header("Access-Control-Allow-Origin: " . $_SERVER['HTTP_ORIGIN']);
 }
 header("Access-Control-Allow-Credentials: true");
 
@@ -15,7 +15,7 @@ header("Access-Control-Allow-Credentials: true");
 require_once __DIR__ . "/config.php";
 require_once __DIR__ . "/class/Connect.class.php";
 require_once __DIR__ . "/class/Participant.class.php";
-require_once __DIR__ . "/class/Workshop.class.php"; 
+require_once __DIR__ . "/class/Workshop.class.php";
 require __DIR__ . "/../vendor/autoload.php";
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -25,7 +25,7 @@ use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 
 if (!isset($_GET['workshop_id']) || !is_numeric($_GET['workshop_id'])) {
-  die(json_encode(["success" => false, "message" => "Invalid workshop ID."]));
+    die(json_encode(["success" => false, "message" => "Invalid workshop ID."]));
 }
 
 $workshopId = intval($_GET['workshop_id']);
@@ -60,9 +60,9 @@ $currentYear = date("Y");
 
 $spreadsheet = new Spreadsheet();
 $spreadsheet->getProperties()
-    ->setCreator("IMC {$currentYear}")  
+    ->setCreator("IMC {$currentYear}")
     ->setLastModifiedBy("IMC {$currentYear}")
-    ->setTitle("Workshop Participants {$currentYear}")  
+    ->setTitle("Workshop Participants {$currentYear}")
     ->setSubject("Participants List for {$currentYear}")
     ->setDescription("Excel 2007 export for OpenOffice compatibility - {$currentYear}")
     ->setKeywords("IMC IMO openoffice excel export {$currentYear}")
@@ -71,7 +71,7 @@ $spreadsheet->getProperties()
 // 🚀 Remove default sheet (to prevent duplicate issues)
 $spreadsheet->removeSheetByIndex(0);
 
-// ✅ **Header Styling**
+//**Header Styling**
 $headerStyle = [
     'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
     'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '4F81BD']],
@@ -89,7 +89,7 @@ $headerStyle = [
 function createSheet($spreadsheet, $sheetName, $participants, $headerStyle)
 {
     if (empty($participants)) {
-        return; 
+        return;
     }
 
     $sheet = $spreadsheet->createSheet();
@@ -107,7 +107,7 @@ function createSheet($spreadsheet, $sheetName, $participants, $headerStyle)
     $row = 2;
     foreach ($participants as $p) {
         $fullName = "{$p['title']} {$p['last_name']} {$p['first_name']}";
-        $confirmedStatus = $p["confirmation_sent"] ? "confirmed" : "NO";
+        $confirmedStatus = $p["confirmation_sent"] ? "YES" : "NO";
 
         $sheet->fromArray([
             $fullName,
@@ -125,14 +125,16 @@ function createSheet($spreadsheet, $sheetName, $participants, $headerStyle)
     }
 }
 
-// ✅ **Create "Online Participants" Sheet**
-if (!empty($onlineParticipants)) {
-    createSheet($spreadsheet, "Online Participants", $onlineParticipants, $headerStyle);
-}
 
-// ✅ **Create "Onsite Participants" Sheet**
+
+//**Create "Onsite Participants" Sheet**
 if (!empty($onsiteParticipants)) {
     createSheet($spreadsheet, "Onsite Participants", $onsiteParticipants, $headerStyle);
+}
+
+//**Create "Online Participants" Sheet**
+if (!empty($onlineParticipants)) {
+    createSheet($spreadsheet, "Online Participants", $onlineParticipants, $headerStyle);
 }
 
 // Ensure at least one sheet exists

@@ -100,7 +100,7 @@ function createSheet($spreadsheet, $sheetName, $participants, $includeAccommodat
         $fullName = trim("{$p['title']} {$p['last_name']} {$p['first_name']}");
 
         // Confirmation status
-        $confirmedStatus = isset($p["confirmation_sent"]) && $p["confirmation_sent"] == "1" ? "confirmed" : "NO";
+        $confirmedStatus = isset($p["confirmation_sent"]) && $p["confirmation_sent"] == "1" ? "YES" : "NO";
 
         // Compute totals
         $total = isset($p["total_due"]) ? $p["total_due"] : 0;
@@ -108,7 +108,7 @@ function createSheet($spreadsheet, $sheetName, $participants, $includeAccommodat
         $paymentMethod = isset($p["payment_method_name"]) ? $p["payment_method_name"] : "n/a";
 
         // Get participant comments
-        $comments = isset($p["comments"]) ? $p["comments"] : "N/A";
+        $comments = isset($p["comments"]) ? $p["comments"] : "n/a";
 
         // Create row data
         $dataRow = [

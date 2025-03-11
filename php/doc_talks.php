@@ -50,10 +50,20 @@ $sheet = $spreadsheet->getActiveSheet();
 $sheet->setTitle("All Talks");
 
 // Define column headers
-$headers = ["Session", "Duration", "Presenter", "Title", "Authors", "Abstract", "Online"];
+$headers = ["Session", "Duration", "Presenter", "Title", "Authors", "Abstract", "Online", "Confirmed"];
 
 // Write headers
 $sheet->fromArray([$headers], NULL, 'A1');
+
+// ✅ **Apply header styling**
+$headerStyle = [
+    'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
+    'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '4F81BD']],
+    'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+    'borders' => ['bottom' => ['borderStyle' => Border::BORDER_THIN]]
+];
+
+$sheet->getStyle('A1:H1')->applyFromArray($headerStyle);
 
 // Insert talk data
 $row = 2;
@@ -61,6 +71,7 @@ foreach ($talks as $session => $talkList) {
     foreach ($talkList as $talk) {
         $presenter = trim("{$talk['first_name']} {$talk['last_name']}");
         $isOnline = isset($talk['is_online']) && $talk['is_online'] == "1" ? "true" : "false";
+        $confirmed = isset($talk["confirmation_sent"]) && $talk["confirmation_sent"] == "1" ? "confirmed" : "NO";
 
         $sheet->fromArray([
             $session,
@@ -69,38 +80,30 @@ foreach ($talks as $session => $talkList) {
             isset($talk["title"]) ? $talk["title"] : "Untitled",
             isset($talk["authors"]) ? $talk["authors"] : "No author available",
             isset($talk["abstract"]) ? $talk["abstract"] : "No abstract available",
-            $isOnline
+            $isOnline,
+            $confirmed
         ], NULL, "A$row");
 
-        // Wrap text for the abstract column (column E)
+        // Wrap text for the Abstract & Authors columns (Columns F & E)
+        $sheet->getStyle("F$row")->getAlignment()->setWrapText(true);
         $sheet->getStyle("E$row")->getAlignment()->setWrapText(true);
 
         $row++;
     }
 }
 
-// Auto-size columns for better readability
-foreach (range('A', 'F') as $col) {
+// ✅ **Auto-size all columns**
+foreach (range('A', 'H') as $col) {
     $sheet->getColumnDimension($col)->setAutoSize(true);
 }
 
-// Set styles for headers
-$headerStyle = [
-    'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
-    'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '4F81BD']],
-    'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
-    'borders' => ['bottom' => ['borderStyle' => Border::BORDER_THIN]]
-];
-
-$sheet->getStyle('A1:G1')->applyFromArray($headerStyle);
-
 // Set alignment for all columns
-$sheet->getStyle("A1:F$row")->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+$sheet->getStyle("A1:H$row")->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
 
-// Prevent excessive cell height in Abstract column
+// Prevent excessive cell height in Abstract & Authors columns
 $sheet->getRowDimension(1)->setRowHeight(25);
 
-// Generate and send file
+// ✅ **Generate and send file**
 ob_end_clean();
 header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
 header("Content-Disposition: attachment; filename=\"$fileName\"");
