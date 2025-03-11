@@ -96,49 +96,18 @@ class ContributionManager
             throw new Exception("Failed to update contributions: " . $e->getMessage());
         }
     }
-
     public function getAllTalks()
     {
-        try {
-            $stmt = $this->pdo->prepare("
-                SELECT 
-                    s.name AS session_name,
-                    c.title AS talk_title,
-                    p.id AS participant_id,
-                    p.first_name,
-                    p.last_name,
-                    p.confirmation_sent
-                FROM contributions c
-                JOIN participants p ON c.participant_id = p.id
-                JOIN imc_sessions s ON c.session_id = s.id
-                WHERE c.type = 'talk'
-                ORDER BY s.name, c.title;
-            ");
-
-            $stmt->execute();
-            $talks = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            // Group talks by session
-            $groupedTalks = [];
-            foreach ($talks as $talk) {
-                $session = $talk['session_name'];
-                unset($talk['session_name']);
-
-                if (!isset($groupedTalks[$session])) {
-                    $groupedTalks[$session] = [];
-                }
-                $groupedTalks[$session][] = $talk;
-            }
-
-            return $groupedTalks;
-        } catch (Exception $e) {
-            throw new Exception("Failed to fetch talks: " . $e->getMessage());
-        }
+        return $this->getContributionsByType('talk');
     }
-
 
     public function getAllPosters()
     {
+        return $this->getContributionsByType('poster');
+    }
+
+    private function getContributionsByType($type)
+    {
         try {
             $stmt = $this->pdo->prepare("
                 SELECT 
@@ -151,29 +120,26 @@ class ContributionManager
                 FROM contributions c
                 JOIN participants p ON c.participant_id = p.id
                 JOIN imc_sessions s ON c.session_id = s.id
-                WHERE c.type = 'poster'
+                WHERE c.type = ?
                 ORDER BY s.name, c.title;
             ");
+            $stmt->execute([$type]);
+            $contributions = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            $stmt->execute();
-            $talks = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            // Group talks by session
-            $groupedTalks = [];
-            foreach ($talks as $talk) {
-                $session = $talk['session_name'];
-                unset($talk['session_name']);
-
-                if (!isset($groupedTalks[$session])) {
-                    $groupedTalks[$session] = [];
+            $groupedContributions = [];
+            foreach ($contributions as $contribution) {
+                $session = $contribution['session_name'];
+                unset($contribution['session_name']);
+                if (!isset($groupedContributions[$session])) {
+                    $groupedContributions[$session] = [];
                 }
-                $groupedTalks[$session][] = $talk;
+                $groupedContributions[$session][] = $contribution;
             }
 
-            return $groupedTalks;
+            return $groupedContributions;
         } catch (Exception $e) {
-            throw new Exception("Failed to fetch talks: " . $e->getMessage());
+            throw new Exception("Failed to fetch contributions: " . $e->getMessage());
         }
-    } 
+    }
 
 }
