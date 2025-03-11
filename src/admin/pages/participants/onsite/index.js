@@ -96,24 +96,26 @@ const AdminParticipantsOnsite = () => {
       ) : (
         <>
           {errorDelete && <p className="alert alert-danger">{errorDelete}</p>}
-          <div className="d-flex gap-2 mb-3">
-            <select
-              className="form-select w-auto"
-              value={searchType}
-              onChange={(e) => setSearchType(e.target.value)}
-            >
-              <option value="last_name">Search by Last Name</option>
-              <option value="email">Search by Email</option>
-            </select>
-            <div className="position-relative w-auto">
-              <input
-                type="text"
-                className="form-control pe-5"
-                placeholder={`Enter ${searchType.replace("_", " ")}`}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-              <CiSearch className="position-absolute top-50 end-0 translate-middle-y me-2" />
+          <div className="d-flex flex-column flex-md-row gap-2 mb-3">
+            <div className="d-flex gap-2">
+              <select
+                className="form-select w-auto"
+                value={searchType}
+                onChange={(e) => setSearchType(e.target.value)}
+              >
+                <option value="last_name">Search by Last Name</option>
+                <option value="email">Search by Email</option>
+              </select>
+              <div className="position-relative w-auto">
+                <input
+                  type="text"
+                  className="form-control pe-5"
+                  placeholder={`Enter ${searchType.replace("_", " ")}`}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+                <CiSearch className="position-absolute top-50 end-0 translate-middle-y me-2" />
+              </div>
             </div>
             <DocButton
               className="ms-auto"

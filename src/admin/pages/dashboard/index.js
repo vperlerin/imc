@@ -1,5 +1,5 @@
-import classNames from "classnames";
 import css from './index.module.scss';
+import classNames from "classnames"; 
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { retry } from "utils/retry.js";
@@ -65,15 +65,14 @@ const AdminDashboard = () => {
   if (error) return <PageContain title="Admin Dashboard"><p className="text-danger">{error}</p></PageContain>;
 
   return (
-    <PageContain>
-      <div className={classNames(css.dashboard, 'mx-auto')}>
+    <PageContain isMxWidth> 
         <h3>{getRandomGreeting()}</h3>
         <p className="mb-4">Here is a quick summary of what's going on here:</p>
 
-        <div className="d-flex flex-column flex-md-row gap-3 w-100">
+        <div className="d-flex flex-column flex-md-row  gap-3 w-100">
 
           {/* Confirmed and Unconfirmed Onsite Participants */}
-          <div className="flex-grow-1 flex-shrink-0 border p-3 rounded-2 position-relative">
+          <div className={classNames('flex-grow-1 flex-shrink-0 border p-3 rounded-2 position-relative', css.col)}>
             <div className=" ">
               <h5 className="fw-bold">
                 <Link to="/admin/participants/onsite">
@@ -87,7 +86,7 @@ const AdminDashboard = () => {
               <div className="mt-4">
                 <h6>Unconfirmed On-site Participants</h6>
                 {dashboardData.onsite_unconfirmed.length > 0 ? (
-                  <div className="table-responsive" style={{ maxWidth: "calc(100vw - 2rem)" }}>
+                  <div className="table-responsive" >
                     <table className="table table-striped">
                       <thead>
                         <tr>
@@ -127,7 +126,7 @@ const AdminDashboard = () => {
 
 
           {/* Confirmed and Unconfirmed Online Participants */}
-          <div className="flex-grow-1 flex-shrink-0 border p-3 rounded-2 position-relative">
+          <div className={classNames('flex-grow-1 flex-shrink-0 border p-3 rounded-2 position-relative', css.col)}>
             <div className=" ">
               <h5 className="fw-bold">
                 <Link to="/admin/participants/online">
@@ -141,6 +140,7 @@ const AdminDashboard = () => {
               <div className="mt-4">
                 <h6>Unconfirmed Online Participants</h6>
                 {dashboardData.online_unconfirmed.length > 0 ? (
+                  <div className="table-responsive" >
                   <table className="table table-striped">
                     <thead>
                       <tr>
@@ -170,6 +170,7 @@ const AdminDashboard = () => {
                       ))}
                     </tbody>
                   </table>
+                </div>
                 ) : (
                   <p className="text-success"><i>No unconfirmed online participants: you go to go!</i></p>
                 )}
@@ -179,9 +180,10 @@ const AdminDashboard = () => {
         </div>
 
         {/* Workshop Stats */}
-        <div className="mt-4 border p-3 rounded-2">
+        <div className={classNames('mt-4 border p-3 rounded-2', css.col)}>
           <h5>Workshop Attendance</h5>
           {dashboardData.workshop_stats.length > 0 ? (
+            <div className="table-responsive" >
             <table className="table table-bordered">
               <thead>
                 <tr>
@@ -215,13 +217,11 @@ const AdminDashboard = () => {
                 ))}
               </tbody>
             </table>
+            </div>
           ) : (
             <p><i>No workshop data available.</i></p>
           )}
         </div>
-
-
-      </div>
     </PageContain >
   );
 };

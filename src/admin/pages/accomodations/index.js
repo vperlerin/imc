@@ -5,12 +5,13 @@ import React, { useState } from "react";
 import { useApiParticipantsWithRegistration } from "api/participants/accomodations.js";
 import DocButton from "@/admin/components/doc-button";
 
-const AdminAccommodations = ({ typeFilter = 'not_no' }) => {
+const AdminAccommodations = ({ typeFilter = '' }) => {
+  const [curFilter, setCurFilter] = useState(typeFilter || 'not_no');
   const [searchQuery, setSearchQuery] = useState("");
   const [sortColumn, setSortColumn] = useState(null);
   const [sortOrder, setSortOrder] = useState("asc");
 
-  const { participants, loading, error } = useApiParticipantsWithRegistration(typeFilter);
+  const { participants, loading, error } = useApiParticipantsWithRegistration(curFilter);
   const searchType = "last_name";
 
   // Function to handle sorting
@@ -82,7 +83,7 @@ const AdminAccommodations = ({ typeFilter = 'not_no' }) => {
 
             <DocButton
               className="ms-auto"
-              link={`${process.env.REACT_APP_API_URL}/doc_accommodations.php?type=${typeFilter}`}
+              link={`${process.env.REACT_APP_API_URL}/doc_accommodations.php?type=${curFilter}`}
             />
           </div>
 
@@ -96,37 +97,39 @@ const AdminAccommodations = ({ typeFilter = 'not_no' }) => {
                   <th className="sortable" onClick={() => handleSort("last_name")}>
                     Name {sortColumn === "last_name" && (sortOrder === "asc" ? "🔼" : "🔽")}
                   </th>
-                  <th className="sortable" onClick={() => handleSort("registration_type")}>
-                    Reg. Type {sortColumn === "registration_type" && (sortOrder === "asc" ? "🔼" : "🔽")}
-                  </th>
+                  {/*
                   <th className="sortable" onClick={() => handleSort("price")}>
-                    Price {sortColumn === "price" && (sortOrder === "asc" ? "🔼" : "🔽")}
-                  </th>
+                  Price {sortColumn === "price" && (sortOrder === "asc" ? "🔼" : "🔽")}
+                </th>*/
+                  }
+
                   <th className="sortable" onClick={() => handleSort("description")}>
-                    Description {sortColumn === "description" && (sortOrder === "asc" ? "🔼" : "🔽")}
+                    Accommodation {sortColumn === "description" && (sortOrder === "asc" ? "🔼" : "🔽")}
                   </th>
+                  {/*
                   <th className="sortable" onClick={() => handleSort("room_left")}>
                     Room Left {sortColumn === "room_left" && (sortOrder === "asc" ? "🔼" : "🔽")}
                   </th>
+                  */}
                 </tr>
               </thead>
               <tbody>
                 {filteredParticipants.length > 0 ? (
                   filteredParticipants.map((participant) => (
                     <tr key={participant.id}>
-                      <td>{participant.created_at?.split(" ")[0] || "N/A"}</td>
+                      <td>{participant.created_at?.split(" ")[0] || "n/a"}</td>
                       <td>
                         {participant.title} {participant.first_name} {participant.last_name}
                       </td>
-                      <td>{participant.registration_type || "N/A"}</td>
-                      <td>{participant.price ? `$${participant.price}` : "N/A"}</td>
-                      <td>{participant.description || "N/A"}</td>
-                      <td>{participant.room_left ?? "N/A"}</td>
+                      <td>{participant.description || "n/a"}</td>
+                      {/*
+                      <td>{participant.room_left ?? "n/a"}</td>
+                      */}
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="6" className="text-center">
+                    <td colSpan="5" className="text-center">
                       No participants found.
                     </td>
                   </tr>

@@ -20,5 +20,5 @@ export const menuItems = [
     ],
   },
   { title: "Accomodations", link: "/admin/accomodations" },
-  { title: "Download", link: "/admin/downloads" },
+  { title: "Downloads", link: "/admin/downloads" },
 ];

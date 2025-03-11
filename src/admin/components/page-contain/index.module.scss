@@ -1,20 +1,29 @@
-@use 'styles/index' as *; 
+@use 'styles/index' as *;
 
 .pageContain {
   display: flex;
-  flex-flow: column;  
+  flex-flow: column;
   @include scrollY();
   @include scrollStyledDark();
   min-height: var(--app-height);
   height: 100%;
 
   h2 {
-    text-wrap: balance;
+    text-wrap: balance; 
+    font-size: calc(1.05rem + 0.9vw);
+
+    @include media-breakpoint-up(md) {
+      font-size: calc(1.325rem + 0.9vw);
+    } 
+  }
+
+  .titleWrap {
+    margin-bottom: 1.5rem;
   }
 }
 
 .illustration {
-  height: var(--imc-illus-mobile-max-height); 
+  height: var(--imc-illus-mobile-max-height);
   background-repeat: no-repeat;
   background-size: cover;
   background-position: 50% 50%;
@@ -29,7 +38,7 @@
   }
 }
 
-.title { 
+.title {
   @include media-breakpoint-up(md) {
     border-radius: 1rem;
     max-width: calc(100% - 1rem);
@@ -39,7 +48,9 @@
 }
 
 .maxW {
-  max-width: $max-width;
-  margin: 0 auto;
   width: 100%;
+
+  @include media-breakpoint-up(md) {
+    max-width: min(calc(100% - 2rem), #{$max-width});
+  }
 }

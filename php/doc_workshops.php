@@ -105,17 +105,17 @@ function createSheet($spreadsheet, $sheetName, $participants)
     }
 }
 
-// ✅ Only create "Online Participants" sheet if they exist
+// Only create "Online Participants" sheet if they exist
 if (!empty($onlineParticipants)) {
     createSheet($spreadsheet, "Online Participants", $onlineParticipants);
 }
 
-// ✅ Only create "Onsite Participants" sheet if they exist
+// Only create "Onsite Participants" sheet if they exist
 if (!empty($onsiteParticipants)) {
     createSheet($spreadsheet, "Onsite Participants", $onsiteParticipants);
 }
 
-// ✅ Ensure at least one sheet exists
+// Ensure at least one sheet exists
 if ($spreadsheet->getSheetCount() == 0) {
     $spreadsheet->createSheet()->setTitle("No Participants");
 }

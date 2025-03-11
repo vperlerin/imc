@@ -64,7 +64,7 @@ foreach ($talks as $session => $talkList) {
 
         $sheet->fromArray([
             $session,
-            isset($talk["duration"]) ? $talk["duration"] : "N/A",
+            isset($talk["duration"]) ? $talk["duration"] : "n/a",
             $presenter,
             isset($talk["title"]) ? $talk["title"] : "Untitled",
             isset($talk["authors"]) ? $talk["authors"] : "No author available",

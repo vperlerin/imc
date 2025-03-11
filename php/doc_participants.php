@@ -92,7 +92,7 @@ function createSheet($spreadsheet, $sheetName, $participants, $includeAccommodat
         // Compute totals
         $total = isset($p["total_due"]) ? $p["total_due"] : 0;
         $totalPaid = isset($p["total_paid"]) ? $p["total_paid"] : 0;
-        $paymentMethod = isset($p["payment_method_name"]) ? $p["payment_method_name"] : "N/A";
+        $paymentMethod = isset($p["payment_method_name"]) ? $p["payment_method_name"] : "n/a";
 
         // Create row data
         $dataRow = [

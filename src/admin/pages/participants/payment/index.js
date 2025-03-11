@@ -376,7 +376,7 @@ const Payments = ({ isCurOnline = false }) => {
                   {payments.map((payment) =>
                     parseFloat(payment.amount) !== 0 ? (
                       <tr key={payment.id}>
-                        <td>{payment.payment_date.split(' ')[0] || "N/A"}</td>
+                        <td>{payment.payment_date.split(' ')[0] || "n/a"}</td>
                         <td>{parseFloat(payment.amount).toFixed(2)}</td>
                         <td>{payment.payment_method}</td>
                         <td>{payment.admin_note || "No note"}</td>

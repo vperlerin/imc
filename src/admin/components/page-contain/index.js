@@ -14,7 +14,7 @@ const PageContain = ({
   title = '',
   rightContent,
   children,
-  isMaxWidth = false,
+  isMaxWidth = true,
 }) => {
   const pageTitle = title ? `${title} | ${cd.name_display} ${cd.year}` : `${cd.name_display} ${cd.year}`;
 
@@ -30,17 +30,18 @@ const PageContain = ({
         <div className='d-flex flex-row'>
           <Menu cd={cd} />
 
-          <div className="mx-md-4 my-3 h-100 flex-grow-1 d-flex flex-column px-3 px-md-0">
+          <div className={classNames(
+            'mx-md-4 my-3 h-100 flex-grow-1 d-flex flex-column px-3 px-md-0',
+            { [`${css.maxW} mx-md-auto`]: isMaxWidth }
+          )}>
             {breadcrumb.length !== 0 && (
               <BreadCrumb links={breadcrumb} />
             )}
-            <div className="d-flex justify-content-between align-items-center">
+            <div className={classNames('d-flex justify-content-between align-items-center', css.titleWrap)}>
               {title && <h2>{title}</h2>}
               {rightContent && <div>{rightContent}</div>}
             </div>
-            <div className={classNames(isMaxWidth && css.maxW)}>
-              {children}
-            </div>
+            {children}
           </div>
         </div>
       </div>
