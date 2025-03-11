@@ -23,16 +23,14 @@ export const useApiWorkshopsParticipants = (workshopId) => {
           )
         );
 
-        if (response.data.success && Array.isArray(response.data.data)) {
-          console.log("RESPONSE ?", response);
+        if (response.data.success && Array.isArray(response.data.data)) { 
           setParticipants(response.data.data);
         } else {
           throw new Error(
             response.data.message || "Database access error, please try again."
           );
         }
-      } catch (err) {
-        console.log("ERRR?" , err);
+      } catch (err) { 
         setError(
           err.message || "Failed to fetch participants. Please refresh the page."
         );

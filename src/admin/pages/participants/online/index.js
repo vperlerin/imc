@@ -64,7 +64,6 @@ const AdminParticipantsOnline = () => {
     { url: "/admin/participants/onsite", name: "On-site Participants" },
   ];
 
-  console.log("PARTICIPANTS IN ADMIN TABLE ", participants);
 
   return (
     <PageContain

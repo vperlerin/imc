@@ -268,15 +268,7 @@ const Payments = ({ isCurOnline = false }) => {
 
   const confirmationSent = (participant?.participant.confirmation_sent !== "0" && participant?.participant.confirmation_sent !== 0);
   const confirmationDate = !!participant?.participant.confirmation_date;
-
-  /*
-  confirmation_sent => CONFIRMED
-  confirmation_date => EMAILED
-  console.log("CONFIRMATION SENT (confirmed)  ", participant?.participant.confirmation_sent ,  ' BOOLEAN:',  confirmationSent);
-  console.log("CONFIRMATION DATE (email sent) ", participant?.participant.confirmation_date ,  ' BOOLEAN:',  confirmationDate);
-  */
-
-
+ 
   const customActions = (
     <>
       <td>

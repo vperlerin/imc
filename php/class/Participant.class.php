@@ -1146,8 +1146,7 @@ class ParticipantManager
             JOIN participant_workshops pw ON p.id = pw.participant_id
             LEFT JOIN accommodation a ON p.id = a.participant_id
             LEFT JOIN registration_types rt ON a.registration_type_id = rt.id
-            WHERE pw.workshop_id = :workshop_id
-            AND p.is_online = 0
+            WHERE pw.workshop_id = :workshop_id 
         ";
     
         $stmt = $pdo->prepare($sql);

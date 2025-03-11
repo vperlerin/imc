@@ -13,6 +13,8 @@ const AdminParticipantsWorkshops = ({ workshopId }) => {
   const { participants, loading } = useApiWorkshopsParticipants(workshopId);
   const { workshops, loading: loadingWorkshops  } = useApiSpecificData();
 
+  console.log("workshopId? ", workshopId);
+
   // Find the current workshop based on workshopId
   const currentWorkshop = workshops?.find(w => w.id === String(workshopId));
   const breadcrumb = [{ url: "/admin/participants/workshops/", name: `${currentWorkshop && currentWorkshop.title} Participants` }];
