@@ -30,7 +30,7 @@ if (!isset($_GET['workshop_id']) || !is_numeric($_GET['workshop_id'])) {
 
 $workshopId = intval($_GET['workshop_id']);
 
-$participantManager = new Workshop($pdo);
+$participantManager = new ParticipantManager($pdo);
 $participants = $participantManager->getParticipantsByWorkshop($pdo, $workshopId);
 
 
