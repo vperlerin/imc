@@ -202,7 +202,7 @@ const MainForm = () => {
   }, [participant, workshops, password]);
 
 
-  if (!isDebugMode ) {
+  if (!isDebugMode && false) {
     return <PageContain title="Register On-site">Come back soon…</PageContain>;
   }
 

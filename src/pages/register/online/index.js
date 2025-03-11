@@ -177,7 +177,7 @@ const MainForm = () => {
   }, [participant, workshops, password]);
 
 
-    if (!isDebugMode ) {
+    if (!isDebugMode && false) {
       return <PageContain title="Register Onsite">Come back soon…</PageContain>;
     }
 

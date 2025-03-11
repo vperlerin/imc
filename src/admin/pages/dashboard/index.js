@@ -118,7 +118,7 @@ const AdminDashboard = () => {
                     </table>
                   </div>
                 ) : (
-                  <p>No unconfirmed onsite participants!</p>
+                  <p className="text-success"><i>No unconfirmed on-site participants: you go to go!</i></p>
                 )}
               </div>
             </div>
