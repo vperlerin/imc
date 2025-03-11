@@ -10,20 +10,49 @@ const AdminTalks = () => {
   const [sortColumn, setSortColumn] = useState(null);
   const [sortOrder, setSortOrder] = useState("asc");
   const [talks, setTalks] = useState([]);
+  const [filteredTalks, setFilteredTalks] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     axios
       .get(`${process.env.REACT_APP_API_URL}/api/get_talks.php`)
       .then((response) => {
-        setTalks(response.data);
+        console.log("RESPONSE ", response.data.data)
+
+        if (response.data.success) {
+          setTalks(response.data.data);
+          setFilteredTalks(response.data.data);
+        } else {
+          setError(response.data.data);
+        }
         setLoading(false);
       })
       .catch((error) => {
-        console.error("Error fetching talks:", error);
+        setError("Error fetching talks:", error);
         setLoading(false);
       });
   }, []);
+
+  useEffect(() => {
+    let filtered = talks;
+    if (searchQuery) {
+      const lowerQuery = searchQuery.toLowerCase();
+      filtered = talks.filter((talk) =>
+        talk.talk_title.toLowerCase().includes(lowerQuery)
+      );
+    }
+    if (sortColumn) {
+      filtered = [...filtered].sort((a, b) => {
+        let valueA = a[sortColumn] ?? "";
+        let valueB = b[sortColumn] ?? "";
+        valueA = valueA.toString().toLowerCase();
+        valueB = valueB.toString().toLowerCase();
+        return sortOrder === "asc" ? (valueA < valueB ? -1 : 1) : (valueA > valueB ? -1 : 1);
+      });
+    }
+    setFilteredTalks(filtered);
+  }, [searchQuery, sortColumn, sortOrder, talks]);
 
   const handleSort = (column) => {
     if (sortColumn === column) {
@@ -34,27 +63,9 @@ const AdminTalks = () => {
     }
   };
 
-  let filteredTalks = talks;
-
-  if (searchQuery) {
-    const lowerQuery = searchQuery.toLowerCase();
-    filteredTalks = filteredTalks.filter((talk) =>
-      talk.talk_title.toLowerCase().includes(lowerQuery)
-    );
-  }
-
-  if (sortColumn) {
-    filteredTalks = [...filteredTalks].sort((a, b) => {
-      let valueA = a[sortColumn] ?? "";
-      let valueB = b[sortColumn] ?? "";
-      valueA = valueA.toString().toLowerCase();
-      valueB = valueB.toString().toLowerCase();
-      return sortOrder === "asc" ? (valueA < valueB ? -1 : 1) : (valueA > valueB ? -1 : 1);
-    });
-  }
-
   return (
     <PageContain title="Talks List" isMaxWidth>
+      {error && <div className="alert alert-danger fw-bolder">{error}</div>}
       {loading ? (
         <Loader />
       ) : (
@@ -70,10 +81,8 @@ const AdminTalks = () => {
               />
               <CiSearch className="position-absolute top-50 end-0 translate-middle-y me-2" />
             </div>
-
             <DocButton className="ms-auto" link={`${process.env.REACT_APP_API_URL}/doc_talks.php`} />
           </div>
-
           <div className="table-responsive" style={{ maxWidth: "calc(100vw - 2rem)" }}>
             <table className="table table-striped">
               <thead>

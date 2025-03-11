@@ -116,6 +116,7 @@ class ContributionManager
                     p.id AS participant_id,
                     p.first_name,
                     p.last_name,
+                    p.is_online,
                     p.confirmation_sent
                 FROM contributions c
                 JOIN participants p ON c.participant_id = p.id
