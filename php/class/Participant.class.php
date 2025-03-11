@@ -1164,14 +1164,7 @@ class ParticipantManager
     public function getAllParticipants() {
         $sql = "
             SELECT 
-                p.id, 
-                p.title, 
-                p.first_name, 
-                p.last_name, 
-                p.email, 
-                p.country, 
-                p.is_online, 
-                p.confirmation_sent, 
+                p.*, 
                 IFNULL(rt.description, 'Not Assigned') AS accommodation
             FROM participants p
             LEFT JOIN accommodation a ON p.id = a.participant_id

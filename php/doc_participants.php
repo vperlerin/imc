@@ -126,14 +126,15 @@ function createSheet($spreadsheet, $sheetName, $participants, $includeAccommodat
     }
 }
 
-// Only create "Online Participants" sheet if they exist
-if (!empty($onlineParticipants)) {
-    createSheet($spreadsheet, "Online Participants", $onlineParticipants);
-}
 
 // Only create "Onsite Participants" sheet if they exist
 if (!empty($onsiteParticipants)) {
     createSheet($spreadsheet, "Onsite Participants", $onsiteParticipants, true);
+}
+
+// Only create "Online Participants" sheet if they exist
+if (!empty($onlineParticipants)) {
+    createSheet($spreadsheet, "Online Participants", $onlineParticipants);
 }
 
 // Ensure at least one sheet exists
