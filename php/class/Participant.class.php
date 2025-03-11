@@ -1136,7 +1136,7 @@ class ParticipantManager
     public function getParticipantsByWorkshop($workshopId)
     {
         $sql = "
-            SELECT 
+            SELECT DISTINCT 
                 p.*, 
                 a.registration_type_id, 
                 rt.description AS registration_type_description
@@ -1144,11 +1144,12 @@ class ParticipantManager
             JOIN participant_workshops pw ON p.id = pw.participant_id
             LEFT JOIN accommodation a ON p.id = a.participant_id
             LEFT JOIN registration_types rt ON a.registration_type_id = rt.id
-            WHERE pw.workshop_id = :workshop_id 
+            WHERE pw.workshop_id = :workshop_id
+            AND p.status = 'active'
         ";
     
         $stmt = $this->pdo->prepare($sql);
-        $stmt->bindParam(':workshop_id', $workshopId, PDO::PARAM_INT);
+        $stmt->bindValue(':workshop_id', (int) $workshopId, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
