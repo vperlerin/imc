@@ -39,7 +39,7 @@ $workshopManager = new WorkshopManager($pdo);
 $workshop = $workshopManager->getWorkshopById($pdo, $workshopId);
 
 var_dump($workshop);
-
+/*
 exit;
 
 if (!$workshop) {
@@ -126,3 +126,4 @@ header("Cache-Control: max-age=0");
 $writer = new Xlsx($spreadsheet);
 $writer->save("php://output");
 exit;
+*/
