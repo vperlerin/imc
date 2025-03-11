@@ -74,6 +74,14 @@ html {
     --bs-backdrop-bg: #CCCCCC; // modal overlay
   }
 
+  .h-0 {
+    height: 0;
+  }
+
+  .w-0 {
+    width: 0;
+  }
+
   .visible {
     visibility: visible !important;
   }

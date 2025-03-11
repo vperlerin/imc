@@ -390,7 +390,7 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
               </div>
             )}
             
-              <div className={classNames(css.mxW, 'mx-auto', tab === "summary" && isSummaryReady ? 'visible': "invisible")}>
+              <div className={classNames(css.mxW, 'mx-auto', tab === "summary" && isSummaryReady ? 'visible': "invisible h-0 w-0 overflow-hidden")}>
                 <div className="d-flex mt-3 align-items-center justify-content-between w-100 mb-3">
                   <div>
                     {participant?.participant?.first_name
@@ -423,7 +423,6 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
                     </div>
                   )}
                 </div>
-
                 <Summary
                   isAdmin
                   isOnline={isOnline}
