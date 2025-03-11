@@ -31,15 +31,12 @@ $participants = $participantManager->getAllParticipants($pdo);
 
 // Separate Online and Onsite participants (PHP 7.4 compatible)
 $onlineParticipants = array_filter($participants, function ($p) {
-    return $p["is_online"] == "1";
+  return $p["is_online"] == "1";
 });
 $onsiteParticipants = array_filter($participants, function ($p) {
-    return $p["is_online"] == "0";
+  return $p["is_online"] == "0";
 });
 
-
-var_dump($onsiteParticipants);
-exit; return; die;
 
 // Get current year and date
 $currentYear = date("Y");
@@ -51,59 +48,62 @@ $fileName = "IMC{$currentYear}-Participant-{$currentDate}.xlsx";
 // Create new Spreadsheet
 $spreadsheet = new Spreadsheet();
 $spreadsheet->getProperties()
-    ->setCreator("IMC {$currentYear}")
-    ->setLastModifiedBy("IMC {$currentYear}")
-    ->setTitle("IMC Participants {$currentYear}")
-    ->setSubject("Participants List")
-    ->setDescription("Excel 2007 export for OpenOffice compatibility.")
-    ->setKeywords("openoffice excel export {$currentYear}")
-    ->setCategory("Participant Data");
+  ->setCreator("IMC {$currentYear}")
+  ->setLastModifiedBy("IMC {$currentYear}")
+  ->setTitle("IMC Participants {$currentYear}")
+  ->setSubject("Participants List")
+  ->setDescription("Excel 2007 export for OpenOffice compatibility.")
+  ->setKeywords("openoffice excel export {$currentYear}")
+  ->setCategory("Participant Data");
 
-// Function to create a sheet
 function createSheet($spreadsheet, $sheetName, $participants, $includeAccommodation = false)
 {
-    if (empty($participants)) {
-        return;  
-    }
+  // Reindex array to ensure sequential keys (0,1,2...) for PhpSpreadsheet
+  $participants = array_values($participants);
 
-    // Create a new sheet
-    $sheet = $spreadsheet->createSheet();
-    $sheet->setTitle($sheetName);
-    $spreadsheet->setActiveSheetIndex($spreadsheet->getSheetCount() - 1); // Make it the active sheet
+  if (empty($participants)) {
+    return;  
+  }
 
-    // Define column headers
-    $headers = ["Full Name", "Email", "Country", "Confirmed"];
+  // Create a new sheet
+  $sheet = $spreadsheet->createSheet();
+  $sheet->setTitle($sheetName);
+  $spreadsheet->setActiveSheetIndex($spreadsheet->getSheetCount() - 1); // Make it the active sheet
+
+  // Define column headers
+  $headers = ["Full Name", "Email", "Country", "Confirmed"];
+  if ($includeAccommodation) {
+    $headers[] = "Accommodation"; // Add accommodation column for onsite participants
+  }
+
+  // Write headers
+  $sheet->fromArray([$headers], NULL, 'A1');
+
+  // Insert participant data
+  $dataRows = [];
+  foreach ($participants as $p) {
+    $fullName = "{$p['title']} {$p['last_name']} {$p['first_name']}";
+    $confirmedStatus = ($p["confirmation_sent"] == "1") ? "confirmed" : "not confirmed";
+    $dataRow = [$fullName, $p["email"], $p["country"], $confirmedStatus];
+
     if ($includeAccommodation) {
-        $headers[] = "Accommodation"; // Add accommodation column for onsite participants
+      $dataRow[] = $p["accommodation"] ?? "Not Assigned"; // Handle missing accommodation
     }
 
-    // Ensure at least one row of headers is set before inserting data
-    $sheet->fromArray([$headers], NULL, 'A1');
+    $dataRows[] = $dataRow;
+  }
 
-    // Insert participant data
-    $dataRows = [];
-    foreach ($participants as $p) {
-        $fullName = "{$p['title']} {$p['last_name']} {$p['first_name']}";
-        $confirmedStatus = $p["confirmation_sent"] ? "confirmed" : "not confirmed";
-        $dataRow = [$fullName, $p["email"], $p["country"], $confirmedStatus];
+  // Ensure the data array is not empty before calling fromArray()
+  if (!empty($dataRows)) {
+    $sheet->fromArray($dataRows, NULL, 'A2'); // Start data from row 2 (below headers)
+  }
 
-        if ($includeAccommodation) {
-            $dataRow[] = $p["accommodation"] ?? "Not Assigned"; // Handle missing accommodation
-        }
-
-        $dataRows[] = $dataRow;
-    }
-
-    // Ensure the data array is not empty before calling fromArray()
-    if (!empty($dataRows)) {
-        $sheet->fromArray($dataRows, NULL, 'A2'); // Start data from row 2 (below headers)
-    }
-
-    // Set auto column width for better readability
-    foreach (range('A', count($headers)) as $col) {
-        $sheet->getColumnDimension($col)->setAutoSize(true);
-    }
+  // Set auto column width for better readability
+  foreach (range('A', count($headers)) as $col) {
+    $sheet->getColumnDimension($col)->setAutoSize(true);
+  }
 }
+
 
 // Create "Onsite Participants" sheet
 createSheet($spreadsheet, "Onsite Participants", $onsiteParticipants, true);
@@ -113,9 +113,9 @@ createSheet($spreadsheet, "Online Participants", $onlineParticipants);
 
 // Ensure at least one sheet exists
 if ($spreadsheet->getSheetCount() == 1 && empty($onlineParticipants) && empty($onsiteParticipants)) {
-    $sheet = $spreadsheet->setActiveSheetIndex(0);
-    $sheet->setTitle("No Participants");
-    $sheet->setCellValue('A1', 'No participants found.');
+  $sheet = $spreadsheet->setActiveSheetIndex(0);
+  $sheet->setTitle("No Participants");
+  $sheet->setCellValue('A1', 'No participants found.');
 }
 
 // Set the first sheet as active
