@@ -31,10 +31,10 @@ $participants = $participantManager->getAllParticipants($pdo);
 
 // Separate Online and Onsite participants (ensure indexed arrays)
 $onlineParticipants = array_values(array_filter($participants, function ($p) {
-    return $p["is_online"] == "1";
+  return isset($p["is_online"]) && $p["is_online"] == "1";
 }));
 $onsiteParticipants = array_values(array_filter($participants, function ($p) {
-    return $p["is_online"] == "0";
+  return isset($p["is_online"]) && $p["is_online"] == "0";
 }));
 
 // Get current year and date
@@ -58,7 +58,6 @@ $spreadsheet->getProperties()
 // Remove the default empty sheet
 $spreadsheet->removeSheetByIndex(0);
 
-// Function to create a sheet
 function createSheet($spreadsheet, $sheetName, $participants, $includeAccommodation = false)
 {
     if (empty($participants)) {
@@ -76,16 +75,20 @@ function createSheet($spreadsheet, $sheetName, $participants, $includeAccommodat
         $headers[] = "Accommodation"; // Add accommodation column for onsite participants
     }
 
-    // Write headers (only if they exist)
+    // Ensure headers exist before writing
     if (!empty($headers)) {
         $sheet->fromArray([$headers], NULL, 'A1');
     }
 
-    // Insert participant data
+    // Insert participant data safely
     $dataRows = [];
     foreach ($participants as $p) {
-        $fullName = "{$p['title']} {$p['last_name']} {$p['first_name']}";
-        $confirmedStatus = ($p["confirmation_sent"] == "1") ? "confirmed" : "not confirmed";
+        if (!isset($p["first_name"], $p["last_name"], $p["email"], $p["country"])) {
+            continue; // Skip if required fields are missing
+        }
+
+        $fullName = trim("{$p['title']} {$p['last_name']} {$p['first_name']}");
+        $confirmedStatus = isset($p["confirmation_sent"]) && $p["confirmation_sent"] == "1" ? "confirmed" : "not confirmed";
         $dataRow = [$fullName, $p["email"], $p["country"], $confirmedStatus];
 
         if ($includeAccommodation) {
@@ -95,14 +98,15 @@ function createSheet($spreadsheet, $sheetName, $participants, $includeAccommodat
         $dataRows[] = $dataRow;
     }
 
-    // Ensure the data array is structured properly before calling `fromArray()`
+    // Ensure dataRows is structured correctly before calling `fromArray()`
     if (!empty($dataRows)) {
-        $sheet->fromArray($dataRows, NULL, 'A2'); // Start data from row 2 (below headers)
+        $sheet->fromArray($dataRows, NULL, 'A2'); // Start data from row 2
     }
 
-    // Set auto column width safely
-    foreach (range(0, count($headers) - 1) as $index) {
-        $col = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($index + 1);
+    // Ensure auto column width is correctly calculated
+    $columnCount = count($headers);
+    for ($i = 1; $i <= $columnCount; $i++) {
+        $col = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($i);
         $sheet->getColumnDimension($col)->setAutoSize(true);
     }
 }
