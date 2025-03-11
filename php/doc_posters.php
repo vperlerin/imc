@@ -50,54 +50,57 @@ $sheet = $spreadsheet->getActiveSheet();
 $sheet->setTitle("All Posters");
 
 // Define column headers
-$headers = ["Session",  "Presenter", "Title", "Authors", "Abstract"];
+$headers = ["Session", "Presenter", "Title", "Authors", "Abstract", "Confirmed"];
 
 // Write headers
 $sheet->fromArray([$headers], NULL, 'A1');
+
+// ✅ **Apply header styling**
+$headerStyle = [
+    'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
+    'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '4F81BD']],
+    'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+    'borders' => ['bottom' => ['borderStyle' => Border::BORDER_THIN]]
+];
+
+$sheet->getStyle('A1:F1')->applyFromArray($headerStyle);
 
 // Insert poster data
 $row = 2;
 foreach ($posters as $session => $posterList) {
     foreach ($posterList as $poster) {
-        $presenter = trim("{$poster['first_name']} {$poster['last_name']}"); 
+        $presenter = trim("{$poster['first_name']} {$poster['last_name']}");
+        $confirmed = isset($poster["confirmation_sent"]) && $poster["confirmation_sent"] == "1" ? "YES" : "NO";
 
         $sheet->fromArray([
             $session,
             $presenter,
             isset($poster["title"]) ? $poster["title"] : "Untitled",
             isset($poster["authors"]) ? $poster["authors"] : "No author available",
-            isset($poster["abstract"]) ? $poster["abstract"] : "No abstract available", 
+            isset($poster["abstract"]) ? $poster["abstract"] : "No abstract available",
+            $confirmed
         ], NULL, "A$row");
 
-        // Wrap text for the abstract column (column F)
-        $sheet->getStyle("F$row")->getAlignment()->setWrapText(true);
+        // Wrap text for the Abstract & Authors columns (Columns E & D)
+        $sheet->getStyle("E$row")->getAlignment()->setWrapText(true);
+        $sheet->getStyle("D$row")->getAlignment()->setWrapText(true);
 
         $row++;
     }
 }
 
-// Auto-size columns for better readability
+// ✅ **Auto-size all columns**
 foreach (range('A', 'F') as $col) {
     $sheet->getColumnDimension($col)->setAutoSize(true);
 }
 
-// Set styles for headers
-$headerStyle = [
-  'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
-  'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '4F81BD']],
-  'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
-  'borders' => ['bottom' => ['borderStyle' => Border::BORDER_THIN]]
-];
-
-$sheet->getStyle('A1:E1')->applyFromArray($headerStyle);
-
 // Set alignment for all columns
-$sheet->getStyle("A1:E$row")->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+$sheet->getStyle("A1:F$row")->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
 
-// Prevent excessive cell height in Abstract column
+// Prevent excessive cell height in Abstract & Authors columns
 $sheet->getRowDimension(1)->setRowHeight(25);
 
-// Generate and send file
+// ✅ **Generate and send file**
 ob_end_clean();
 header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
 header("Content-Disposition: attachment; filename=\"$fileName\"");

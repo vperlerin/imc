@@ -71,7 +71,7 @@ foreach ($talks as $session => $talkList) {
     foreach ($talkList as $talk) {
         $presenter = trim("{$talk['first_name']} {$talk['last_name']}");
         $isOnline = isset($talk['is_online']) && $talk['is_online'] == "1" ? "true" : "false";
-        $confirmed = isset($talk["confirmation_sent"]) && $talk["confirmation_sent"] == "1" ? "confirmed" : "NO";
+        $confirmed = isset($talk["confirmation_sent"]) && $talk["confirmation_sent"] == "1" ? "YES" : "NO";
 
         $sheet->fromArray([
             $session,
