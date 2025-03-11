@@ -179,15 +179,19 @@ const AdminDashboard = () => {
         </div>
 
         {/* Workshop Stats */}
-        <div className="mt-4  border p-3 rounded-2 ">
+        <div className="mt-4 border p-3 rounded-2">
           <h4>Workshop Attendance</h4>
           {dashboardData.workshop_stats.length > 0 ? (
             <table className="table table-bordered">
               <thead>
                 <tr>
                   <th>Workshop</th>
-                  <th>Confirmed</th>
-                  <th>Unconfirmed</th>
+                  <th>Total Online</th>
+                  <th>Confirmed Online</th>
+                  <th>Unconfirmed Online</th>
+                  <th>Total Onsite</th>
+                  <th>Confirmed Onsite</th>
+                  <th>Unconfirmed Onsite</th>
                 </tr>
               </thead>
               <tbody>
@@ -199,10 +203,13 @@ const AdminDashboard = () => {
                       >
                         {workshop.workshop_title}
                       </Link>
-
                     </td>
-                    <td>{workshop.confirmed_participants}</td>
-                    <td>{workshop.unconfirmed_participants}</td>
+                    <td>{workshop.total_online_participants}</td>
+                    <td className="text-success">{workshop.confirmed_online_participants}</td>
+                    <td className="text-danger">{workshop.unconfirmed_online_participants}</td>
+                    <td>{workshop.total_onsite_participants}</td>
+                    <td className="text-success">{workshop.confirmed_onsite_participants}</td>
+                    <td className="text-danger">{workshop.unconfirmed_onsite_participants}</td>
                   </tr>
                 ))}
               </tbody>
@@ -211,6 +218,7 @@ const AdminDashboard = () => {
             <p>No workshop data available.</p>
           )}
         </div>
+
       </div>
     </PageContain >
   );

@@ -1,13 +1,16 @@
 <?php
 
-class DashboardManager {
+class DashboardManager
+{
     private $pdo;
 
-    public function __construct(PDO $pdo) {
+    public function __construct(PDO $pdo)
+    {
         $this->pdo = $pdo;
     }
 
-    public function getDashboardData() {
+    public function getDashboardData()
+    {
         $query = "
             -- Fetch unconfirmed online participants
             SELECT id, first_name, last_name, title, confirmation_sent, confirmation_date
@@ -41,15 +44,20 @@ class DashboardManager {
             FROM participants
             WHERE is_online = FALSE AND confirmation_sent = FALSE;
 
-            -- Count workshop attendees (confirmed and unconfirmed)
+            -- Count workshop attendees (confirmed and unconfirmed) 
             SELECT 
                 w.title AS workshop_title,
-                SUM(CASE WHEN p.confirmation_sent = TRUE THEN 1 ELSE 0 END) AS confirmed_participants,
-                SUM(CASE WHEN p.confirmation_sent = FALSE THEN 1 ELSE 0 END) AS unconfirmed_participants
+                SUM(CASE WHEN p.is_online = TRUE THEN 1 ELSE 0 END) AS total_online_participants,
+                SUM(CASE WHEN p.is_online = FALSE THEN 1 ELSE 0 END) AS total_onsite_participants,
+                SUM(CASE WHEN p.is_online = TRUE AND p.confirmation_sent = TRUE THEN 1 ELSE 0 END) AS confirmed_online_participants,
+                SUM(CASE WHEN p.is_online = TRUE AND p.confirmation_sent = FALSE THEN 1 ELSE 0 END) AS unconfirmed_online_participants,
+                SUM(CASE WHEN p.is_online = FALSE AND p.confirmation_sent = TRUE THEN 1 ELSE 0 END) AS confirmed_onsite_participants,
+                SUM(CASE WHEN p.is_online = FALSE AND p.confirmation_sent = FALSE THEN 1 ELSE 0 END) AS unconfirmed_onsite_participants
             FROM workshops w
             LEFT JOIN participant_workshops pw ON w.id = pw.workshop_id
             LEFT JOIN participants p ON pw.participant_id = p.id  
             GROUP BY w.title;
+
         ";
 
         $this->pdo->beginTransaction();
