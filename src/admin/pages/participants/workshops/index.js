@@ -79,16 +79,13 @@ const AdminParticipantsWorkshops = ({ workshopId }) => {
         <Loader />
       ) : (
         <>
-        <DocButton 
-          link={`${process.env.REACT_APP_API_URL}/doc_workshops.php?workshop_id=${workshopId}`}
-        />
- 
- 
+
+
           <div className="d-flex gap-2 mb-3">
             {/* Sorting by Type */}
             <select className="form-select w-auto" value={sortType} onChange={(e) => setSortType(e.target.value)}>
               <option value="all">All</option>
-              <option value="online">Online</option> 
+              <option value="online">Online</option>
               <option value="onsite">On-Site</option>
             </select>
 
@@ -102,7 +99,13 @@ const AdminParticipantsWorkshops = ({ workshopId }) => {
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
               <CiSearch className="position-absolute top-50 end-0 translate-middle-y me-2" />
-            </div> 
+            </div>
+
+            <DocButton
+              className="ms-auto"
+              link={`${process.env.REACT_APP_API_URL}/doc_workshops.php?workshop_id=${workshopId}`}
+            />
+
           </div>
 
           <div className="table-responsive" style={{ maxWidth: "calc(100vw - 2rem)" }}>

@@ -31,11 +31,9 @@ if (!isset($_GET['workshop_id']) || !is_numeric($_GET['workshop_id'])) {
 }
 
 $workshopId = intval($_GET['workshop_id']);
- 
- 
+
 $workshopManager = new WorkshopManager($pdo);
 $workshop = $workshopManager->getWorkshopById($workshopId);
- 
 
 if (!$workshop) {
     die(json_encode(["success" => false, "message" => "Workshop not found."]));
@@ -70,12 +68,19 @@ $spreadsheet->getProperties()
     ->setKeywords("openoffice excel export")
     ->setCategory("Workshop Data");
 
-// Function to create a sheet
+// ❌ REMOVE the default empty sheet before adding new ones
+$spreadsheet->removeSheetByIndex(0);
+
+// Function to create a sheet only if participants exist
 function createSheet($spreadsheet, $sheetName, $participants)
 {
-    $spreadsheet->createSheet();
-    $sheet = $spreadsheet->setActiveSheetIndex($spreadsheet->getSheetCount() - 1);
+    if (empty($participants)) {
+        return; // ❌ Skip creating an empty sheet
+    }
+
+    $sheet = $spreadsheet->createSheet();
     $sheet->setTitle($sheetName);
+    $spreadsheet->setActiveSheetIndex($spreadsheet->getSheetCount() - 1); // Make it the active sheet
 
     // Set column headers
     $headers = ["Full Name", "Email", "Country", "Confirmed"];
@@ -103,11 +108,20 @@ function createSheet($spreadsheet, $sheetName, $participants)
     }
 }
 
-// Create "Online Participants" sheet
-createSheet($spreadsheet, "Online Participants", $onlineParticipants);
+// ✅ Only create "Online Participants" sheet if they exist
+if (!empty($onlineParticipants)) {
+    createSheet($spreadsheet, "Online Participants", $onlineParticipants);
+}
 
-// Create "Onsite Participants" sheet
-createSheet($spreadsheet, "Onsite Participants", $onsiteParticipants);
+// ✅ Only create "Onsite Participants" sheet if they exist
+if (!empty($onsiteParticipants)) {
+    createSheet($spreadsheet, "Onsite Participants", $onsiteParticipants);
+}
+
+// ✅ Ensure at least one sheet exists
+if ($spreadsheet->getSheetCount() == 0) {
+    $spreadsheet->createSheet()->setTitle("No Participants");
+}
 
 // Set the first sheet as active
 $spreadsheet->setActiveSheetIndex(0);

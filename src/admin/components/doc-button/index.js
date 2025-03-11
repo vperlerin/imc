@@ -6,10 +6,14 @@ const formatIcons = {
   xls: <FaFileExcel />, 
 };
 
-const DocButton = ({ link, format = "xls", title = "Download" }) => {
+const DocButton = ({ 
+  link, 
+  className,
+  format = "xls", 
+  title = "Download" }) => {
   return (
     <Link
-      className="btn btn-outline-success d-inline-flex align-items-center gap-2"
+      className={`btn btn-outline-success d-inline-flex align-items-center gap-2 ${className}`}
       to={link}
       aria-label={`Download ${title} in ${format.toUpperCase()} format`}
     >
