@@ -32,8 +32,13 @@ if (!isset($_GET['workshop_id']) || !is_numeric($_GET['workshop_id'])) {
 
 $workshopId = intval($_GET['workshop_id']);
 
+echo "$workshopId " . $workshopId;
+
+
 $workshopManager = new WorkshopManager($pdo);
 $workshop = $workshopManager->getWorkshopById($pdo, $workshopId);
+
+var_dump($workshop);
 
 if (!$workshop) {
     die(json_encode(["success" => false, "message" => "Workshop not found."]));

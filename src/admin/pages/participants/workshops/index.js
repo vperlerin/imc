@@ -1,9 +1,10 @@
 import { CiSearch } from "react-icons/ci";
 import PageContain from "@/admin/components/page-contain";
 import Loader from "components/loader";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useApiWorkshopsParticipants } from "api/participants/workshops.js";
 import { useApiSpecificData } from "api/specific-data";
+import DocButton from "@/admin/components/doc-button";
 
 const AdminParticipantsWorkshops = ({ workshopId }) => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -78,11 +79,16 @@ const AdminParticipantsWorkshops = ({ workshopId }) => {
         <Loader />
       ) : (
         <>
+        <DocButton 
+          link={`${process.env.REACT_APP_API_URL}/doc_workshops.php?workshop_id=${workshopId}`}
+        />
+ 
+ 
           <div className="d-flex gap-2 mb-3">
             {/* Sorting by Type */}
             <select className="form-select w-auto" value={sortType} onChange={(e) => setSortType(e.target.value)}>
               <option value="all">All</option>
-              <option value="online">Online</option>
+              <option value="online">Online</option> 
               <option value="onsite">On-Site</option>
             </select>
 
