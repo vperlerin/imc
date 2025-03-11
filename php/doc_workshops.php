@@ -20,6 +20,7 @@ header("Access-Control-Allow-Credentials: true");
 require_once __DIR__ . "/config.php";
 require_once __DIR__ . "/class/Connect.class.php";
 require_once __DIR__ . "/class/Participant.class.php";
+require_once __DIR__ . "/class/Workshop.class.php"; 
 require __DIR__ . "/../vendor/autoload.php";
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -31,6 +32,13 @@ if (!isset($_GET['workshop_id']) || !is_numeric($_GET['workshop_id'])) {
 
 $workshopId = intval($_GET['workshop_id']);
 
+$workshopManager = new WorkshopManager($pdo);
+$workshop = $workshopManager->getWorkshopById($pdo, $workshopId);
+
+if (!$workshop) {
+    die(json_encode(["success" => false, "message" => "Workshop not found."]));
+}
+
 $participantManager = new ParticipantManager($pdo);
 $participants = $participantManager->getParticipantsByWorkshop($pdo, $workshopId);
 
@@ -41,6 +49,13 @@ $onlineParticipants = array_filter($participants, function ($p) {
 $onsiteParticipants = array_filter($participants, function ($p) {
     return $p["is_online"] == "0";
 });
+
+// Get current date in "DD-MM-YYYY" format
+$currentDate = date("d-m-Y");
+
+// Generate a sanitized workshop name for the filename
+$workshopName = preg_replace('/[^A-Za-z0-9_ -]/', '', $workshop['title']); // Remove special characters
+$fileName = "{$workshopName}_{$currentDate}.xlsx";
 
 // Create new Spreadsheet
 $spreadsheet = new Spreadsheet();
@@ -98,7 +113,7 @@ $spreadsheet->setActiveSheetIndex(0);
 // Send as downloadable Excel file
 ob_end_clean(); // Clear previous output before headers
 header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-header("Content-Disposition: attachment; filename=workshop_{$workshopId}.xlsx");
+header("Content-Disposition: attachment; filename=\"$fileName\"");
 header("Cache-Control: max-age=0");
 
 $writer = new Xlsx($spreadsheet);
