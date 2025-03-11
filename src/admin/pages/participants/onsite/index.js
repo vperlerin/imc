@@ -5,6 +5,8 @@ import Loader from "components/loader";
 import React, { useEffect, useState } from "react";
 import { useApiOnsiteParticipants } from "api/participants/onsite.js";
 import { useApiDeleteParticipant } from "@/admin/api/participants/delete";
+import DocButton from "@/admin/components/doc-button";
+
 
 const AdminParticipantsOnsite = () => {
   const [filteredParticipants, setFilteredParticipants] = useState([]);
@@ -19,7 +21,7 @@ const AdminParticipantsOnsite = () => {
   const { participants, loading, error, setParticipants } = useApiOnsiteParticipants();
   const { deleteParticipant, errorDelete, isDeleting } = useApiDeleteParticipant(setParticipants, setFilteredParticipants);
 
- 
+
   useEffect(() => {
     if (!searchQuery) {
       setFilteredParticipants(participants);
@@ -113,8 +115,12 @@ const AdminParticipantsOnsite = () => {
               />
               <CiSearch className="position-absolute top-50 end-0 translate-middle-y me-2" />
             </div>
+            <DocButton
+              className="ms-auto"
+              link={`${process.env.REACT_APP_API_URL}/doc_participants.php`}
+            />
           </div>
-          <AdminTable participants={filteredParticipants} onDelete={handleDeleteClick}/>
+          <AdminTable participants={filteredParticipants} onDelete={handleDeleteClick} />
         </>
       )}
 

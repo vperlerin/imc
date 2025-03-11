@@ -59,10 +59,11 @@ $spreadsheet->getProperties()
 $spreadsheet->removeSheetByIndex(0);
 
 // Function to create a sheet
+// Function to create a sheet only if participants exist
 function createSheet($spreadsheet, $sheetName, $participants, $includeAccommodation = false)
 {
     if (empty($participants)) {
-        return; // Skip creating an empty sheet if there are no participants
+        return;  
     }
 
     $sheet = $spreadsheet->createSheet();
@@ -74,6 +75,7 @@ function createSheet($spreadsheet, $sheetName, $participants, $includeAccommodat
     if ($includeAccommodation) {
         $headers[] = "Accommodation"; // Add accommodation column for onsite participants
     }
+    
     $sheet->fromArray($headers, NULL, 'A1');
 
     // Insert participant data
@@ -84,7 +86,7 @@ function createSheet($spreadsheet, $sheetName, $participants, $includeAccommodat
         $dataRow = [$fullName, $p["email"], $p["country"], $confirmedStatus];
 
         if ($includeAccommodation) {
-            $dataRow[] = $p["accommodation"] ?? "Not Assigned"; // Include accommodation for onsite
+            $dataRow[] = $p["accommodation"] ?? "Not Assigned"; // Handle missing accommodation
         }
 
         $sheet->fromArray($dataRow, NULL, "A$row");
@@ -97,11 +99,13 @@ function createSheet($spreadsheet, $sheetName, $participants, $includeAccommodat
     }
 }
 
-// Create "Online Participants" sheet
-createSheet($spreadsheet, "Online Participants", $onlineParticipants);
 
 // Create "Onsite Participants" sheet
 createSheet($spreadsheet, "Onsite Participants", $onsiteParticipants, true);
+
+// Create "Online Participants" sheet
+createSheet($spreadsheet, "Online Participants", $onlineParticipants);
+
 
 // Ensure at least one sheet exists
 if ($spreadsheet->getSheetCount() == 0) {
