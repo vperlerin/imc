@@ -67,7 +67,7 @@ foreach ($talks as $session => $talkList) {
             isset($talk["duration"]) ? $talk["duration"] : "N/A",
             $presenter,
             isset($talk["title"]) ? $talk["title"] : "Untitled",
-            isset($talk["authors"]) ? $talk["auhots"] : "No author available",
+            isset($talk["authors"]) ? $talk["authors"] : "No author available",
             isset($talk["abstract"]) ? $talk["abstract"] : "No abstract available",
             $isOnline
         ], NULL, "A$row");
