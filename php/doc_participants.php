@@ -55,10 +55,10 @@ $spreadsheet->getProperties()
     ->setKeywords("openoffice excel export {$currentYear}")
     ->setCategory("Participant Data");
 
-// ✅ Remove the default empty sheet
+// Remove the default empty sheet
 $spreadsheet->removeSheetByIndex(0);
 
-// ✅ Function to create a sheet
+// Function to create a sheet
 function createSheet($spreadsheet, $sheetName, $participants, $includeAccommodation = false)
 {
     if (empty($participants)) {
@@ -76,10 +76,12 @@ function createSheet($spreadsheet, $sheetName, $participants, $includeAccommodat
         $headers[] = "Accommodation"; // Add accommodation column for onsite participants
     }
 
-    // Write headers (formatted correctly for `fromArray()`)
-    $sheet->fromArray([$headers], NULL, 'A1');
+    // Write headers (only if they exist)
+    if (!empty($headers)) {
+        $sheet->fromArray([$headers], NULL, 'A1');
+    }
 
-    // ✅ Insert participant data correctly
+    // Insert participant data
     $dataRows = [];
     foreach ($participants as $p) {
         $fullName = "{$p['title']} {$p['last_name']} {$p['first_name']}";
@@ -93,28 +95,30 @@ function createSheet($spreadsheet, $sheetName, $participants, $includeAccommodat
         $dataRows[] = $dataRow;
     }
 
-    // ✅ Ensure the data array is structured properly before calling `fromArray()`
+    // Ensure the data array is structured properly before calling `fromArray()`
     if (!empty($dataRows)) {
         $sheet->fromArray($dataRows, NULL, 'A2'); // Start data from row 2 (below headers)
     }
 
-    // ✅ Set auto column width for better readability
-    foreach (range('A', count($headers)) as $col) {
+    // Set auto column width safely
+    foreach (range(0, count($headers) - 1) as $index) {
+        $col = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($index + 1);
         $sheet->getColumnDimension($col)->setAutoSize(true);
     }
 }
 
-// ✅ Only create "Online Participants" sheet if they exist
+
+// Only create "Online Participants" sheet if they exist
 if (!empty($onlineParticipants)) {
     createSheet($spreadsheet, "Online Participants", $onlineParticipants);
 }
 
-// ✅ Only create "Onsite Participants" sheet if they exist
+// Only create "Onsite Participants" sheet if they exist
 if (!empty($onsiteParticipants)) {
     createSheet($spreadsheet, "Onsite Participants", $onsiteParticipants, true);
 }
 
-// ✅ Ensure at least one sheet exists
+// Ensure at least one sheet exists
 if ($spreadsheet->getSheetCount() == 0) {
     $spreadsheet->createSheet()->setTitle("No Participants");
     $spreadsheet->setActiveSheetIndex(0);
@@ -123,9 +127,8 @@ if ($spreadsheet->getSheetCount() == 0) {
 
 // Set the first sheet as active
 $spreadsheet->setActiveSheetIndex(0);
-
-// ✅ Send as downloadable Excel file
-ob_end_clean(); // Clear previous output before headers
+ 
+ob_end_clean(); 
 header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
 header("Content-Disposition: attachment; filename=\"$fileName\"");
 header("Cache-Control: max-age=0");
