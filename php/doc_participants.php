@@ -37,6 +37,10 @@ $onsiteParticipants = array_filter($participants, function ($p) {
     return $p["is_online"] == "0";
 });
 
+
+var_dump($onsiteParticipants);
+exit; return; die;
+
 // Get current year and date
 $currentYear = date("Y");
 $currentDate = date("d-m-Y");
@@ -100,7 +104,6 @@ function createSheet($spreadsheet, $sheetName, $participants, $includeAccommodat
         $sheet->getColumnDimension($col)->setAutoSize(true);
     }
 }
-
 
 // Create "Onsite Participants" sheet
 createSheet($spreadsheet, "Onsite Participants", $onsiteParticipants, true);
