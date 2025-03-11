@@ -186,15 +186,15 @@ const AdminDashboard = () => {
               <thead>
                 <tr>
                   <th rowSpan="2">Workshop</th>
-                  <th colSpan="3" className="text-center">Online Participants</th>
-                  <th colSpan="3" className="text-centert">Onsite Participants</th>
+                  <th colSpan="2" className="text-center">Online Participants</th>
+                  <th colSpan="2" className="text-centert">Onsite Participants</th>
                 </tr>
                 <tr>
 
-                  <th className="text-success">Confirmed</th>
-                  <th className="text-danger">Unconfirmed</th>
-                  <th className="text-success">Confirmed</th>
-                  <th className="text-danger">Unconfirmed</th>
+                  <th>Confirmed</th>
+                  <th>Unconfirmed</th>
+                  <th>Confirmed</th>
+                  <th>Unconfirmed</th>
                 </tr>
               </thead>
               <tbody>
@@ -216,7 +216,7 @@ const AdminDashboard = () => {
               </tbody>
             </table>
           ) : (
-            <p>No workshop data available.</p>
+            <p><i>No workshop data available.</i></p>
           )}
         </div>
 

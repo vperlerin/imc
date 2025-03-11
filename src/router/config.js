@@ -36,6 +36,7 @@ const lazyPages = {
   WorkshopSpectro: lazy(() => import("pages/program/workshops/spectro")),
   // ADMIN
   AdminDashboard: lazy(() => import("admin/pages/dashboard")),
+  AdminDownloads: lazy(() => import("admin/pages/downloads")),
   AdminParticipantsOnsite: lazy(() => import("admin/pages/participants/onsite")),
   AdminParticipantsOnline: lazy(() => import("admin/pages/participants/online")),
   AdminParticipantsWorkshops: lazy(() => import("admin/pages/participants/workshops")),
@@ -97,6 +98,7 @@ const routeConfig = [
   { path: "/admin/participants/online/payment/:participantId", element: (<ProtectedRoute><lazyPages.AdminParticipantsPayment isCurOnline /></ProtectedRoute>) }, 
   { path: "/admin/contributions/talks", element: (<ProtectedRoute><lazyPages.AdminTalks /></ProtectedRoute>) },
   { path: "/admin/contributions/posters", element: (<ProtectedRoute><lazyPages.AdminPosters /></ProtectedRoute>) },
+  { path: "/admin/downloads", element: (<ProtectedRoute><lazyPages.AdminDownloads /></ProtectedRoute>) },
   // 404
   { path: "*", element: <Placeholder title="Oops! Looks like you’ve taken a wrong turn into the meteor shower. This page has burned up in the atmosphere!" /> },
 ];
