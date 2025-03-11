@@ -2,11 +2,11 @@ import { CiSearch } from "react-icons/ci";
 import PageContain from "@/admin/components/page-contain";
 import Loader from "components/loader";
 import React, { useState } from "react";
-import { useApiParticipantsWithRegistration } from "api/participants/accomodations.js";
+import { useApiParticipantsWithRegistration } from "api/participants/accommodations.js";
 import DocButton from "@/admin/components/doc-button";
 
-const AdminAccommodations = ({ typeFilter = '' }) => {
-  const [curFilter, setCurFilter] = useState(typeFilter || 'not_no');
+const AdminAccommodations = ({ typeFilter = "" }) => {
+  const [curFilter, setCurFilter] = useState(typeFilter || "not_no");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortColumn, setSortColumn] = useState(null);
   const [sortOrder, setSortOrder] = useState("asc");
@@ -29,7 +29,7 @@ const AdminAccommodations = ({ typeFilter = '' }) => {
 
   if (searchQuery) {
     const lowerQuery = searchQuery.toLowerCase();
-    filteredParticipants = filteredParticipants.filter(participant => {
+    filteredParticipants = filteredParticipants.filter((participant) => {
       const fieldValue = participant[searchType] ? String(participant[searchType]).toLowerCase() : "";
       return fieldValue.includes(lowerQuery);
     });
@@ -62,13 +62,14 @@ const AdminAccommodations = ({ typeFilter = '' }) => {
       isMaxWidth
       title="Participants' Accommodations"
     >
+
       {loading ? (
         <Loader />
       ) : error ? (
         <p className="text-danger">Error: {error}</p>
       ) : (
         <>
-          <div className="d-flex gap-2 mb-3">
+          <div className="d-flex flex-column flex-md-row gap-2 mb-3">
             {/* Search Filter */}
             <div className="position-relative w-auto">
               <input
@@ -80,6 +81,16 @@ const AdminAccommodations = ({ typeFilter = '' }) => {
               />
               <CiSearch className="position-absolute top-50 end-0 translate-middle-y me-2" />
             </div>
+
+            <select
+              className="form-select w-auto"
+              value={curFilter}
+              onChange={(e) => setCurFilter(e.target.value)}
+            >
+              <option value="not_no">Staying at the hostel</option>
+              <option value="no">No Accommodation</option>
+            </select>
+
 
             <DocButton
               className="ms-auto"
@@ -97,20 +108,9 @@ const AdminAccommodations = ({ typeFilter = '' }) => {
                   <th className="sortable" onClick={() => handleSort("last_name")}>
                     Name {sortColumn === "last_name" && (sortOrder === "asc" ? "🔼" : "🔽")}
                   </th>
-                  {/*
-                  <th className="sortable" onClick={() => handleSort("price")}>
-                  Price {sortColumn === "price" && (sortOrder === "asc" ? "🔼" : "🔽")}
-                </th>*/
-                  }
-
                   <th className="sortable" onClick={() => handleSort("description")}>
                     Accommodation {sortColumn === "description" && (sortOrder === "asc" ? "🔼" : "🔽")}
                   </th>
-                  {/*
-                  <th className="sortable" onClick={() => handleSort("room_left")}>
-                    Room Left {sortColumn === "room_left" && (sortOrder === "asc" ? "🔼" : "🔽")}
-                  </th>
-                  */}
                 </tr>
               </thead>
               <tbody>
@@ -122,9 +122,6 @@ const AdminAccommodations = ({ typeFilter = '' }) => {
                         {participant.title} {participant.first_name} {participant.last_name}
                       </td>
                       <td>{participant.description || "n/a"}</td>
-                      {/*
-                      <td>{participant.room_left ?? "n/a"}</td>
-                      */}
                     </tr>
                   ))
                 ) : (

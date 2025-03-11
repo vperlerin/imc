@@ -1163,13 +1163,21 @@ class ParticipantManager
      */
     public function getAllParticipants() {
         $sql = "
-            SELECT 
+          SELECT 
                 p.*, 
-                IFNULL(rt.description, 'Not Assigned') AS accommodation
+                IFNULL(rt.description, 'Not Assigned') AS accommodation,
+                (
+                    SELECT pm.method 
+                    FROM payments pay 
+                    LEFT JOIN payment_methods pm ON pay.payment_method_id = pm.id
+                    WHERE pay.participant_id = p.id
+                    ORDER BY pay.created_at DESC 
+                    LIMIT 1
+                ) AS payment_method_name
             FROM participants p
             LEFT JOIN accommodation a ON p.id = a.participant_id
             LEFT JOIN registration_types rt ON a.registration_type_id = rt.id
-            ORDER BY p.created_at DESC
+            ORDER BY p.created_at DESC;
         ";
 
         $stmt = $this->pdo->prepare($sql);

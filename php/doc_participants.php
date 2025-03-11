@@ -19,6 +19,9 @@ require __DIR__ . "/../vendor/autoload.php";
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Style\Border;
 
 // Initialize participant manager
 $participantManager = new ParticipantManager($pdo);
@@ -37,7 +40,7 @@ $currentYear = date("Y");
 $currentDate = date("d-m-Y");
 
 // Generate filename
-$fileName = "IMC{$currentYear}-Participant-{$currentDate}.xlsx";
+$fileName = "IMC{$currentYear}-Participants-Finance-{$currentDate}.xlsx";
 
 // Create new Spreadsheet
 $spreadsheet = new Spreadsheet();
@@ -68,13 +71,23 @@ function createSheet($spreadsheet, $sheetName, $participants, $includeAccommodat
     $spreadsheet->setActiveSheetIndex($spreadsheet->getIndex($sheet)); // Ensure it's active
 
     // Define column headers
-    $headers = ["Full Name", "Email", "Country", "Confirmed", "Total", "Total Due", "Total Paid", "Payment Method"];
+    $headers = ["Full Name", "Email", "Country", "Confirmed", "Total", "Total Due", "Total Paid", "Payment Method", "Comments"];
     if ($includeAccommodation) {
         $headers[] = "Accommodation"; // Add accommodation column for onsite participants
     }
 
     // Write headers
     $sheet->fromArray([$headers], NULL, 'A1');
+
+    // Apply header styles
+    $headerStyle = [
+        'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
+        'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '4F81BD']],
+        'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+        'borders' => ['bottom' => ['borderStyle' => Border::BORDER_THIN]]
+    ];
+    $sheet->getStyle('A1:' . \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex(count($headers)) . '1')
+          ->applyFromArray($headerStyle);
 
     // Insert participant data
     $dataRows = [];
@@ -94,6 +107,9 @@ function createSheet($spreadsheet, $sheetName, $participants, $includeAccommodat
         $totalPaid = isset($p["total_paid"]) ? $p["total_paid"] : 0;
         $paymentMethod = isset($p["payment_method_name"]) ? $p["payment_method_name"] : "n/a";
 
+        // Get participant comments
+        $comments = isset($p["comments"]) ? $p["comments"] : "N/A";
+
         // Create row data
         $dataRow = [
             $fullName,
@@ -103,7 +119,8 @@ function createSheet($spreadsheet, $sheetName, $participants, $includeAccommodat
             number_format($total, 2) . "€",
             number_format($total - $totalPaid, 2) . "€",
             number_format($totalPaid, 2) . "€",
-            $paymentMethod
+            $paymentMethod,
+            $comments
         ];
 
         if ($includeAccommodation) {
@@ -125,7 +142,6 @@ function createSheet($spreadsheet, $sheetName, $participants, $includeAccommodat
         $sheet->getColumnDimension($col)->setAutoSize(true);
     }
 }
-
 
 // Only create "Onsite Participants" sheet if they exist
 if (!empty($onsiteParticipants)) {

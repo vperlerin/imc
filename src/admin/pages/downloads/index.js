@@ -18,22 +18,32 @@ const AdminDownloads = () => {
       title="Downloads"
     >
 
-      <p>
-        <strong className="d-block">For the treasurer:</strong>
-        <DocButton className="d-block fw-bolder" link={`${process.env.REACT_APP_API_URL}/doc_participants.php`} title="All participants" />
-      </p>
+      <div className="mb-4">
+        <h5 className="mb-3">Finance</h5>
+        <DocButton className="d-block fw-bolder" link={`${process.env.REACT_APP_API_URL}/doc_participants.php`} title="All participants financial details" />
+      </div>
 
-      <p>
-        <strong className="d-block">For the SOC:</strong>
-        <DocButton className="d-block fw-bolder"  link={`${process.env.REACT_APP_API_URL}/doc_posters.php`} title="All posters" />
-        <DocButton className="d-block fw-bolder"  link={`${process.env.REACT_APP_API_URL}/doc_talks.php`} title="All talks" />
-      </p>
+      <div className="mb-4">
+        <h5 className="mb-3">Accomomdations</h5>
+        <DocButton className="d-block fw-bolder" link={`${process.env.REACT_APP_API_URL}/doc_accommodations.php`} title="All participants accomodations" />
+      </div>
 
-      <p>
-        <strong className="d-block">For the people in charge of the Workshops:</strong>
-        <DocButton className="d-block fw-bolder"  link={`${process.env.REACT_APP_API_URL}/doc_workshops.php?workshop_id=1`} title="All Spectrography Workshop Participants" />
-        <DocButton className="d-block fw-bolder"  link={`${process.env.REACT_APP_API_URL}/doc_workshops.php?workshop_id=2`} title="All Radio Workshop Participants" />
-      </p>
+
+      <div className="mb-4">
+        <h5 className="mb-3">Workshops:</h5>
+        <div className="d-flex flex-columnd flex-md-row gap-2">
+          <DocButton className="d-block fw-bolder" link={`${process.env.REACT_APP_API_URL}/doc_workshops.php?workshop_id=1`} title="All Spectrography Workshop Participants" />
+          <DocButton className="d-block fw-bolder" link={`${process.env.REACT_APP_API_URL}/doc_workshops.php?workshop_id=2`} title="All Radio Workshop Participants" />
+        </div>
+      </div>
+
+      <div className="mb-4">
+        <h5 className="mb-3">For the SOC</h5>
+        <div className="d-flex gap-2">
+          <DocButton className="d-block fw-bolder" link={`${process.env.REACT_APP_API_URL}/doc_posters.php`} title="All posters" />
+          <DocButton className="d-block fw-bolder" link={`${process.env.REACT_APP_API_URL}/doc_talks.php`} title="All talks" />
+        </div>
+      </div>
 
     </PageContain>
   );

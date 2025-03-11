@@ -82,7 +82,8 @@ const AdminTalks = () => {
         <Loader />
       ) : (
         <>
-          <div className="d-flex gap-2 mb-3">
+         <div className="d-flex flex-column flex-md-row gap-2 mb-3">
+             
             <div className="position-relative w-auto">
               <input
                 type="text"

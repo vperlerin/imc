@@ -19,6 +19,6 @@ export const menuItems = [
       { title: "Posters", link: "/admin/contributions/posters" },
     ],
   },
-  { title: "Accomodations", link: "/admin/accomodations" },
+  { title: "Accommodations", link: "/admin/accomodations" },
   { title: "Downloads", link: "/admin/downloads" },
 ];
