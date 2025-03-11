@@ -54,7 +54,7 @@ $spreadsheet->getProperties()
 $spreadsheet->removeSheetByIndex(0);
 
 // Define column headers
-$headers = ["Registered On", "Name", "Registration Type"];
+$headers = ["Registered On", "Name", "Country", "Organization", "Registration Type"];
 
 /**
  * Populates an Excel sheet with participant data.
@@ -81,9 +81,16 @@ function populateSheet($spreadsheet, $title, $data, $headers)
             (isset($participant['last_name']) ? $participant['last_name'] : '')
         );
 
+        $country = isset($participant["country"]) ? $participant["country"] : "N/A";
+        $organization = isset($participant["organization"]) && !empty($participant["organization"]) 
+            ? $participant["organization"] 
+            : "No organization";
+
         $sheet->fromArray([
             isset($participant["created_at"]) ? $participant["created_at"] : "N/A",
             $fullName,
+            $country,
+            $organization,
             isset($participant["description"]) ? $participant["description"] : "N/A"
         ], NULL, "A$row");
 
@@ -91,7 +98,7 @@ function populateSheet($spreadsheet, $title, $data, $headers)
     }
 
     // Auto-size columns
-    foreach (range('A', 'C') as $col) {
+    foreach (range('A', 'E') as $col) {
         $sheet->getColumnDimension($col)->setAutoSize(true);
     }
 
@@ -103,7 +110,7 @@ function populateSheet($spreadsheet, $title, $data, $headers)
         'borders' => ['bottom' => ['borderStyle' => Border::BORDER_THIN]]
     ];
 
-    $sheet->getStyle('A1:C1')->applyFromArray($headerStyle);
+    $sheet->getStyle('A1:E1')->applyFromArray($headerStyle);
 }
 
 // Populate "Staying at the hostel"
