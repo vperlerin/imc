@@ -59,15 +59,15 @@ $sheet->fromArray([$headers], NULL, 'A1');
 $row = 2;
 foreach ($talks as $session => $talkList) {
     foreach ($talkList as $talk) {
-        $presenter = "{$talk['first_name']} {$talk['last_name']}";
-        $isOnline = $talk['is_online'] === "1" ? "true" : "false";
+        $presenter = trim("{$talk['first_name']} {$talk['last_name']}");
+        $isOnline = isset($talk['is_online']) && $talk['is_online'] == "1" ? "true" : "false";
 
         $sheet->fromArray([
             $session,
-            $talk["duration"] ?? "N/A",
+            isset($talk["duration"]) ? $talk["duration"] : "N/A",
             $presenter,
-            $talk["talk_title"],
-            $talk["abstract"],
+            isset($talk["talk_title"]) ? $talk["talk_title"] : "Untitled",
+            isset($talk["abstract"]) ? $talk["abstract"] : "No abstract available",
             $isOnline
         ], NULL, "A$row");
 
