@@ -29,9 +29,13 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 $participantManager = new ParticipantManager($pdo);
 $participants = $participantManager->getAllParticipants($pdo);
 
-// Separate Online and Onsite participants
-$onlineParticipants = array_filter($participants, fn($p) => $p["is_online"] == "1");
-$onsiteParticipants = array_filter($participants, fn($p) => $p["is_online"] == "0");
+// Separate Online and Onsite participants (PHP 7.4 compatible)
+$onlineParticipants = array_filter($participants, function ($p) {
+    return $p["is_online"] == "1";
+});
+$onsiteParticipants = array_filter($participants, function ($p) {
+    return $p["is_online"] == "0";
+});
 
 // Get current year and date
 $currentYear = date("Y");
