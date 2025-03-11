@@ -18,7 +18,7 @@ header("Access-Control-Allow-Credentials: true");
 // Include dependencies
 require_once __DIR__ . "/config.php";
 require_once __DIR__ . "/class/Connect.class.php";
-require_once __DIR__ . "/class/AccommodationManager.class.php";
+require_once __DIR__ . "/class/Accommodation.class.php";
 require __DIR__ . "/../vendor/autoload.php";
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
