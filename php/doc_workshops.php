@@ -1,4 +1,9 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+ob_clean(); 
+
 // Allow CORS for local development & production
 $allowed_origins = [
   "https://imc2025.imo.net",
@@ -14,7 +19,7 @@ header("Content-Type: application/json");
 require_once __DIR__ . "/../../config.php";
 require_once __DIR__ . "/../../class/Connect.class.php";
 require_once __DIR__ . "/../../class/Dashboard.class.php";
-require '/../../../vendor/autoload.php';
+require __DIR__ .  '/../../../vendor/autoload.php';
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -78,3 +83,5 @@ header("Cache-Control: max-age=0");
 $writer = new Xlsx($spreadsheet);
 $writer->save("php://output");
 exit;
+
+?>
