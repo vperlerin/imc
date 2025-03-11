@@ -59,23 +59,25 @@ $spreadsheet->getProperties()
 function createSheet($spreadsheet, $sheetName, $participants, $includeAccommodation = false)
 {
     if (empty($participants)) {
-        return; // ❌ Skip creating an empty sheet
+        return;  
     }
 
+    // Create a new sheet
     $sheet = $spreadsheet->createSheet();
     $sheet->setTitle($sheetName);
     $spreadsheet->setActiveSheetIndex($spreadsheet->getSheetCount() - 1); // Make it the active sheet
 
-    // Set column headers
+    // Define column headers
     $headers = ["Full Name", "Email", "Country", "Confirmed"];
     if ($includeAccommodation) {
         $headers[] = "Accommodation"; // Add accommodation column for onsite participants
     }
-    
-    $sheet->fromArray($headers, NULL, 'A1');
+
+    // Ensure at least one row of headers is set before inserting data
+    $sheet->fromArray([$headers], NULL, 'A1');
 
     // Insert participant data
-    $row = 2;
+    $dataRows = [];
     foreach ($participants as $p) {
         $fullName = "{$p['title']} {$p['last_name']} {$p['first_name']}";
         $confirmedStatus = $p["confirmation_sent"] ? "confirmed" : "not confirmed";
@@ -85,15 +87,20 @@ function createSheet($spreadsheet, $sheetName, $participants, $includeAccommodat
             $dataRow[] = $p["accommodation"] ?? "Not Assigned"; // Handle missing accommodation
         }
 
-        $sheet->fromArray($dataRow, NULL, "A$row");
-        $row++;
+        $dataRows[] = $dataRow;
+    }
+
+    // Ensure the data array is not empty before calling fromArray()
+    if (!empty($dataRows)) {
+        $sheet->fromArray($dataRows, NULL, 'A2'); // Start data from row 2 (below headers)
     }
 
     // Set auto column width for better readability
-    foreach (range('A', count($headers) + 1) as $col) {
+    foreach (range('A', count($headers)) as $col) {
         $sheet->getColumnDimension($col)->setAutoSize(true);
     }
 }
+
 
 // Create "Onsite Participants" sheet
 createSheet($spreadsheet, "Onsite Participants", $onsiteParticipants, true);
