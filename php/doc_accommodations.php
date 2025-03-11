@@ -50,11 +50,11 @@ $spreadsheet->getProperties()
     ->setKeywords("conference accommodations export")
     ->setCategory("Accommodation Data");
 
-//  **Remove default sheet (fixes duplicate sheet error)**
+// 🚀 **Remove default sheet (fixes duplicate sheet error)**
 $spreadsheet->removeSheetByIndex(0);
 
 // Define column headers
-$headers = ["Registered On", "Name", "Country", "Organization", "Registration Type"];
+$headers = ["Registered On", "Name", "Country", "Organization", "Registration Type", "Comments", "Confirmed"];
 
 /**
  * Populates an Excel sheet with participant data.
@@ -85,20 +85,33 @@ function populateSheet($spreadsheet, $title, $data, $headers)
         $organization = isset($participant["organization"]) && !empty($participant["organization"]) 
             ? $participant["organization"] 
             : "No organization";
+        
+        // Get comments (handle empty)
+        $comments = isset($participant["comments"]) && !empty($participant["comments"]) 
+            ? $participant["comments"] 
+            : "No comments";
 
+        // Get confirmed status
+        $confirmedStatus = isset($participant["confirmation_sent"]) && $participant["confirmation_sent"] == "1" 
+            ? "confirmed" 
+            : "NO";
+
+        // Insert row data
         $sheet->fromArray([
             isset($participant["created_at"]) ? $participant["created_at"] : "N/A",
             $fullName,
             $country,
             $organization,
-            isset($participant["description"]) ? $participant["description"] : "N/A"
+            isset($participant["description"]) ? $participant["description"] : "N/A",
+            $comments,
+            $confirmedStatus
         ], NULL, "A$row");
 
         $row++;
     }
 
     // Auto-size columns
-    foreach (range('A', 'E') as $col) {
+    foreach (range('A', 'G') as $col) {
         $sheet->getColumnDimension($col)->setAutoSize(true);
     }
 
@@ -110,7 +123,7 @@ function populateSheet($spreadsheet, $title, $data, $headers)
         'borders' => ['bottom' => ['borderStyle' => Border::BORDER_THIN]]
     ];
 
-    $sheet->getStyle('A1:E1')->applyFromArray($headerStyle);
+    $sheet->getStyle('A1:G1')->applyFromArray($headerStyle);
 }
 
 // Populate "Staying at the hostel"
