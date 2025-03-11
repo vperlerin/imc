@@ -24,6 +24,7 @@ export const useApiWorkshopsParticipants = (workshopId) => {
         );
 
         if (response.data.success && Array.isArray(response.data.data)) {
+          console.log("RESPONSE ?", response);
           setParticipants(response.data.data);
         } else {
           throw new Error(
@@ -31,6 +32,7 @@ export const useApiWorkshopsParticipants = (workshopId) => {
           );
         }
       } catch (err) {
+        console.log("ERRR?" , err);
         setError(
           err.message || "Failed to fetch participants. Please refresh the page."
         );

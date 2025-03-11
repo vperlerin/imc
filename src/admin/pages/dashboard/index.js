@@ -180,18 +180,21 @@ const AdminDashboard = () => {
 
         {/* Workshop Stats */}
         <div className="mt-4 border p-3 rounded-2">
-          <h4>Workshop Attendance</h4>
+          <h5>Workshop Attendance</h5>
           {dashboardData.workshop_stats.length > 0 ? (
             <table className="table table-bordered">
               <thead>
                 <tr>
-                  <th>Workshop</th>
-                  <th>Total Online</th>
-                  <th>Confirmed Online</th>
-                  <th>Unconfirmed Online</th>
-                  <th>Total Onsite</th>
-                  <th>Confirmed Onsite</th>
-                  <th>Unconfirmed Onsite</th>
+                  <th rowSpan="2">Workshop</th>
+                  <th colSpan="3" className="text-center">Online Participants</th>
+                  <th colSpan="3" className="text-centert">Onsite Participants</th>
+                </tr>
+                <tr>
+                  
+                  <th className="text-success">Confirmed</th>
+                  <th className="text-danger">Unconfirmed</th> 
+                  <th className="text-success">Confirmed</th>
+                  <th className="text-danger">Unconfirmed</th>
                 </tr>
               </thead>
               <tbody>
@@ -204,11 +207,9 @@ const AdminDashboard = () => {
                         {workshop.workshop_title}
                       </Link>
                     </td>
-                    <td>{workshop.total_online_participants}</td>
-                    <td className="text-success">{workshop.confirmed_online_participants}</td>
-                    <td className="text-danger">{workshop.unconfirmed_online_participants}</td>
-                    <td>{workshop.total_onsite_participants}</td>
-                    <td className="text-success">{workshop.confirmed_onsite_participants}</td>
+                    <td className="text-success fw-bolder">{workshop.confirmed_online_participants}</td>
+                    <td className="text-danger">{workshop.unconfirmed_online_participants}</td> 
+                    <td className="text-success fw-bolder">{workshop.confirmed_onsite_participants}</td>
                     <td className="text-danger">{workshop.unconfirmed_onsite_participants}</td>
                   </tr>
                 ))}
@@ -218,6 +219,7 @@ const AdminDashboard = () => {
             <p>No workshop data available.</p>
           )}
         </div>
+
 
       </div>
     </PageContain >

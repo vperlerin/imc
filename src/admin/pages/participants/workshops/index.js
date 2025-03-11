@@ -6,40 +6,18 @@ import React, { useEffect, useState } from "react";
 import { useApiWorkshopsParticipants } from "api/participants/workshops.js";
 import { useApiSpecificData } from "api/specific-data";
 
-const AdminParticipantsWorkshops = ({ workshopId }) => { 
+const AdminParticipantsWorkshops = ({ workshopId }) => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchType, setSearchType] = useState("last_name");
-  const [filteredParticipants, setFilteredParticipants] = useState([]);
-  const [sortType, setSortType] = useState("all"); 
+  const [searchType, setSearchType] = useState("last_name"); 
+  const [sortType, setSortType] = useState("all");
   const { participants, loading } = useApiWorkshopsParticipants(workshopId);
-  const { workshops, loading: loadingWorkshops, error: specificDataError } = useApiSpecificData();
+  const { workshops, loading: loadingWorkshops  } = useApiSpecificData();
 
   // Find the current workshop based on workshopId
   const currentWorkshop = workshops?.find(w => w.id === String(workshopId));
-
-  useEffect(() => {
-    let filtered = participants;
-
-    // Apply search filter
-    if (searchQuery) {
-      const lowerQuery = searchQuery.toLowerCase();
-      filtered = filtered.filter((participant) => {
-        const fieldValue = participant[searchType] ? String(participant[searchType]).toLowerCase() : "";
-        return fieldValue.includes(lowerQuery);
-      });
-    }
-
-    // Apply type sorting
-    if (sortType !== "all") {
-      filtered = filtered.filter((participant) =>
-        sortType === "online" ? participant.is_online === "1" : participant.is_online === "0"
-      );
-    }
-
-    setFilteredParticipants(filtered);
-  }, [searchQuery, searchType, sortType, participants]);
-
   const breadcrumb = [{ url: "/admin/participants/workshops/", name: `${currentWorkshop && currentWorkshop.title} Participants` }];
+  console.log("participants? ", participants);
+
 
   return (
     <PageContain
@@ -51,7 +29,7 @@ const AdminParticipantsWorkshops = ({ workshopId }) => {
         <Loader />
       ) : (
         <>
-          
+
           <div className="d-flex gap-2 mb-3">
             {/* Search Filter */}
             <select className="form-select w-auto" value={searchType} onChange={(e) => setSearchType(e.target.value)}>
@@ -92,8 +70,8 @@ const AdminParticipantsWorkshops = ({ workshopId }) => {
                 </tr>
               </thead>
               <tbody>
-                {filteredParticipants.length > 0 ? (
-                  filteredParticipants.map((participant) => (
+                {participants.length > 0 ? (
+                  participants.map((participant) => (
                     <tr key={participant.id}>
                       <td>{participant.created_at.split(" ")[0]}</td>
                       <td>{participant.is_online === "0" ? "ON-SITE" : "ONLINE"}</td>
