@@ -62,4 +62,22 @@ class WorkshopManager
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+
+    /**
+     * Get workshop details by ID
+     * 
+     * @param int $workshopId The ID of the workshop
+     * @return array|null Returns an associative array with workshop details or null if not found
+     */
+    public function getWorkshopById($workshopId) {
+        $sql = "SELECT id, title FROM workshops WHERE id = :workshop_id LIMIT 1";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindParam(':workshop_id', $workshopId, PDO::PARAM_INT);
+        $stmt->execute();
+        
+        $workshop = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        return $workshop ?: null;
+    }
 }
