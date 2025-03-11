@@ -273,7 +273,6 @@ class ContributionManager
         } catch (Exception $e) {
             throw new Exception("Failed to fetch talks: " . $e->getMessage());
         }
-    }
-}
+    } 
 
 }
