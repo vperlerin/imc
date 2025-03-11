@@ -19,7 +19,7 @@ header("Content-Type: application/json");
 require_once __DIR__ . "/config.php";
 require_once __DIR__ . "/class/Connect.class.php";
 require_once __DIR__ . "/class/Dashboard.class.php";
-require __DIR__ .  '/../../vendor/autoload.php';
+require __DIR__ .  '/../vendor/autoload.php';
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
