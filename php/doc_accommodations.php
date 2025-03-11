@@ -50,6 +50,9 @@ $spreadsheet->getProperties()
     ->setKeywords("conference accommodations export")
     ->setCategory("Accommodation Data");
 
+// 🚀 **Remove default sheet (fixes duplicate sheet error)**
+$spreadsheet->removeSheetByIndex(0);
+
 // Define column headers
 $headers = ["Registered On", "Name", "Registration Type"];
 
@@ -59,20 +62,15 @@ $headers = ["Registered On", "Name", "Registration Type"];
  * @param string $title
  * @param array $data
  * @param array $headers
- * @param int $sheetIndex
  */
-function populateSheet($spreadsheet, $title, $data, $headers, $sheetIndex)
+function populateSheet($spreadsheet, $title, $data, $headers)
 {
-    // Create a new sheet or select existing one
-    if ($sheetIndex === 0) {
-        $sheet = $spreadsheet->getActiveSheet();
-    } else {
-        $sheet = $spreadsheet->createSheet();
-        $spreadsheet->addSheet($sheet, $sheetIndex);
-    }
-
+    // Create a new sheet
+    $sheet = $spreadsheet->createSheet();
     $sheet->setTitle($title);
-    $spreadsheet->setActiveSheetIndex($sheetIndex);
+    $spreadsheet->setActiveSheetIndex($spreadsheet->getIndex($sheet));
+
+    // Write headers
     $sheet->fromArray([$headers], NULL, 'A1');
 
     $row = 2;
@@ -108,11 +106,15 @@ function populateSheet($spreadsheet, $title, $data, $headers, $sheetIndex)
     $sheet->getStyle('A1:C1')->applyFromArray($headerStyle);
 }
 
-// Populate "Staying at the hostel" (first sheet)
-populateSheet($spreadsheet, "Staying at the hostel", $stayingAtHostel, $headers, 0);
+// Populate "Staying at the hostel"
+if (!empty($stayingAtHostel)) {
+    populateSheet($spreadsheet, "Staying at the hostel", $stayingAtHostel, $headers);
+}
 
-// Populate "No Accommodation" (second sheet)
-populateSheet($spreadsheet, "No Accommodation", $noAccommodation, $headers, 1);
+// Populate "No Accommodation"
+if (!empty($noAccommodation)) {
+    populateSheet($spreadsheet, "No Accommodation", $noAccommodation, $headers);
+}
 
 // Ensure the first sheet is active
 $spreadsheet->setActiveSheetIndex(0);

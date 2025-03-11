@@ -87,7 +87,7 @@ function createSheet($spreadsheet, $sheetName, $participants)
     $row = 2;
     foreach ($participants as $p) {
         $fullName = "{$p['title']} {$p['last_name']} {$p['first_name']}";
-        $confirmedStatus = $p["confirmation_sent"] ? "confirmed" : "not confirmed";
+        $confirmedStatus = $p["confirmation_sent"] ? "confirmed" : "NO";
 
         $sheet->fromArray([
             $fullName,
