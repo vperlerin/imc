@@ -19,7 +19,7 @@ header("Access-Control-Allow-Credentials: true");
 // Include dependencies
 require_once __DIR__ . "/config.php";
 require_once __DIR__ . "/class/Connect.class.php";
-require_once __DIR__ . "/class/Dashboard.class.php";
+require_once __DIR__ . "/class/Participant.class.php";
 require __DIR__ . "/../vendor/autoload.php";
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -31,8 +31,8 @@ if (!isset($_GET['workshop_id']) || !is_numeric($_GET['workshop_id'])) {
 
 $workshopId = intval($_GET['workshop_id']);
 
-$dashboardManager = new DashboardManager($pdo);
-$participants = $dashboardManager->getParticipantsByWorkshop($pdo, $workshopId);
+$participantManager = new Participant($pdo);
+$participants = $participantManager->getParticipantsByWorkshop($pdo, $workshopId);
 
 // Separate Online and Onsite participants
 $onlineParticipants = array_filter($participants, function ($p) {
