@@ -61,7 +61,7 @@ const AdminParticipantsOnline = () => {
   };
 
   const breadcrumb = [
-    { url: "/admin/participants/onsite", name: "Onsite Participants" },
+    { url: "/admin/participants/onsite", name: "On-site Participants" },
   ];
 
   console.log("PARTICIPANTS IN ADMIN TABLE ", participants);

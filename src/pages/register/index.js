@@ -22,12 +22,12 @@ const Register = () => {
 
       <div className="d-flex gap-3 justify-content-center mt-3"> 
         <Link
-          aria-label="Register ONSITE"
+          aria-label="Register ON-SITE"
           className="btn btn-outline-primary fw-bolder" 
           to="/register/onsite"
           title="Register ONSITE"
         >
-          Register ONSITE
+          Register ON-SITE
         </Link>
 
         <Link

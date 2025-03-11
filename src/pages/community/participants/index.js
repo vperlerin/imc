@@ -28,7 +28,7 @@ const Participants = () => {
       <div className="d-flex flex-column flex-md-row gap-3 justify-content-between mt-3">
 
         <div>
-          <h3>Onsite Participants</h3>
+          <h3>On-site Participants</h3>
           {onsiteParticipants.length > 0 ? (
             <ul className="list-unstyled">
               {onsiteParticipants.map((participant) => (

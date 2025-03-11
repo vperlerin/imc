@@ -44,7 +44,7 @@ const Payment = () => {
       <p>Please note that the LOC cannot print posters larger than {cd.poster_print.size}.</p>
 
       <p>
-        The IMC onsite registration fee is either:
+        The IMC on-site registration fee is either:
       </p>
 
       <ul className="d-flex flex-column gap-2">

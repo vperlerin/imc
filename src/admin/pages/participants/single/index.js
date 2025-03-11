@@ -203,7 +203,7 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
   const breadcrumb = [
     {
       url: `/admin/participants/${isOnline ? 'online' : 'onsite'}`,
-      name: isOnline ? "Online Participants" : "Onsite Participants"
+      name: isOnline ? "Online Participants" : "On-site Participants"
     },
     {
       url: `/admin/participants/${isOnline ? 'online' : 'onsite'}/${participantId}/${activeTab}`,

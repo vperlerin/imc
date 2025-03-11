@@ -7,7 +7,8 @@ export const menuItems = [
     subLinks: [
       { title: "On-site", link: "/admin/participants/onsite" },
       { title: "Online", link: "/admin/participants/online" },
-      { title: "Workshops", link: "/admin/participants/workshops" },
+      { title: "Radio Workshop", link: "/admin/participants/workshops/radio" },
+      { title: "Spectro Workshop", link: "/admin/participants/workshops/spectro" },
     ],
   },
   {

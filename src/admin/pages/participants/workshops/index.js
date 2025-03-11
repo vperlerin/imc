@@ -6,15 +6,17 @@ import Loader from "components/loader";
 import React, { useEffect, useState } from "react";
 import { useApiWorkshopsParticipants } from "api/participants/workshops.js";
 
-const AdminParticipantsWorkshops = () => {
-  const [selectedWorkshop, setSelectedWorkshop] = useState("1");
+const AdminParticipantsWorkshops = ({workshopId}) => { 
   const [workshops, setWorkshops] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchType, setSearchType] = useState("last_name");
   const [filteredParticipants, setFilteredParticipants] = useState([]);
   const [sortType, setSortType] = useState("all"); // New state for sorting type
 
-  const { participants, loading } = useApiWorkshopsParticipants(selectedWorkshop);
+  console.log("workshops? ", workshops);
+
+
+  const { participants, loading } = useApiWorkshopsParticipants(workshopId);
 
   useEffect(() => {
     let filtered = participants;

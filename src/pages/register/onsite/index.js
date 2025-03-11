@@ -154,7 +154,7 @@ const MainForm = () => {
             subject: `Workshop Registration`,
             message: `Hey ${workshop.responsible_name.split(" ")[0]},<br><br>
                       ${participant.participant.first_name} ${participant.participant.last_name} (${participant.participant.email})
-                      has just registered for the "${workshop.title}" (ONSITE).<br>See you,<br>V./<br>`,
+                      has just registered for the "${workshop.title}" (ON-SITE).<br>See you,<br>V./<br>`,
             to: workshop.responsible_email,
             toName: workshop.responsible_name,
             fromName: "IMC 2025",
@@ -165,7 +165,7 @@ const MainForm = () => {
         });
 
         const responseEmailTeam = await sendEmail({
-          subject: "New Onsite IMC Registration",
+          subject: "New On-site IMC Registration",
           message: emailToTeam,
           to: process.env.REACT_APP_CONTACT_EMAIL,
           toName: process.env.REACT_APP_CONTACT_NAME,
@@ -176,7 +176,7 @@ const MainForm = () => {
         });
 
         const responseEmailParticipant = await sendEmail({
-          subject: "New Onsite IMC Registration",
+          subject: "New On-site IMC Registration",
           message: emailToParticipant,
           to: participant.participant.email,
           toName: `${participant.participant.first_name} ${participant.participant.last_name}`,
@@ -203,7 +203,7 @@ const MainForm = () => {
 
 
   if (!isDebugMode ) {
-    return <PageContain title="Register Onsite">Come back soon…</PageContain>;
+    return <PageContain title="Register On-site">Come back soon…</PageContain>;
   }
 
   if (loading) return <Loader />;

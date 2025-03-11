@@ -156,7 +156,7 @@ const Payments = ({ isCurOnline = false }) => {
 
   const isOnline = participant?.participant?.is_online === "1";
   const breadcrumb = [
-    { url: `/admin/participants/${isOnline ? 'online' : 'onsite'}`, name: isOnline ? "Online Participants" : "Onsite Participants" },
+    { url: `/admin/participants/${isOnline ? 'online' : 'onsite'}`, name: isOnline ? "Online Participants" : "On-site Participants" },
     { url: `/admin/participants/${isOnline ? 'online' : 'onsite'}/payment/${participantId}`, name: `${participant?.participant?.first_name || "Participant"} ${participant?.participant?.last_name || ""}'s Payments` }
   ];
 
