@@ -1133,7 +1133,7 @@ class ParticipantManager
     }
 
 
-    public function getParticipantsByWorkshop($pdo, $workshopId)
+    public function getParticipantsByWorkshop($workshopId)
     {
         $sql = "
             SELECT 

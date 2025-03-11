@@ -43,6 +43,8 @@ const lazyPages = {
   AdminParticipantsWorkshops: lazy(() => import("admin/pages/participants/workshops")),
   AdminParticipantsUser: lazy(() => import("admin/pages/participants/single")),
   AdminParticipantsPayment: lazy(() => import("admin/pages/participants/payment")),
+  AdminTalks: lazy(() => import("admin/pages/contributions/talks")), 
+
 };
 
 // Placeholder component for 404
@@ -92,9 +94,8 @@ const routeConfig = [
   { path: "/admin/participants/onsite/:participantId/:tab?", element: (<ProtectedRoute><lazyPages.AdminParticipantsUser isCurOnline={false} /></ProtectedRoute>) },
   { path: "/admin/participants/online/:participantId/:tab?", element: (<ProtectedRoute><lazyPages.AdminParticipantsUser isCurOnline/></ProtectedRoute>) }, 
   { path: "/admin/participants/onsite/payment/:participantId", element: (<ProtectedRoute><lazyPages.AdminParticipantsPayment isCurOnline={false} /></ProtectedRoute>) },
-  { path: "/admin/participants/online/payment/:participantId", element: (<ProtectedRoute><lazyPages.AdminParticipantsPayment isCurOnline /></ProtectedRoute>) },
-
-
+  { path: "/admin/participants/online/payment/:participantId", element: (<ProtectedRoute><lazyPages.AdminParticipantsPayment isCurOnline /></ProtectedRoute>) }, 
+  { path: "/admin/contributions/talks", element: (<ProtectedRoute><lazyPages.AdminTalks /></ProtectedRoute>) },
   // 404
   { path: "*", element: <Placeholder title="Oops! Looks like you’ve taken a wrong turn into the meteor shower. This page has burned up in the atmosphere!" /> },
 ];

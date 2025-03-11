@@ -40,7 +40,7 @@ if (!$workshop) {
 }
 
 $participantManager = new ParticipantManager($pdo);
-$participants = $participantManager->getParticipantsByWorkshop($pdo, $workshopId);
+$participants = $participantManager->getParticipantsByWorkshop($workshopId);
 
 // Separate Online and Onsite participants
 $onlineParticipants = array_filter($participants, function ($p) {

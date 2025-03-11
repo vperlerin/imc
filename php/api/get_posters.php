@@ -15,25 +15,18 @@ header("Access-Control-Allow-Methods: GET, OPTIONS");
 
 require_once __DIR__ . "/../config.php";
 require_once __DIR__ . "/../class/Connect.class.php";
-require_once __DIR__ . "/../class/Participant.class.php";
+require_once __DIR__ . "/../class/Contribution.class.php";
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit;
 }
-
-// Validate workshop ID
-$workshopId = $_GET['workshop_id'] ?? null;
-if (!$workshopId || !is_numeric($workshopId)) {
-    echo json_encode(["success" => false, "message" => "Invalid workshop ID"]);
-    exit;
-}
-
+ 
 try {
-    $participantManager = new ParticipantManager($pdo);
-    $participants = $participantManager->getParticipantsByWorkshop($workshopId);
+    $contributionManager = new ContributionManager($pdo);
+    $contributions = $contributionManager->getAllPosters();
 
-    echo json_encode(["success" => true, "data" => $participants]);
+    echo json_encode(["success" => true, "data" => $contributions]);
 } catch (Exception $e) {
     echo json_encode(["success" => false, "message" => $e->getMessage()]);
 }

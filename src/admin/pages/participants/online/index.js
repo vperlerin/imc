@@ -62,7 +62,7 @@ const AdminParticipantsOnline = () => {
   };
 
   const breadcrumb = [
-    { url: "/admin/participants/onsite", name: "On-site Participants" },
+    { url: "/admin/participants/online", name: "Online Participants" },
   ];
 
 
