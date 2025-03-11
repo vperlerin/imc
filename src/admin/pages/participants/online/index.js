@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import { useApiOnlineParticipants } from "api/participants/online.js";
 import { useApiDeleteParticipant } from "@/admin/api/participants/delete";
 import AdminTable from "@/admin/components/admin-table";
+import DocButton from "@/admin/components/doc-button";
 
 
 const AdminParticipantsOnline = () => {
@@ -114,8 +115,12 @@ const AdminParticipantsOnline = () => {
               />
               <CiSearch className="position-absolute top-50 end-0 translate-middle-y me-2" />
             </div>
+            <DocButton
+              className="ms-auto"
+              link={`${process.env.REACT_APP_API_URL}/doc_participants.php`}
+            />
           </div>
-          <AdminTable participants={filteredParticipants} onDelete={handleDeleteClick}/>
+          <AdminTable participants={filteredParticipants} onDelete={handleDeleteClick} />
         </>
       )}
 

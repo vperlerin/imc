@@ -30,12 +30,8 @@ $participantManager = new ParticipantManager($pdo);
 $participants = $participantManager->getAllParticipants($pdo);
 
 // Separate Online and Onsite participants
-$onlineParticipants = array_filter($participants, function ($p) {
-    return $p["is_online"] == "1";
-});
-$onsiteParticipants = array_filter($participants, function ($p) {
-    return $p["is_online"] == "0";
-});
+$onlineParticipants = array_filter($participants, fn($p) => $p["is_online"] == "1");
+$onsiteParticipants = array_filter($participants, fn($p) => $p["is_online"] == "0");
 
 // Get current year and date
 $currentYear = date("Y");
@@ -55,15 +51,11 @@ $spreadsheet->getProperties()
     ->setKeywords("openoffice excel export {$currentYear}")
     ->setCategory("Participant Data");
 
-// Remove the default empty sheet before adding new ones
-$spreadsheet->removeSheetByIndex(0);
-
 // Function to create a sheet
-// Function to create a sheet only if participants exist
 function createSheet($spreadsheet, $sheetName, $participants, $includeAccommodation = false)
 {
     if (empty($participants)) {
-        return;  
+        return; // ❌ Skip creating an empty sheet
     }
 
     $sheet = $spreadsheet->createSheet();
@@ -94,11 +86,10 @@ function createSheet($spreadsheet, $sheetName, $participants, $includeAccommodat
     }
 
     // Set auto column width for better readability
-    foreach (range('A', count($headers)) as $col) {
+    foreach (range('A', count($headers) + 1) as $col) {
         $sheet->getColumnDimension($col)->setAutoSize(true);
     }
 }
-
 
 // Create "Onsite Participants" sheet
 createSheet($spreadsheet, "Onsite Participants", $onsiteParticipants, true);
@@ -106,10 +97,11 @@ createSheet($spreadsheet, "Onsite Participants", $onsiteParticipants, true);
 // Create "Online Participants" sheet
 createSheet($spreadsheet, "Online Participants", $onlineParticipants);
 
-
 // Ensure at least one sheet exists
-if ($spreadsheet->getSheetCount() == 0) {
-    $spreadsheet->createSheet()->setTitle("No Participants");
+if ($spreadsheet->getSheetCount() == 1 && empty($onlineParticipants) && empty($onsiteParticipants)) {
+    $sheet = $spreadsheet->setActiveSheetIndex(0);
+    $sheet->setTitle("No Participants");
+    $sheet->setCellValue('A1', 'No participants found.');
 }
 
 // Set the first sheet as active
