@@ -29,7 +29,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 $participantManager = new ParticipantManager($pdo);
 $participants = $participantManager->getAllParticipants($pdo);
 
-// Separate Online and Onsite participants
+// Separate Online and Onsite participants (ensure indexed arrays)
 $onlineParticipants = array_values(array_filter($participants, function ($p) {
     return $p["is_online"] == "1";
 }));
@@ -55,7 +55,10 @@ $spreadsheet->getProperties()
     ->setKeywords("openoffice excel export {$currentYear}")
     ->setCategory("Participant Data");
 
-// Function to create a sheet
+// ✅ Remove the default empty sheet
+$spreadsheet->removeSheetByIndex(0);
+
+// ✅ Function to create a sheet
 function createSheet($spreadsheet, $sheetName, $participants, $includeAccommodation = false)
 {
     if (empty($participants)) {
@@ -63,23 +66,20 @@ function createSheet($spreadsheet, $sheetName, $participants, $includeAccommodat
     }
 
     // Create a new sheet
-    $sheet = ($spreadsheet->getSheetCount() == 1 && $spreadsheet->getActiveSheet()->getTitle() == "Worksheet") 
-        ? $spreadsheet->getActiveSheet() // Use default first sheet if it's still empty
-        : $spreadsheet->createSheet();
-
+    $sheet = $spreadsheet->createSheet();
     $sheet->setTitle($sheetName);
     $spreadsheet->setActiveSheetIndex($spreadsheet->getIndex($sheet)); // Ensure it's active
 
     // Define column headers
-    $headers = [["Full Name", "Email", "Country", "Confirmed"]];
+    $headers = ["Full Name", "Email", "Country", "Confirmed"];
     if ($includeAccommodation) {
-        $headers[0][] = "Accommodation"; // Add accommodation column for onsite participants
+        $headers[] = "Accommodation"; // Add accommodation column for onsite participants
     }
 
-    // Write headers
-    $sheet->fromArray($headers, NULL, 'A1');
+    // Write headers (formatted correctly for `fromArray()`)
+    $sheet->fromArray([$headers], NULL, 'A1');
 
-    // Insert participant data
+    // ✅ Insert participant data correctly
     $dataRows = [];
     foreach ($participants as $p) {
         $fullName = "{$p['title']} {$p['last_name']} {$p['first_name']}";
@@ -93,40 +93,38 @@ function createSheet($spreadsheet, $sheetName, $participants, $includeAccommodat
         $dataRows[] = $dataRow;
     }
 
-    // Ensure the data array is not empty before calling fromArray()
+    // ✅ Ensure the data array is structured properly before calling `fromArray()`
     if (!empty($dataRows)) {
         $sheet->fromArray($dataRows, NULL, 'A2'); // Start data from row 2 (below headers)
     }
 
-    // Set auto column width for better readability
-    foreach (range('A', count($headers[0])) as $col) {
+    // ✅ Set auto column width for better readability
+    foreach (range('A', count($headers)) as $col) {
         $sheet->getColumnDimension($col)->setAutoSize(true);
     }
 }
 
-// Remove the default empty sheet **only if necessary**
-if ($spreadsheet->getSheetCount() == 1 && $spreadsheet->getActiveSheet()->getTitle() == "Worksheet") {
-    $spreadsheet->removeSheetByIndex(0);
+// ✅ Only create "Online Participants" sheet if they exist
+if (!empty($onlineParticipants)) {
+    createSheet($spreadsheet, "Online Participants", $onlineParticipants);
 }
 
-// Create "Onsite Participants" sheet
-createSheet($spreadsheet, "Onsite Participants", $onsiteParticipants, true);
+// ✅ Only create "Onsite Participants" sheet if they exist
+if (!empty($onsiteParticipants)) {
+    createSheet($spreadsheet, "Onsite Participants", $onsiteParticipants, true);
+}
 
-// Create "Online Participants" sheet
-createSheet($spreadsheet, "Online Participants", $onlineParticipants);
-
-// Ensure at least one sheet exists
+// ✅ Ensure at least one sheet exists
 if ($spreadsheet->getSheetCount() == 0) {
-    $sheet = $spreadsheet->createSheet();
-    $sheet->setTitle("No Participants");
+    $spreadsheet->createSheet()->setTitle("No Participants");
     $spreadsheet->setActiveSheetIndex(0);
-    $sheet->setCellValue('A1', 'No participants found.');
+    $spreadsheet->getActiveSheet()->setCellValue('A1', 'No participants found.');
 }
 
 // Set the first sheet as active
 $spreadsheet->setActiveSheetIndex(0);
 
-// Send as downloadable Excel file
+// ✅ Send as downloadable Excel file
 ob_end_clean(); // Clear previous output before headers
 header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
 header("Content-Disposition: attachment; filename=\"$fileName\"");
