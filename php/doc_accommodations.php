@@ -50,7 +50,7 @@ $spreadsheet->getProperties()
     ->setKeywords("conference accommodations export")
     ->setCategory("Accommodation Data");
 
-// 🚀 **Remove default sheet (fixes duplicate sheet error)**
+//  **Remove default sheet (fixes duplicate sheet error)**
 $spreadsheet->removeSheetByIndex(0);
 
 // Define column headers
