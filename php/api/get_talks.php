@@ -1,6 +1,12 @@
 <?php
 
- 
+// Enable error reporting
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+ob_clean(); // Clears any previous output
+
+
 $allowed_origins = [
     "https://imc2025.imo.net",
     "http://localhost:3000"
@@ -21,9 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit;
 }
-
  
-
 try {
     $contributionManager = new ContributionManager($pdo);
     $contributions = $contributionManager->getAllTalks();
