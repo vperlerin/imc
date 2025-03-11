@@ -1152,5 +1152,36 @@ class ParticipantManager
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+
+    /**
+     * Get all participants (both onsite and online)
+     * Includes accommodation details for onsite participants.
+     * 
+     * @return array List of participants
+     */
+    public function getAllParticipants() {
+        $sql = "
+            SELECT 
+                p.id, 
+                p.title, 
+                p.first_name, 
+                p.last_name, 
+                p.email, 
+                p.country, 
+                p.is_online, 
+                p.confirmation_sent, 
+                IFNULL(rt.description, 'Not Assigned') AS accommodation
+            FROM participants p
+            LEFT JOIN accommodation a ON p.id = a.participant_id
+            LEFT JOIN registration_types rt ON a.registration_type_id = rt.id
+            ORDER BY p.created_at DESC
+        ";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     
 }

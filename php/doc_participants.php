@@ -20,27 +20,14 @@ header("Access-Control-Allow-Credentials: true");
 require_once __DIR__ . "/config.php";
 require_once __DIR__ . "/class/Connect.class.php";
 require_once __DIR__ . "/class/Participant.class.php";
-require_once __DIR__ . "/class/Workshop.class.php"; 
 require __DIR__ . "/../vendor/autoload.php";
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
-if (!isset($_GET['workshop_id']) || !is_numeric($_GET['workshop_id'])) {
-  die(json_encode(["success" => false, "message" => "Invalid workshop ID."]));
-}
-
-$workshopId = intval($_GET['workshop_id']);
-
-$workshopManager = new WorkshopManager($pdo);
-$workshop = $workshopManager->getWorkshopById($workshopId);
-
-if (!$workshop) {
-    die(json_encode(["success" => false, "message" => "Workshop not found."]));
-}
-
+// Initialize participant manager
 $participantManager = new ParticipantManager($pdo);
-$participants = $participantManager->getParticipantsByWorkshop($pdo, $workshopId);
+$participants = $participantManager->getAllParticipants($pdo);
 
 // Separate Online and Onsite participants
 $onlineParticipants = array_filter($participants, function ($p) {
@@ -50,34 +37,32 @@ $onsiteParticipants = array_filter($participants, function ($p) {
     return $p["is_online"] == "0";
 });
 
-// Get current date in "DD-MM-YYYY" format
+// Get current year and date
+$currentYear = date("Y");
 $currentDate = date("d-m-Y");
 
-// Generate a sanitized workshop name for the filename
-$workshopName = preg_replace('/[^A-Za-z0-9_ -]/', '', $workshop['title']); // Remove special characters
-$fileName = "{$workshopName}_{$currentDate}.xlsx";
+// Generate filename
+$fileName = "IMC{$currentYear}-Participant-{$currentDate}.xlsx";
 
-
-// Create new Spreadsheet 
-$currentYear = date("Y");
-
+// Create new Spreadsheet
 $spreadsheet = new Spreadsheet();
 $spreadsheet->getProperties()
-    ->setCreator("IMC {$currentYear}")  
+    ->setCreator("IMC {$currentYear}")
     ->setLastModifiedBy("IMC {$currentYear}")
-    ->setTitle("Workshop Participants {$currentYear}")  
-    ->setSubject("Participants List for {$currentYear}")
-    ->setDescription("Excel 2007 export for OpenOffice compatibility - {$currentYear}")
-    ->setKeywords("IMC IMO openoffice excel export {$currentYear}")
-    ->setCategory("Workshop Data {$currentYear}");
+    ->setTitle("IMC Participants {$currentYear}")
+    ->setSubject("Participants List")
+    ->setDescription("Excel 2007 export for OpenOffice compatibility.")
+    ->setKeywords("openoffice excel export {$currentYear}")
+    ->setCategory("Participant Data");
 
-+$spreadsheet->removeSheetByIndex(0);
+// Remove the default empty sheet before adding new ones
+$spreadsheet->removeSheetByIndex(0);
 
-// Function to create a sheet only if participants exist
-function createSheet($spreadsheet, $sheetName, $participants)
+// Function to create a sheet
+function createSheet($spreadsheet, $sheetName, $participants, $includeAccommodation = false)
 {
     if (empty($participants)) {
-        return; 
+        return; // Skip creating an empty sheet if there are no participants
     }
 
     $sheet = $spreadsheet->createSheet();
@@ -86,41 +71,39 @@ function createSheet($spreadsheet, $sheetName, $participants)
 
     // Set column headers
     $headers = ["Full Name", "Email", "Country", "Confirmed"];
+    if ($includeAccommodation) {
+        $headers[] = "Accommodation"; // Add accommodation column for onsite participants
+    }
     $sheet->fromArray($headers, NULL, 'A1');
 
-    // Insert Data
+    // Insert participant data
     $row = 2;
     foreach ($participants as $p) {
         $fullName = "{$p['title']} {$p['last_name']} {$p['first_name']}";
         $confirmedStatus = $p["confirmation_sent"] ? "confirmed" : "not confirmed";
+        $dataRow = [$fullName, $p["email"], $p["country"], $confirmedStatus];
 
-        $sheet->fromArray([
-            $fullName,
-            $p["email"],
-            $p["country"],
-            $confirmedStatus
-        ], NULL, "A$row");
+        if ($includeAccommodation) {
+            $dataRow[] = $p["accommodation"] ?? "Not Assigned"; // Include accommodation for onsite
+        }
 
+        $sheet->fromArray($dataRow, NULL, "A$row");
         $row++;
     }
 
     // Set auto column width for better readability
-    foreach (range('A', 'D') as $col) {
+    foreach (range('A', count($headers)) as $col) {
         $sheet->getColumnDimension($col)->setAutoSize(true);
     }
 }
 
-// ✅ Only create "Online Participants" sheet if they exist
-if (!empty($onlineParticipants)) {
-    createSheet($spreadsheet, "Online Participants", $onlineParticipants);
-}
+// Create "Online Participants" sheet
+createSheet($spreadsheet, "Online Participants", $onlineParticipants);
 
-// ✅ Only create "Onsite Participants" sheet if they exist
-if (!empty($onsiteParticipants)) {
-    createSheet($spreadsheet, "Onsite Participants", $onsiteParticipants);
-}
+// Create "Onsite Participants" sheet
+createSheet($spreadsheet, "Onsite Participants", $onsiteParticipants, true);
 
-// ✅ Ensure at least one sheet exists
+// Ensure at least one sheet exists
 if ($spreadsheet->getSheetCount() == 0) {
     $spreadsheet->createSheet()->setTitle("No Participants");
 }
