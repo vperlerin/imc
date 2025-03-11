@@ -29,11 +29,6 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 $participantManager = new ParticipantManager($pdo);
 $participants = $participantManager->getAllParticipants($pdo);
 
-
-var_dump($participants);
-exit;
-return;
-
 // Separate Online and Onsite participants (PHP 7.4 compatible)
 $onlineParticipants = array_filter($participants, function ($p) {
     return $p["is_online"] == "1";
