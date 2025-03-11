@@ -1,18 +1,13 @@
 import PageContain from "components/page-contain";
 import React from "react";
 import { Link } from "react-router-dom";
-import { conferenceData as cf } from "data/conference-data";
+import { conferenceData as cd } from "data/conference-data";
 
 const Spectro = () => {
-  const workshop = cf.workshops.find(w => w.title === "Spectroscopy Workshop");
+  const workshop = cd.workshops.find(w => w.title === "Spectroscopy Workshop");
 
   return (
     <PageContain title="Spectroscopy Workshop">
-      <p>
-        In case participants wish to stay at the Stayokay hostel before the start of the IMC,
-        they should book a room themselves at the hostel.
-      </p>
-
       <div className="mb-4">
 
         <p>
@@ -42,6 +37,9 @@ const Spectro = () => {
               <><i>Unfortunately, this workshop won't be available online.</i><br /></>
             )} 
 
+ 
+        <div className="mt-3">In case participants wish to stay at the {cd.hotel} before the start of the IMC,
+        they should book a room directly with the hostel.</div>
         </div>
 
       </div>

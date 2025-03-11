@@ -140,7 +140,7 @@ const TalkPosterForm = ({
       )}
 
       {/* Printing (Only for Posters) */}
-      {!isTalk && (
+      {!isTalk && !isEditing && (
         <>
           {/* Display warning message if print value changes while editing */}
           {isEditing && printChanged && (

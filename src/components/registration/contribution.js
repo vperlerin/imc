@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import cssForm from "styles/components/form.module.scss";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import StepDislay from "components/registration/stepDisplay";
 import TalkPosterForm from "./talkPoster";
 import { MdAdd } from "react-icons/md";
@@ -23,22 +23,23 @@ const ContributionForm = ({
   step,
   stepTotal,
   trigger,
-  setValue,
-  getValues,
+  setValue, 
   sessions,
   watch
 }) => {
   const { fields: talks, append: addTalk, remove: removeTalk } = useFieldArray({ control, name: "talks" });
   const { fields: posters, append: addPoster, remove: removePoster } = useFieldArray({ control, name: "posters" });
 
-  const setWantsToContribute = (value) => {
+  const setWantsToContribute = (value) => { 
     setValue("wantsToContribute", value, { shouldDirty: true, shouldValidate: true });
   };
 
   // Validate before adding new talk/poster
   const validateAndAdd = async (type) => {
-    const isValid = await trigger();
+    const isValid = await trigger(); 
+
     if (isValid) {
+      setValue("wantsToContribute", true);
       if (type === "talk") addTalk({});
       else if (!isOnline) addPoster({ print: false }); // Default print to false
     }
@@ -70,6 +71,7 @@ const ContributionForm = ({
       });
     }
   };
+ 
  
   return (
     <div className="position-relative">

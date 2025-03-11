@@ -11,8 +11,8 @@ import { useApiParticipant } from "api/participants";
 import { useApiSpecificData } from "api/specific-data/index.js";
 import { useForm } from "react-hook-form";
 import { useSelector, useDispatch } from 'react-redux';
-import { useBlockNavigation } from "hooks/block-navigation.js";  
-import { useApiLogout } from 'api/oauth/logout';  
+import { useBlockNavigation } from "hooks/block-navigation.js";
+import { useApiLogout } from 'api/oauth/logout';
 
 const UpdateRegistration = () => {
   const dispatch = useDispatch();
@@ -22,21 +22,44 @@ const UpdateRegistration = () => {
   const [saving, setSaving] = useState(false);
   const [participantId, setParticipantId] = useState(null);
   const [unsavedChanges, setUnsavedChanges] = useState(false);
-  const [fetchTrigger, setFetchTrigger] = useState(0);  
+  const [fetchTrigger, setFetchTrigger] = useState(0);
   const hasFetchedParticipant = useRef(false);
-
+  let isOnline = false;
   const user = useSelector(authSelectors.getUser);
-  const { control, register, handleSubmit, getValues, setValue, formState: { errors }, reset, trigger, watch } = useForm();
-// TODO
-
-  console.log("UPDATE isOnline on useApiParticipant");
-
-
-  const { participant, loading: participantLoading } = useApiParticipant(participantId, fetchTrigger);
+  const { control, register, handleSubmit, getValues, setValue, formState: { errors }, trigger, watch } = useForm();
+ 
+  const { participant, loading: participantLoading } = useApiParticipant(participantId, isOnline,  fetchTrigger);
   const { loading: specificDataLoading, sessions } = useApiSpecificData();
   const { logout, loading: logoutLoading } = useApiLogout();
+  isOnline = participant?.participant?.is_online === "1";
 
   useBlockNavigation(unsavedChanges);
+
+  useEffect(() => {
+    if (!participant || sessions.length === 0) {
+      return;
+    }
+
+    // Handle Contributions (Talks & Posters)
+    if (participant.contributions && Array.isArray(participant.contributions) && sessions.length > 0) {
+      const updatedTalks = participant.contributions
+        .filter(contribution => contribution.type === "talk")
+        .map(talk => ({ ...talk }));
+
+      const updatedPosters = participant.contributions
+        .filter(contribution => contribution.type === "poster")
+        .map(poster => ({ ...poster }));
+
+      // Set values in form so they persist on submit
+      setValue("talks", updatedTalks);
+      setValue("posters", updatedPosters);
+
+      // Set wantsToContribute if at least one talk or poster exists
+      if (updatedTalks.length > 0 || updatedPosters.length > 0) {
+        setValue("wantsToContribute", "1");
+      }
+    }
+  }, [participant, sessions, setValue]);
 
   // Detect form changes to prevent accidental navigation
   useEffect(() => {
@@ -79,20 +102,19 @@ const UpdateRegistration = () => {
 
     // Process contributions
     const contributions = participant.contributions || [];
- 
+
     const updatedTalks = contributions
       .filter(c => c.type === "talk")
-      .map(talk => ({ ...talk  || sessions[0]?.id }));
+      .map(talk => ({ ...talk || sessions[0]?.id }));
 
     const updatedPosters = contributions
       .filter(c => c.type === "poster")
-      .map(poster => ({ ...poster  || sessions[0]?.id }));
+      .map(poster => ({ ...poster || sessions[0]?.id }));
 
     // Store data in form fields
     setValue("talks", updatedTalks);
     setValue("posters", updatedPosters);
-
-    console.log("UDPATED TALKS ", updatedTalks);
+ 
 
   }, [participant, sessions, setValue]);
 
@@ -143,19 +165,28 @@ const UpdateRegistration = () => {
           <div className="border rounded-2 p-3 mb-3">
             <p className="fw-bolder">{`Hello ${participant.participant.title} ${participant.participant.first_name} ${participant.participant.last_name},`}</p>
             <p>
-              On this page, you have the option to update either your travel details or contributions (talks & posters).
-              If you need to make any other changes to your records, please{' '}
-              <Link aria-label="Contact" to="/contact" title="Contact">contact us</Link>.
+              {isOnline ? (
+                <>
+                  On this page, you have the option to update your contributions (talks).
+                  If you need to make any other changes to your records, please{' '}
+                  <Link aria-label="Contact" to="/contact" title="Contact">contact us</Link>.
+                </>
+              ) : (
+                <>
+                  On this page, you have the option to update either your travel details or contributions (talks & posters).
+                  If you need to make any other changes to your records, please{' '}
+                  <Link aria-label="Contact" to="/contact" title="Contact">contact us</Link>.
+                </>
+              )}
             </p>
-
-            <div className="d-flex gap-2 mb-2">
-              <button
-                className={classNames('btn fw-bolder', activeSection === "arrival" ? 'btn-primary' : 'btn-outline-primary')}
-                onClick={() => setActiveSection(activeSection === "arrival" ? null : "arrival")}
-              >
-                Travel Details
-              </button>
-
+            {!isOnline && (
+            <div className="d-flex gap-2 mb-2"> 
+                <button
+                  className={classNames('btn fw-bolder', activeSection === "arrival" ? 'btn-primary' : 'btn-outline-primary')}
+                  onClick={() => setActiveSection(activeSection === "arrival" ? null : "arrival")}
+                >
+                  Travel Details
+                </button> 
               <button
                 className={classNames('btn fw-bolder', activeSection === "contributions" ? 'btn-primary' : 'btn-outline-primary')}
                 onClick={() => setActiveSection(activeSection === "contributions" ? null : "contributions")}
@@ -163,6 +194,7 @@ const UpdateRegistration = () => {
                 Contributions
               </button>
             </div>
+            )}
 
             {errMsg && (
               <div className="alert alert-danger fw-bolder mt-3">{errMsg}</div>
@@ -171,20 +203,22 @@ const UpdateRegistration = () => {
             {successMsg && (
               <div className="alert alert-success fw-bolder mt-3">
                 {successMsg}
-                <button
-                  aria-label="Logout"
-                  className="btn btn-outline-danger px-3 fw-bolder ms-3"
-                  onClick={logout}
-                  disabled={logoutLoading}
-                  title="Logout"
-                >
-                  {logoutLoading ? "Logging out..." : "Logout"}
-                </button>
+                <div className="text-center mt-2">
+                  <button
+                    aria-label="Logout"
+                    className="btn btn-outline-danger px-3 fw-bolder ms-3"
+                    onClick={logout}
+                    disabled={logoutLoading}
+                    title="Logout"
+                  >
+                    {logoutLoading ? "Logging out..." : "Logout"}
+                  </button>
+                </div>
               </div>
             )}
           </div>
 
-          {!!activeSection && (
+          {(!!activeSection || isOnline) && (
             <div className="mt-2 position-relative">
               <form onSubmit={handleSubmit(onSubmit)}>
                 {saving && <Loader isFixed={false} />}
@@ -193,8 +227,20 @@ const UpdateRegistration = () => {
                   <Arrival isEditing conferenceData={cd} register={register} errors={errors} setValue={setValue} trigger={trigger} />
                 )}
 
-                {activeSection === "contributions" && (
-                  <Contribution isEditing conferenceData={cd} control={control} register={register} errors={errors} getValues={getValues} setValue={setValue} watch={watch} trigger={trigger} sessions={sessions} />
+                {(activeSection === "contributions" || isOnline) && (
+                  <Contribution
+                    isEditing
+                    isOnline={isOnline}
+                    conferenceData={cd}
+                    control={control}
+                    register={register}
+                    errors={errors}
+                    getValues={getValues}
+                    setValue={setValue}
+                    watch={watch}
+                    trigger={trigger}
+                    sessions={sessions}
+                  />
                 )}
 
                 <div className="mt-4 d-flex justify-content-end">

@@ -4,10 +4,6 @@ import { conferenceData as cf } from "data/conference-data";
 import { formatFullDate } from "utils/date";
 import { Link } from "react-router-dom";
 
-const LatexTemplate = "/files/Latex-Template.zip";
-const LatexStyle = "/files/imc.sty";
-const MSWordTemplate = "/files/MSWord-Template.docx";
-
 const Guidelines = () => {
   return (
     <PageContain title="Submission and Proceedings Guidelines">
@@ -76,43 +72,6 @@ const Guidelines = () => {
       </ul>
 
       <div className="rounded-2 p-3 border border-2 mb-4">
-        {/*
-          <p>
-            The {cf.year} IMC Proceedings will be prepared in PDFLaTeX. Those familiar with PDFLaTeX are encouraged to use the template available in{' '}
-            <a href={LatexTemplate} download>
-              this archive
-            </a>, which also contains a sample article. Those who are less familiar with PDFLaTeX are welcome to submit their article in Word. The editors will then convert your article to PDFLaTeX. Word users SHOULD use{' '}
-            <a href={MSWordTemplate} download>
-              this document
-            </a>{' '}
-            to format their article in the style of proceedings. To avoid compatibility issues, please save the Word file as "Word 2007" or earlier. Feel free to{' '}
-            <Link aria-label="Contact" to="/contact" title="Contact">
-              contact us
-            </Link>{' '}
-            if you need help.
-          </p>
-
-          <p>If reworking a previous paper (written according to these guidelines), please update the header:</p>
-          <ul>
-            <li>
-              For Word users: "Proceedings of the IMC, {cf.location}, {cf.year}"
-              <br />
-              <i>Note:</i> Copy this header on the first two pages to ensure it appears on all subsequent odd and even-numbered pages.
-            </li>
-            <li>
-              For LaTeX users: include the following{' '}
-              <a href={LatexStyle} download>
-                sty file
-              </a>.
-              <br />
-              <i>Note:</i> Insert the line <code>\usepackage{"{imc}"}</code> just above <code>\begin{"{document}"}</code>.
-              <br />
-              Please provide a separate link to  <a href={LatexStyle} download>
-                imc.sty
-              </a>.
-            </li>
-          </ul>
-        */}
         The Proceedings of the IMC {cf.year} will be published in WGN, the journal of the IMO.
         Please follow the guidelines in <a className="fw-bolder" href="https://www.imo.net/docs/writingforwgn.pdf" target="_blank" rel="noopener noreferrer">this document</a> to prepare your paper.
       </div>

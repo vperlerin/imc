@@ -3,6 +3,7 @@ import PageContain from "components/page-contain";
 import React from "react";
 import { useApiOnlineParticipants } from "api/participants/online.js";
 import { useApiOnsiteParticipants } from "api/participants/onsite.js";
+import { Link } from "react-router-dom";
 import ReactCountryFlag from "react-country-flag";
 import Loader from "components/loader";
 
@@ -39,7 +40,15 @@ const Participants = () => {
               ))}
             </ul>
           ) : (
-            <p>No confirmed onsite participants.</p>
+            <p>No one has confirmed on-site participation yet. {' '}
+              <Link
+                aria-label="On-site Registration"
+                className="fw-bolder"
+                to="/register/onsite"
+                title="Register On-site"
+              >Be the first!
+              </Link>
+            </p>
           )}
         </div>
 
@@ -56,7 +65,14 @@ const Participants = () => {
               ))}
             </ul>
           ) : (
-            <p>No confirmed online participants.</p>
+            <p>No one has confirmed online participation yet. {' '}
+              <Link
+                aria-label="On-site Registration"
+                className="fw-bolder"
+                to="/register/onsite"
+                title="Register On-site"
+              >Be the first!
+              </Link></p>
           )}
         </div>
         {onsiteParticipants.length > 0 && onlineParticipants.length > 0(

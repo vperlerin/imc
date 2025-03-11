@@ -23,27 +23,54 @@ const AdminTable = ({ participants, withActions = true, customActions= null, onD
 
   const sortedParticipants = [...participants].sort((a, b) => {
     if (!sortColumn) return 0;
-
+  
     let valueA = a[sortColumn];
     let valueB = b[sortColumn];
-
+  
     // Handle numeric fields
     if (["total_due", "total_paid", "paypal_fee"].includes(sortColumn)) {
       valueA = parseFloat(valueA) || 0;
       valueB = parseFloat(valueB) || 0;
     }
-
-    // Handle dates
-    if (sortColumn === "created_at" || sortColumn === "confirmation_date") {
-      valueA = new Date(valueA).getTime() || 0;
-      valueB = new Date(valueB).getTime() || 0;
+  
+    // Handle due amount separately
+    if (sortColumn === "due_amount") {
+      const getDueAmount = (participant) => {
+        const totalDue = parseFloat(participant.total_due) || 0;
+        const totalPaid = parseFloat(participant.total_paid) || 0;
+        const paypalFee = parseFloat(participant.paypal_fee || 0);
+        return participant.payment_method_name?.toLowerCase() === "paypal"
+          ? totalDue + paypalFee - totalPaid
+          : totalDue - totalPaid;
+      };
+      valueA = getDueAmount(a);
+      valueB = getDueAmount(b);
     }
-
+  
+    // Handle dates
+    if (["created_at", "confirmation_date"].includes(sortColumn)) {
+      valueA = valueA ? new Date(valueA).getTime() : 0;
+      valueB = valueB ? new Date(valueB).getTime() : 0;
+    }
+  
+    // Handle payment_method_name case-insensitively and default to empty string if missing
+    if (sortColumn === "payment_method") {
+      valueA = a.payment_method_name ? a.payment_method_name.toLowerCase() : "";
+      valueB = b.payment_method_name ? b.payment_method_name.toLowerCase() : "";
+    }
+  
+    // Handle confirmation_sent as boolean-like sorting
+    if (sortColumn === "confirmation_sent") {
+      valueA = valueA === "1" ? 1 : 0;
+      valueB = valueB === "1" ? 1 : 0;
+    }
+  
     if (valueA < valueB) return sortOrder === "asc" ? -1 : 1;
     if (valueA > valueB) return sortOrder === "asc" ? 1 : -1;
     return 0;
   });
-
+  
+  
   return (
     <div className="table-responsive" style={{ maxWidth: "calc(100vw - 2rem)" }}>
       <table className="table table-striped">

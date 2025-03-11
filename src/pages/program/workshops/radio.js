@@ -1,26 +1,16 @@
 import PageContain from "components/page-contain";
 import React from "react";
 import { Link } from "react-router-dom";
-import { conferenceData as cf } from "data/conference-data";
+import { conferenceData as cd } from "data/conference-data";
 
 const Radio = () => {
-  const workshop = cf.workshops.find(w => w.title === "Radio Workshop");
-
+  const workshop = cd.workshops.find(w => w.title === "Radio Workshop");
 
   return (
     <PageContain title="Radio Workshop">
-      <p>
-        In case participants wish to stay at the Stayokay hostel before the start of the IMC,
-        they should book a room themselves at the hostel.
-      </p>
-
-
-
+ 
       <div className="mb-4"> 
-
-
-
-        <p>
+       <p>
           This year, the radio workshop will mainly focus on head echoes produced by scattering of the radio waves on the ionized region moving in front of the incoming meteoroid.  However, any other topic related to radio observations of meteors is very welcome.  The final program will become available a few weeks before the event.
         </p>
 
@@ -36,6 +26,9 @@ const Radio = () => {
               <><i>Unfortunately, this workshop won't be available online.</i><br /></>
             )} 
 
+ 
+        <div className="mt-3">In case participants wish to stay at the {cd.hotel} before the start of the IMC,
+        they should book a room directly with the hostel.</div>
        
         </div>
 
@@ -52,6 +45,8 @@ const Radio = () => {
           Register
         </Link>
       </div>
+
+    
     </PageContain>
   );
 };

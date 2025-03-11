@@ -49,9 +49,7 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
     errorMsg,
     participantError,
     specificDataError,
-  ].filter(Boolean);
- 
-  console.log("paypalFee ", paypalFee, " p ", participant?.participant.paypal_fee);
+  ].filter(Boolean); 
 
   // Paypal fess
   useEffect(() => {
