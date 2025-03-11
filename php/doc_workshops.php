@@ -40,6 +40,8 @@ $workshop = $workshopManager->getWorkshopById($pdo, $workshopId);
 
 var_dump($workshop);
 
+exit;
+
 if (!$workshop) {
     die(json_encode(["success" => false, "message" => "Workshop not found."]));
 }
