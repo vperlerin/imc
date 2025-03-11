@@ -1140,17 +1140,20 @@ class ParticipantManager
         $sql = "
             SELECT 
                 p.*, 
-                a.registration_type_id
+                a.registration_type_id, 
+                rt.description AS registration_type_description
             FROM participants p
             JOIN participant_workshops pw ON p.id = pw.participant_id
             LEFT JOIN accommodation a ON p.id = a.participant_id
+            LEFT JOIN registration_types rt ON a.registration_type_id = rt.id
             WHERE pw.workshop_id = :workshop_id
             AND p.is_online = 0
         ";
-
+    
         $stmt = $pdo->prepare($sql);
         $stmt->bindParam(':workshop_id', $workshopId, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+    
 }
