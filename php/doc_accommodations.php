@@ -55,13 +55,24 @@ $headers = ["Registered On", "Name", "Registration Type"];
 
 /**
  * Populates an Excel sheet with participant data.
- * @param \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet $sheet
+ * @param Spreadsheet $spreadsheet
  * @param string $title
  * @param array $data
  * @param array $headers
+ * @param int $sheetIndex
  */
-function populateSheet($sheet, $title, $data, $headers) {
+function populateSheet($spreadsheet, $title, $data, $headers, $sheetIndex)
+{
+    // Create a new sheet or select existing one
+    if ($sheetIndex === 0) {
+        $sheet = $spreadsheet->getActiveSheet();
+    } else {
+        $sheet = $spreadsheet->createSheet();
+        $spreadsheet->addSheet($sheet, $sheetIndex);
+    }
+
     $sheet->setTitle($title);
+    $spreadsheet->setActiveSheetIndex($sheetIndex);
     $sheet->fromArray([$headers], NULL, 'A1');
 
     $row = 2;
@@ -97,17 +108,18 @@ function populateSheet($sheet, $title, $data, $headers) {
     $sheet->getStyle('A1:C1')->applyFromArray($headerStyle);
 }
 
-// Create and populate first sheet for "Staying at the hostel"
-$sheet1 = $spreadsheet->getActiveSheet();
-populateSheet($sheet1, "Staying at the hostel", $stayingAtHostel, $headers);
+// Populate "Staying at the hostel" (first sheet)
+populateSheet($spreadsheet, "Staying at the hostel", $stayingAtHostel, $headers, 0);
 
-// Create and populate second sheet for "No Accommodation"
-$sheet2 = $spreadsheet->createSheet();
-$spreadsheet->addSheet($sheet2, 1);
-populateSheet($sheet2, "No Accommodation", $noAccommodation, $headers);
+// Populate "No Accommodation" (second sheet)
+populateSheet($spreadsheet, "No Accommodation", $noAccommodation, $headers, 1);
 
-// Generate and send file
-ob_end_clean();
+// Ensure the first sheet is active
+$spreadsheet->setActiveSheetIndex(0);
+
+// Ensure output buffer is clean
+if (ob_get_length()) ob_end_clean();
+
 header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
 header("Content-Disposition: attachment; filename=\"$fileName\"");
 header("Cache-Control: max-age=0");

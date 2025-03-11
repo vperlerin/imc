@@ -100,7 +100,7 @@ function createSheet($spreadsheet, $sheetName, $participants, $includeAccommodat
         $fullName = trim("{$p['title']} {$p['last_name']} {$p['first_name']}");
 
         // Confirmation status
-        $confirmedStatus = isset($p["confirmation_sent"]) && $p["confirmation_sent"] == "1" ? "confirmed" : "not confirmed";
+        $confirmedStatus = isset($p["confirmation_sent"]) && $p["confirmation_sent"] == "1" ? "confirmed" : "NO";
 
         // Compute totals
         $total = isset($p["total_due"]) ? $p["total_due"] : 0;
