@@ -33,6 +33,7 @@ $workshopId = intval($_GET['workshop_id']);
 $dashboardManager = new DashboardManager($pdo);
 $participants = $dashboardManager->getParticipantsByWorkshop($pdo, $workshopId);
 
+
 // Separate Online and Onsite participants
 $onlineParticipants = array_filter($participants, fn($p) => $p["is_online"] == "1");
 $onsiteParticipants = array_filter($participants, fn($p) => $p["is_online"] == "0");
