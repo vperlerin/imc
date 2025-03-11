@@ -50,7 +50,7 @@ $sheet = $spreadsheet->getActiveSheet();
 $sheet->setTitle("All Posters");
 
 // Define column headers
-$headers = ["Session", "Duration", "Presenter", "Title", "Authors", "Abstract", "Online"];
+$headers = ["Session",  "Presenter", "Title", "Authors", "Abstract", "Online"];
 
 // Write headers
 $sheet->fromArray([$headers], NULL, 'A1');
@@ -64,7 +64,6 @@ foreach ($posters as $session => $posterList) {
 
         $sheet->fromArray([
             $session,
-            isset($poster["duration"]) ? $poster["duration"] : "N/A",
             $presenter,
             isset($poster["title"]) ? $poster["title"] : "Untitled",
             isset($poster["authors"]) ? $poster["authors"] : "No author available",
@@ -80,7 +79,7 @@ foreach ($posters as $session => $posterList) {
 }
 
 // Auto-size columns for better readability
-foreach (range('A', 'G') as $col) {
+foreach (range('A', 'F') as $col) {
     $sheet->getColumnDimension($col)->setAutoSize(true);
 }
 
@@ -92,10 +91,10 @@ $headerStyle = [
   'borders' => ['bottom' => ['borderStyle' => Border::BORDER_THIN]]
 ];
 
-$sheet->getStyle('A1:G1')->applyFromArray($headerStyle);
+$sheet->getStyle('A1:F1')->applyFromArray($headerStyle);
 
 // Set alignment for all columns
-$sheet->getStyle("A1:G$row")->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+$sheet->getStyle("A1:F$row")->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
 
 // Prevent excessive cell height in Abstract column
 $sheet->getRowDimension(1)->setRowHeight(25);
