@@ -18,32 +18,33 @@ const AdminTalks = () => {
     axios
       .get(`${process.env.REACT_APP_API_URL}/api/get_talks.php`)
       .then((response) => {
-        console.log("RESPONSE ", response.data.data)
-
         if (response.data.success) {
-          setTalks(response.data.data);
-          setFilteredTalks(response.data.data);
+          const formattedTalks = Object.entries(response.data.data).flatMap(([sessionName, talks]) =>
+            talks.map((talk) => ({ ...talk, session_name: sessionName }))
+          );
+          setTalks(formattedTalks);
+          setFilteredTalks(formattedTalks);
         } else {
           setError(response.data.data);
         }
         setLoading(false);
       })
       .catch((error) => {
-        setError("Error fetching talks:", error);
+        setError("Error fetching talks: " + error.message);
         setLoading(false);
       });
   }, []);
 
   useEffect(() => {
-    let filtered = talks;
+    let filtered = [...talks];
     if (searchQuery) {
       const lowerQuery = searchQuery.toLowerCase();
-      filtered = talks.filter((talk) =>
-        talk.talk_title.toLowerCase().includes(lowerQuery)
+      filtered = filtered.filter((talk) =>
+        talk.title.toLowerCase().includes(lowerQuery)
       );
     }
     if (sortColumn) {
-      filtered = [...filtered].sort((a, b) => {
+      filtered.sort((a, b) => {
         let valueA = a[sortColumn] ?? "";
         let valueB = b[sortColumn] ?? "";
         valueA = valueA.toString().toLowerCase();
@@ -88,7 +89,7 @@ const AdminTalks = () => {
               <thead>
                 <tr>
                   <th className="sortable" onClick={() => handleSort("session_name")}>Session {sortColumn === "session_name" && (sortOrder === "asc" ? "🔼" : "🔽")}</th>
-                  <th className="sortable" onClick={() => handleSort("talk_title")}>Talk Title {sortColumn === "talk_title" && (sortOrder === "asc" ? "🔼" : "🔽")}</th>
+                  <th className="sortable" onClick={() => handleSort("title")}>Talk Title {sortColumn === "title" && (sortOrder === "asc" ? "🔼" : "🔽")}</th>
                   <th className="sortable" onClick={() => handleSort("last_name")}>Presenter {sortColumn === "last_name" && (sortOrder === "asc" ? "🔼" : "🔽")}</th>
                   <th className="sortable" onClick={() => handleSort("confirmation_sent")}>Confirmed {sortColumn === "confirmation_sent" && (sortOrder === "asc" ? "🔼" : "🔽")}</th>
                 </tr>
@@ -98,7 +99,7 @@ const AdminTalks = () => {
                   filteredTalks.map((talk, index) => (
                     <tr key={index}>
                       <td>{talk.session_name}</td>
-                      <td>{talk.talk_title}</td>
+                      <td>{talk.title}</td>
                       <td>{`${talk.first_name} ${talk.last_name}`}</td>
                       <td>{talk.confirmation_sent === "1" ? "✅" : "❌"}</td>
                     </tr>

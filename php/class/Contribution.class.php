@@ -112,7 +112,7 @@ class ContributionManager
             $stmt = $this->pdo->prepare("
                 SELECT 
                     s.name AS session_name,
-                    c.title AS talk_title,
+                    c.*,
                     p.id AS participant_id,
                     p.first_name,
                     p.last_name,
