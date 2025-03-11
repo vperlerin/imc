@@ -1,22 +1,21 @@
-import { FaRegTrashAlt } from "react-icons/fa";
 import { CiSearch } from "react-icons/ci";
 import PageContain from "@/admin/components/page-contain";
 import classNames from "classnames";
 import Loader from "components/loader";
 import React, { useEffect, useState } from "react";
 import { useApiWorkshopsParticipants } from "api/participants/workshops.js";
+import { useApiSpecificData } from "api/specific-data";
 
-const AdminParticipantsWorkshops = ({workshopId}) => { 
-  const [workshops, setWorkshops] = useState([]);
+const AdminParticipantsWorkshops = ({ workshopId }) => { 
   const [searchQuery, setSearchQuery] = useState("");
   const [searchType, setSearchType] = useState("last_name");
   const [filteredParticipants, setFilteredParticipants] = useState([]);
-  const [sortType, setSortType] = useState("all"); // New state for sorting type
-
-  console.log("workshops? ", workshops);
-
-
+  const [sortType, setSortType] = useState("all"); 
   const { participants, loading } = useApiWorkshopsParticipants(workshopId);
+  const { workshops, loading: loadingWorkshops, error: specificDataError } = useApiSpecificData();
+
+  // Find the current workshop based on workshopId
+  const currentWorkshop = workshops?.find(w => w.id === String(workshopId));
 
   useEffect(() => {
     let filtered = participants;
@@ -40,31 +39,19 @@ const AdminParticipantsWorkshops = ({workshopId}) => {
     setFilteredParticipants(filtered);
   }, [searchQuery, searchType, sortType, participants]);
 
-  const breadcrumb = [{ url: "/admin/participants/workshops", name: "Workshop Participants" }];
+  const breadcrumb = [{ url: "/admin/participants/workshops/", name: `${currentWorkshop && currentWorkshop.title} Participants` }];
 
   return (
     <PageContain
       breadcrumb={breadcrumb}
       isMaxWidth
-      title="Workshop Participants"
-      rightContent={
-        <select
-          className="form-select"
-          value={selectedWorkshop}
-          onChange={(e) => setSelectedWorkshop(e.target.value)}
-        >
-          {workshops.map((workshop) => (
-            <option key={workshop.id} value={workshop.id}>
-              {workshop.title} ({workshop.date})
-            </option>
-          ))}
-        </select>
-      }
+      title={currentWorkshop && currentWorkshop.title}
     >
-      {loading ? (
+      {loading || loadingWorkshops ? (
         <Loader />
       ) : (
         <>
+          
           <div className="d-flex gap-2 mb-3">
             {/* Search Filter */}
             <select className="form-select w-auto" value={searchType} onChange={(e) => setSearchType(e.target.value)}>

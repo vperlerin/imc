@@ -1,8 +1,39 @@
+import classNames from "classnames";
+import css from './index.module.scss';
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { retry } from "utils/retry.js";
 import PageContain from "@/admin/components/page-contain";
 import Loader from "components/loader";
+import { Link } from "react-router-dom";
+
+
+const getRandomGreeting = () => {
+  const messages = [
+    "i hope you're doing great today!",
+    "rise and shine!",
+    "you're awesome, keep it up!",
+    "wishing you a fantastic day!",
+    "hope you're feeling amazing!",
+    "you're doing an incredible job!",
+    "hope today brings you lots of joy!",
+    "the IMO is lucky to have you!",
+    "no matter what happens today, you got this!",
+    "don't forget to take a moment for yourself today!",
+    "hope today brings you exciting opportunities!",
+    "every day is a fresh start—make it count!",
+    "your kindness makes the IMC a better place!",
+    "just a reminder: you're doing great!",
+    "don't forget to smile today!",
+  ];
+
+  const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+  return `Hey Marc, ${randomMessage}`;
+}
+
+// Example usage:
+console.log(getRandomGreeting());
+
 
 const AdminDashboard = () => {
   const [dashboardData, setDashboardData] = useState(null);
@@ -34,93 +65,121 @@ const AdminDashboard = () => {
   if (error) return <PageContain title="Admin Dashboard"><p className="text-danger">{error}</p></PageContain>;
 
   return (
-    <PageContain title="Admin Dashboard">
-      <div className="container">
-        <h2 className="mb-4">Dashboard Overview</h2>
+    <PageContain>
+      <div className={classNames(css.dashboard, 'mx-auto')}>
+        <h3>{getRandomGreeting()}</h3>
+        <p className="mb-4">Here is a quick summary of what's going on here:</p>
 
-        <div className="row g-4">
-          {/* Confirmed and Unconfirmed Online Participants */}
-          <div className="col-md-6">
-            <div className="card border-primary p-3">
-              <h5 className="fw-bold">Online Participants</h5>
-              <p>✅ Confirmed: <b>{dashboardData.confirmed_online}</b></p>
-              <p>❌ Unconfirmed: <b>{dashboardData.unconfirmed_online}</b></p>
-            </div>
-          </div>
+        <div className="d-flex flex-column flex-md-row gap-3 w-100">
 
           {/* Confirmed and Unconfirmed Onsite Participants */}
-          <div className="col-md-6">
-            <div className="card border-success p-3">
-              <h5 className="fw-bold">Onsite Participants</h5>
-              <p>✅ Confirmed: <b>{dashboardData.confirmed_onsite}</b></p>
-              <p>❌ Unconfirmed: <b>{dashboardData.unconfirmed_onsite}</b></p>
+          <div className="flex-grow-1 flex-shrink-0 border p-3 rounded-2 position-relative">
+            <div className=" ">
+              <h5 className="fw-bold">
+                <Link to="/admin/participants/onsite">
+                  On-site Participants
+                </Link>
+              </h5>
+              <div className="position-absolute border rounded-3 border-3 top-0 end-0 m-2 p-2">
+                ✅  <b>{dashboardData.confirmed_onsite}{' '}</b>/ {dashboardData.unconfirmed_onsite}
+              </div>
+
+              <div className="mt-4">
+                <h6>Unconfirmed On-site Participants</h6>
+                {dashboardData.onsite_unconfirmed.length > 0 ? (
+                  <div className="table-responsive" style={{ maxWidth: "calc(100vw - 2rem)" }}>
+                    <table className="table table-striped">
+                      <thead>
+                        <tr>
+                          <th>ID</th>
+                          <th>Name</th>
+                          <th>Confirmed</th>
+                          <th>Email sent</th>
+                          <td></td>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {dashboardData.onsite_unconfirmed.map((p) => (
+                          <tr key={p.id}>
+                            <td>{p.id}</td>
+                            <td>{p.title} {p.first_name} {p.last_name}</td>
+                            <td>{p.confirmation_sent === "1" ? "✅" : "❌"}</td>
+                            <td className={classNames(p?.confirmation_date && "text-success")}>
+                              {p.confirmation_date ? formatFullDate(p.confirmation_date) : "❌"}
+                            </td>
+                            <td>
+                              <div className="d-flex gap-2 justify-content-end">
+                                <a href={`/admin/participants/onsite/payment/${p.id}`} className="btn btn-sm btn-outline-success fw-bolder">Payments</a>
+                                <a href={`/admin/participants/online/${p.id}`} className="btn btn-sm btn-outline-primary fw-bolder">Edit</a>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <p>No unconfirmed onsite participants!</p>
+                )}
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Unconfirmed Participants Tables */}
-        <div className="mt-4">
-          <h4>Unconfirmed Online Participants</h4>
-          {dashboardData.online_unconfirmed.length > 0 ? (
-            <table className="table table-striped">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Name</th>
-                  <th>Title</th>
-                  <th>Confirmation Sent</th>
-                  <th>Confirmation Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                {dashboardData.online_unconfirmed.map((p) => (
-                  <tr key={p.id}>
-                    <td>{p.id}</td>
-                    <td>{p.title} {p.first_name} {p.last_name}</td>
-                    <td>{p.title}</td>
-                    <td>{p.confirmation_sent ? "✅" : "❌"}</td>
-                    <td>{p.confirmation_date || "❌"}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          ) : (
-            <p>No unconfirmed online participants.</p>
-          )}
-        </div>
 
-        <div className="mt-4">
-          <h4>Unconfirmed Onsite Participants</h4>
-          {dashboardData.onsite_unconfirmed.length > 0 ? (
-            <table className="table table-striped">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Name</th>
-                  <th>Title</th>
-                  <th>Confirmation Sent</th>
-                  <th>Confirmation Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                {dashboardData.onsite_unconfirmed.map((p) => (
-                  <tr key={p.id}>
-                    <td>{p.id}</td>
-                    <td>{p.title} {p.first_name} {p.last_name}</td>
-                    <td>{p.title}</td>
-                    <td>{p.confirmation_sent ? "✅" : "❌"}</td>
-                    <td>{p.confirmation_date || "❌"}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          ) : (
-            <p>No unconfirmed onsite participants.</p>
-          )}
+          {/* Confirmed and Unconfirmed Online Participants */}
+          <div className="flex-grow-1 flex-shrink-0 border p-3 rounded-2 position-relative">
+            <div className=" ">
+              <h5 className="fw-bold">
+                <Link to="/admin/participants/online">
+                  Online Participants
+                </Link>
+              </h5>
+              <div className="position-absolute border rounded-3 border-3 top-0 end-0 m-2 p-2">
+                ✅ <b>{dashboardData.confirmed_online}{' '}</b>/ {dashboardData.unconfirmed_online}
+              </div>
+              {/* Unconfirmed Participants Tables */}
+              <div className="mt-4">
+                <h6>Unconfirmed Online Participants</h6>
+                {dashboardData.online_unconfirmed.length > 0 ? (
+                  <table className="table table-striped">
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Confirmed</th>
+                        <th>Email sent</th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {dashboardData.online_unconfirmed.map((p) => (
+                        <tr key={p.id}>
+                          <td>{p.id}</td>
+                          <td>{p.title} {p.first_name} {p.last_name}</td>
+                          <td>{p.confirmation_sent === "1" ? "✅" : "❌"}</td>
+                          <td className={classNames(p?.confirmation_date && "text-success")}>
+                            {p.confirmation_date ? formatFullDate(p.confirmation_date) : "❌"}
+                          </td>
+                          <td>
+                            <div className="d-flex gap-2 justify-content-end">
+                              <a href={`/admin/participants/onsite/payment/${p.id}`} className="btn btn-sm btn-outline-success fw-bolder">Payments</a>
+                              <a href={`/admin/participants/online/${p.id}`} className="btn btn-sm btn-outline-primary fw-bolder">Edit</a>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                ) : (
+                  <p>No unconfirmed online participants!</p>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Workshop Stats */}
-        <div className="mt-4">
+        <div className="mt-4  border p-3 rounded-2 ">
           <h4>Workshop Attendance</h4>
           {dashboardData.workshop_stats.length > 0 ? (
             <table className="table table-bordered">
@@ -134,7 +193,14 @@ const AdminDashboard = () => {
               <tbody>
                 {dashboardData.workshop_stats.map((workshop, index) => (
                   <tr key={index}>
-                    <td>{workshop.workshop_title}</td>
+                    <td className="fw-bolder">
+                      <Link
+                        to={`/admin/participants/workshops/${workshop.workshop_title.toLowerCase().includes('radio') ? 'radio' : 'spectro'}`}
+                      >
+                        {workshop.workshop_title}
+                      </Link>
+
+                    </td>
                     <td>{workshop.confirmed_participants}</td>
                     <td>{workshop.unconfirmed_participants}</td>
                   </tr>
@@ -146,7 +212,7 @@ const AdminDashboard = () => {
           )}
         </div>
       </div>
-    </PageContain>
+    </PageContain >
   );
 };
 

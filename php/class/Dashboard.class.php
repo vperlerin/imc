@@ -22,26 +22,22 @@ class DashboardManager {
             ORDER BY COALESCE(updated_at, created_at) DESC;
 
             -- Count confirmed online participants
-            SELECT 
-                COUNT(*) AS confirmed_online
+            SELECT COUNT(*) AS confirmed_online
             FROM participants
             WHERE is_online = TRUE AND confirmation_sent = TRUE AND confirmation_date IS NOT NULL;
 
             -- Count unconfirmed online participants
-            SELECT 
-                COUNT(*) AS unconfirmed_online
+            SELECT COUNT(*) AS unconfirmed_online
             FROM participants
             WHERE is_online = TRUE AND confirmation_sent = FALSE;
 
             -- Count confirmed onsite participants
-            SELECT 
-                COUNT(*) AS confirmed_onsite
+            SELECT  COUNT(*) AS confirmed_onsite
             FROM participants
             WHERE is_online = FALSE AND confirmation_sent = TRUE AND confirmation_date IS NOT NULL;
 
             -- Count unconfirmed onsite participants
-            SELECT 
-                COUNT(*) AS unconfirmed_onsite
+            SELECT   COUNT(*) AS unconfirmed_onsite
             FROM participants
             WHERE is_online = FALSE AND confirmation_sent = FALSE;
 
@@ -52,7 +48,7 @@ class DashboardManager {
                 SUM(CASE WHEN p.confirmation_sent = FALSE THEN 1 ELSE 0 END) AS unconfirmed_participants
             FROM workshops w
             LEFT JOIN participant_workshops pw ON w.id = pw.workshop_id
-            LEFT JOIN participants p ON pw.participant_id = p.id AND p.is_online = TRUE
+            LEFT JOIN participants p ON pw.participant_id = p.id  
             GROUP BY w.title;
         ";
 
