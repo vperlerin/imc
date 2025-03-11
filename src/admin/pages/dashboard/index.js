@@ -16,15 +16,15 @@ const getRandomGreeting = () => {
     "wishing you a fantastic day!",
     "hope you're feeling amazing!",
     "you're doing an incredible job!",
-    "hope today brings you lots of joy!",
+    "très bonne journée à toi :)",
     "the IMO is lucky to have you!",
-    "no matter what happens today, you got this!",
-    "don't forget to take a moment for yourself today!",
-    "hope today brings you exciting opportunities!",
-    "every day is a fresh start—make it count!",
     "your kindness makes the IMC a better place!",
-    "just a reminder: you're doing great!",
-    "don't forget to smile today!",
+    "jouw vriendelijkheid maakt de IMC een betere plek!",
+    "your kindness makes the IMC a better place!",
+    "the IMO is lucky to have you!",
+    "de IMO heeft geluk met jou!",
+    "you're doing an incredible job!",
+    "je doet ongelooflijk goed werk!"
   ];
 
   const randomMessage = messages[Math.floor(Math.random() * messages.length)];
@@ -81,7 +81,7 @@ const AdminDashboard = () => {
                 </Link>
               </h5>
               <div className="position-absolute border rounded-3 border-3 top-0 end-0 m-2 p-2">
-                ✅  <b>{dashboardData.confirmed_onsite}{' '}</b>/ {dashboardData.unconfirmed_onsite}
+                ✅  <b>{dashboardData.confirmed_onsite}{' '}</b>/ {(parseFloat(dashboardData.unconfirmed_onsite) + parseFloat(dashboardData.confirmed_onsite))}
               </div>
 
               <div className="mt-4">
@@ -135,7 +135,7 @@ const AdminDashboard = () => {
                 </Link>
               </h5>
               <div className="position-absolute border rounded-3 border-3 top-0 end-0 m-2 p-2">
-                ✅ <b>{dashboardData.confirmed_online}{' '}</b>/ {dashboardData.unconfirmed_online}
+                ✅  <b>{dashboardData.confirmed_online}{' '}</b>/ {(parseFloat(dashboardData.unconfirmed_online) + parseFloat(dashboardData.confirmed_online))}
               </div>
               {/* Unconfirmed Participants Tables */}
               <div className="mt-4">
@@ -171,7 +171,7 @@ const AdminDashboard = () => {
                     </tbody>
                   </table>
                 ) : (
-                  <p>No unconfirmed online participants!</p>
+                  <p className="text-success"><i>No unconfirmed online participants: you go to go!</i></p>
                 )}
               </div>
             </div>
@@ -190,9 +190,9 @@ const AdminDashboard = () => {
                   <th colSpan="3" className="text-centert">Onsite Participants</th>
                 </tr>
                 <tr>
-                  
+
                   <th className="text-success">Confirmed</th>
-                  <th className="text-danger">Unconfirmed</th> 
+                  <th className="text-danger">Unconfirmed</th>
                   <th className="text-success">Confirmed</th>
                   <th className="text-danger">Unconfirmed</th>
                 </tr>
@@ -208,7 +208,7 @@ const AdminDashboard = () => {
                       </Link>
                     </td>
                     <td className="text-success fw-bolder">{workshop.confirmed_online_participants}</td>
-                    <td className="text-danger">{workshop.unconfirmed_online_participants}</td> 
+                    <td className="text-danger">{workshop.unconfirmed_online_participants}</td>
                     <td className="text-success fw-bolder">{workshop.confirmed_onsite_participants}</td>
                     <td className="text-danger">{workshop.unconfirmed_onsite_participants}</td>
                   </tr>

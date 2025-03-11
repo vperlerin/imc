@@ -9,6 +9,7 @@ const AdminTalks = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortColumn, setSortColumn] = useState(null);
   const [sortOrder, setSortOrder] = useState("asc");
+  const [confirmationFilter, setConfirmationFilter] = useState("all");
   const [talks, setTalks] = useState([]);
   const [filteredTalks, setFilteredTalks] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -43,17 +44,27 @@ const AdminTalks = () => {
         talk.title.toLowerCase().includes(lowerQuery)
       );
     }
+    if (confirmationFilter !== "all") {
+      filtered = filtered.filter((talk) =>
+        confirmationFilter === "confirmed" ? talk.confirmation_sent === "1" : talk.confirmation_sent === "0"
+      );
+    }
     if (sortColumn) {
       filtered.sort((a, b) => {
         let valueA = a[sortColumn] ?? "";
         let valueB = b[sortColumn] ?? "";
-        valueA = valueA.toString().toLowerCase();
-        valueB = valueB.toString().toLowerCase();
+        if (sortColumn === "onsite") {
+          valueA = a.is_online === "0" ? 1 : 0;
+          valueB = b.is_online === "0" ? 1 : 0;
+        } else {
+          valueA = valueA.toString().toLowerCase();
+          valueB = valueB.toString().toLowerCase();
+        }
         return sortOrder === "asc" ? (valueA < valueB ? -1 : 1) : (valueA > valueB ? -1 : 1);
       });
     }
     setFilteredTalks(filtered);
-  }, [searchQuery, sortColumn, sortOrder, talks]);
+  }, [searchQuery, confirmationFilter, sortColumn, sortOrder, talks]);
 
   const handleSort = (column) => {
     if (sortColumn === column) {
@@ -82,16 +93,27 @@ const AdminTalks = () => {
               />
               <CiSearch className="position-absolute top-50 end-0 translate-middle-y me-2" />
             </div>
+            <select
+              className="form-select w-auto"
+              value={confirmationFilter}
+              onChange={(e) => setConfirmationFilter(e.target.value)}
+            >
+              <option value="all">All</option>
+              <option value="confirmed">Only Confirmed</option>
+              <option value="not_confirmed">Only Non-Confirmed</option>
+            </select>
             <DocButton className="ms-auto" link={`${process.env.REACT_APP_API_URL}/doc_talks.php`} />
           </div>
           <div className="table-responsive" style={{ maxWidth: "calc(100vw - 2rem)" }}>
             <table className="table table-striped">
               <thead>
                 <tr>
-                  <th className="sortable" onClick={() => handleSort("session_name")}>Session {sortColumn === "session_name" && (sortOrder === "asc" ? "🔼" : "🔽")}</th>
-                  <th className="sortable" onClick={() => handleSort("title")}>Talk Title {sortColumn === "title" && (sortOrder === "asc" ? "🔼" : "🔽")}</th>
-                  <th className="sortable" onClick={() => handleSort("last_name")}>Presenter {sortColumn === "last_name" && (sortOrder === "asc" ? "🔼" : "🔽")}</th>
-                  <th className="sortable" onClick={() => handleSort("confirmation_sent")}>Confirmed {sortColumn === "confirmation_sent" && (sortOrder === "asc" ? "🔼" : "🔽")}</th>
+                  <th className="sortable" onClick={() => handleSort("session_name")}>Session</th>
+                  <th className="sortable" onClick={() => handleSort("title")}>Title</th>
+                  <th className="sortable" onClick={() => handleSort("last_name")}>Presenter</th>
+                  <th className="sortable" onClick={() => handleSort("duration")}>Dur.</th>
+                  <th className="sortable" onClick={() => handleSort("onsite")}>Onsite</th>
+                  <th className="sortable" onClick={() => handleSort("confirmation_sent")}>Confirmed</th>
                 </tr>
               </thead>
               <tbody>
@@ -101,12 +123,14 @@ const AdminTalks = () => {
                       <td>{talk.session_name}</td>
                       <td>{talk.title}</td>
                       <td>{`${talk.first_name} ${talk.last_name}`}</td>
+                      <td>{`${talk.duration}`}</td>
+                      <td>{talk.is_online === "0" ? "✅" : "❌"}</td>
                       <td>{talk.confirmation_sent === "1" ? "✅" : "❌"}</td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="4" className="text-center">No talks found.</td>
+                    <td colSpan="6" className="text-center">No talks found.</td>
                   </tr>
                 )}
               </tbody>

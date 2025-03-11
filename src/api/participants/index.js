@@ -24,10 +24,11 @@ export const useApiParticipant = (participantId, isOnline = false, fetchTrigger 
         })
       );
 
+      setError(null); 
       if (response.data.success && response.data.data) {
         setParticipant(response.data.data);
       } else {
-        throw new Error(response.data.message || "Participant not found.");
+        setError(response.data.message || "Participant not found.");
       }
     } catch (err) {
       setError(err.message || "Failed to fetch participant data.");
@@ -37,6 +38,7 @@ export const useApiParticipant = (participantId, isOnline = false, fetchTrigger 
   }, [participantId, isOnline, withAdminNotes]);
 
   useEffect(() => {
+    setError(null);
     fetchParticipant();
   }, [fetchParticipant, fetchTrigger]);  
 

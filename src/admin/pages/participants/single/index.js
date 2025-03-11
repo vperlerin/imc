@@ -29,10 +29,8 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
   const [successMsg, setSuccessMsg] = useState(null);
   const [unsavedChanges, setUnsavedChanges] = useState(false);
   const [total, setTotal] = useState(0);
-  const [paypalFee, setPaypalFee] = useState(0);
-  const [talks, setTalks] = useState([]);
-  const [fetchParticipantTrigger, setFetchParticipantTrigger] = useState(false);
-  const [posters, setPosters] = useState([]);
+  const [paypalFee, setPaypalFee] = useState(0); 
+  const [fetchParticipantTrigger, setFetchParticipantTrigger] = useState(false); 
   const activeTab = tab || "identity";
   const navigate = useNavigate();
 
@@ -43,6 +41,7 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
   const { participant, loading: participantLoading, error: participantError } = useApiParticipant(participantId, isCurOnline, fetchParticipantTrigger, true);
   const { control, register, handleSubmit, getValues, setValue, formState: { errors }, trigger, watch } = useForm();
   const isOnline = participant?.participant?.is_online === "1";
+ 
  
   const loading = specificdataLoading || participantLoading || isSaving;
   const error = [
@@ -125,10 +124,7 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
       const updatedPosters = contributions
         .filter(contribution => contribution.type === "poster")
         .map(poster => ({ ...poster }));
-
-      // Store in state
-      setTalks(updatedTalks);
-      setPosters(updatedPosters);
+ 
 
       // Set values in form so they persist on submit
       setValue("talks", updatedTalks);
@@ -152,7 +148,7 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
       setValue("tshirt_size", extra_options.tshirt_size || "");
     }
 
-  }, [participant, sessions, setValue, setTalks, setPosters]);
+  }, [participant, sessions, setValue]);
 
 
   const onSubmit = async (formData) => {
@@ -240,15 +236,6 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
                 <li key={index}>{err}</li>
               ))}
             </ul>
-            <div className="mt-2">
-              If you think this is a mistake please try again or {' '} <Link
-                aria-label="Contact"
-                to="/contact"
-                title="Contact"
-              >
-                contact us
-              </Link>.
-            </div>
           </div>
         )}
  
