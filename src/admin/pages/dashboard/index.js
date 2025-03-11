@@ -10,7 +10,7 @@ import { Link } from "react-router-dom";
 
 const getRandomGreeting = () => {
   const messages = [
-    "i hope you're doing great today!",
+    "I hope you're doing great today!",
     "rise and shine!",
     "you're awesome, keep it up!",
     "wishing you a fantastic day!",

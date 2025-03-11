@@ -1,6 +1,6 @@
 <?php
 
-// Allow CORS for local development & production
+// Enable CORS for local development & production
 $allowed_origins = [
     "https://imc2025.imo.net",
     "http://localhost:3000"
@@ -26,10 +26,10 @@ $participants = $participantManager->getAllParticipants($pdo);
 
 // Separate Online and Onsite participants (ensure indexed arrays)
 $onlineParticipants = array_values(array_filter($participants, function ($p) {
-  return isset($p["is_online"]) && $p["is_online"] == "1";
+    return isset($p["is_online"]) && $p["is_online"] == "1";
 }));
 $onsiteParticipants = array_values(array_filter($participants, function ($p) {
-  return isset($p["is_online"]) && $p["is_online"] == "0";
+    return isset($p["is_online"]) && $p["is_online"] == "0";
 }));
 
 // Get current year and date
@@ -46,17 +46,20 @@ $spreadsheet->getProperties()
     ->setLastModifiedBy("IMC {$currentYear}")
     ->setTitle("IMC Participants {$currentYear}")
     ->setSubject("Participants List")
-    ->setDescription("Excel 2007 export for OpenOffice compatibility.")
-    ->setKeywords("openoffice excel export {$currentYear}")
+    ->setDescription("Excel export for participant data.")
+    ->setKeywords("conference participants export")
     ->setCategory("Participant Data");
 
 // Remove the default empty sheet
 $spreadsheet->removeSheetByIndex(0);
 
+/**
+ * Create a sheet with participant data
+ */
 function createSheet($spreadsheet, $sheetName, $participants, $includeAccommodation = false)
 {
     if (empty($participants)) {
-        return; // ❌ Skip creating an empty sheet
+        return; // ❌ Skip empty sheets
     }
 
     // Create a new sheet
@@ -65,26 +68,43 @@ function createSheet($spreadsheet, $sheetName, $participants, $includeAccommodat
     $spreadsheet->setActiveSheetIndex($spreadsheet->getIndex($sheet)); // Ensure it's active
 
     // Define column headers
-    $headers = ["Full Name", "Email", "Country", "Confirmed"];
+    $headers = ["Full Name", "Email", "Country", "Confirmed", "Total", "Total Due", "Total Paid", "Payment Method"];
     if ($includeAccommodation) {
         $headers[] = "Accommodation"; // Add accommodation column for onsite participants
     }
 
-    // Ensure headers exist before writing
-    if (!empty($headers)) {
-        $sheet->fromArray([$headers], NULL, 'A1');
-    }
+    // Write headers
+    $sheet->fromArray([$headers], NULL, 'A1');
 
-    // Insert participant data safely
+    // Insert participant data
     $dataRows = [];
     foreach ($participants as $p) {
         if (!isset($p["first_name"], $p["last_name"], $p["email"], $p["country"])) {
             continue; // Skip if required fields are missing
         }
 
+        // Format full name
         $fullName = trim("{$p['title']} {$p['last_name']} {$p['first_name']}");
+
+        // Confirmation status
         $confirmedStatus = isset($p["confirmation_sent"]) && $p["confirmation_sent"] == "1" ? "confirmed" : "not confirmed";
-        $dataRow = [$fullName, $p["email"], $p["country"], $confirmedStatus];
+
+        // Compute totals
+        $total = isset($p["total_due"]) ? $p["total_due"] : 0;
+        $totalPaid = isset($p["total_paid"]) ? $p["total_paid"] : 0;
+        $paymentMethod = isset($p["payment_method_name"]) ? $p["payment_method_name"] : "N/A";
+
+        // Create row data
+        $dataRow = [
+            $fullName,
+            $p["email"],
+            $p["country"],
+            $confirmedStatus,
+            number_format($total, 2) . "€",
+            number_format($total - $totalPaid, 2) . "€",
+            number_format($totalPaid, 2) . "€",
+            $paymentMethod
+        ];
 
         if ($includeAccommodation) {
             $dataRow[] = $p["accommodation"] ?? "Not Assigned"; // Handle missing accommodation
@@ -93,19 +113,18 @@ function createSheet($spreadsheet, $sheetName, $participants, $includeAccommodat
         $dataRows[] = $dataRow;
     }
 
-    // Ensure dataRows is structured correctly before calling `fromArray()`
+    // Write data rows
     if (!empty($dataRows)) {
         $sheet->fromArray($dataRows, NULL, 'A2'); // Start data from row 2
     }
 
-    // Ensure auto column width is correctly calculated
+    // Auto-size columns for better readability
     $columnCount = count($headers);
     for ($i = 1; $i <= $columnCount; $i++) {
         $col = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($i);
         $sheet->getColumnDimension($col)->setAutoSize(true);
     }
 }
-
 
 // Only create "Online Participants" sheet if they exist
 if (!empty($onlineParticipants)) {
@@ -126,8 +145,8 @@ if ($spreadsheet->getSheetCount() == 0) {
 
 // Set the first sheet as active
 $spreadsheet->setActiveSheetIndex(0);
- 
-ob_end_clean(); 
+
+ob_end_clean();
 header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
 header("Content-Disposition: attachment; filename=\"$fileName\"");
 header("Cache-Control: max-age=0");
