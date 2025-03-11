@@ -50,7 +50,7 @@ $sheet = $spreadsheet->getActiveSheet();
 $sheet->setTitle("All Talks");
 
 // Define column headers
-$headers = ["Session", "Duration", "Presenter", "Title", "Abstract", "Online"];
+$headers = ["Session", "Duration", "Presenter", "Title", "Authors", "Abstract", "Online"];
 
 // Write headers
 $sheet->fromArray([$headers], NULL, 'A1');
@@ -66,7 +66,8 @@ foreach ($talks as $session => $talkList) {
             $session,
             isset($talk["duration"]) ? $talk["duration"] : "N/A",
             $presenter,
-            isset($talk["talk_title"]) ? $talk["talk_title"] : "Untitled",
+            isset($talk["title"]) ? $talk["title"] : "Untitled",
+            isset($talk["authors"]) ? $talk["auhots"] : "No author available",
             isset($talk["abstract"]) ? $talk["abstract"] : "No abstract available",
             $isOnline
         ], NULL, "A$row");
