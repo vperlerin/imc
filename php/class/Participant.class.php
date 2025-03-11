@@ -1147,7 +1147,7 @@ class ParticipantManager
             WHERE pw.workshop_id = :workshop_id 
         ";
     
-        $stmt = $pdo->prepare($sql);
+        $stmt = $this->pdo->prepare($sql);
         $stmt->bindParam(':workshop_id', $workshopId, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
