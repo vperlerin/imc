@@ -50,7 +50,7 @@ $sheet = $spreadsheet->getActiveSheet();
 $sheet->setTitle("All Posters");
 
 // Define column headers
-$headers = ["Session",  "Presenter", "Title", "Authors", "Abstract", "Online"];
+$headers = ["Session",  "Presenter", "Title", "Authors", "Abstract"];
 
 // Write headers
 $sheet->fromArray([$headers], NULL, 'A1');
@@ -59,16 +59,14 @@ $sheet->fromArray([$headers], NULL, 'A1');
 $row = 2;
 foreach ($posters as $session => $posterList) {
     foreach ($posterList as $poster) {
-        $presenter = trim("{$poster['first_name']} {$poster['last_name']}");
-        $isOnline = isset($poster['is_online']) && $poster['is_online'] == "1" ? "true" : "false";
+        $presenter = trim("{$poster['first_name']} {$poster['last_name']}"); 
 
         $sheet->fromArray([
             $session,
             $presenter,
             isset($poster["title"]) ? $poster["title"] : "Untitled",
             isset($poster["authors"]) ? $poster["authors"] : "No author available",
-            isset($poster["abstract"]) ? $poster["abstract"] : "No abstract available",
-            $isOnline
+            isset($poster["abstract"]) ? $poster["abstract"] : "No abstract available", 
         ], NULL, "A$row");
 
         // Wrap text for the abstract column (column F)
@@ -91,10 +89,10 @@ $headerStyle = [
   'borders' => ['bottom' => ['borderStyle' => Border::BORDER_THIN]]
 ];
 
-$sheet->getStyle('A1:F1')->applyFromArray($headerStyle);
+$sheet->getStyle('A1:E1')->applyFromArray($headerStyle);
 
 // Set alignment for all columns
-$sheet->getStyle("A1:F$row")->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+$sheet->getStyle("A1:E$row")->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
 
 // Prevent excessive cell height in Abstract column
 $sheet->getRowDimension(1)->setRowHeight(25);
