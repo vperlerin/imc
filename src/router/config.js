@@ -5,8 +5,6 @@ import { Link } from "react-router-dom";
 import Loader from "components/loader";
 import ProtectedRoute from "hooks/protected-route";
 
-
-
 // Lazy-load pages using relative paths (Webpack resolves them correctly)
 const lazyPages = {
   Home: lazy(() => import("pages/home")),
@@ -44,6 +42,8 @@ const lazyPages = {
   AdminParticipantsUser: lazy(() => import("admin/pages/participants/single")),
   AdminParticipantsPayment: lazy(() => import("admin/pages/participants/payment")),
   AdminTalks: lazy(() => import("admin/pages/contributions/talks")), 
+  AdminPosters: lazy(() => import("admin/pages/contributions/posters")), 
+
 
 };
 
@@ -96,6 +96,7 @@ const routeConfig = [
   { path: "/admin/participants/onsite/payment/:participantId", element: (<ProtectedRoute><lazyPages.AdminParticipantsPayment isCurOnline={false} /></ProtectedRoute>) },
   { path: "/admin/participants/online/payment/:participantId", element: (<ProtectedRoute><lazyPages.AdminParticipantsPayment isCurOnline /></ProtectedRoute>) }, 
   { path: "/admin/contributions/talks", element: (<ProtectedRoute><lazyPages.AdminTalks /></ProtectedRoute>) },
+  { path: "/admin/contributions/posters", element: (<ProtectedRoute><lazyPages.AdminPosters /></ProtectedRoute>) },
   // 404
   { path: "*", element: <Placeholder title="Oops! Looks like you’ve taken a wrong turn into the meteor shower. This page has burned up in the atmosphere!" /> },
 ];

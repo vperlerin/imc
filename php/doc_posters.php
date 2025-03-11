@@ -25,29 +25,29 @@ use PhpOffice\PhpSpreadsheet\Style\Border;
 
 // Initialize contribution manager
 $contributionManager = new ContributionManager($pdo);
-$talks = $contributionManager->getAllTalks();
+$posters = $contributionManager->getAllPosters();
 
 // Get current year and date
 $currentYear = date("Y");
 $currentDate = date("d-m-Y");
 
 // Generate filename
-$fileName = "IMC{$currentYear}-Talks-{$currentDate}.xlsx";
+$fileName = "IMC{$currentYear}-Posters-{$currentDate}.xlsx";
 
 // Create new Spreadsheet
 $spreadsheet = new Spreadsheet();
 $spreadsheet->getProperties()
     ->setCreator("IMC {$currentYear}")
     ->setLastModifiedBy("IMC {$currentYear}")
-    ->setTitle("IMC Talks {$currentYear}")
-    ->setSubject("Talks List")
-    ->setDescription("Excel export for all talks.")
-    ->setKeywords("conference talks export")
-    ->setCategory("Talk Data");
+    ->setTitle("IMC Posters {$currentYear}")
+    ->setSubject("Posters List")
+    ->setDescription("Excel export for all posters.")
+    ->setKeywords("conference posters export")
+    ->setCategory("Poster Data");
 
 // Create a single sheet
 $sheet = $spreadsheet->getActiveSheet();
-$sheet->setTitle("All Talks");
+$sheet->setTitle("All Posters");
 
 // Define column headers
 $headers = ["Session", "Duration", "Presenter", "Title", "Authors", "Abstract", "Online"];
@@ -55,47 +55,47 @@ $headers = ["Session", "Duration", "Presenter", "Title", "Authors", "Abstract", 
 // Write headers
 $sheet->fromArray([$headers], NULL, 'A1');
 
-// Insert talk data
+// Insert poster data
 $row = 2;
-foreach ($talks as $session => $talkList) {
-    foreach ($talkList as $talk) {
-        $presenter = trim("{$talk['first_name']} {$talk['last_name']}");
-        $isOnline = isset($talk['is_online']) && $talk['is_online'] == "1" ? "true" : "false";
+foreach ($posters as $session => $posterList) {
+    foreach ($posterList as $poster) {
+        $presenter = trim("{$poster['first_name']} {$poster['last_name']}");
+        $isOnline = isset($poster['is_online']) && $poster['is_online'] == "1" ? "true" : "false";
 
         $sheet->fromArray([
             $session,
-            isset($talk["duration"]) ? $talk["duration"] : "N/A",
+            isset($poster["duration"]) ? $poster["duration"] : "N/A",
             $presenter,
-            isset($talk["title"]) ? $talk["title"] : "Untitled",
-            isset($talk["authors"]) ? $talk["authors"] : "No author available",
-            isset($talk["abstract"]) ? $talk["abstract"] : "No abstract available",
+            isset($poster["title"]) ? $poster["title"] : "Untitled",
+            isset($poster["authors"]) ? $poster["authors"] : "No author available",
+            isset($poster["abstract"]) ? $poster["abstract"] : "No abstract available",
             $isOnline
         ], NULL, "A$row");
 
-        // Wrap text for the abstract column (column E)
-        $sheet->getStyle("E$row")->getAlignment()->setWrapText(true);
+        // Wrap text for the abstract column (column F)
+        $sheet->getStyle("F$row")->getAlignment()->setWrapText(true);
 
         $row++;
     }
 }
 
 // Auto-size columns for better readability
-foreach (range('A', 'F') as $col) {
+foreach (range('A', 'G') as $col) {
     $sheet->getColumnDimension($col)->setAutoSize(true);
 }
 
 // Set styles for headers
 $headerStyle = [
-    'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
-    'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '4F81BD']],
-    'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
-    'borders' => ['bottom' => ['borderStyle' => Border::BORDER_THIN]]
+  'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
+  'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '4F81BD']],
+  'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+  'borders' => ['bottom' => ['borderStyle' => Border::BORDER_THIN]]
 ];
 
 $sheet->getStyle('A1:G1')->applyFromArray($headerStyle);
 
 // Set alignment for all columns
-$sheet->getStyle("A1:F$row")->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+$sheet->getStyle("A1:G$row")->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
 
 // Prevent excessive cell height in Abstract column
 $sheet->getRowDimension(1)->setRowHeight(25);
