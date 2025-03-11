@@ -20,6 +20,9 @@ require __DIR__ . "/../vendor/autoload.php";
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Style\Border;
 
 if (!isset($_GET['workshop_id']) || !is_numeric($_GET['workshop_id'])) {
   die(json_encode(["success" => false, "message" => "Invalid workshop ID."]));
@@ -52,7 +55,6 @@ $currentDate = date("d-m-Y");
 $workshopName = preg_replace('/[^A-Za-z0-9_ -]/', '', $workshop['title']); // Remove special characters
 $fileName = "{$workshopName}_{$currentDate}.xlsx";
 
-
 // Create new Spreadsheet 
 $currentYear = date("Y");
 
@@ -66,10 +68,25 @@ $spreadsheet->getProperties()
     ->setKeywords("IMC IMO openoffice excel export {$currentYear}")
     ->setCategory("Workshop Data {$currentYear}");
 
-+$spreadsheet->removeSheetByIndex(0);
+// 🚀 Remove default sheet (to prevent duplicate issues)
+$spreadsheet->removeSheetByIndex(0);
 
-// Function to create a sheet only if participants exist
-function createSheet($spreadsheet, $sheetName, $participants)
+// ✅ **Header Styling**
+$headerStyle = [
+    'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
+    'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '4F81BD']],
+    'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+    'borders' => ['bottom' => ['borderStyle' => Border::BORDER_THIN]]
+];
+
+/**
+ * Creates an Excel sheet with participant data and applies header styling.
+ * @param Spreadsheet $spreadsheet
+ * @param string $sheetName
+ * @param array $participants
+ * @param array $headerStyle
+ */
+function createSheet($spreadsheet, $sheetName, $participants, $headerStyle)
 {
     if (empty($participants)) {
         return; 
@@ -79,9 +96,12 @@ function createSheet($spreadsheet, $sheetName, $participants)
     $sheet->setTitle($sheetName);
     $spreadsheet->setActiveSheetIndex($spreadsheet->getSheetCount() - 1); // Make it the active sheet
 
-    // Set column headers
+    // Define column headers
     $headers = ["Full Name", "Email", "Country", "Confirmed"];
-    $sheet->fromArray($headers, NULL, 'A1');
+    $sheet->fromArray([$headers], NULL, 'A1');
+
+    // Apply header styling
+    $sheet->getStyle('A1:D1')->applyFromArray($headerStyle);
 
     // Insert Data
     $row = 2;
@@ -105,19 +125,22 @@ function createSheet($spreadsheet, $sheetName, $participants)
     }
 }
 
-// Only create "Online Participants" sheet if they exist
+// ✅ **Create "Online Participants" Sheet**
 if (!empty($onlineParticipants)) {
-    createSheet($spreadsheet, "Online Participants", $onlineParticipants);
+    createSheet($spreadsheet, "Online Participants", $onlineParticipants, $headerStyle);
 }
 
-// Only create "Onsite Participants" sheet if they exist
+// ✅ **Create "Onsite Participants" Sheet**
 if (!empty($onsiteParticipants)) {
-    createSheet($spreadsheet, "Onsite Participants", $onsiteParticipants);
+    createSheet($spreadsheet, "Onsite Participants", $onsiteParticipants, $headerStyle);
 }
 
 // Ensure at least one sheet exists
 if ($spreadsheet->getSheetCount() == 0) {
-    $spreadsheet->createSheet()->setTitle("No Participants");
+    $sheet = $spreadsheet->createSheet();
+    $sheet->setTitle("No Participants");
+    $spreadsheet->setActiveSheetIndex(0);
+    $sheet->setCellValue('A1', 'No participants found.');
 }
 
 // Set the first sheet as active
