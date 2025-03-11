@@ -2,6 +2,14 @@ IMC
 
 WARNING: NEVER PUSH FROM THE SERVER
 
+run composer on server 
+{
+    "require": {
+        "phpoffice/phpspreadsheet": "^1.25"
+    }
+}
+
+
 1- Update src/data/conference-data.json 
 2- Update /env/.env with DB user & password
 3- Make sure imc/env/.env is the same than /env/.env

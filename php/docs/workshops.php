@@ -7,7 +7,7 @@ error_reporting(E_ALL);
 require_once __DIR__ . "/../../config.php";
 require_once __DIR__ . "/../../class/Connect.class.php";
 require_once __DIR__ . "/../../class/Dashboard.class.php";
-require '/../../vendor/autoload.php';
+require '/../../../vendor/autoload.php';
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
