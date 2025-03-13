@@ -12,6 +12,9 @@ if (isset($_SERVER['HTTP_ORIGIN']) && in_array($_SERVER['HTTP_ORIGIN'], $allowed
 header("Content-Type: application/json");
 header("Access-Control-Allow-Methods: GET, OPTIONS");
 
+require_once __DIR__ . "/../config.php";
+require_once __DIR__ . "/../class/Accomodation.class.php"; 
+
 // Handle preflight OPTIONS request
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
@@ -26,10 +29,7 @@ if ($typeFilter !== null && !in_array($typeFilter, ['no', 'not_no'])) {
 }
 
 try {
-    // Instantiate the AccommodationManager
-    $accommodationManager = new AccommodationManager($pdo);
-    
-    // Fetch available rooms
+    $accommodationManager = new AccommodationManager($pdo); 
     $availableRooms = $accommodationManager->gatAvailableRooms();
 
     // Return the result in JSON format
