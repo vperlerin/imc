@@ -1,7 +1,7 @@
 import { CiSearch } from "react-icons/ci";
 import PageContain from "@/admin/components/page-contain";
 import Loader from "components/loader";
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useApiParticipantsWithRegistration } from "api/participants/accommodations.js";
 import DocButton from "@/admin/components/doc-button";
 
@@ -16,45 +16,43 @@ const AdminAccommodations = ({ typeFilter = "" }) => {
 
   // Function to handle sorting
   const handleSort = (column) => {
-    if (sortColumn === column) {
-      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-    } else {
-      setSortColumn(column);
-      setSortOrder("asc");
-    }
+    setSortOrder(sortColumn === column ? (sortOrder === "asc" ? "desc" : "asc") : "asc");
+    setSortColumn(column);
   };
 
-  // Filter participants based on search
-  let filteredParticipants = participants || [];
+  // Filter and sort participants efficiently using useMemo
+  const filteredParticipants = useMemo(() => {
+    let filtered = participants ? [...participants] : []; // Ensure a fresh copy of the participants array
 
-  if (searchQuery) {
-    const lowerQuery = searchQuery.toLowerCase();
-    filteredParticipants = filteredParticipants.filter((participant) => {
-      const fieldValue = participant[searchType] ? String(participant[searchType]).toLowerCase() : "";
-      return fieldValue.includes(lowerQuery);
-    });
-  }
+    // Apply search filter
+    if (searchQuery) {
+      const lowerQuery = searchQuery.toLowerCase();
+      filtered = filtered.filter((participant) =>
+        participant[searchType]?.toLowerCase().includes(lowerQuery)
+      );
+    }
 
-  // Sort participants based on selected column
-  if (sortColumn) {
-    filteredParticipants = [...filteredParticipants].sort((a, b) => {
-      let valueA = a[sortColumn] ?? "";
-      let valueB = b[sortColumn] ?? "";
+    // Apply sorting
+    if (sortColumn) {
+      filtered.sort((a, b) => {
+        let valueA = a[sortColumn] ?? "";
+        let valueB = b[sortColumn] ?? "";
 
-      // Convert values for proper sorting
-      if (["created_at"].includes(sortColumn)) {
-        valueA = new Date(valueA).getTime() || 0;
-        valueB = new Date(valueB).getTime() || 0;
-      } else {
-        valueA = valueA.toString().toLowerCase();
-        valueB = valueB.toString().toLowerCase();
-      }
+        // Convert values properly for sorting
+        if (sortColumn === "created_at") {
+          valueA = new Date(valueA).getTime() || 0;
+          valueB = new Date(valueB).getTime() || 0;
+        } else {
+          valueA = valueA.toString().toLowerCase();
+          valueB = valueB.toString().toLowerCase();
+        }
 
-      if (valueA < valueB) return sortOrder === "asc" ? -1 : 1;
-      if (valueA > valueB) return sortOrder === "asc" ? 1 : -1;
-      return 0;
-    });
-  }
+        return sortOrder === "asc" ? valueA.localeCompare(valueB) : valueB.localeCompare(valueA);
+      });
+    }
+
+    return filtered;
+  }, [participants, searchQuery, sortColumn, sortOrder]);
 
   return (
     <PageContain
@@ -62,7 +60,6 @@ const AdminAccommodations = ({ typeFilter = "" }) => {
       isMaxWidth
       title="Participants' Accommodations"
     >
-
       {loading ? (
         <Loader />
       ) : error ? (
@@ -90,7 +87,6 @@ const AdminAccommodations = ({ typeFilter = "" }) => {
               <option value="not_no">Staying at the hostel</option>
               <option value="no">No Accommodation</option>
             </select>
-
 
             <DocButton
               className="ms-auto"
