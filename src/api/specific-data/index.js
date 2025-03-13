@@ -14,7 +14,7 @@ export const useApiSpecificData = () => {
     const fetchSpecificData = async () => {
       try {
         const response = await retry(() =>
-          axios.get(`${process.env.REACT_APP_API_URL}/get_specific_data.php`)
+          axios.get(`${process.env.REACT_APP_API_URL}/get_specific_data.php`),
         );
         if (response.data.success) {
           setWorkshops(response.data.data.workshops || []);

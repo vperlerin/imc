@@ -17,12 +17,13 @@ export const useApiConfirmParticipant = () => {
         {
           id: participantId,
           ...confirmationData,
-        }
+        },
       );
 
       return response.data;
     } catch (err) {
-      const errorMessage = err.response?.data?.message || "An unexpected error occurred.";
+      const errorMessage =
+        err.response?.data?.message || "An unexpected error occurred.";
       setErrorConfirm(errorMessage);
       return { success: false, message: errorMessage };
     } finally {

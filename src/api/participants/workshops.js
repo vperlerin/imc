@@ -19,20 +19,21 @@ export const useApiWorkshopsParticipants = (workshopId) => {
         const response = await retry(() =>
           axios.get(
             `${process.env.REACT_APP_API_URL}/api/get_workshops_participants.php`,
-            { params: { workshop_id: workshopId } }
-          )
+            { params: { workshop_id: workshopId } },
+          ),
         );
 
-        if (response.data.success && Array.isArray(response.data.data)) { 
+        if (response.data.success && Array.isArray(response.data.data)) {
           setParticipants(response.data.data);
         } else {
           throw new Error(
-            response.data.message || "Database access error, please try again."
+            response.data.message || "Database access error, please try again.",
           );
         }
-      } catch (err) { 
+      } catch (err) {
         setError(
-          err.message || "Failed to fetch participants. Please refresh the page."
+          err.message ||
+            "Failed to fetch participants. Please refresh the page.",
         );
       } finally {
         setLoading(false);

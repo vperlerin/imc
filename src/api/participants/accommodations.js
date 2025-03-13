@@ -17,25 +17,33 @@ export const useApiParticipantsWithRegistration = (typeFilter) => {
     const fetchParticipants = async () => {
       try {
         const response = await retry(() =>
-          axios.get(`${process.env.REACT_APP_API_URL}/api/get_accomodations.php`, {
-            params: { type: typeFilter },
-          })
+          axios.get(
+            `${process.env.REACT_APP_API_URL}/api/get_accomodations.php`,
+            {
+              params: { type: typeFilter },
+            },
+          ),
         );
 
         if (response.data.success && Array.isArray(response.data.data)) {
           setParticipants(response.data.data);
         } else {
-          throw new Error(response.data.message || "Database access error, please try again.");
+          throw new Error(
+            response.data.message || "Database access error, please try again.",
+          );
         }
       } catch (err) {
-        setError(err.message || "Failed to fetch participants. Please refresh the page.");
+        setError(
+          err.message ||
+            "Failed to fetch participants. Please refresh the page.",
+        );
       } finally {
         setLoading(false);
       }
     };
 
     fetchParticipants();
-  }, [typeFilter]);   
+  }, [typeFilter]);
 
   return { participants, loading, error, setParticipants };
 };

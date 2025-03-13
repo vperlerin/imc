@@ -9,18 +9,17 @@ const isJSON = (jsonString) => {
     return false;
   }
 };
- 
+
 const session = localStorage.getItem("session");
 const parsedSession = isJSON(session);
 
- 
 const store = configureStore({
   reducer: {
     auth: authReducer,
   },
   preloadedState: {
     auth: parsedSession
-      ? { isAuthenticated: !!parsedSession.isAuthenticated }  
+      ? { isAuthenticated: !!parsedSession.isAuthenticated }
       : { isAuthenticated: false },
   },
 });

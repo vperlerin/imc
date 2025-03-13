@@ -17,7 +17,9 @@ export const useApiLogout = () => {
 
     try {
       const response = await retry(() =>
-        axios.get(`${process.env.REACT_APP_API_URL}/auth/logout.php`, { withCredentials: true })
+        axios.get(`${process.env.REACT_APP_API_URL}/auth/logout.php`, {
+          withCredentials: true,
+        }),
       );
 
       if (response.data.success) {
@@ -32,7 +34,7 @@ export const useApiLogout = () => {
     } finally {
       setLoading(false);
     }
-  }, [dispatch, navigate]);  
+  }, [dispatch, navigate]);
 
-  return { logout, loading, error };  
+  return { logout, loading, error };
 };

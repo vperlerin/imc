@@ -12,13 +12,15 @@ export const useApiPayments = (participantId) => {
 
     setLoading(true);
     setError(null);
-    
+
     try {
       const response = await retry(() =>
-        axios.get(`${process.env.REACT_APP_API_URL}/admin/api/get_payments.php?id=${participantId}`)
+        axios.get(
+          `${process.env.REACT_APP_API_URL}/admin/api/get_payments.php?id=${participantId}`,
+        ),
       );
 
-      if(!response.data.success) {
+      if (!response.data.success) {
         setError(response.data.message || "Error fetching payments.");
       } else {
         setPayments(response.data.data || []);

@@ -4,10 +4,10 @@ import axios from "axios";
 const loadAuthState = () => {
   const session = localStorage.getItem("session");
   return {
-    oauth: session || null, 
-    user: null,  
+    oauth: session || null,
+    user: null,
     isAuthenticated: !!session,
-    isAdmin: false,  
+    isAdmin: false,
   };
 };
 
@@ -36,38 +36,35 @@ const authSlice = createSlice({
 });
 export const fetchUser = () => async (dispatch) => {
   try {
- 
     const response = await axios.get(
       `${process.env.REACT_APP_API_URL}/auth/user.php`,
-      { withCredentials: true }
+      { withCredentials: true },
     );
- 
+
     if (!response.data?.success) {
       throw new Error(response.data?.message || "Failed to fetch user data");
     }
 
     const user = {
       ...response.data.user,
-      is_admin: !!response.data.user?.is_admin,  
+      is_admin: !!response.data.user?.is_admin,
     };
 
-    dispatch(authActions.setUser(user)); 
+    dispatch(authActions.setUser(user));
   } catch (error) {
     console.error("Error fetching user:", error);
     dispatch(authActions.logout());
   }
 };
 
-
-
 export const authActions = {
   ...authSlice.actions,
   fetchUser,
 };
 export const authSelectors = {
-  getUser: (state) => state.auth.user, 
+  getUser: (state) => state.auth.user,
   isAdmin: (state) => !!state.auth.user?.is_admin,
-  isLoggedIn: (state) => !!state.auth.user,  
+  isLoggedIn: (state) => !!state.auth.user,
 };
 export const authReducer = authSlice.reducer;
 export default authSlice;

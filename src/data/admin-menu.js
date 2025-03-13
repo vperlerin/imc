@@ -8,7 +8,10 @@ export const menuItems = [
       { title: "On-site", link: "/admin/participants/onsite" },
       { title: "Online", link: "/admin/participants/online" },
       { title: "Radio Workshop", link: "/admin/participants/workshops/radio" },
-      { title: "Spectro Workshop", link: "/admin/participants/workshops/spectro" },
+      {
+        title: "Spectro Workshop",
+        link: "/admin/participants/workshops/spectro",
+      },
     ],
   },
   {

@@ -7,12 +7,14 @@ export const useApiOnsiteParticipants = (confirmedOnly = false) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {  
+  useEffect(() => {
     const fetchParticipants = async () => {
       try {
         const queryParam = confirmedOnly ? "?confirmed_only=1" : "";
-        const response =  await retry(() =>
-          axios.get(`${process.env.REACT_APP_API_URL}/admin/api/onsite_participants.php${queryParam}`) 
+        const response = await retry(() =>
+          axios.get(
+            `${process.env.REACT_APP_API_URL}/admin/api/onsite_participants.php${queryParam}`,
+          ),
         );
 
         if (response.data.success && Array.isArray(response.data.data)) {
@@ -22,7 +24,7 @@ export const useApiOnsiteParticipants = (confirmedOnly = false) => {
             response.data.message || "Database access error, please try again.",
           );
         }
-      } catch (err) { 
+      } catch (err) {
         setError(
           err.message ||
             "Failed to fetch participants. Please refresh the page.",

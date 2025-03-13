@@ -21,7 +21,7 @@ const Participants = () => {
     countryCounts[participant.country] = (countryCounts[participant.country] || 0) + 1;
   });
 
-  const totalParticipants = onsiteParticipants.length + onlineParticipants.length;
+  const totalParticipants = onsiteParticipants?.length + onlineParticipants?.length;
 
   return (
     <PageContain title="Participants">
@@ -75,7 +75,7 @@ const Participants = () => {
               </Link></p>
           )}
         </div>
-        {onsiteParticipants.length > 0 && onlineParticipants.length > 0(
+        {(onsiteParticipants.length > 0 ||  onlineParticipants.length > 0) && (
           <div className="border p-3 rounded-2">
             <h4 className="m-0 mb-2">Participants per Country</h4>
             <ul className="list-unstyled">

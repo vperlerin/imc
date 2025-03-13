@@ -1,6 +1,6 @@
 import { retry } from "utils/retry.js";
 import { useState, useCallback } from "react";
-import axios from "axios"; 
+import axios from "axios";
 import { useApiPayments } from "@/admin/api/payments";
 
 export const useApiAddPayment = (participantId) => {
@@ -8,32 +8,39 @@ export const useApiAddPayment = (participantId) => {
   const [error, setError] = useState(null);
   const { refetchPayments } = useApiPayments(participantId); // Get refetch function
 
-  const addPayment = useCallback(async (paymentData) => {
-    if (!participantId) return;
+  const addPayment = useCallback(
+    async (paymentData) => {
+      if (!participantId) return;
 
-    setLoading(true);
-    setError(null);
+      setLoading(true);
+      setError(null);
 
-    try {
-      const response = await retry(() =>
-        axios.post(`${process.env.REACT_APP_API_URL}/admin/api/add_payment.php`, { paymentData }, {
-          headers: { "Content-Type": "application/json" }
-        })
-      );
+      try {
+        const response = await retry(() =>
+          axios.post(
+            `${process.env.REACT_APP_API_URL}/admin/api/add_payment.php`,
+            { paymentData },
+            {
+              headers: { "Content-Type": "application/json" },
+            },
+          ),
+        );
 
-      if (response.data.success) {
-        await refetchPayments();  
-        return { success: true, message: "Payment added successfully!" };
-      } else {
-        throw new Error(response.data.message || "Failed to add payment.");
+        if (response.data.success) {
+          await refetchPayments();
+          return { success: true, message: "Payment added successfully!" };
+        } else {
+          throw new Error(response.data.message || "Failed to add payment.");
+        }
+      } catch (err) {
+        setError(err.message || "Error adding payment.");
+        return { success: false, message: err.message };
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      setError(err.message || "Error adding payment.");
-      return { success: false, message: err.message };
-    } finally {
-      setLoading(false);
-    }
-  }, [participantId, refetchPayments]);
+    },
+    [participantId, refetchPayments],
+  );
 
   return { addPayment, loading, error };
 };
