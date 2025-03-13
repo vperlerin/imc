@@ -36,9 +36,7 @@ if ($typeFilter !== null && !in_array($typeFilter, ['no', 'not_no'])) {
 try {
     $accommodationManager = new AccommodationManager($pdo); 
     $availableRooms = $accommodationManager->gatAvailableRooms();
-
-    var_dump( $availableRooms);
-
+ 
     // Return the result in JSON format
     echo json_encode(["success" => true, "data" => $availableRooms]);
 } catch (Exception $e) {
