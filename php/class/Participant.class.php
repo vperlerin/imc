@@ -193,6 +193,10 @@ class ParticipantManager
             $excursionValue = !empty($data['excursion']) && ($data['excursion'] === 1 || $data['excursion'] === "1" || $data['excursion'] === "true") ? 1 : 0;
             $buytshirtValue = !empty($data['buy_tshirt']) && ($data['buy_tshirt'] === 1 || $data['buy_tshirt'] === "1" || $data['buy_tshirt'] === "true") ? 1 : 0;
 
+            error_log("excursionValue ", $excursionValue);
+            error_log("buytshirtValue ", $buytshirtValue);
+
+
             // Execute the prepared statement
             $stmt->execute([
                 ':participant_id' => $participantId,
