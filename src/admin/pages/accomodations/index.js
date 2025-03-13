@@ -1,7 +1,8 @@
+import { useState, useMemo, useEffect } from "react";
 import { CiSearch } from "react-icons/ci";
 import PageContain from "@/admin/components/page-contain";
 import Loader from "components/loader";
-import React, { useState, useMemo } from "react";
+import { useApiAvailableRooms } from "@/admin/api/accomodations/index.js";  
 import { useApiParticipantsWithRegistration } from "api/participants/accommodations.js";
 import DocButton from "@/admin/components/doc-button";
 
@@ -11,7 +12,12 @@ const AdminAccommodations = ({ typeFilter = "" }) => {
   const [sortColumn, setSortColumn] = useState(null);
   const [sortOrder, setSortOrder] = useState("asc");
 
+  // Fetch available rooms data
+  const { availableRooms, loading: loadingRooms, error: errorRooms } = useApiAvailableRooms();
+
+  // Fetch participants data
   const { participants, loading, error } = useApiParticipantsWithRegistration(curFilter);
+
   const searchType = "last_name";
 
   // Function to handle sorting
@@ -22,12 +28,7 @@ const AdminAccommodations = ({ typeFilter = "" }) => {
 
   // Filter and sort participants efficiently using useMemo
   const filteredParticipants = useMemo(() => {
-    let filtered = participants ? [...participants] : []; // Ensure a fresh copy of the participants array
-
-    // Remove duplicates based on participant ID
-    filtered = filtered.filter((value, index, self) =>
-      index === self.findIndex((t) => t.id === value.id) // Ensures unique participants based on their ID
-    );
+    let filtered = participants ? [...participants] : [];
 
     // Apply search filter
     if (searchQuery) {
@@ -65,12 +66,18 @@ const AdminAccommodations = ({ typeFilter = "" }) => {
       isMaxWidth
       title="Participants' Accommodations"
     >
-      {loading ? (
+      {loading || loadingRooms ? (
         <Loader />
-      ) : error ? (
-        <p className="text-danger">Error: {error}</p>
+      ) : error || errorRooms ? (
+        <p className="text-danger">Error: {error || errorRooms}</p>
       ) : (
         <>
+          {/* Display available rooms */}
+          <div className="mb-3">
+            <h5>Available Rooms</h5>
+            <p>Total available rooms across all categories: {availableRooms?.reduce((total, room) => total + room.available_rooms, 0) || 0}</p>
+          </div>
+
           <div className="d-flex flex-column flex-md-row gap-2 mb-3">
             {/* Search Filter */}
             <div className="position-relative w-auto">
@@ -103,8 +110,8 @@ const AdminAccommodations = ({ typeFilter = "" }) => {
             <table className="table table-striped">
               <thead>
                 <tr>
-                  <th className="sortable" onClick={() => handleSort("created_at")}>
-                    Reg. Date {sortColumn === "created_at" && (sortOrder === "asc" ? "🔼" : "🔽")}
+                  <th onClick={() => handleSort("created_at")}>
+                    Reg. Date
                   </th>
                   <th className="sortable" onClick={() => handleSort("last_name")}>
                     Name {sortColumn === "last_name" && (sortOrder === "asc" ? "🔼" : "🔽")}
@@ -117,12 +124,12 @@ const AdminAccommodations = ({ typeFilter = "" }) => {
               <tbody>
                 {filteredParticipants.length > 0 ? (
                   filteredParticipants.map((participant) => (
-                    <tr key={participant.id}>
+                    <tr key={participant.participant_id}>
                       <td>{participant.created_at?.split(" ")[0] || "n/a"}</td>
                       <td>
                         {participant.title} {participant.first_name} {participant.last_name}
                       </td>
-                      <td>{participant.description || "n/a"}</td>
+                      <td>{participant.registration_type || "n/a"}</td>
                     </tr>
                   ))
                 ) : (
