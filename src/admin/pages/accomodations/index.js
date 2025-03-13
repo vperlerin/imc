@@ -24,6 +24,11 @@ const AdminAccommodations = ({ typeFilter = "" }) => {
   const filteredParticipants = useMemo(() => {
     let filtered = participants ? [...participants] : []; // Ensure a fresh copy of the participants array
 
+    // Remove duplicates based on participant ID
+    filtered = filtered.filter((value, index, self) =>
+      index === self.findIndex((t) => t.id === value.id) // Ensures unique participants based on their ID
+    );
+
     // Apply search filter
     if (searchQuery) {
       const lowerQuery = searchQuery.toLowerCase();
