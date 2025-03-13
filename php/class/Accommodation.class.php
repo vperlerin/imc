@@ -44,6 +44,11 @@ class AccommodationManager
             $sql .= " AND r.type != 'no'"; // Only participants with valid registration types (not 'no')
         }
     
+        // Remove any conditions implicitly filtering unconfirmed participants
+        // Ensure that all participants are included, even those without confirmation
+        // Do NOT filter out based on confirmation_sent
+        // For now, we're not including any WHERE clause on confirmation_sent, but you can add it if needed
+    
         // Remove duplicate participants based on their ID
         $sql .= " GROUP BY p.id"; // Group by participant ID to avoid duplicates
     
@@ -57,6 +62,7 @@ class AccommodationManager
         // Return the fetched results
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+    
     
     
 }
