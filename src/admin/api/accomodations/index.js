@@ -13,7 +13,7 @@ export const useApiAvailableRooms = () => {
 
     try {
       const response = await retry(() =>
-        axios.get(`${process.env.REACT_APP_API_URL}/admin/api/get_left_accomodations.php`)
+        axios.get(`${process.env.REACT_APP_API_URL}/api/get_left_accommodations.php`)
       );
 
       if (!response.data.success) {
