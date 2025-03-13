@@ -12,7 +12,7 @@ const DocButton = ({
   format = "xls", 
   title = "Download" 
 }) => {
-  const isPhpRoute = link.startsWith("/php/");
+  const isPhpRoute = true;
 
   return (
     isPhpRoute ? (
@@ -20,6 +20,7 @@ const DocButton = ({
         href={link} 
         className={`btn btn-outline-success d-inline-flex align-items-center gap-2 ${className}`}
         aria-label={`Download ${title} in ${format.toUpperCase()} format`}
+
       >
         {formatIcons[format] || null} {title}
       </a>
