@@ -91,10 +91,12 @@ const Comments = ({
 
       <div className="mx-md-3 mb-3">
         <div className="mb-4">
-          <label className="form-label fw-bold pb-0">Comments or specific instructions</label>
+          <label className="form-label fw-bold pb-0">Preferred Roommates, Comments, or Specific Instructions</label>
+          <p class="text-info fw-bolder mb-1">If you selected to stay with us in a double, triple, or quadruple room,
+            please enter the names of your preferred roommates below.</p>
           <textarea
             className="form-control"
-            placeholder="Add a comment if needed"
+            placeholder="Add a comment and/or the list of your preferred roommates if needed"
             {...register("comments")}
           ></textarea>
           {errors.comments && <p className="text-danger">{errors.comments.message}</p>}
