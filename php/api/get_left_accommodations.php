@@ -12,6 +12,10 @@ if (isset($_SERVER['HTTP_ORIGIN']) && in_array($_SERVER['HTTP_ORIGIN'], $allowed
 header("Content-Type: application/json");
 header("Access-Control-Allow-Methods: GET, OPTIONS");
 
+ini_set('display_errors', '1');
+ini_set('display_startup_errors', '1');
+error_reporting(E_ALL);
+
 require_once __DIR__ . "/../config.php";
 require_once __DIR__ . "/../class/Accomodation.class.php"; 
 
