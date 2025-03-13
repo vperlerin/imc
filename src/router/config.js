@@ -4,15 +4,7 @@ import { Routes, Route } from "react-router-dom";
 import { Link } from "react-router-dom";
 import Loader from "components/loader";
 import ProtectedRoute from "hooks/protected-route";
-
-const phpRoutes = [
-  "/php/doc_participants.php",
-  "/php/doc_accommodations.php",
-  "/php/doc_workshops.php?workshop_id=1",
-  "/php/doc_workshops.php?workshop_id=2",
-  "/php/doc_posters.php",
-  "/php/doc_talks.php"
-];
+ 
 
 
 // Lazy-load pages using relative paths (Webpack resolves them correctly)
@@ -111,12 +103,7 @@ const routeConfig = [
   { path: "/admin/contributions/talks", element: (<ProtectedRoute><lazyPages.AdminTalks /></ProtectedRoute>) },
   { path: "/admin/contributions/posters", element: (<ProtectedRoute><lazyPages.AdminPosters /></ProtectedRoute>) },
   { path: "/admin/downloads", element: (<ProtectedRoute><lazyPages.AdminDownloads /></ProtectedRoute>) },
-   // For PHP routes, don't handle them in React Router 
-  ...phpRoutes.map((path) => ({
-    path: path,
-    element: null,  // These are handled by the server, not React Router
-  })),
-
+   
   // 404
   { path: "*", element: <Placeholder title="Oops! Looks like you’ve taken a wrong turn into the meteor shower. This page has burned up in the atmosphere!" /> },
 ];
