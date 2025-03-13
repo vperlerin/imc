@@ -21,6 +21,7 @@ class AccommodationManager
  
     public function getParticipantsWithRegistrationDetails($typeFilter)
     {
+        // Define the query with the correct conditions
         $sql = "
         SELECT DISTINCT
             p.id AS participant_id,
@@ -33,12 +34,25 @@ class AccommodationManager
         FROM participants p
         JOIN accommodation a ON p.id = a.participant_id
         JOIN registration_types r ON a.registration_type_id = r.id
-        WHERE r.type " . ($typeFilter === 'no' ? "= 'no'" : "!= 'no'") . "
-        ORDER BY r.type ASC";
+        WHERE 1
+        ";
     
+        // Modify the WHERE clause based on the typeFilter
+        if ($typeFilter === 'no') {
+            $sql .= " AND r.type = 'no'"; // Filter for 'no' registration type
+        } else {
+            $sql .= " AND r.type != 'no'"; // Filter for non-'no' registration types
+        }
+    
+        // Add ordering by registration type
+        $sql .= " ORDER BY r.type ASC";
+    
+        // Prepare and execute the query
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute();
     
+        // Return the fetched results
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+    
 }
