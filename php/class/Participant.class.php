@@ -79,8 +79,6 @@ class ParticipantManager
                 }
             }
 
-            error_log("DATA AFTER CLEANIG before insert: " . json_encode($data));
-
             $this->pdo->beginTransaction();
 
             // Check if email exists
@@ -192,8 +190,8 @@ class ParticipantManager
             ");
 
             // Normalize boolean values (ensure only "1" or "0" is stored)
-            $excursionValue = !empty($data['excursion']) && ($data['excursion'] === "1" || $data['excursion'] === "true") ? 1 : 0;
-            $buytshirtValue = !empty($data['buy_tshirt']) && ($data['buy_tshirt'] === "1" || $data['buy_tshirt'] === "true") ? 1 : 0;
+            $excursionValue = !empty($data['excursion']) && ($data['excursion'] === 1 || $data['excursion'] === "1" || $data['excursion'] === "true") ? 1 : 0;
+            $buytshirtValue = !empty($data['buy_tshirt']) && ($data['buy_tshirt'] === 1 || $data['buy_tshirt'] === "1" || $data['buy_tshirt'] === "true") ? 1 : 0;
 
             // Execute the prepared statement
             $stmt->execute([

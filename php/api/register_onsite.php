@@ -27,7 +27,7 @@ require_once __DIR__ . "/../class/Registrationtype.class.php";
 try {
     $data = json_decode(file_get_contents("php://input"), true);
 
-    // ✅ Override with test data if "test=1" is in the request
+    // Override with test data if "test=1" is in the request
     if (isset($_GET['test']) && $_GET['test'] == "1") {
         $data = [
             "is_early_bird" => "true",
@@ -69,7 +69,7 @@ try {
         ];
     }
 
-    // ✅ Required fields validation
+    // Required fields validation
     $required_fields = [
         'title', 'first_name', 'last_name', 'email', 
         'total_due', 'paypal_fee', 'registration_type_id', 'is_online'
@@ -81,19 +81,19 @@ try {
         }
     }
 
-    // ✅ Generate a random password
+    // Generate a random password
     $plain_password = bin2hex(random_bytes(4));
     $password_hash = password_hash($plain_password, PASSWORD_DEFAULT);
     $data['password'] = $plain_password;
 
-    // ✅ Initialize ParticipantManager using existing $pdo from Connect.class.php
+    // Initialize ParticipantManager using existing $pdo from Connect.class.php
     $participantManager = new ParticipantManager($pdo);
 
     if ($participantManager->emailExists($data['email'])) {
         throw new Exception("The email address '{$data['email']}' is already in use. Please use a different email.");
     }
 
-    // ✅ Save participant
+    // Save participant
     $participant_id = $participantManager->saveParticipant($data, $password_hash);
 
     echo json_encode([
