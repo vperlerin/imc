@@ -187,8 +187,8 @@ export const registrationEmailToParticipant = (participant, workshops, paymentMe
            Since you haven't selected a payment method, <strong>please contact the IMO Treasurer Marc Gyssens immediately</strong>.<br>`;
 
     const paymentInstructionsMessage = curParticipant.payment_method_id === "1"
-        ? `If you have not paid immediately after submitting your registration, you can find the necessary payment instructions <a href="https://${year}.imo.net/register/payment">on our website</a>.<br>`
-        : `The necessary payment instructions can be found <a href="https://${year}.imo.net/register/payment">on our website</a>.<br>`;
+        ? `If you have not paid immediately after submitting your registration, you can find the necessary payment instructions <a href="https://imc${year}.imo.net/register/payment">on our website</a>.<br>`
+        : `The necessary payment instructions can be found <a href="https://imc${year}.imo.net/register/payment">on our website</a>.<br>`;
 
     let summarySection = "";
     if (!isOnline) {
@@ -218,7 +218,7 @@ export const registrationEmailToParticipant = (participant, workshops, paymentMe
         
         The registration fee must be sent to the IMO Treasurer <strong>IMMEDIATELY</strong>. Failure to make payment will result in the <strong>cancellation of your registration</strong>.<br><br>
 
-        You can update some of your registration details using the password below on our <a href="https://${year}.imo.net/login">login page</a>:<br>
+        You can update some of your registration details using the password below on our <a href="https://imc${year}.imo.net/login">login page</a>:<br>
         <strong>${password}</strong><br><br>
 
         We look forward to meeting you at the conference!<br><br>
