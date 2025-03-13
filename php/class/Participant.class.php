@@ -79,6 +79,8 @@ class ParticipantManager
                 }
             }
 
+            error_log("DATA AFTER CLEANIG before insert: " . json_encode($data));
+
             $this->pdo->beginTransaction();
 
             // Check if email exists
