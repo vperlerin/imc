@@ -1,19 +1,16 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { CiSearch } from "react-icons/ci";
 import PageContain from "@/admin/components/page-contain";
 import Loader from "components/loader";
-import { useApiAvailableRooms } from "@/admin/api/accomodations/index.js";  
 import { useApiParticipantsWithRegistration } from "api/participants/accommodations.js";
 import DocButton from "@/admin/components/doc-button";
+import AvailableRooms from '@/admin/components/rooms';
 
 const AdminAccommodations = ({ typeFilter = "" }) => {
   const [curFilter, setCurFilter] = useState(typeFilter || "not_no");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortColumn, setSortColumn] = useState(null);
   const [sortOrder, setSortOrder] = useState("asc");
-
-  // Fetch available rooms data
-  const { availableRooms, loading: loadingRooms, error: errorRooms } = useApiAvailableRooms();
 
   // Fetch participants data
   const { participants, loading, error } = useApiParticipantsWithRegistration(curFilter);
@@ -66,18 +63,13 @@ const AdminAccommodations = ({ typeFilter = "" }) => {
       isMaxWidth
       title="Participants' Accommodations"
     >
-      {loading || loadingRooms ? (
+      {loading ? (
         <Loader />
-      ) : error || errorRooms ? (
+      ) : error  ? (
         <p className="text-danger">Error: {error || errorRooms}</p>
       ) : (
         <>
-          {/* Display available rooms */}
-          <div className="mb-3">
-            <h5>Available Rooms</h5>
-            <p>Total available rooms across all categories: {availableRooms?.reduce((total, room) => total + room.available_rooms, 0) || 0}</p>
-          </div>
-
+          <AvailableRooms className="mb-4"/>
           <div className="d-flex flex-column flex-md-row gap-2 mb-3">
             {/* Search Filter */}
             <div className="position-relative w-auto">

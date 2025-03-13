@@ -7,7 +7,16 @@
 /* unused harmony exports onPreventDefault, onPreventStop */
 const a=e=>{e&&e.stopPropagation()}}
 /***/,
-/***/1299:
+/***/3318:
+/***/(e,t,s)=>{
+/* harmony export */s.d(t,{
+/* harmony export */L:()=>/* binding */a
+/* harmony export */});const a=function(e){let{interval:t=100,retries:s=14}=arguments.length>1&&void 0!==arguments[1]?arguments[1]:{};return new Promise(((n,i)=>{e().then(n).catch((l=>{setTimeout((()=>{s?a(e,{interval:1.5*t,retries:s-1}).then(n,i):i(l)}),t)}))}))};
+/***/},
+/***/3464:
+/***/(e,t,s)=>{e.exports=s.p+"702c5653d2360537e78f.svg";
+/***/},
+/***/3680:
 /***/(e,t,s)=>{
 // ESM COMPAT FLAG
 s.r(t),
@@ -30,15 +39,6 @@ return x&&(S=[...S].sort(((e,t)=>{let s=e[x]??"",a=t[x]??"";
 return["created_at"].includes(x)?(s=new Date(s).getTime()||0,a=new Date(a).getTime()||0):(s=s.toString().toLowerCase(),a=a.toString().toLowerCase()),s<a?"asc"===b?-1:1:s>a?"asc"===b?1:-1:0}))),(0/* default */,m.jsx)(n.A,{breadcrumb:y,isMaxWidth:!0,title:N?N.title:"Workshop Participants",children:j||w?(0/* default */,m.jsx)(i.A,{}):(0,m.jsxs)(m.Fragment,{children:[(0,m.jsxs)("div",{className:"d-flex gap-2 mb-3",children:[(0,m.jsxs)("select",{className:"form-select w-auto",value:h,onChange:e=>u(e.target.value),children:[(0,m.jsx)("option",{value:"all",children:"All"}),(0,m.jsx)("option",{value:"online",children:"Online"}),(0,m.jsx)("option",{value:"onsite",children:"On-Site"})]}),(0,m.jsxs)("div",{className:"position-relative w-auto",children:[(0,m.jsx)("input",{type:"text",className:"form-control pe-5",placeholder:`Enter ${k.replace("_"," ")}`,value:s,onChange:e=>p(e.target.value)}),(0/* CiSearch */,m.jsx)(a.Xj1,{className:"position-absolute top-50 end-0 translate-middle-y me-2"})]}),(0/* default */,m.jsx)(d.A,{className:"ms-auto",link:`https://imc2025.imo.net/php/doc_workshops.php?workshop_id=${t}`})]}),(0,m.jsx)("div",{className:"table-responsive",style:{maxWidth:"calc(100vw - 2rem)"},children:(0,m.jsxs)("table",{className:"table table-striped",children:[(0,m.jsx)("thead",{children:(0,m.jsxs)("tr",{children:[(0,m.jsxs)("th",{className:"sortable",onClick:()=>C("created_at"),children:["Reg. Date ","created_at"===x&&("asc"===b?"🔼":"🔽")]}),(0,m.jsxs)("th",{className:"sortable",onClick:()=>C("is_online"),children:["Type ","is_online"===x&&("asc"===b?"🔼":"🔽")]}),(0,m.jsxs)("th",{className:"sortable",onClick:()=>C("last_name"),children:["Name ","last_name"===x&&("asc"===b?"🔼":"🔽")]}),(0,m.jsxs)("th",{className:"sortable",onClick:()=>C("registration_type_description"),children:["Reg. Type ","registration_type_description"===x&&("asc"===b?"🔼":"🔽")]}),(0,m.jsxs)("th",{className:"sortable",onClick:()=>C("confirmation_sent"),children:["Confirmed ","confirmation_sent"===x&&("asc"===b?"🔼":"🔽")]})]})}),(0,m.jsx)("tbody",{children:S.length>0?S.map((e=>(0,m.jsxs)("tr",{children:[(0,m.jsx)("td",{children:e.created_at.split(" ")[0]}),(0,m.jsx)("td",{children:"0"===e.is_online?"ON-SITE":"ONLINE"}),(0,m.jsxs)("td",{children:[e.title," ",e.first_name," ",e.last_name]}),(0,m.jsx)("td",{children:e.registration_type_description||"n/a"}),(0,m.jsx)("td",{children:"1"===e.confirmation_sent?"✅":"❌"})]},e.id))):(0,m.jsx)("tr",{children:(0,m.jsx)("td",{colSpan:"8",className:"text-center",children:"No participants found for this workshop."})})})]})})]})})};
 /* harmony default export */}
 /***/,
-/***/3318:
-/***/(e,t,s)=>{
-/* harmony export */s.d(t,{
-/* harmony export */L:()=>/* binding */a
-/* harmony export */});const a=function(e){let{interval:t=100,retries:s=14}=arguments.length>1&&void 0!==arguments[1]?arguments[1]:{};return new Promise(((n,i)=>{e().then(n).catch((l=>{setTimeout((()=>{s?a(e,{interval:1.5*t,retries:s-1}).then(n,i):i(l)}),t)}))}))};
-/***/},
-/***/3464:
-/***/(e,t,s)=>{e.exports=s.p+"702c5653d2360537e78f.svg";
-/***/},
 /***/4493:
 /***/(e,t,s)=>{
 /* harmony export */s.d(t,{

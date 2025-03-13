@@ -6,6 +6,7 @@ import { retry } from "utils/retry.js";
 import PageContain from "@/admin/components/page-contain";
 import Loader from "components/loader";
 import { Link } from "react-router-dom";
+import AvailableRooms from '@/admin/components/rooms';
 
 
 const getRandomGreeting = () => {
@@ -68,6 +69,8 @@ const AdminDashboard = () => {
     <PageContain isMxWidth> 
         <h3>{getRandomGreeting()}</h3>
         <p className="mb-4">Here is a quick summary of what's going on here:</p>
+
+        <AvailableRooms className="mb-4"/>
 
         <div className="d-flex flex-column flex-md-row  gap-3 w-100">
 
