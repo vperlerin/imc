@@ -72,21 +72,27 @@ foreach ($talks as $session => $talkList) {
         $presenter = trim("{$talk['first_name']} {$talk['last_name']}");
         $isOnline = isset($talk['is_online']) && $talk['is_online'] == "1" ? "true" : "false";
         $confirmed = isset($talk["confirmation_sent"]) && $talk["confirmation_sent"] == "1" ? "YES" : "NO";
+        $abstract = isset($talk["abstract"]) ? $talk["abstract"] : "No abstract available";
+        $authors = isset($talk["authors"]) ? $talk["authors"] : "No author available";
 
         $sheet->fromArray([
             $session,
             isset($talk["duration"]) ? $talk["duration"] : "n/a",
             $presenter,
             isset($talk["title"]) ? $talk["title"] : "Untitled",
-            isset($talk["authors"]) ? $talk["authors"] : "No author available",
-            isset($talk["abstract"]) ? $talk["abstract"] : "No abstract available",
+            $authors,
+            $abstract,
             $isOnline,
             $confirmed
         ], NULL, "A$row");
 
-        // Wrap text for the Abstract & Authors columns (Columns F & E)
+        // ✅ **Enable text wrapping for Abstract & Authors columns (F & E)**
         $sheet->getStyle("F$row")->getAlignment()->setWrapText(true);
         $sheet->getStyle("E$row")->getAlignment()->setWrapText(true);
+
+        // ✅ **Adjust row height dynamically based on content**
+        $rowHeight = max(15, min(100, strlen($abstract) / 5)); // Adjust dynamically
+        $sheet->getRowDimension($row)->setRowHeight($rowHeight);
 
         $row++;
     }
@@ -99,9 +105,6 @@ foreach (range('A', 'H') as $col) {
 
 // Set alignment for all columns
 $sheet->getStyle("A1:H$row")->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
-
-// Prevent excessive cell height in Abstract & Authors columns
-$sheet->getRowDimension(1)->setRowHeight(25);
 
 // ✅ **Generate and send file**
 ob_end_clean();

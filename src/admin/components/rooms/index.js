@@ -31,12 +31,10 @@ const AvailableRooms = ({ className, showLink = false }) => {
   };
 
   return (
-    <div className={classNames(className, "p-3 border rounded-2 position-relative")}>
+    <div className={classNames(className, "position-relative", showLink && ' border rounded-2 p-3 ')}>
       {loading && <Loader />}
 
-      {!showLink ? (
-        <h5>Available Rooms by Type</h5> 
-      ) : (
+      {showLink && (
         <h5><Link to="/admin/accomodations">Available Rooms by Type</Link></h5> 
       )}
 

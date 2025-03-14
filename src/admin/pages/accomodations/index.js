@@ -59,7 +59,6 @@ const AdminAccommodations = ({ typeFilter = "" }) => {
 
   return (
     <PageContain
-      breadcrumb={[{ url: "/admin/accommodations/", name: "Participants' Accommodations" }]}
       isMaxWidth
       title="Participants' Accommodations"
     >
@@ -108,8 +107,14 @@ const AdminAccommodations = ({ typeFilter = "" }) => {
                   <th className="sortable" onClick={() => handleSort("last_name")}>
                     Name {sortColumn === "last_name" && (sortOrder === "asc" ? "🔼" : "🔽")}
                   </th>
-                  <th className="sortable" onClick={() => handleSort("description")}>
-                    Accommodation {sortColumn === "description" && (sortOrder === "asc" ? "🔼" : "🔽")}
+                  <th className="sortable" >
+                    Accommodation 
+                  </th>
+                  <th >
+                    Confirmed
+                  </th>
+                  <th >
+                    Comments
                   </th>
                 </tr>
               </thead>
@@ -121,7 +126,9 @@ const AdminAccommodations = ({ typeFilter = "" }) => {
                       <td>
                         {participant.title} {participant.first_name} {participant.last_name}
                       </td>
-                      <td>{participant.registration_type || "n/a"}</td>
+                      <td>{participant.registration_type || ""}</td>
+                      <td>{participant.confirmation_sent === "1" ? "✅" : "❌"}</td>
+                      <td>{participant.comments || ""}</td>
                     </tr>
                   ))
                 ) : (
