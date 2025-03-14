@@ -31,6 +31,7 @@ class AccommodationManager
                 p.created_at,
                 p.country,
                 p.organization,
+                p.comments,
                 p.confirmation_sent,
                 r.id AS registration_type_id,
                 r.type AS registration_type
