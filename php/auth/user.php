@@ -28,14 +28,19 @@ if (!isset($_SESSION["user_id"])) {
     exit;
 }
 
+// Fetch user details from session
+$userData = [
+    "id" => $_SESSION["user_id"], // Always returns the participant ID if available
+    "email" => $_SESSION["email"],
+    "is_admin" => $_SESSION["is_admin"] ?? false,
+    "role" => $_SESSION["role"] ?? "participant",
+    "participant_id" => $_SESSION["participant_id"] ?? null,
+    "admin_id" => $_SESSION["admin_id"] ?? null,
+];
 
 $response = [
     "success" => true,
-    "user" => [
-        "id" => $_SESSION["user_id"],
-        "email" => $_SESSION["email"],
-        "is_admin" => $_SESSION["is_admin"],
-    ]
+    "user" => $userData
 ];
 
 http_response_code(200);
