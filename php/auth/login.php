@@ -66,13 +66,34 @@ function getUser($conn, $email, $table, $isAdminTable = false) {
 $adminUser = getUser($conn, $email, "admins", true);
 $participantUser = getUser($conn, $email, "participants");
 
-// Determine the user to return
-$user = $participantUser ?: $adminUser; // Prefer participant ID if both exist
-$isAdmin = $adminUser !== null;
-$userRole = $adminUser["role"] ?? "participant";
+$validAdminPassword = $adminUser && password_verify($password, $adminUser["password_hash"]);
+$validParticipantPassword = $participantUser && password_verify($password, $participantUser["password_hash"]);
 
-// If user not found or password doesn't match
-if (!$user || !password_verify($password, $user["password_hash"])) {
+// Determine the user details
+$user = null;
+$isAdmin = false;
+$userRole = "participant"; // Default role
+$participantId = $participantUser["id"] ?? null;
+$adminId = $adminUser["id"] ?? null;
+
+if ($validAdminPassword) {
+    // If admin password is entered and participant exists, use participant ID but admin role
+    if ($participantUser) {
+        $user = $participantUser;
+        $isAdmin = true;
+        $userRole = "admin";
+    } else {
+        // If no participant exists, use admin ID normally
+        $user = $adminUser;
+        $isAdmin = true;
+        $userRole = $adminUser["role"];
+    }
+} elseif ($validParticipantPassword) {
+    // If participant password is entered, use participant ID and participant role
+    $user = $participantUser;
+    $userRole = "participant";
+} else {
+    // No valid password found
     http_response_code(401);
     echo json_encode(["success" => false, "message" => "Invalid credentials"]);
     exit;
@@ -80,7 +101,7 @@ if (!$user || !password_verify($password, $user["password_hash"])) {
 
 // Secure session handling
 session_regenerate_id(true);
-$_SESSION["user_id"] = $user["id"]; // Always use the participant's ID if available
+$_SESSION["user_id"] = $user["id"]; // Always use participant ID if exists
 $_SESSION["email"] = $user["email"];
 $_SESSION["is_admin"] = $isAdmin;
 $_SESSION["role"] = $userRole;
@@ -98,10 +119,10 @@ $response = [
     "success" => true,
     "message" => "Login successful",
     "user" => [
-        "id" => $user["id"], // This will be the participant's ID if they exist in both tables
+        "id" => $user["id"], // Always use participant ID if available
         "email" => $user["email"],
         "is_admin" => $isAdmin,
-        "role" => $userRole
+        "role" => $userRole, 
     ]
 ];
 
