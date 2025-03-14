@@ -98,10 +98,15 @@ foreach ($talks as $session => $talkList) {
     }
 }
 
-// ✅ **Auto-size all columns**
+// ✅ **Auto-size all columns except Abstract**
 foreach (range('A', 'H') as $col) {
-    $sheet->getColumnDimension($col)->setAutoSize(true);
+    if ($col !== 'F') { // Skip Abstract column
+        $sheet->getColumnDimension($col)->setAutoSize(true);
+    }
 }
+
+// ✅ **Set Abstract column width to max 250px (~35 Excel width units)**
+$sheet->getColumnDimension('F')->setWidth(35);
 
 // Set alignment for all columns
 $sheet->getStyle("A1:H$row")->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
