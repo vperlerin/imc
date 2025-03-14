@@ -29,6 +29,9 @@ class AccommodationManager
                 p.last_name,
                 p.email,
                 p.created_at,
+                p.country,
+                p.organization,
+                p.confirmation_sent,
                 r.id AS registration_type_id,
                 r.type AS registration_type
             FROM participants p

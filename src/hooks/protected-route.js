@@ -1,25 +1,30 @@
-import { authSelectors, fetchUser } from 'store/auth';
+import { authSelectors, fetchUser } from "store/auth";
 import { useSelector, useDispatch } from "react-redux";
 import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 
-const ProtectedRoute = ({ children }) => {
+const ProtectedRoute = ({ children, allowedRoles = [] }) => {
   const dispatch = useDispatch();
-  const isAdmin = useSelector(authSelectors.isAdmin);
   const isAuthenticated = useSelector(authSelectors.isLoggedIn);
-  const [loading, setLoading] = useState(true);  
+  const userRole = useSelector((state) => state.auth.role); 
+  const [loading, setLoading] = useState(true);
   const host = window.location.host;
 
   useEffect(() => {
-    if(host === 'localhost:3000') { return }
-    dispatch(fetchUser()).finally(() => setLoading(false));   
+    if (host === "localhost:3000") return;
+    dispatch(fetchUser()).finally(() => setLoading(false));
   }, [dispatch]);
 
-  if(host === 'localhost:3000') { return <>{children}</>}
+  if (host === "localhost:3000") return <>{children}</>;
 
-  if (loading) return <></>;  // Prevents redirection before API call completes
-  
-  return isAuthenticated && isAdmin ? children : <Navigate to="/login" replace />;
+  if (loading) return <></>; // Prevents redirection before API call completes
+
+  // Redirect if user is not authenticated or doesn't have the correct role
+  if (!isAuthenticated || !allowedRoles.includes(userRole)) {
+    return <Navigate to="/login" replace />;
+  }
+ 
+  return children;
 };
 
 export default ProtectedRoute;

@@ -102,7 +102,7 @@ function populateSheet($spreadsheet, $title, $data, $headers)
             $fullName,
             $country,
             $organization,
-            isset($participant["description"]) ? $participant["description"] : "n/a",
+            isset($participant["registration_type"]) ? $participant["registration_type"] : "n/a",
             $comments,
             $confirmedStatus
         ], NULL, "A$row");
