@@ -100,8 +100,8 @@ const routeConfig = [
   { path: "/admin/participants/online/:participantId/:tab?", element: (<ProtectedRoute allowedRoles={["admin"]}><lazyPages.AdminParticipantsUser isCurOnline/></ProtectedRoute>) }, 
   { path: "/admin/participants/onsite/payment/:participantId", element: (<ProtectedRoute allowedRoles={["admin"]}><lazyPages.AdminParticipantsPayment isCurOnline={false} /></ProtectedRoute>) },
   { path: "/admin/participants/online/payment/:participantId", element: (<ProtectedRoute allowedRoles={["admin"]}><lazyPages.AdminParticipantsPayment isCurOnline /></ProtectedRoute>) }, 
-  { path: "/admin/contributions/talks", element: (<ProtectedRoute allowedRoles={["admin", "soc"]}><lazyPages.AdminTalks /></ProtectedRoute>) },
-  { path: "/admin/contributions/posters", element: (<ProtectedRoute allowedRoles={["admin", "soc"]}><lazyPages.AdminPosters /></ProtectedRoute>) },
+  { path: "/admin/contributions/talks", element: (<ProtectedRoute allowedRoles={["admin", "soc", "loc"]}><lazyPages.AdminTalks /></ProtectedRoute>) },
+  { path: "/admin/contributions/posters", element: (<ProtectedRoute allowedRoles={["admin", "soc", "loc"]}><lazyPages.AdminPosters /></ProtectedRoute>) },
   { path: "/admin/downloads", element: (<ProtectedRoute allowedRoles={["admin", "soc", "loc"]}><lazyPages.AdminDownloads /></ProtectedRoute>) },
    
   // 404

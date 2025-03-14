@@ -30,15 +30,21 @@ const Participants = () => {
         <div>
           <h3>On-site Participants</h3>
           {onsiteParticipants.length > 0 ? (
-            <ul className="list-unstyled">
-              {onsiteParticipants.map((participant) => (
-                <li key={participant.id} className="d-flex align-items-center gap-2">
-                  <ReactCountryFlag countryCode={participant.country} svg className={css.flag} title={participant.country} />
-                  {participant.title} {participant.first_name} {participant.last_name}
-                  {participant.organization ? ` (${participant.organization})` : ""}
-                </li>
-              ))}
-            </ul>
+            <>
+              <p className="mb-3">
+                {onsiteParticipants.length} online participant
+                {onsiteParticipants.length !== 1 ? 's have' : ' has'} been confirmed so far.
+              </p>
+              <ul className="list-unstyled">
+                {onsiteParticipants.map((participant) => (
+                  <li key={participant.id} className="d-flex align-items-center gap-2 mb-2">
+                    <ReactCountryFlag countryCode={participant.country} svg className={css.flag} title={participant.country} />
+                    {participant.title} {participant.first_name} {participant.last_name}
+                    {participant.organization ? ` (${participant.organization})` : ""}
+                  </li>
+                ))}
+              </ul>
+            </>
           ) : (
             <p>No one has confirmed on-site participation yet. {' '}
               <Link
@@ -55,15 +61,21 @@ const Participants = () => {
         <div>
           <h3>Online Participants</h3>
           {onlineParticipants.length > 0 ? (
-            <ul className="list-unstyled">
-              {onlineParticipants.map((participant) => (
-                <li key={participant.id} className="d-flex align-items-center gap-2">
-                  <ReactCountryFlag countryCode={participant.country} svg className={css.flag} title={participant.country} />
-                  {participant.title} {participant.first_name} {participant.last_name}
-                  {participant.organization ? ` (${participant.organization})` : ""}
-                </li>
-              ))}
-            </ul>
+            <>
+              <p className="mb-3">
+                {onlineParticipants.length} online participant
+                {onlineParticipants.length !== 1 ? 's have' : ' has'} been confirmed so far.
+              </p>              <ul className="list-unstyled">
+                {onlineParticipants.map((participant) => (
+                  <li key={participant.id} className="d-flex align-items-center gap-2 mb-2">
+                    <ReactCountryFlag countryCode={participant.country} svg className={css.flag} title={participant.country} />
+                    {participant.title} {participant.first_name} {participant.last_name}
+                    {participant.organization ? ` (${participant.organization})` : ""}
+                  </li>
+                ))}
+              </ul>
+            </>
+
           ) : (
             <p>No one has confirmed online participation yet. {' '}
               <Link
@@ -75,14 +87,14 @@ const Participants = () => {
               </Link></p>
           )}
         </div>
-        {(onsiteParticipants.length > 0 ||  onlineParticipants.length > 0) && (
+        {(onsiteParticipants.length > 0 || onlineParticipants.length > 0) && (
           <div className="border p-3 rounded-2">
-            <h4 className="m-0 mb-2">Participants per Country</h4>
-            <ul className="list-unstyled">
+            <h4 className="m-0 mb-2">{Object.entries(countryCounts).length} countries represented</h4>
+            <ul className="list-unstyled mb-0">
               {Object.entries(countryCounts).map(([country, count]) => (
                 <li key={country} className="d-flex align-items-center gap-2 mb-1">
                   <ReactCountryFlag countryCode={country} svg className={css.flag} title={country} />
-                  <span>{count} ({((count / totalParticipants) * 100).toFixed(1)}%)</span>
+                  <span> {((count / totalParticipants) * 100).toFixed(1)}%</span>
                 </li>
               ))}
             </ul>
