@@ -22,7 +22,13 @@ const Menu = ({ cd }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const isAdmin = useSelector(authSelectors.isAdmin);
+  const isParticipant = useSelector(authSelectors.isParticipant);
   const isLoggedIn = useSelector(authSelectors.isLoggedIn);
+
+
+  console.log("IS ADMIN? ", isAdmin);
+  console.log("IS PARTICPANT ", isParticipant);
+  console.log("isLoggedIn ", isLoggedIn);
 
   const { logout, loading: logoutLoading, error: logoutError } = useApiLogout(); // Use logout hook
 
@@ -159,7 +165,7 @@ const Menu = ({ cd }) => {
                 </div>
               ) : (
                 <>
-                  {isAdmin ? (
+                  {isAdmin && (
                     <Link
                       aria-label="Admin"
                       className="btn btn-outline-tertiary px-3 fw-bolder"
@@ -169,7 +175,9 @@ const Menu = ({ cd }) => {
                     >
                       Admin
                     </Link>
-                  ) : (
+                  )}
+                  
+                  {isParticipant && (
                     <Link
                       aria-label="Edit your record"
                       className="btn btn-outline-tertiary px-3 fw-bolder"
@@ -177,7 +185,7 @@ const Menu = ({ cd }) => {
                       onClick={() => goTo('/update-registration')}
                       title="Register"
                     >
-                      Update Your Data
+                      Update Your Record
                     </Link>
                   )}
 

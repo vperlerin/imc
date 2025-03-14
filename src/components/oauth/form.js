@@ -2,9 +2,9 @@ import axios from "axios";
 import React, { useState } from "react";
 import Loader from "components/loader";
 import PasswordInput from "components/form/pwd";
-import { useDispatch, useSelector } from "react-redux";  
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
-import { authActions, authSelectors } from "store/auth"; 
+import { authActions, authSelectors } from "store/auth";
 import classNames from "classnames";
 import css from "./index.module.scss";
 import cssForm from "styles/components/form.module.scss";
@@ -15,37 +15,50 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const dispatch = useDispatch();
-  const navigate = useNavigate(); 
-  const isAdmin = useSelector(authSelectors.isAdmin);  
+  const navigate = useNavigate();
+  const userRole = useSelector((state) => state.auth.role);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError(null);
     setIsLoading(true);
-
+  
     try {
       const response = await axios.post(
         `${process.env.REACT_APP_API_URL}/auth/login.php`,
         { email, password },
         { headers: { "Content-Type": "application/json" }, withCredentials: true }
       );
-
+  
       if (!response.data?.success) {
         throw new Error(response.data?.message || "Invalid response from server");
       }
-
-      // Store session token
-      dispatch(authActions.setSession("authenticated")); 
-      // Fetch user details securely from backend
-      await dispatch(authActions.fetchUser());  
-      const user = response.data.user;
-      navigate(user?.is_admin ? "/admin/dashboard" : "/update-registration");
+  
+      dispatch(authActions.setSession("authenticated"));
+      await dispatch(authActions.fetchUser());
+  
+      // Redirect user based on role
+      switch (response.data.user.role) {
+        case "admin":
+          navigate("/admin/dashboard");
+          break;
+        case "soc":
+          navigate("/admin/soc-panel");
+          break;
+        case "loc":
+          navigate("/admin/loc-panel");
+          break;
+        default:
+          navigate("/update-registration");
+          break;
+      }
     } catch (err) {
       setError(err.response?.data?.message || err.message || "Something went wrong.");
     } finally {
       setIsLoading(false);
     }
   };
+  
 
   return (
     <div className={classNames(css.login, "flex-grow-1 d-flex h-100 align-items-center justify-content-center position-relative")}>

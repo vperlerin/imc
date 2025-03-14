@@ -24,7 +24,7 @@ const AdminDownloads = () => {
       </div>
 
       <div className="mb-4">
-        <h5 className="mb-3">Accomomdations</h5>
+        <h5 className="mb-3">Accommodations</h5>
         <DocButton className="d-block fw-bolder" link={`${process.env.REACT_APP_API_URL}/doc_accommodations.php`} title="All participants accomodations" />
       </div>
 

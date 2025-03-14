@@ -31,11 +31,7 @@ const getRandomGreeting = () => {
   const randomMessage = messages[Math.floor(Math.random() * messages.length)];
   return `Hey Marc, ${randomMessage}`;
 }
-
-// Example usage:
-console.log(getRandomGreeting());
-
-
+ 
 const AdminDashboard = () => {
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -69,12 +65,7 @@ const AdminDashboard = () => {
     <PageContain isMxWidth> 
         <h3>{getRandomGreeting()}</h3>
         <p className="mb-4">Here is a quick summary of what's going on here:</p>
-
-
-        
         <AvailableRooms className="mb-4" showLink/>
-        
-
         <div className="d-flex flex-column flex-md-row  gap-3 w-100">
 
           {/* Confirmed and Unconfirmed Onsite Participants */}
