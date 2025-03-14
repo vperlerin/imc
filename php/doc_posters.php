@@ -71,34 +71,43 @@ foreach ($posters as $session => $posterList) {
     foreach ($posterList as $poster) {
         $presenter = trim("{$poster['first_name']} {$poster['last_name']}");
         $confirmed = isset($poster["confirmation_sent"]) && $poster["confirmation_sent"] == "1" ? "YES" : "NO";
+        $abstract = isset($poster["abstract"]) ? $poster["abstract"] : "No abstract available";
+        $authors = isset($poster["authors"]) ? $poster["authors"] : "No author available";
 
         $sheet->fromArray([
             $session,
             $presenter,
             isset($poster["title"]) ? $poster["title"] : "Untitled",
-            isset($poster["authors"]) ? $poster["authors"] : "No author available",
-            isset($poster["abstract"]) ? $poster["abstract"] : "No abstract available",
+            $authors,
+            $abstract,
             $confirmed
         ], NULL, "A$row");
 
-        // Wrap text for the Abstract & Authors columns (Columns E & D)
+        // ✅ **Enable text wrapping for Abstract & Authors columns (E & D)**
         $sheet->getStyle("E$row")->getAlignment()->setWrapText(true);
         $sheet->getStyle("D$row")->getAlignment()->setWrapText(true);
+
+        // ✅ **Improve Row Height Calculation for Abstract**
+        $numLines = substr_count($abstract, "\n") + ceil(strlen($abstract) / 50); // Estimate line count
+        $rowHeight = max(20, min(200, $numLines * 15)); // Adjust dynamically (limit max height)
+        $sheet->getRowDimension($row)->setRowHeight($rowHeight);
 
         $row++;
     }
 }
 
-// ✅ **Auto-size all columns**
+// ✅ **Auto-size all columns except Abstract**
 foreach (range('A', 'F') as $col) {
-    $sheet->getColumnDimension($col)->setAutoSize(true);
+    if ($col !== 'E') { // Skip Abstract column
+        $sheet->getColumnDimension($col)->setAutoSize(true);
+    }
 }
+
+// ✅ **Set Abstract column width to max 250px (~35 Excel width units)**
+$sheet->getColumnDimension('E')->setWidth(35);
 
 // Set alignment for all columns
 $sheet->getStyle("A1:F$row")->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
-
-// Prevent excessive cell height in Abstract & Authors columns
-$sheet->getRowDimension(1)->setRowHeight(25);
 
 // ✅ **Generate and send file**
 ob_end_clean();

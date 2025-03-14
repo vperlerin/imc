@@ -70,7 +70,7 @@ $row = 2;
 foreach ($talks as $session => $talkList) {
     foreach ($talkList as $talk) {
         $presenter = trim("{$talk['first_name']} {$talk['last_name']}");
-        $isOnline = isset($talk['is_online']) && $talk['is_online'] == "1" ? "true" : "false";
+        $isOnline = isset($talk['is_online']) && $talk['is_online'] == "1" ? "YES" : "NO";
         $confirmed = isset($talk["confirmation_sent"]) && $talk["confirmation_sent"] == "1" ? "YES" : "NO";
         $abstract = isset($talk["abstract"]) ? $talk["abstract"] : "No abstract available";
         $authors = isset($talk["authors"]) ? $talk["authors"] : "No author available";
