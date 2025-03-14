@@ -105,6 +105,8 @@ $_SESSION["user_id"] = $user["id"]; // Always use participant ID if exists
 $_SESSION["email"] = $user["email"];
 $_SESSION["is_admin"] = $isAdmin;
 $_SESSION["role"] = $userRole;
+$_SESSION["participant_id"] = $participantId;
+$_SESSION["admin_id"] = $adminId;
 
 // Ensure session cookie is sent
 setcookie(session_name(), session_id(), [
@@ -122,7 +124,9 @@ $response = [
         "id" => $user["id"], // Always use participant ID if available
         "email" => $user["email"],
         "is_admin" => $isAdmin,
-        "role" => $userRole, 
+        "role" => $userRole,
+        "participant_id" => $participantId,
+        "admin_id" => $adminId
     ]
 ];
 
