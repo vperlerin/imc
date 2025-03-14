@@ -90,8 +90,9 @@ foreach ($talks as $session => $talkList) {
         $sheet->getStyle("F$row")->getAlignment()->setWrapText(true);
         $sheet->getStyle("E$row")->getAlignment()->setWrapText(true);
 
-        // ✅ **Adjust row height dynamically based on content**
-        $rowHeight = max(15, min(100, strlen($abstract) / 5)); // Adjust dynamically
+        // ✅ **Improve Row Height Calculation for Abstract**
+        $numLines = substr_count($abstract, "\n") + ceil(strlen($abstract) / 50); // Estimate line count
+        $rowHeight = max(20, min(200, $numLines * 15)); // Adjust dynamically (limit max height)
         $sheet->getRowDimension($row)->setRowHeight($rowHeight);
 
         $row++;
