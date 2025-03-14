@@ -37,7 +37,7 @@ const AdminParticipantsOnline = () => {
 
   // Calculate totals
   const totalParticipants = participants.length;
-  const totalConfirmed = participants.filter((p) => p.confirmation_sent === true).length;
+  const totalConfirmed = participants.filter((p) => p.confirmation_sent === "1").length;
 
   // Handle delete button click
   const handleDeleteClick = (participant) => {
@@ -73,7 +73,7 @@ const AdminParticipantsOnline = () => {
       title="ONLINE Participants"
       rightContent={
         <>
-          <strong>Confirmed:</strong> {totalConfirmed} / {totalParticipants}
+          <strong>Confirmed:</strong> <strong className="text-success">{totalConfirmed}</strong> / {totalParticipants}
         </>
       }
     >

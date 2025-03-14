@@ -70,13 +70,16 @@ const AdminDashboard = () => {
         <h3>{getRandomGreeting()}</h3>
         <p className="mb-4">Here is a quick summary of what's going on here:</p>
 
-        <AvailableRooms className="mb-4"/>
+
+        
+        <AvailableRooms className="mb-4" showLink/>
+        
 
         <div className="d-flex flex-column flex-md-row  gap-3 w-100">
 
           {/* Confirmed and Unconfirmed Onsite Participants */}
           <div className={classNames('flex-grow-1 flex-shrink-0 border p-3 rounded-2 position-relative', css.col)}>
-            <div className=" ">
+           
               <h5 className="fw-bold">
                 <Link to="/admin/participants/onsite">
                   On-site Participants
@@ -123,14 +126,13 @@ const AdminDashboard = () => {
                 ) : (
                   <p className="text-success"><i>No unconfirmed on-site participants: you go to go!</i></p>
                 )}
-              </div>
-            </div>
+              </div> 
           </div>
 
 
           {/* Confirmed and Unconfirmed Online Participants */}
           <div className={classNames('flex-grow-1 flex-shrink-0 border p-3 rounded-2 position-relative', css.col)}>
-            <div className=" ">
+            
               <h5 className="fw-bold">
                 <Link to="/admin/participants/online">
                   Online Participants
@@ -177,9 +179,8 @@ const AdminDashboard = () => {
                 ) : (
                   <p className="text-success"><i>No unconfirmed online participants: you go to go!</i></p>
                 )}
-              </div>
-            </div>
-          </div>
+              </div> 
+            </div>  
         </div>
 
         {/* Workshop Stats */}
