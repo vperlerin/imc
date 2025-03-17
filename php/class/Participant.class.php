@@ -1158,6 +1158,7 @@ class ParticipantManager
             LEFT JOIN registration_types rt ON a.registration_type_id = rt.id
             WHERE pw.workshop_id = :workshop_id
             AND p.status = 'active'
+            ORDER BY p.confirm_sent DESC, p.id ASC
         ";
 
         $stmt = $this->pdo->prepare($sql);
