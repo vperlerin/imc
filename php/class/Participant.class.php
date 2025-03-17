@@ -804,24 +804,24 @@ class ParticipantManager
         $selectFields = $confirmedOnly
             ? "p.id, p.title, p.first_name, p.last_name, p.organization, p.country"
             : "
-            p.id,
-            p.created_at,
-            p.title, 
-            p.first_name, 
-            p.last_name, 
-            p.email,
-            p.confirmation_sent, 
-            p.confirmation_date,
-            p.total_due, 
-            p.total_paid,
-            p.paypal_fee,
-            (SELECT pm.method 
-             FROM payments pay 
-             LEFT JOIN payment_methods pm ON pay.payment_method_id = pm.id
-             WHERE pay.participant_id = p.id
-             ORDER BY pay.created_at DESC 
-             LIMIT 1) AS payment_method_name
-        ";
+        p.id,
+        p.created_at,
+        p.title, 
+        p.first_name, 
+        p.last_name, 
+        p.email,
+        p.confirmation_sent, 
+        p.confirmation_date,
+        p.total_due, 
+        p.total_paid,
+        p.paypal_fee,
+        (SELECT pm.method 
+         FROM payments pay 
+         LEFT JOIN payment_methods pm ON pay.payment_method_id = pm.id
+         WHERE pay.participant_id = p.id
+         ORDER BY pay.created_at DESC 
+         LIMIT 1) AS payment_method_name
+    ";
 
         $query = "SELECT $selectFields FROM participants p WHERE p.is_online = FALSE AND p.status = 'active'";
 
@@ -830,11 +830,17 @@ class ParticipantManager
             $query .= " AND p.confirmation_sent = 1";
         }
 
-        // Apply ORDER BY only when retrieving full data
+        // Sorting logic: Move confirmed participants with confirmation_date to bottom
         if (!$confirmedOnly) {
-            $query .= " GROUP BY p.id ORDER BY p.created_at DESC";
+            $query .= " GROUP BY p.id 
+                    ORDER BY 
+                        CASE 
+                            WHEN p.confirmation_sent = 1 AND p.confirmation_date IS NOT NULL THEN 1 
+                            ELSE 0 
+                        END ASC, 
+                        p.created_at DESC";
         } else {
-            $query .= " GROUP BY p.country ORDER BY p.first_name DESC";
+            $query .= " GROUP BY p.country";
         }
 
         $stmt = $this->pdo->prepare($query);
@@ -844,13 +850,13 @@ class ParticipantManager
     }
 
 
+
     /**
      * Retrieve all online active participants with payment method.
      * If `$confirmedOnly` is true, only return confirmed participants.
      */
     public function getOnlineParticipants($confirmedOnly = false)
     {
-
         // Select fields based on confirmedOnly
         $selectFields = $confirmedOnly
             ? "p.id, p.title, p.first_name, p.last_name, p.organization, p.country"
@@ -867,11 +873,11 @@ class ParticipantManager
             p.total_paid,
             p.paypal_fee, 
             (SELECT pm.method 
-             FROM payments pay 
-             LEFT JOIN payment_methods pm ON pay.payment_method_id = pm.id
-             WHERE pay.participant_id = p.id
-             ORDER BY pay.created_at DESC 
-             LIMIT 1) AS payment_method_name
+            FROM payments pay 
+            LEFT JOIN payment_methods pm ON pay.payment_method_id = pm.id
+            WHERE pay.participant_id = p.id
+            ORDER BY pay.created_at DESC 
+            LIMIT 1) AS payment_method_name
         ";
 
         $query = "SELECT $selectFields FROM participants p WHERE p.is_online = TRUE AND p.status = 'active'";
@@ -881,11 +887,17 @@ class ParticipantManager
             $query .= " AND p.confirmation_sent = 1";
         }
 
-        // Apply ORDER BY only when retrieving full data
+        // Sorting logic: Move confirmed participants with confirmation_date to bottom
         if (!$confirmedOnly) {
-            $query .= " GROUP BY p.id ORDER BY p.created_at DESC";
+            $query .= " GROUP BY p.id 
+                    ORDER BY 
+                        CASE 
+                            WHEN p.confirmation_sent = 1 AND p.confirmation_date IS NOT NULL THEN 1 
+                            ELSE 0 
+                        END ASC, 
+                        p.created_at DESC";
         } else {
-            $query .= " GROUP BY p.country ORDER BY p.first_name DESC";
+            $query .= " GROUP BY p.country";
         }
 
         $stmt = $this->pdo->prepare($query);
@@ -1147,7 +1159,7 @@ class ParticipantManager
             WHERE pw.workshop_id = :workshop_id
             AND p.status = 'active'
         ";
-    
+
         $stmt = $this->pdo->prepare($sql);
         $stmt->bindValue(':workshop_id', (int) $workshopId, PDO::PARAM_INT);
         $stmt->execute();
@@ -1161,7 +1173,8 @@ class ParticipantManager
      * 
      * @return array List of participants
      */
-    public function getAllParticipants() {
+    public function getAllParticipants()
+    {
         $sql = "
           SELECT 
                 p.*, 
@@ -1184,6 +1197,4 @@ class ParticipantManager
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-
-    
 }

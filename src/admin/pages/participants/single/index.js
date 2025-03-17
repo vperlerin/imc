@@ -220,6 +220,7 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
   );
 
   const hasAdminNotes = !!participant?.participant?.admin_notes;
+ 
 
   return (
     <PageContain
@@ -380,26 +381,29 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
               <div className={classNames(css.mxW, 'mx-auto', tab === "summary" && isSummaryReady ? 'visible': "invisible h-0 w-0 overflow-hidden")}>
                 <div className="d-flex mt-3 align-items-center justify-content-between w-100 mb-3">
                   <div>
+                    <strong>
                     {participant?.participant?.first_name
                       ? participant.participant.first_name.charAt(0).toUpperCase() +
                       participant.participant.first_name.slice(1)
                       : ""}
 
                     {' '}{participant?.participant?.last_name || ""}
-
-                    {participant.confirmation_sent === "1" ? (
+                    </strong>
+                    {' '}
+                    {participant.participant.confirmation_sent === "1" ? (
                       <>
-                        ✅ {`has been confirmed on `} {participant.confirmation_date && formatFullDate(participant.confirmation_date)}
+                        {`has been confirmed on `} 
+                        <span className="text-success">{participant.participant.confirmation_date && formatFullDate(participant.participant.confirmation_date)}</span>
 
                       </>
                     ) : (
                       <>
                         ❌  has NOT been confirmed yet.
                       </>
-                    )}
+                    )} 
                   </div>
 
-                  {participant.confirmation_sent !== "1" && (
+                  {participant.participant.confirmation_sent !== "1" && (
                     <div>
                       <Link
                         className="btn btn-outline-success fw-bolder"

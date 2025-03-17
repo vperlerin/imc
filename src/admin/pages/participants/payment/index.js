@@ -1,4 +1,5 @@
 import { IoIosMail } from "react-icons/io";
+import { FaRegTrashAlt } from "react-icons/fa";
 import AdminTable from "@/admin/components/admin-table";
 import css from './index.module.scss';
 import classNames from "classnames";
@@ -12,13 +13,13 @@ import { conferenceData as cd } from "data/conference-data";
 import { useForm } from "react-hook-form";
 import { useApiPayments } from "@/admin/api/payments";
 import { useApiAddPayment } from "@/admin/api/payments/add";
+import { useApiDeletePayment } from '@/admin/api/payments/delete';
+
 import { useApiSpecificData } from "api/specific-data";
 import { useApiParticipant } from "api/participants";
 import { useApiConfirmParticipant } from '@/admin/api/participants/confirm';
-import { formatFullDate } from "utils/date";
+
 import { sendEmail } from "hooks/send-email";
-
-
 
 const Payments = ({ isCurOnline = false }) => {
   const { participantId } = useParams();
@@ -26,6 +27,7 @@ const Payments = ({ isCurOnline = false }) => {
   const [additionalMessage, setAdditionalMessage] = useState("");
   const [formErrors, setFormErrors] = useState(null);
   const [_confirmError, set_ConfirmError] = useState(null);
+  const [deletePaymentError, setDeletePaymentError] = useState(null);
   const [successMsg, setSuccessMsg] = useState(null);
   const [editingPayment, setEditingPayment] = useState(null);
   const [fetchParticipantTrigger, setFetchParticipantTrigger] = useState(false);
@@ -38,8 +40,9 @@ const Payments = ({ isCurOnline = false }) => {
   const { participant, loading: participantLoading, error: participantError } = useApiParticipant(participantId, isCurOnline, fetchParticipantTrigger);
   const { payments, loading: paymenstLoading, error: paymentsError, refetchPayments } = useApiPayments(participantId);
   const { addPayment } = useApiAddPayment(participantId);
+  const { deletePayment, loading: deleteLoading, error: deleteError } = useApiDeletePayment(participantId);
   const { confirmParticipant, isConfirming, errorConfirm } = useApiConfirmParticipant();
- 
+
 
   const {
     formState: { errors },
@@ -105,6 +108,20 @@ const Payments = ({ isCurOnline = false }) => {
       await refetchPayments();
     } else {
       setFormErrors(result.message);
+    }
+  };
+
+  const onDeletePayment = async (paymentId) => {
+    if (!window.confirm("Are you sure you want to delete this payment?")) {
+      return;
+    }
+
+    const result = await deletePayment(paymentId);
+
+    if (result.success) {
+      setSuccessMsg("Payment deleted successfully!");
+    } else {
+      setDeletePaymentError(result.message);
     }
   };
 
@@ -194,7 +211,7 @@ const Payments = ({ isCurOnline = false }) => {
       setWantToAddMessage(true);
       return;
     }
- 
+
     setIsConfirmingEmail(true);
 
     try {
@@ -268,7 +285,7 @@ const Payments = ({ isCurOnline = false }) => {
 
   const confirmationSent = (participant?.participant.confirmation_sent !== "0" && participant?.participant.confirmation_sent !== 0);
   const confirmationDate = !!participant?.participant.confirmation_date;
- 
+
   const customActions = (
     <>
       <td>
@@ -315,8 +332,8 @@ const Payments = ({ isCurOnline = false }) => {
                 <div className="mb-3 row">
                   <label className="col-sm-3 col-form-label fw-bold">Amount (€)</label>
                   <div className="col-sm-5">
-                    <input type="number" className={classNames('form-control', cssForm.md50)} {...register("amount", { required: true, min: 0 })} step="0.01" />
-                    {errors.amount && <span className="text-danger">Amount is required and must be positive.</span>}
+                    <input type="number" className={classNames('form-control', cssForm.md50)} {...register("amount", { required: true })} step="0.01" />
+                    {errors.amount && <span className="text-danger">Amount is required.</span>}
                   </div>
                 </div>
                 <div className="mb-3 row">
@@ -363,6 +380,12 @@ const Payments = ({ isCurOnline = false }) => {
             <div className="border p-3 rounded-2 mt-3">
               <h4 className="mb-3">Payments in record</h4>
 
+              {(deletePaymentError || deleteError) && (
+                <div className="alert alert-danger fw-bolder">
+                  {deletePaymentError || deleteError}
+                </div>
+              )}
+
               <table className="table table-bordered table-striped">
                 <thead>
                   <tr>
@@ -370,6 +393,7 @@ const Payments = ({ isCurOnline = false }) => {
                     <th>Amount (€)</th>
                     <th>Method</th>
                     <th>Admin Note</th>
+                    <th></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -380,6 +404,17 @@ const Payments = ({ isCurOnline = false }) => {
                         <td>{parseFloat(payment.amount).toFixed(2)}</td>
                         <td>{payment.payment_method}</td>
                         <td>{payment.admin_note || "No note"}</td>
+                        <td>
+                          <div className="position-relative">
+                            <button
+                              className="btn btn-outline-danger d-inline-flex align-items-center"
+                              onClick={() => onDeletePayment(payment.id)}
+                            >
+                              {deleteLoading && <Loader />}
+                              <FaRegTrashAlt />
+                            </button>
+                          </div>
+                        </td>
                       </tr>
                     ) : null
                   )}
