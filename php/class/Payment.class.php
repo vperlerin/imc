@@ -113,9 +113,49 @@ class PaymentManager
      */
     public function deletePayment($paymentId)
     {
-        $stmt = $this->pdo->prepare("DELETE FROM payments WHERE id = ?");
-        return $stmt->execute([$paymentId]);
+        try {
+            $this->pdo->beginTransaction();
+    
+            // Get the payment details before deletion
+            $stmt = $this->pdo->prepare("SELECT participant_id, amount FROM payments WHERE id = ?");
+            $stmt->execute([$paymentId]);
+            $payment = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+            if (!$payment) {
+                throw new Exception("Payment not found.");
+            }
+    
+            $participantId = $payment['participant_id'];
+            $amount = $payment['amount'];
+     
+            if ($amount >= 0) { 
+                $updateStmt = $this->pdo->prepare("
+                    UPDATE participants 
+                    SET total_paid = GREATEST(0, total_paid - ?) 
+                    WHERE id = ?
+                ");
+            } else { 
+                $updateStmt = $this->pdo->prepare("
+                    UPDATE participants 
+                    SET total_due = GREATEST(0, total_due + ABS(?)) 
+                    WHERE id = ?
+                ");
+            }
+    
+            $updateStmt->execute([abs($amount), $participantId]);
+    
+            // Delete the payment
+            $deleteStmt = $this->pdo->prepare("DELETE FROM payments WHERE id = ?");
+            $deleteStmt->execute([$paymentId]);
+    
+            $this->pdo->commit();
+            return true;
+        } catch (Exception $e) {
+            $this->pdo->rollBack();
+            return false;
+        }
     }
+    
 
     public function getPaymentMethod($method)
     {

@@ -20,7 +20,7 @@ export const useApiDeletePayment = (participantId) => {
           axios.delete(
             `${process.env.REACT_APP_API_URL}/admin/api/delete_payment.php`,
             {
-              data: { paymentId },
+              data: { payment_id: paymentId },
               headers: { "Content-Type": "application/json" },
             }
           )

@@ -120,6 +120,9 @@ const Payments = ({ isCurOnline = false }) => {
 
     if (result.success) {
       setSuccessMsg("Payment deleted successfully!");
+      // Refecht participant
+      setFetchParticipantTrigger(prev => !prev);
+      await refetchPayments();
     } else {
       setDeletePaymentError(result.message);
     }
