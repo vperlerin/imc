@@ -52,7 +52,7 @@ class AccommodationManager
         $sql .= " GROUP BY p.id"; // Group by participant ID to avoid duplicates
 
         // Order the results by registration type
-        $sql .= " ORDER BY r.type ASC";
+        $sql .= " ORDER BY r.type ASC, p.confirmation_sent DESC";
 
         // Prepare and execute the query
         $stmt = $this->pdo->prepare($sql);
