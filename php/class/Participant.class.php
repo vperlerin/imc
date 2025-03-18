@@ -834,7 +834,7 @@ class ParticipantManager
         } else {
             $query .= " GROUP BY p.id ORDER BY 
                         CASE 
-                            WHEN p.confirmation_sent = 1 AND p.confirmation_date IS NOT NULL THEN 1 
+                            WHEN p.confirmation_sent = 1 THEN 1 
                             ELSE 0 
                         END ASC, 
                         p.created_at DESC";
