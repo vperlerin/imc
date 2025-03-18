@@ -800,10 +800,10 @@ class ParticipantManager
      */
     public function getOnsiteParticipants($confirmedOnly = false)
     {
-        // Select fields based on confirmedOnly
+        // Select fields based on $confirmedOnly
         $selectFields = $confirmedOnly
             ? "p.id, p.title, p.first_name, p.last_name, p.organization, p.country"
-            : "
+            : <<<SQL
         p.id,
         p.created_at,
         p.title, 
@@ -815,32 +815,29 @@ class ParticipantManager
         p.total_due, 
         p.total_paid,
         p.paypal_fee,
-        (SELECT pm.method 
-         FROM payments pay 
-         LEFT JOIN payment_methods pm ON pay.payment_method_id = pm.id
-         WHERE pay.participant_id = p.id
-         ORDER BY pay.created_at DESC 
-         LIMIT 1) AS payment_method_name
-    ";
+        (
+            SELECT pm.method 
+            FROM payments pay 
+            LEFT JOIN payment_methods pm ON pay.payment_method_id = pm.id
+            WHERE pay.participant_id = p.id
+            ORDER BY pay.created_at DESC 
+            LIMIT 1
+        ) AS payment_method_name
+    SQL;
 
-        $query = "SELECT $selectFields FROM participants p WHERE p.is_online = FALSE AND p.status = 'active'";
+        // Base Query
+        $query = "SELECT $selectFields FROM participants p WHERE p.is_online = 0 AND p.status = 'active'";
 
-        // Apply filtering for confirmed participants if needed
+        // Apply filtering for confirmed participants
         if ($confirmedOnly) {
-            $query .= " AND p.confirmation_sent = 1";
-        }
-
-        // Sorting logic: Move confirmed participants with confirmation_date to bottom
-        if (!$confirmedOnly) {
-            $query .= " GROUP BY p.id 
-                    ORDER BY 
+            $query .= " AND p.confirmation_sent = 1 GROUP BY p.country";
+        } else {
+            $query .= " GROUP BY p.id ORDER BY 
                         CASE 
                             WHEN p.confirmation_sent = 1 AND p.confirmation_date IS NOT NULL THEN 1 
                             ELSE 0 
                         END ASC, 
                         p.created_at DESC";
-        } else {
-            $query .= " GROUP BY p.country";
         }
 
         $stmt = $this->pdo->prepare($query);
@@ -848,6 +845,7 @@ class ParticipantManager
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
 
 
 
