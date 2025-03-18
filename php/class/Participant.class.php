@@ -838,7 +838,7 @@ class ParticipantManager
     
         // Apply filtering for confirmed participants
         if ($confirmedOnly) {
-            $query .= " AND p.confirmation_sent = 1 GROUP BY p.country";
+            $query .= " AND p.confirmation_sent = 1 ORDER BY p.country, p.last_name, p.first_name";  
         } else {
             $query .= " GROUP BY p.id ORDER BY 
                             CASE 
@@ -853,6 +853,7 @@ class ParticipantManager
     
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+    
     
 
     /**
