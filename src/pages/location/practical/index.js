@@ -13,7 +13,7 @@ const Pratical = () => {
 
       <h3 className="mt-4">Visas</h3>
       <p>
-        If you are coming to the Netherlands you should always check if you need a visa and, if so, what type of visa. Find out how to apply for a visa and how to track the status of your application via the website of the <a href="https://www.netherlandsworldwide.nl/visa-the-netherlands" rel="noopener noreferrer">Dutch Government</a>.
+        If you are coming to the Netherlands you should always check if you need a visa and, if so, what type of visa. Find out how to apply for a visa and how to track the status of your application via the website of the <a className="fw-bolder" href="https://www.netherlandsworldwide.nl/visa-the-netherlands" rel="noopener noreferrer">Dutch Government</a>.
       </p>
 
       <p>
@@ -30,6 +30,7 @@ const Pratical = () => {
       <p>The LOC can usually also provide assistance with matters not covered on these pages. They can be contacted via the  {' '}
         <Link
         aria-label="Contact"
+        className="fw-bolder"
         to="/contact"
         title="Contact"
       >

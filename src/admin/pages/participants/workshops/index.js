@@ -113,19 +113,19 @@ const AdminParticipantsWorkshops = ({ workshopId }) => {
               <thead>
                 <tr>
                   <th className="sortable" onClick={() => handleSort("created_at")}>
-                    Reg. Date {sortColumn === "created_at" && (sortOrder === "asc" ? "🔼" : "🔽")}
+                    Reg. Date  
                   </th>
                   <th className="sortable" onClick={() => handleSort("is_online")}>
-                    Type {sortColumn === "is_online" && (sortOrder === "asc" ? "🔼" : "🔽")}
+                    Type 
                   </th>
                   <th className="sortable" onClick={() => handleSort("last_name")}>
-                    Name {sortColumn === "last_name" && (sortOrder === "asc" ? "🔼" : "🔽")}
+                    Name 
                   </th>
                   <th className="sortable" onClick={() => handleSort("registration_type_description")}>
-                    Reg. Type {sortColumn === "registration_type_description" && (sortOrder === "asc" ? "🔼" : "🔽")}
+                    Reg. Type 
                   </th>
                   <th className="sortable" onClick={() => handleSort("confirmation_sent")}>
-                    Confirmed {sortColumn === "confirmation_sent" && (sortOrder === "asc" ? "🔼" : "🔽")}
+                    Confirmed 
                   </th>
                 </tr>
               </thead>

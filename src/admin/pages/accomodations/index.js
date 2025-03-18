@@ -41,16 +41,23 @@ const AdminAccommodations = ({ typeFilter = "" }) => {
         let valueA = a[sortColumn] ?? "";
         let valueB = b[sortColumn] ?? "";
 
-        // Convert values properly for sorting
-        if (sortColumn === "created_at") {
+        if (sortColumn === "confirmed") {
+          valueA = a.confirmation_sent === "1" ? 1 : 0;
+          valueB = b.confirmation_sent === "1" ? 1 : 0;
+          return sortOrder === "asc" ? valueA - valueB : valueB - valueA;
+        } else if (sortColumn === "created_at") {
           valueA = new Date(valueA).getTime() || 0;
           valueB = new Date(valueB).getTime() || 0;
+          return sortOrder === "asc" ? valueA - valueB : valueB - valueA;
+        } else if (typeof valueA === "number" || !isNaN(parseFloat(valueA))) {
+          valueA = parseFloat(valueA) || 0;
+          valueB = parseFloat(valueB) || 0;
+          return sortOrder === "asc" ? valueA - valueB : valueB - valueA;
         } else {
           valueA = valueA.toString().toLowerCase();
           valueB = valueB.toString().toLowerCase();
+          return sortOrder === "asc" ? valueA.localeCompare(valueB) : valueB.localeCompare(valueA);
         }
-
-        return sortOrder === "asc" ? valueA.localeCompare(valueB) : valueB.localeCompare(valueA);
       });
     }
 
@@ -64,8 +71,8 @@ const AdminAccommodations = ({ typeFilter = "" }) => {
     >
       {loading ? (
         <Loader />
-      ) : error  ? (
-        <p className="text-danger">Error: {error || errorRooms}</p>
+      ) : error ? (
+        <p className="text-danger">Error: {error}</p>
       ) : (
         <>
           <AvailableRooms className="mb-4"/>
@@ -101,19 +108,19 @@ const AdminAccommodations = ({ typeFilter = "" }) => {
             <table className="table table-striped">
               <thead>
                 <tr>
-                  <th onClick={() => handleSort("created_at")}>
-                    Reg. Date
+                  <th className="sortable" onClick={() => handleSort("created_at")}>
+                    Reg. Date 
                   </th>
                   <th className="sortable" onClick={() => handleSort("last_name")}>
-                    Name {sortColumn === "last_name" && (sortOrder === "asc" ? "🔼" : "🔽")}
+                    Name 
                   </th>
-                  <th className="sortable" >
+                  <th className="sortable" onClick={() => handleSort("registration_type")}>
                     Accommodation 
                   </th>
-                  <th >
-                    Confirmed
+                  <th className="sortable" onClick={() => handleSort("confirmed")}>
+                    Confirmed 
                   </th>
-                  <th >
+                  <th>
                     Comments
                   </th>
                 </tr>

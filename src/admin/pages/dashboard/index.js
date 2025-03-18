@@ -77,7 +77,7 @@ const AdminDashboard = () => {
                 </Link>
               </h5>
               <div className="position-absolute border rounded-3 border-3 top-0 end-0 m-2 p-2">
-                ✅  <b>{dashboardData.confirmed_onsite}{' '}</b>/ {(parseFloat(dashboardData.unconfirmed_onsite) + parseFloat(dashboardData.confirmed_onsite))}
+                ✅  <b className="text-success">{dashboardData.confirmed_onsite}{' '}</b>/ {(parseFloat(dashboardData.unconfirmed_onsite) + parseFloat(dashboardData.confirmed_onsite))}
               </div>
 
               <div className="mt-4">
@@ -130,7 +130,7 @@ const AdminDashboard = () => {
                 </Link>
               </h5>
               <div className="position-absolute border rounded-3 border-3 top-0 end-0 m-2 p-2">
-                ✅  <b>{dashboardData.confirmed_online}{' '}</b>/ {(parseFloat(dashboardData.unconfirmed_online) + parseFloat(dashboardData.confirmed_online))}
+                ✅  <b className="text-success">{dashboardData.confirmed_online}{' '}</b>/ {(parseFloat(dashboardData.unconfirmed_online) + parseFloat(dashboardData.confirmed_online))}
               </div>
               {/* Unconfirmed Participants Tables */}
               <div className="mt-4">

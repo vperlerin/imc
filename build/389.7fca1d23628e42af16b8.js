@@ -97,7 +97,7 @@ var i=n(6942),s=n.n(i);// ./src/admin/pages/participants/single/index.module.scs
 // extracted by mini-css-extract-plugin
 /* harmony default export */const a="index-module__mxW--Ve0tI",r="tabs-module__tab--ed4Qs",l="tabs-module__active--frwOf",o="tabs-module__contentMxw--q4nV3";
 // EXTERNAL MODULE: ./node_modules/axios/lib/axios.js + 48 modules
-var c=n(1083),d=n(7647),m=n(6645),u=n(6540),p=n(2199),h=n(7767),x=n(9785),b=n(7762),f=n(4493),g=n(4972),v=n(4976),_=n(476),j=n(3975),y=n(9156),w=n(5680),k=n(6538),N=n(5058),A=n(6827),S=n(4668),L=n(5846),M=n(4848);
+var c=n(1083),d=n(7647),m=n(6645),u=n(6540),p=n(2199),h=n(7767),x=n(9785),b=n(7762),f=n(4493),g=n(4972),v=n(4976),_=n(847),j=n(3975),y=n(9156),w=n(5680),k=n(6538),N=n(5058),A=n(6827),S=n(4668),L=n(5846),M=n(4848);
 // EXTERNAL MODULE: ./src/admin/components/page-contain/index.js + 10 modules
 // ./src/admin/pages/participants/single/index.js
 const C=e=>{let{isCurOnline:t=!1}=e;const{participantId:n,tab:i}=(0,h/* useParams */.g)(),[C,$]=(0,u.useState)(""),[D,E]=(0,u.useState)(!1),[O,I]=(0,u.useState)(null),[V,P]=(0,u.useState)(!1),[T,W]=(0,u.useState)(0),[z,F]=(0,u.useState)(0),[q,R]=(0,u.useState)(!1),U=i||"identity",B=(0,h/* useNavigate */.Zp)();(0,p/* useBlockNavigation */.V)(V);const{workshops:H,paymentMethods:Y,registrationTypes:Z,loading:G,sessions:J,error:Q}=(0,f/* useApiSpecificData */.Q)(),{participant:X,loading:K,error:ee}=(0,g/* useApiParticipant */.D)(n,t,q,!0),{control:te,register:ne,handleSubmit:ie,getValues:se,setValue:ae,formState:{errors:re},trigger:le,watch:oe}=(0,x/* useForm */.mN)(),ce="1"===X?.participant?.is_online,de=G||K||D,me=[C,ee,Q].filter(Boolean);

@@ -294,7 +294,7 @@ const Payments = ({ isCurOnline = false }) => {
       <td>
         {!confirmationSent && !confirmationDate && (
           <div className="d-flex gap-2 justify-content-end">
-            <button className="btn btn-outline-success fw-bolder" onClick={handleConfirmClick}>
+            <button className="btn btn-sm btn-outline-success fw-bolder" onClick={handleConfirmClick}>
               CONFIRM
             </button>
           </div>
@@ -302,7 +302,7 @@ const Payments = ({ isCurOnline = false }) => {
 
         {confirmationSent && !confirmationDate && (
           <div className="d-flex gap-2 justify-content-end">
-            <button className="btn btn-outline-success fw-bolder" onClick={handleConfirmClick}>
+            <button className="btn btn-sm btn-outline-success fw-bolder" onClick={handleConfirmClick}>
               SEND <IoIosMail />
             </button>
           </div>

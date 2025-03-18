@@ -3,6 +3,7 @@ import css from './index.module.scss';
 import PageContain from "components/page-contain";
 import React from "react";
 import { Link } from 'react-router-dom';
+import GoogleMap from "components/g-map";
 
 // Import images statically
 import ven1 from 'assets/img/illus/venue/ven1.jpg';
@@ -20,7 +21,7 @@ const Venue = () => {
       >
 
         <p>
-          The IMC 2025 will take place in the cozy and spacious <a href="https://www.stayokay.com/en/hostel/soest" target="_blank" rel="noopener noreferrer">Stayokay Soest</a> venue that combines the architecture of a historical school building with modern facilities, creating a vibrant conference atmosphere in a green and forested area. Nature-minded delegates will be able to absorb the sandy expanse of the nearby stunning Soesterduinen inland dune complex. The venue accommodates meeting rooms for plenary sessions with smaller rooms for ad hoc meetings, poster sessions or other activities. It will be available entirely for the conference and offers everything for a comfortable stay. From rooms with private bathrooms, a breakfast and dinner, to a nice terrace with a campfire. The venue is also a sustainable choice thanks to its sustainable solutions to facilitate our conference. Check out the <a href="https://vimeo.com/175690257" target="_blank" rel="noopener noreferrer">venue's video</a> for an impression.   </p>
+          The IMC 2025 will take place in the cozy and spacious <a className="fw-bolder" href="https://www.stayokay.com/en/hostel/soest" target="_blank" rel="noopener noreferrer">Stayokay Soest</a> venue that combines the architecture of a historical school building with modern facilities, creating a vibrant conference atmosphere in a green and forested area. Nature-minded delegates will be able to absorb the sandy expanse of the nearby stunning Soesterduinen inland dune complex. The venue accommodates meeting rooms for plenary sessions with smaller rooms for ad hoc meetings, poster sessions or other activities. It will be available entirely for the conference and offers everything for a comfortable stay. From rooms with private bathrooms, a breakfast and dinner, to a nice terrace with a campfire. The venue is also a sustainable choice thanks to its sustainable solutions to facilitate our conference. Check out the <a className="fw-bolder" href="https://vimeo.com/175690257" target="_blank" rel="noopener noreferrer">venue's video</a> for an impression.   </p>
           
           <div
             className={classNames(css.illusBg, 'rounded-2')}
@@ -39,6 +40,7 @@ const Venue = () => {
             {' '}
             <Link
               aria-label="Extra accodommation"
+              className="fw-bolder"
               to="/location/extra"
               title="Extra accodommation"
             >
@@ -53,9 +55,7 @@ const Venue = () => {
         />
 
       </div>
-
-
-
+ 
       <div
         className="mt-3 mb-4 d-flex flex-column gap-3 align-items-stretch flex-md-row-reverse"
       >
@@ -69,6 +69,8 @@ const Venue = () => {
         />
 
       </div>
+
+       <GoogleMap/>
 
     </PageContain>
   );

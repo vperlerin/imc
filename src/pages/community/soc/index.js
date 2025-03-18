@@ -31,7 +31,8 @@ const Soc = () => {
           <p>
             The  Scientific Committee can be contacted via the {' '}
             <Link
-              aria-label="Contact"
+              aria-label="Contact" 
+              className="fw-bolder"
               to="/contact"
               title="Contact"
             >
@@ -68,6 +69,7 @@ const Soc = () => {
             The Local Organizing Committee can be contacted via the {' '}
             <Link
               aria-label="Contact"
+              className="fw-bolder"
               to="/contact"
               title="Contact"
             >
