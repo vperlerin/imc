@@ -1,5 +1,26 @@
- 
+@use 'styles/index' as *; 
+
 .flag {
   width: 1.5rem;
   height: 1.5rem;
 } 
+
+.bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 4px; 
+  background-color: #007bff;  
+  border-radius: 2px;
+  transition: width 0.4s ease-in-out;
+  bottom: -.5rem;
+}
+
+.perc {
+  width: 100%;
+
+  @include media-breakpoint-up(md) { 
+      width: auto;
+      min-width: 20rem; 
+  }
+}

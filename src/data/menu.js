@@ -13,12 +13,10 @@ export const menuItems = [
     title: "Community & Activities",
     link: "/community",
     subLinks: [
-      { title: "Excursion", link: "/community/excursion" },
-      {
-        title: "Scientific and Local Organizing Committee",
-        link: "/community/soc",
-      },
       { title: "Participants", link: "/community/participants" },
+      { title: "Excursion", link: "/community/excursion" },
+      { title: "Scientific and Local Organizing Committee", link: "/community/soc" },
+     
     ],
   },
   {
