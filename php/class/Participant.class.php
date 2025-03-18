@@ -819,7 +819,7 @@ class ParticipantManager
                 COALESCE(pm.method, 'Unknown') AS payment_method_name
             ";
         }
-    
+
         // Base Query with JOIN to get latest payment method
         $query = "
             SELECT $selectFields
@@ -835,10 +835,10 @@ class ParticipantManager
             ) AS pm ON pm.participant_id = p.id
             WHERE p.is_online = 0 AND p.status = 'active'
         ";
-    
+
         // Apply filtering for confirmed participants
         if ($confirmedOnly) {
-            $query .= " AND p.confirmation_sent = 1 ORDER BY p.country, p.last_name, p.first_name";  
+            $query .= " AND p.confirmation_sent = 1 ORDER BY p.country, p.last_name, p.first_name";
         } else {
             $query .= " GROUP BY p.id ORDER BY 
                             CASE 
@@ -847,14 +847,14 @@ class ParticipantManager
                             END ASC, 
                             p.created_at DESC";
         }
-    
+
         $stmt = $this->pdo->prepare($query);
         $stmt->execute();
-    
+
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    
-    
+
+
 
     /**
      * Retrieve all online active participants with payment method.
@@ -863,9 +863,10 @@ class ParticipantManager
     public function getOnlineParticipants($confirmedOnly = false)
     {
         // Select fields based on confirmedOnly
-        $selectFields = $confirmedOnly
-            ? "p.id, p.title, p.first_name, p.last_name, p.organization, p.country"
-            : "
+        if ($confirmedOnly) {
+            $selectFields = "p.id, p.title, p.first_name, p.last_name, p.organization, p.country";
+        } else {
+            $selectFields = "
             p.id,
             p.created_at,
             p.title, 
@@ -877,32 +878,36 @@ class ParticipantManager
             p.total_due, 
             p.total_paid,
             p.paypal_fee, 
-            (SELECT pm.method 
-            FROM payments pay 
-            LEFT JOIN payment_methods pm ON pay.payment_method_id = pm.id
-            WHERE pay.participant_id = p.id
-            ORDER BY pay.created_at DESC 
-            LIMIT 1) AS payment_method_name
+            COALESCE(pm.method, 'Unknown') AS payment_method_name
         ";
-
-        $query = "SELECT $selectFields FROM participants p WHERE p.is_online = TRUE AND p.status = 'active'";
-
-        // Apply filtering for confirmed participants if needed
-        if ($confirmedOnly) {
-            $query .= " AND p.confirmation_sent = 1";
         }
 
-        // Sorting logic: Move confirmed participants with confirmation_date to bottom
-        if (!$confirmedOnly) {
-            $query .= " GROUP BY p.id 
-                    ORDER BY 
+        // Base Query with JOIN to get latest payment method
+        $query = "
+        SELECT $selectFields
+        FROM participants p
+        LEFT JOIN (
+            SELECT pay.participant_id, pm.method
+            FROM payments pay
+            JOIN payment_methods pm ON pay.payment_method_id = pm.id
+            WHERE pay.id = (
+                SELECT MAX(sub_pay.id) FROM payments sub_pay 
+                WHERE sub_pay.participant_id = pay.participant_id
+            )
+        ) AS pm ON pm.participant_id = p.id
+        WHERE p.is_online = 1 AND p.status = 'active'
+    ";
+
+        // Apply filtering for confirmed participants
+        if ($confirmedOnly) {
+            $query .= " AND p.confirmation_sent = 1 ORDER BY p.country, p.last_name, p.first_name"; // ✅ FIX: Removed GROUP BY
+        } else {
+            $query .= " GROUP BY p.id ORDER BY 
                         CASE 
                             WHEN p.confirmation_sent = 1 AND p.confirmation_date IS NOT NULL THEN 1 
                             ELSE 0 
                         END ASC, 
                         p.created_at DESC";
-        } else {
-            $query .= " GROUP BY p.country";
         }
 
         $stmt = $this->pdo->prepare($query);
@@ -910,6 +915,7 @@ class ParticipantManager
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
 
     /**
      * Hard delete a participant
