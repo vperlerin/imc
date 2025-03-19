@@ -1,0 +1,10 @@
+"use strict";(self.webpackChunkimc2025=self.webpackChunkimc2025||[]).push([[9179],{
+/***/2827:
+/***/(s,l,i)=>{i.r(l),
+/* harmony export */i.d(l,{
+/* harmony export */default:()=>o
+/* harmony export */});
+/* harmony import */var a=i(7647),c=i(8057),e=(i(6540),i(4848));
+/* harmony import */const o=()=>(0/* ["default"] */,e.jsxs)(a.A,{breadcrumb:[{url:"/admin/downloads",name:"Downloads"}],isMaxWidth:!0,title:"Downloads",children:[(0,e.jsxs)("div",{className:"mb-4",children:[(0,e.jsx)("h5",{className:"mb-3",children:"Finance"}),(0/* ["default"] */,e.jsx)(c.A,{className:"d-block fw-bolder",link:"https://imc2025.imo.net/php/doc_participants.php",title:"All participants financial details"})]}),(0,e.jsxs)("div",{className:"mb-4",children:[(0,e.jsx)("h5",{className:"mb-3",children:"Accommodations"}),(0/* ["default"] */,e.jsx)(c.A,{className:"d-block fw-bolder",link:"https://imc2025.imo.net/php/doc_accommodations.php",title:"All participants accomodations"})]}),(0,e.jsxs)("div",{className:"mb-4",children:[(0,e.jsx)("h5",{className:"mb-3",children:"Workshops:"}),(0,e.jsxs)("div",{className:"d-flex flex-columnd flex-md-row gap-2",children:[(0/* ["default"] */,e.jsx)(c.A,{className:"d-block fw-bolder",link:"https://imc2025.imo.net/php/doc_workshops.php?workshop_id=1",title:"All Spectrography Workshop Participants"}),(0/* ["default"] */,e.jsx)(c.A,{className:"d-block fw-bolder",link:"https://imc2025.imo.net/php/doc_workshops.php?workshop_id=2",title:"All Radio Workshop Participants"})]})]}),(0,e.jsxs)("div",{className:"mb-4",children:[(0,e.jsx)("h5",{className:"mb-3",children:"Contributions"}),(0,e.jsxs)("div",{className:"d-flex gap-2",children:[(0/* ["default"] */,e.jsx)(c.A,{className:"d-block fw-bolder",link:"https://imc2025.imo.net/php/doc_posters.php",title:"All posters"}),(0/* ["default"] */,e.jsx)(c.A,{className:"d-block fw-bolder",link:"https://imc2025.imo.net/php/doc_talks.php",title:"All talks"})]})]})]});
+/* harmony default export */}
+/***/}]);

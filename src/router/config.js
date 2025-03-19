@@ -4,9 +4,7 @@ import { Routes, Route } from "react-router-dom";
 import { Link } from "react-router-dom";
 import Loader from "components/loader";
 import ProtectedRoute from "hooks/protected-route";
- 
-
-
+  
 // Lazy-load pages using relative paths (Webpack resolves them correctly)
 const lazyPages = {
   Home: lazy(() => import("pages/home")),

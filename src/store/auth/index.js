@@ -7,11 +7,14 @@ const loadAuthState = () => {
     oauth: session || null,
     user: null,
     isAuthenticated: !!session,
-    role: null, // New role state
+    role: null,
+    participantId: null,
+    adminId: null,
   };
 };
 
 const initialState = loadAuthState();
+
 const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -23,7 +26,7 @@ const authSlice = createSlice({
     },
     setUser: (state, action) => {
       state.user = { ...action.payload };
-      state.role = action.payload.role || "participant"; // Default role is participant
+      state.role = action.payload.role || "participant"; // Default role
       state.participantId = action.payload.participant_id || null;
       state.adminId = action.payload.admin_id || null;
     },
@@ -38,7 +41,6 @@ const authSlice = createSlice({
     },
   },
 });
-
 
 export const fetchUser = () => async (dispatch) => {
   try {
@@ -56,10 +58,11 @@ export const fetchUser = () => async (dispatch) => {
       role: response.data.user?.role || "participant",
       participant_id: response.data.user?.participant_id || null,
       admin_id: response.data.user?.admin_id || null,
+      is_admin: response.data.user?.is_admin || false,
     };
 
     dispatch(authActions.setUser(user));
-  } catch (error) { 
+  } catch (error) {
     dispatch(authActions.logout());
   }
 };
@@ -71,10 +74,10 @@ export const authActions = {
 
 export const authSelectors = {
   getUser: (state) => state.auth.user,
-  isAdmin: (state) => state.auth.adminId !== null,  
-  isParticipant: (state) => state.auth.participantId !== null,  
-  isSoc: (state) => state.auth.role === "soc",
-  isLoc: (state) => state.auth.role === "loc",
+  isAdmin: (state) => !!state.auth.user?.is_admin,  
+  isParticipant: (state) => !!state.auth.user?.participantId,  
+  isSoc: (state) => state.auth.user?.role === "soc",
+  isLoc: (state) => state.auth.user?.role === "loc",
   isLoggedIn: (state) => !!state.auth.user,
 };
 

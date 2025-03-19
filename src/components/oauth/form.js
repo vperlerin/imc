@@ -43,10 +43,10 @@ const Login = () => {
           navigate("/admin/dashboard");
           break;
         case "soc":
-          navigate("/admin/soc-panel");
+          navigate("/admin/contributions/talks");
           break;
         case "loc":
-          navigate("/admin/loc-panel");
+          navigate("/admin/accomodations");
           break;
         default:
           navigate("/update-registration");
