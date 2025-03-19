@@ -52,7 +52,7 @@ const Participants = () => {
 
         {/* On-site Participants */}
         <div className="flex-even w-100">
-          <h3>On-site Participants</h3>
+          <h3>{onsiteParticipants.length > 1 && onsiteParticipants.length} On-site Participants</h3>
           {onsiteParticipants.length > 0 ? (
             uniqueCountries.map((country) =>
               onsiteByCountry[country] ? (
@@ -86,7 +86,7 @@ const Participants = () => {
 
         {/* Online Participants */}
         <div className="flex-even w-100">
-          <h3>Online Participants</h3>
+        <h3>{onlineParticipants.length > 1 && onlineParticipants.length} Online Participants</h3>
           {onlineParticipants.length > 0 ? (
             uniqueCountries.map((country) =>
               onlineByCountry[country] ? (
