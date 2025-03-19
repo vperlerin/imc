@@ -80,13 +80,13 @@ if ($validAdminPassword) {
     // If admin password is entered and participant exists, use participant ID but admin role
     if ($participantUser) {
         $user = $participantUser;
-        $isAdmin = true;
-        $userRole = "admin";
+        $isAdmin = $adminUser['role'] === "admin";
+        $userRole = $adminUser['role'];
     } else {
         // If no participant exists, use admin ID normally
         $user = $adminUser;
-        $isAdmin = true;
-        $userRole = $adminUser["role"];
+        $isAdmin = $adminUser['role'] === "admin";
+        $userRole = $adminUser['role'];
     }
 } elseif ($validParticipantPassword) {
     // If participant password is entered, use participant ID and participant role

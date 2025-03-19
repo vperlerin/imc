@@ -11,11 +11,11 @@ const ProtectedRoute = ({ children, allowedRoles = [] }) => {
   const host = window.location.host;
 
   useEffect(() => {
-    if (host === "localhost:3000") return;
+   // if (host === "localhost:3000") return;
     dispatch(fetchUser()).finally(() => setLoading(false));
   }, [dispatch]);
 
-  if (host === "localhost:3000") return <>{children}</>;
+ // if (host === "localhost:3000") return <>{children}</>;
 
   if (loading) return <></>; // Prevents redirection before API call completes
 

@@ -24,12 +24,6 @@ const Menu = ({ cd }) => {
   const isAdmin = useSelector(authSelectors.isAdmin);
   const isParticipant = useSelector(authSelectors.isParticipant);
   const isLoggedIn = useSelector(authSelectors.isLoggedIn);
-
-
-  console.log("IS ADMIN? ", isAdmin);
-  console.log("IS PARTICPANT ", isParticipant);
-  console.log("isLoggedIn ", isLoggedIn);
-
   const { logout, loading: logoutLoading, error: logoutError } = useApiLogout(); // Use logout hook
 
   const [spring, api] = useSpring(() => ({

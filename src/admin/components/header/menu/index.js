@@ -14,13 +14,13 @@ import axios from 'axios';
 
 const sideMenuWidth = parseInt(css.sharedSideMenuWidth, 10) || 250;
 
-const Menu = ({ cd }) => {
+const Menu = ({ cd, isAdmin, isLoc, isSoc}) => {
   const [isMenuOpened, setIsMenuOpened] = useState(false);
   const [isFullyClosed, setIsFullyClosed] = useState(true);
   const dispatch = useDispatch();
   const location = useLocation();
   const navigate = useNavigate();
-
+  
   const [spring, api] = useSpring(() => ({
     right: -sideMenuWidth,
     config: { tension: 350, friction: 30 }
@@ -103,6 +103,13 @@ const Menu = ({ cd }) => {
 
               const isActive = location.pathname.startsWith(item.link) ||
                 (item.subLinks && item.subLinks.some(sub => location.pathname.startsWith(sub.link)));
+
+                const isAllowed =
+                isAdmin ||  
+                (isLoc && item?.allowed?.includes("loc")) ||
+                (isSoc && item?.allowed?.includes("soc"));
+            
+              if (!isAllowed) return null; // Hide the menu item if not allowed 
 
               if (!item.hideFromMenu) {
                 return (
