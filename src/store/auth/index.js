@@ -75,7 +75,7 @@ export const authActions = {
 export const authSelectors = {
   getUser: (state) => state.auth.user,
   isAdmin: (state) => !!state.auth.user?.is_admin,  
-  isParticipant: (state) => !!state.auth.user?.participantId,  
+  isParticipant: (state) => !!state.auth.participantId,  
   isSoc: (state) => state.auth.user?.role === "soc",
   isLoc: (state) => state.auth.user?.role === "loc",
   isLoggedIn: (state) => !!state.auth.user,
