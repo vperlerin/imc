@@ -51,7 +51,7 @@ const Participants = () => {
       <div className="d-flex flex-column flex-md-row gap-4 justify-content-between mt-3 align-items-start">
 
         {/* On-site Participants */}
-        <div className="flex-even">
+        <div className="flex-even w-100">
           <h3>On-site Participants</h3>
           {onsiteParticipants.length > 0 ? (
             uniqueCountries.map((country) =>
@@ -85,7 +85,7 @@ const Participants = () => {
         </div>
 
         {/* Online Participants */}
-        <div className="flex-even">
+        <div className="flex-even w-100">
           <h3>Online Participants</h3>
           {onlineParticipants.length > 0 ? (
             uniqueCountries.map((country) =>
