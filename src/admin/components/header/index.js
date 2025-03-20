@@ -12,6 +12,9 @@ const Header = () => {
   const title = `${cd.name} ${cd.year}`; 
   const isLoc = useSelector(authSelectors.isLoc);
   const isSoc = useSelector(authSelectors.isSoc); 
+
+  const adminHomeURL = isLoc ? '/admin/accommodations' :  isSoc ? '/admin/contributions/talks' : '/admin/dashboard';
+  
  
   return (
     <div className="d-flex align-items-center justify-content-between border-bottom">
@@ -21,7 +24,7 @@ const Header = () => {
           <Link
             aria-label="Admin"
             className={classnames('d-flex align-items-center text-dark text-decoration-none gap-2', css.title)}
-            to={'/admin/dashboard'}
+            to={ adminHomeURL}
             title="Admin"
           >
             <img src={smallLogo} alt={title} className="rounded-circle border border-2 p-1" />
