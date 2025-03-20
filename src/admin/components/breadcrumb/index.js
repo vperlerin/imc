@@ -1,9 +1,15 @@
+import { authSelectors } from 'store/auth';
+import { useSelector } from 'react-redux';
 import { IoHomeOutline } from "react-icons/io5";
 import { Link } from "react-router-dom";
 import classNames from "classnames";
 import cssBreadcrumb from 'styles/components/breadcrumb.module.scss';
 
 const BreadCrumb = ({ links = [] }) => {
+  const isAdmin = useSelector(authSelectors.isAdmin);
+  
+  if(!isAdmin) return null;
+
   return (
     <nav aria-label="breadcrumb" className={cssBreadcrumb.nav}>
       <ol className={classNames("breadcrumb")}>
