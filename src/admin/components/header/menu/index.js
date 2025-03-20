@@ -4,6 +4,8 @@ import classnames from 'classnames';
 import css from './index.module.scss';
 import MenuItem from './item';
 import React, { useState, useEffect } from 'react';
+import { authSelectors } from 'store/auth';
+import { useSelector } from 'react-redux';
 import { animated, useSpring } from '@react-spring/web';
 import { authActions } from 'store/auth';
 import { useDispatch } from 'react-redux';
@@ -14,12 +16,16 @@ import axios from 'axios';
 
 const sideMenuWidth = parseInt(css.sharedSideMenuWidth, 10) || 250;
 
-const Menu = ({ cd, isAdmin, isLoc, isSoc}) => {
+const Menu = ({ cd }) => {
   const [isMenuOpened, setIsMenuOpened] = useState(false);
   const [isFullyClosed, setIsFullyClosed] = useState(true);
   const dispatch = useDispatch();
   const location = useLocation();
   const navigate = useNavigate();
+  
+  const isAdmin = useSelector(authSelectors.isAdmin);
+  const isLoc = useSelector(authSelectors.isLoc);
+  const isSoc = useSelector(authSelectors.isSoc); 
   
   const [spring, api] = useSpring(() => ({
     right: -sideMenuWidth,
