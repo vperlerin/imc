@@ -1,12 +1,11 @@
 export const menuItems = [
-  { title: "Dashboard", link: "/admin/dashboard"},
-
+  { title: "Dashboard", link: "/admin/dashboard"}, 
   {
     title: "Participants",
     link: "/admin/participants",
     subLinks: [
-      { title: "On-site", link: "/admin/participants/onsite", allowed: ['loc'] },
-      { title: "Online", link: "/admin/participants/online", allowed: ['loc'] },
+      { title: "On-site", link: "/admin/participants/onsite" },
+      { title: "Online", link: "/admin/participants/online"},
       { title: "Radio Workshop", link: "/admin/participants/workshops/radio", allowed: ['loc'] },
       { title: "Spectro Workshop", link: "/admin/participants/workshops/spectro", allowed: ['loc'] },
     ],

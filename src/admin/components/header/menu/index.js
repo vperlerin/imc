@@ -22,11 +22,11 @@ const Menu = ({ cd }) => {
   const dispatch = useDispatch();
   const location = useLocation();
   const navigate = useNavigate();
-  
+
   const isAdmin = useSelector(authSelectors.isAdmin);
   const isLoc = useSelector(authSelectors.isLoc);
-  const isSoc = useSelector(authSelectors.isSoc); 
-  
+  const isSoc = useSelector(authSelectors.isSoc);
+
   const [spring, api] = useSpring(() => ({
     right: -sideMenuWidth,
     config: { tension: 350, friction: 30 }
@@ -34,7 +34,7 @@ const Menu = ({ cd }) => {
 
   const handleLogout = async () => {
     await axios.get(`${process.env.REACT_APP_API_URL}/auth/logout.php`, { withCredentials: true });
-    dispatch(authActions.logout());  
+    dispatch(authActions.logout());
     localStorage.removeItem("session");
     navigate('/');
   };
@@ -110,11 +110,11 @@ const Menu = ({ cd }) => {
               const isActive = location.pathname.startsWith(item.link) ||
                 (item.subLinks && item.subLinks.some(sub => location.pathname.startsWith(sub.link)));
 
-                const isAllowed =
-                isAdmin ||  
+              const isAllowed =
+                isAdmin ||
                 (isLoc && item?.allowed?.includes("loc")) ||
                 (isSoc && item?.allowed?.includes("soc"));
-            
+
               if (!isAllowed) return null; // Hide the menu item if not allowed 
 
               if (!item.hideFromMenu) {
@@ -129,21 +129,27 @@ const Menu = ({ cd }) => {
                   >
                     {item.subLinks && (
                       <>
-                        {item.subLinks.map((sub) => {
-                          const isSubActive = location.pathname === sub.link;
-                          return (
-                            <Link
-                              aria-label={sub.title}
-                              key={sub.link}
-                              onClick={onToggle}
-                              to={sub.link}
-                              className={classnames(isSubActive && css.active)}
-                              title={sub.title}
-                            >
-                              {sub.title}
-                            </Link>
-                          );
-                        })}
+                        {item.subLinks
+                          .filter((sub) =>
+                            isAdmin ||
+                            (isLoc && sub?.allowed?.includes("loc")) ||
+                            (isSoc && sub?.allowed?.includes("soc"))
+                          )
+                          .map((sub) => {
+                            const isSubActive = location.pathname === sub.link;
+                            return (
+                              <Link
+                                aria-label={sub.title}
+                                key={sub.link}
+                                onClick={onToggle}
+                                to={sub.link}
+                                className={classnames(isSubActive && css.active)}
+                                title={sub.title}
+                              >
+                                {sub.title}
+                              </Link>
+                            );
+                          })}
                       </>
                     )}
                   </MenuItem>

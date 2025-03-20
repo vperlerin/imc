@@ -90,8 +90,8 @@ const routeConfig = [
   // ADMIN (protected routes)
   { path: "/admin/accomodations", element: <ProtectedRoute allowedRoles={["admin", "loc"]}><lazyPages.AdminAccomodations /></ProtectedRoute> },
   { path: "/admin/dashboard", element: <ProtectedRoute allowedRoles={["admin"]}><lazyPages.AdminDashboard /></ProtectedRoute> },
-  { path: "/admin/participants/online", element: <ProtectedRoute allowedRoles={["admin", "loc"]}><lazyPages.AdminParticipantsOnline /></ProtectedRoute> },
-  { path: "/admin/participants/onsite", element: <ProtectedRoute allowedRoles={["admin", "loc"]}><lazyPages.AdminParticipantsOnsite /></ProtectedRoute> },
+  { path: "/admin/participants/online", element: <ProtectedRoute allowedRoles={["admin"]}><lazyPages.AdminParticipantsOnline /></ProtectedRoute> },
+  { path: "/admin/participants/onsite", element: <ProtectedRoute allowedRoles={["admin"]}><lazyPages.AdminParticipantsOnsite /></ProtectedRoute> },
   { path: "/admin/participants/workshops/radio", element: <ProtectedRoute allowedRoles={["admin", "loc"]}><lazyPages.AdminParticipantsWorkshops workshopId={2} /></ProtectedRoute> },
   { path: "/admin/participants/workshops/spectro", element: <ProtectedRoute allowedRoles={["admin", "loc"]}><lazyPages.AdminParticipantsWorkshops workshopId={1} /></ProtectedRoute> },
   { path: "/admin/participants/onsite/:participantId/:tab?", element: (<ProtectedRoute allowedRoles={["admin"]}><lazyPages.AdminParticipantsUser isCurOnline={false} /></ProtectedRoute>) },

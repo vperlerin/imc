@@ -11,17 +11,19 @@ import { formatConferenceDates } from 'utils/date';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { menuItems } from 'data/menu';
 import { onStopPropagation } from 'utils/event';
-import { useApiLogout } from 'api/oauth/logout';  
+import { useApiLogout } from 'api/oauth/logout';
 
 const sideMenuWidth = parseInt(css.sharedSideMenuWidth, 10) || 250;
 
 const Menu = ({ cd }) => {
   const [isMenuOpened, setIsMenuOpened] = useState(false);
   const [isFullyClosed, setIsFullyClosed] = useState(true);
-  
+
   const location = useLocation();
   const navigate = useNavigate();
   const isAdmin = useSelector(authSelectors.isAdmin);
+  const isLoc = useSelector(authSelectors.isLoc);
+  const isSoc = useSelector(authSelectors.isSoc);
   const isParticipant = useSelector(authSelectors.isParticipant);
   const isLoggedIn = useSelector(authSelectors.isLoggedIn);
   const { logout, loading: logoutLoading, error: logoutError } = useApiLogout(); // Use logout hook
@@ -71,7 +73,7 @@ const Menu = ({ cd }) => {
 
   const handleLogout = async () => {
     await logout();
-    setIsMenuOpened(false); 
+    setIsMenuOpened(false);
   };
 
   return (
@@ -151,7 +153,7 @@ const Menu = ({ cd }) => {
                     aria-label="Login"
                     className="btn btn-outline-primary px-3 fw-bolder"
                     to="/login"
-                    onClick={() => goTo('/login')}
+                    onClick={(e) => { e.preventDefault();  goTo('/login'); }}
                     title="Login"
                   >
                     Login
@@ -164,19 +166,43 @@ const Menu = ({ cd }) => {
                       aria-label="Admin"
                       className="btn btn-outline-tertiary px-3 fw-bolder"
                       to="/admin/dashboard"
-                      onClick={() => goTo('/admin/dashboard')}
+                      onClick={(e) => { e.preventDefault();  goTo('/admin/dashboard'); }}
                       title="Admin"
                     >
                       Admin
                     </Link>
                   )}
-                  
+
+                  {isLoc && (
+                    <Link
+                      aria-label="Admin"
+                      className="btn btn-outline-tertiary px-3 fw-bolder"
+                      to="/admin/accomodations"
+                      onClick={(e) => { e.preventDefault();  goTo('/admin/accomodations'); }}
+                      title="Admin"
+                    >
+                      LOC Admin
+                    </Link>
+                  )}
+
+                  {isSoc && (
+                    <Link
+                      aria-label="Admin"
+                      className="btn btn-outline-tertiary px-3 fw-bolder"
+                      to="/admin/contributions/talks"
+                      onClick={(e) => { e.preventDefault();  goTo('/admin/contributions/talks'); }}
+                      title="Admin"
+                    >
+                      SOC Admin
+                    </Link>
+                  )}
+
                   {isParticipant && (
                     <Link
                       aria-label="Edit your record"
                       className="btn btn-outline-tertiary px-3 fw-bolder"
                       to="/update-registration"
-                      onClick={() => goTo('/update-registration')}
+                      onClick={(e) => { e.preventDefault();  goTo('/update-registration'); }}
                       title="Register"
                     >
                       Update Your Record
