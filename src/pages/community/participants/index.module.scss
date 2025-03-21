@@ -1,16 +1,16 @@
-@use 'styles/index' as *; 
+@use 'styles/index' as *;
 
 .flag {
   width: 1.5rem;
   height: 1.5rem;
-} 
+}
 
 .bar {
   position: absolute;
   bottom: 0;
   left: 0;
-  height: 4px; 
-  background-color: #007bff;  
+  height: 4px;
+  background-color: #007bff;
   border-radius: 2px;
   transition: width 0.4s ease-in-out;
   bottom: -.5rem;
@@ -19,8 +19,25 @@
 .perc {
   width: 100%;
 
-  @include media-breakpoint-up(md) { 
-      width: auto;
-      min-width: 20rem; 
+  @include media-breakpoint-up(md) {
+    width: auto;
+    min-width: 20rem;
+    grid-row: span 2;
   }
+}
+
+.grid {
+  @media screen and (min-width: 1035px) {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: repeat(20, auto);
+    grid-auto-flow: column;
+
+    .col {
+      grid-row: span 19;
+    }
+
+    .searchBar { 
+      grid-column: span 2;
+    } 
+  } 
 }

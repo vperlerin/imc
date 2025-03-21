@@ -1,7 +1,8 @@
 import classNames from 'classnames';
 import css from './index.module.scss';
 import PageContain from "components/page-contain";
-import React from "react";
+import React, { useState } from "react";
+import { CiSearch } from "react-icons/ci"; 
 import { useApiOnlineParticipants } from "api/participants/online.js";
 import { useApiOnsiteParticipants } from "api/participants/onsite.js";
 import { useCountryName } from 'hooks/country-name';
@@ -11,12 +12,23 @@ import Loader from "components/loader";
 
 
 const Participants = () => {
+  const [searchQuery, setSearchQuery] = useState('');
   const countryName = useCountryName;
   const { participants: onlineParticipants, loading: loadingOnline, error: errorOnline } = useApiOnlineParticipants(true);
   const { participants: onsiteParticipants, loading: loadingOnsite, error: errorOnsite } = useApiOnsiteParticipants(true);
 
   if (loadingOnline || loadingOnsite) return <Loader />;
   if (errorOnline || errorOnsite) return <p className="text-danger">Error fetching participants. Please try again later.</p>;
+
+  const filterParticipants = (participants) => {
+    return participants.filter((participant) => {
+      const fullName = `${participant.title} ${participant.first_name} ${participant.last_name}`.toLowerCase();
+      return fullName.includes(searchQuery.toLowerCase());
+    });
+  };
+
+  const filteredOnsiteParticipants = filterParticipants(onsiteParticipants);
+  const filteredOnlineParticipants = filterParticipants(onlineParticipants);
 
   // Grouping participants by country separately for On-site and Online
   const groupByCountry = (participants) => {
@@ -30,8 +42,8 @@ const Participants = () => {
     return grouped;
   };
 
-  const onsiteByCountry = groupByCountry(onsiteParticipants);
-  const onlineByCountry = groupByCountry(onlineParticipants);
+  const onsiteByCountry = groupByCountry(filteredOnsiteParticipants);
+  const onlineByCountry = groupByCountry(filteredOnlineParticipants);
 
   const uniqueCountries = [
     ...new Set([...Object.keys(onsiteByCountry), ...Object.keys(onlineByCountry)])
@@ -48,12 +60,25 @@ const Participants = () => {
 
   return (
     <PageContain title="Participants">
-      <div className="d-flex flex-column flex-md-row gap-4 justify-content-between mt-3 align-items-start">
+
+      <div className={classNames('d-grid gap-4 mt-3 align-items-start', css.grid)}>
+
+        <div className={classNames('w-100 position-relative', css.searchBar)}>
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Search participant by name…"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          <CiSearch className="position-absolute top-50 end-0 translate-middle-y me-2" /> 
+        </div>
 
         {/* On-site Participants */}
-        <div className="flex-even w-100">
-          <h3>{onsiteParticipants.length > 1 && onsiteParticipants.length} On-site Participants</h3>
-          {onsiteParticipants.length > 0 ? (
+        <div className={classNames('w-100', css.col)}>
+          <h3>{filteredOnsiteParticipants.length} On-site Participant{filteredOnsiteParticipants.length > 1 && 's'}</h3>
+
+          {filteredOnsiteParticipants.length > 0 ? (
             uniqueCountries.map((country) =>
               onsiteByCountry[country] ? (
                 <div key={country} className="mb-4">
@@ -73,21 +98,31 @@ const Participants = () => {
               ) : null
             )
           ) : (
-            <p>No one has confirmed on-site participation yet. {' '}
-              <Link
-                aria-label="On-site Registration"
-                className="fw-bolder"
-                to="/register/onsite"
-                title="Register On-site"
-              >Be the first!</Link>
-            </p>
+            <>
+              {searchQuery !== '' ? (
+                <p>No matching onsite participants found.</p>
+              ) : (
+                <p>No one has confirmed onsite participation yet. {' '}
+                  <Link
+                    aria-label="Onsite Registration"
+                    className="fw-bolder"
+                    to="/register/onsite"
+                    title="Register Onsite"
+                  >
+                    Be the first!
+                  </Link>
+                </p>
+              )}
+            </>
           )}
         </div>
 
+
         {/* Online Participants */}
-        <div className="flex-even w-100">
-        <h3>{onlineParticipants.length > 1 && onlineParticipants.length} Online Participants</h3>
-          {onlineParticipants.length > 0 ? (
+        <div className={classNames('w-100', css.col)}>
+          <h3>{filteredOnlineParticipants.length} Online Participant{filteredOnlineParticipants.length > 1 && 's'}</h3>
+
+          {filteredOnlineParticipants.length > 0 ? (
             uniqueCountries.map((country) =>
               onlineByCountry[country] ? (
                 <div key={country} className="mb-4">
@@ -107,16 +142,25 @@ const Participants = () => {
               ) : null
             )
           ) : (
-            <p>No one has confirmed online participation yet. {' '}
-              <Link
-                aria-label="Online Registration"
-                className="fw-bolder"
-                to="/register/online"
-                title="Register Online"
-              >Be the first!</Link>
-            </p>
+            <>
+              {searchQuery !== '' ? (
+                <p>No matching online participants found.</p>
+              ) : (
+                <p>No one has confirmed online participation yet. {' '}
+                  <Link
+                    aria-label="Online Registration"
+                    className="fw-bolder"
+                    to="/register/online"
+                    title="Register Online"
+                  >
+                    Be the first!
+                  </Link>
+                </p>
+              )}
+            </>
           )}
         </div>
+
 
         {(onsiteParticipants.length > 0 || onlineParticipants.length > 0) && (
           <div className={classNames('border p-3 rounded-2 ', css.perc)}>
