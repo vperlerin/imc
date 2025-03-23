@@ -37,10 +37,12 @@ const PageContain = ({
             {breadcrumb.length !== 0 && (
               <BreadCrumb links={breadcrumb} />
             )}
-            <div className={classNames('d-flex justify-content-between align-items-center', css.titleWrap)}>
-              {title && <h2>{title}</h2>}
-              {rightContent && <div>{rightContent}</div>}
-            </div>
+            {(!!title || !!rightContent) && (
+              <div className={classNames('d-flex justify-content-between align-items-center', css.titleWrap)}>
+                {title && <h2>{title}</h2>}
+                {rightContent && <div>{rightContent}</div>}
+              </div>
+            )} 
             {children}
           </div>
         </div>
