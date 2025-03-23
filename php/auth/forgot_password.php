@@ -49,7 +49,7 @@ function getUserByEmail($pdo, $email) {
         $stmt->execute([$email, $email]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     } catch (PDOException $e) {
-        error_log("Database Query Error: " . $e->getMessage());
+        echo("Database Query Error: " . $e->getMessage());
         return false;
     }
 }
