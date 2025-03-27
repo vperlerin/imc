@@ -16,6 +16,12 @@ require_once __DIR__ . "/../../class/Connect.class.php";
 require_once __DIR__ . "/../../class/Participant.class.php";
 
 try {
+    $pdo = Connect::getPDO();
+} catch (Exception $e) {
+    die($e->getMessage()); 
+}
+
+try {
     $participantManager = new ParticipantManager($pdo);
 
     // Check if "confirmed_only" is set in the GET request

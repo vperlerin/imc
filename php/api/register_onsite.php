@@ -25,6 +25,12 @@ require_once __DIR__ . "/../class/Extras.class.php";
 require_once __DIR__ . "/../class/Registrationtype.class.php";
 
 try {
+    $pdo = Connect::getPDO();
+} catch (Exception $e) {
+    die($e->getMessage()); 
+}
+
+try {
     $data = json_decode(file_get_contents("php://input"), true);
 
     // Override with test data if "test=1" is in the request

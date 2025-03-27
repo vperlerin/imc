@@ -23,6 +23,12 @@ use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 
+try {
+    $pdo = Connect::getPDO();
+} catch (Exception $e) {
+    die($e->getMessage()); 
+}
+
 // Initialize contribution manager
 $contributionManager = new ContributionManager($pdo);
 $talks = $contributionManager->getAllTalks();

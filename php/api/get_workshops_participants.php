@@ -22,6 +22,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
+try {
+    $pdo = Connect::getPDO();
+} catch (Exception $e) {
+    die($e->getMessage()); 
+}
+
 // Validate workshop ID
 $workshopId = $_GET['workshop_id'] ?? null;
 if (!$workshopId || !is_numeric($workshopId)) {

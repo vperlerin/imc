@@ -15,6 +15,12 @@ header("Content-Type: application/json");
 require_once __DIR__ . "/config.php";
 require_once __DIR__ . "/class/Connect.class.php";
 
+try {
+  $pdo = Connect::getPDO();
+} catch (Exception $e) {
+  die($e->getMessage()); 
+}
+
 // Initialize Memcached
 $memcached = new Memcached();
 $memcached->addServer('localhost', 11211);

@@ -24,6 +24,12 @@ use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 
+try {
+    $pdo = Connect::getPDO();
+} catch (Exception $e) {
+    die($e->getMessage()); 
+}
+
 if (!isset($_GET['workshop_id']) || !is_numeric($_GET['workshop_id'])) {
     die(json_encode(["success" => false, "message" => "Invalid workshop ID."]));
 }

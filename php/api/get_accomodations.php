@@ -16,6 +16,12 @@ require_once __DIR__ . "/../config.php";
 require_once __DIR__ . "/../class/Accommodation.class.php";
 require_once __DIR__ . "/../class/Connect.class.php";
 
+try {
+    $pdo = Connect::getPDO();
+} catch (Exception $e) {
+    die($e->getMessage()); 
+}
+
 // Handle preflight OPTIONS request
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);

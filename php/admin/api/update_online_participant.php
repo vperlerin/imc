@@ -26,6 +26,12 @@ require_once __DIR__ . "/../../class/Connect.class.php";
 require_once __DIR__ . "/../../class/Participant.class.php";
 
 try {
+    $pdo = Connect::getPDO();
+} catch (Exception $e) {
+    die($e->getMessage()); 
+}
+
+try {
     // Ensure participant ID is provided via query parameter
     if (!isset($_GET['id']) || empty($_GET['id'])) {
         throw new Exception("Invalid request. Participant ID is required.");

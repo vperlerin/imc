@@ -22,6 +22,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
+try {
+    $pdo = Connect::getPDO();
+} catch (Exception $e) {
+    die($e->getMessage()); 
+}
+
 // Validate participant ID
 $participantId = $_GET['id'] ?? null;
 if (!$participantId || !is_numeric($participantId)) {

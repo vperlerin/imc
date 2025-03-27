@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 
 $allowed_origins = [
@@ -24,6 +24,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 try {
+    $pdo = Connect::getPDO();
+} catch (Exception $e) {
+    die($e->getMessage());
+}
+
+try {
     $dashboardManager = new DashboardManager($pdo);
     $dashboardData = $dashboardManager->getDashboardData();
 
@@ -31,4 +37,3 @@ try {
 } catch (Exception $e) {
     echo json_encode(["success" => false, "message" => $e->getMessage()]);
 }
-?>

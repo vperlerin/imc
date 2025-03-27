@@ -25,6 +25,13 @@ if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
     exit;
 }
   
+
+try {
+    $pdo = Connect::getPDO();
+} catch (Exception $e) {
+    die($e->getMessage()); 
+}
+
 // Read JSON input
 $input = file_get_contents("php://input");
 $data = json_decode($input, true);

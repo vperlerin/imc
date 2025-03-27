@@ -23,6 +23,12 @@ use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 
+try {
+    $pdo = Connect::getPDO();
+} catch (Exception $e) {
+    die($e->getMessage()); 
+}
+
 // Initialize participant manager
 $participantManager = new ParticipantManager($pdo);
 $participants = $participantManager->getAllParticipants($pdo);

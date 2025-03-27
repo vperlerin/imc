@@ -33,11 +33,17 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
+try {
+    $pdo = Connect::getPDO();
+} catch (Exception $e) {
+    die($e->getMessage());
+}
+
 // Capture and decode JSON input
 $rawInput = file_get_contents("php://input");
 $input = json_decode($rawInput, true);
 $input = $input['paymentData'];
- 
+
 // Validate input
 if (!$input || !isset($input['participant_id'], $input['amount'], $input['payment_method_id'], $input['payment_date'])) {
     http_response_code(400);
@@ -64,7 +70,7 @@ try {
 
     // Initialize PaymentManager
     $paymentManager = new PaymentManager($pdo);
-    
+
     // Add payment using PaymentManager's method
     $success = $paymentManager->addPayment(
         $participantId,
@@ -77,13 +83,12 @@ try {
     if (!$success) {
         throw new Exception("Failed to add payment.");
     }
- 
+
     echo json_encode([
         "success" => true,
         "message" => "Payment Added Successfully"
     ]);
-} catch (Exception $e) { 
+} catch (Exception $e) {
     http_response_code(400);
     echo json_encode(["success" => false, "message" => $e->getMessage()]);
 }
-?>

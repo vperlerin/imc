@@ -16,6 +16,12 @@ require_once __DIR__ . "/../../class/Connect.class.php";
 require_once __DIR__ . "/../../class/Participant.class.php";
 
 try {
+    $pdo = Connect::getPDO();
+} catch (Exception $e) {
+    die($e->getMessage()); 
+}
+
+try {
     // Retrieve participant ID from GET param (e.g., ?id=123)
     $participantId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 

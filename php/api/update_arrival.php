@@ -19,6 +19,12 @@ require_once __DIR__ . "/../class/Connect.class.php";
 require_once __DIR__ . "/../class/Arrival.class.php"; 
 
 try {
+    $pdo = Connect::getPDO();
+} catch (Exception $e) {
+    die($e->getMessage()); 
+}
+
+try {
     $data = json_decode(file_get_contents("php://input"), true);
 
     if (!isset($data['participant_id']) || empty($data['participant_id'])) {
