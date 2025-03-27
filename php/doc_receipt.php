@@ -1,15 +1,13 @@
 <?php
-ob_clean(); // Clear previous output
-ob_start(); // Start output buffering
 
 // CORS setup
 $allowed_origins = [
-    "https://imc2025.imo.net",
-    "http://localhost:3000"
+  "https://imc2025.imo.net",
+  "http://localhost:3000"
 ];
 
 if (isset($_SERVER['HTTP_ORIGIN']) && in_array($_SERVER['HTTP_ORIGIN'], $allowed_origins)) {
-    header("Access-Control-Allow-Origin: " . $_SERVER['HTTP_ORIGIN']);
+  header("Access-Control-Allow-Origin: " . $_SERVER['HTTP_ORIGIN']);
 }
 header("Access-Control-Allow-Credentials: true");
 
@@ -22,8 +20,11 @@ require __DIR__ . "/../vendor/autoload.php";
 try {
   $pdo = Connect::getPDO();
 } catch (Exception $e) {
-  die($e->getMessage()); 
+  die($e->getMessage());
 }
+
+ob_clean(); // Clear previous output
+ob_start(); // Start output buffering
 
 // TCPDF logic
 use TCPDF;
