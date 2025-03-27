@@ -62,7 +62,7 @@ $spreadsheet->removeSheetByIndex(0);
 function createSheet($spreadsheet, $sheetName, $participants, $includeAccommodation = false)
 {
     if (empty($participants)) {
-        return; // ❌ Skip empty sheets
+        return; // Skip empty sheets
     }
 
     // Create a new sheet

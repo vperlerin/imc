@@ -494,7 +494,7 @@ const Payments = ({ isCurOnline = false }) => {
                     {wantToAddMessage && (
                       <>
                         <div>
-                          <div className="my-3 d-flex gap-3 align-items-strecht">
+                          <div className="my-3 d-flex flex-column flex-md-row gap-3 align-items-strecht">
                             <div className={css.col}>
                               Below is the email that is going to be sent:
                               <div className="bg-white text-black p-3 rounded mt-2" dangerouslySetInnerHTML={{ __html: confirmationMessage }} />
