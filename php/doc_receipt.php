@@ -23,8 +23,8 @@ try {
   die($e->getMessage());
 }
 
-ob_clean(); // Clear previous output
-ob_start(); // Start output buffering
+ob_clean();
+ob_start();
 
 // TCPDF logic
 use TCPDF;
@@ -43,27 +43,114 @@ $pdf->SetMargins(20, 20, 20);
 $pdf->AddPage();
 $pdf->SetFont('helvetica', '', 12);
 
+// Receipt data (in a real app, you'd retrieve this from DB)
 $participantName = "Joost Hartman";
+$receiptNumber = "2025-00123";
 $amountPaid = "€265.00";
 $paymentMethod = "PayPal";
 $transactionDate = date("F j, Y");
 
 $html = <<<EOD
-<h1 style="text-align: center;">Payment Receipt</h1>
-<p><strong>Participant:</strong> {$participantName}</p>
-<p><strong>Amount Paid:</strong> {$amountPaid}</p>
-<p><strong>Payment Method:</strong> {$paymentMethod}</p>
-<p><strong>Date:</strong> {$transactionDate}</p>
-<br>
-<p>We confirm that we have received the above payment for your participation in the International Meteor Conference 2025.</p>
-<p>Thank you for your registration!</p>
-<br><br>
-<p><em>International Meteor Organization</em></p>
+<style>
+  body {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 12px;
+    color: #333;
+  }
+  .logo {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  .logo img {
+    height: 60px;
+  }
+  h1 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .details {
+    margin-bottom: 30px;
+  }
+  .details p {
+    margin: 0 0 5px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+  }
+  th, td {
+    border: 1px solid #aaa;
+    padding: 8px;
+    text-align: left;
+  }
+  th {
+    background-color: #f0f0f0;
+  }
+  .total {
+    text-align: right;
+    font-weight: bold;
+  }
+  .footer {
+    margin-top: 40px;
+    font-style: italic;
+    text-align: center;
+  }
+</style>
+
+<div class="logo">
+  <img src="https://imc2025.imo.net/assets/logo.png" alt="IMO Logo" />
+</div>
+
+<h1>Payment Receipt</h1>
+
+<div class="details">
+  <p><strong>Participant:</strong> {$participantName}</p>
+  <p><strong>Payment Method:</strong> {$paymentMethod}</p>
+  <p><strong>Date:</strong> {$transactionDate}</p>
+  <p><strong>Receipt #:</strong> {$receiptNumber}</p>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>Item</th>
+      <th>Description</th>
+      <th style="text-align:right;">Amount</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Registration</td>
+      <td>Full conference access</td>
+      <td style="text-align:right;">€200.00</td>
+    </tr>
+    <tr>
+      <td>Workshop</td>
+      <td>Spectroscopy workshop</td>
+      <td style="text-align:right;">€50.00</td>
+    </tr>
+    <tr>
+      <td>T-Shirt</td>
+      <td>Size L</td>
+      <td style="text-align:right;">€15.00</td>
+    </tr>
+  </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="2" class="total">Total Paid</td>
+      <td style="text-align:right;"><strong>{$amountPaid}</strong></td>
+    </tr>
+  </tfoot>
+</table>
+
+<div class="footer">
+  Thank you for your registration!<br>
+  International Meteor Organization
+</div>
 EOD;
 
 $pdf->writeHTML($html, true, false, true, false, '');
-
-// Output PDF to browser
 $pdf->Output('payment_receipt.pdf', 'I');
 
 ob_end_flush();
