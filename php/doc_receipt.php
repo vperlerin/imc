@@ -19,6 +19,7 @@ header("Access-Control-Allow-Credentials: true");
 require_once __DIR__ . "/config.php";
 require_once __DIR__ . "/class/Connect.class.php";
 require_once __DIR__ . "/class/Participant.class.php";
+require_once __DIR__ . "/class/Registrationtype.class.php";
 require_once __DIR__ . "/../vendor/autoload.php";
 
 use TCPDF;
@@ -39,10 +40,14 @@ try {
 try {
   $participantManager = new ParticipantManager($pdo);
   $participant = $participantManager->getParticipantDetails($participantId);
+  $registrationtypeManager = new RegistrationtypeManager($pdo);
+  $registrationTypes = $registrationtypeManager->getRegistrationTypes();
 } catch (Exception $e) {
   echo json_encode(["success" => false, "message" => $e->getMessage()]);
   exit;
 }
+
+print_p($registrationTypes);
 
 $conferenceJsonPath = __DIR__ . '/../imc/src/data/conference-data.json';
 if (!file_exists($conferenceJsonPath)) {
