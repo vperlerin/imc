@@ -1,5 +1,4 @@
 import React from "react";
-import { getPaymentMethodById } from "utils/payment_method";
 
 const getPaypalPrice = (price) => {
   return Math.round((price + (0.034 * price + 0.35) / 0.966) * 100) / 100;
@@ -29,12 +28,12 @@ const getSelectedWorkshops = (participantWorkshops = [], isOnline) => {
   return { selected, totalPrice };
 };
 
-const StaticSummary = ({ isOnline, conferenceData, participantData, registrationTypes, paymentMethods }) => {
+const StaticSummary = ({ isOnline, conferenceData, participantData, registrationTypes }) => {
   if (!participantData || !participantData.participant) {
     return <div className="alert alert-danger">No participant data available.</div>;
   }
 
-  const { participant, accommodation, workshops: participantWorkshops, extra_options, contributions = [], payments = [] } = participantData;
+  const { participant, accommodation, workshops: participantWorkshops, extra_options, contributions = [] } = participantData;
 
   // Initialize totalRoomCost
   let totalRoomCost = 0;
