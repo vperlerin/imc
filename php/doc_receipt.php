@@ -1,10 +1,5 @@
 <?php
 
-// Enable error reporting
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
 // CORS setup
 $allowed_origins = [
   "https://imc2025.imo.net",
@@ -25,37 +20,17 @@ require_once __DIR__ . "/../vendor/autoload.php";
 // TCPDF
 use TCPDF;
 
-// Validate participant ID
-$participantId = $_GET['id'] ?? null;
-if (!$participantId || !is_numeric($participantId)) {
-    echo json_encode(["success" => false, "message" => "Invalid participant ID"]);
-    exit;
-}
-
 try {
   $pdo = Connect::getPDO();
 } catch (Exception $e) {
   die($e->getMessage());
 }
 
-try {
-  $participantManager = new ParticipantManager($pdo);
-  $participant = $participantManager->getParticipantDetails($participantId);
+// Replace these with real data from your DB logic
+$participant = [];         // ← You should replace this
+$conferenceData = [];      // ← You should replace this
+$isOnline = false;         // ← You should replace this
 
-  echo json_encode(["success" => true, "data" => $participant]);
-} catch (Exception $e) {
-  echo json_encode(["success" => false, "message" => $e->getMessage()]);
-}
-
-print_r($participant);
-return;
-
-// Replace these with real data from your database
-$participant = []; // fetched from ParticipantManager
-$conferenceData = []; // fetched from config or DB
-$isOnline = false; // set appropriately
-
-// Start output buffering
 ob_clean();
 ob_start();
 
@@ -73,98 +48,94 @@ $pdf->SetMargins(20, 20, 20);
 $pdf->AddPage();
 $pdf->SetFont('helvetica', '', 12);
 
-// --- Calculate Invoice ---
+// --- REGISTRATION COST ---
 $totalRoomCost = 0;
 $registrationDescription = "";
 
 if (!$isOnline) {
-  $registrationTypeId = $participant['accommodation']['registration_type_id'];
-  $registrationTypes = $conferenceData['registration_types'];
-  $regInfo = array_filter($registrationTypes, fn($r) => $r['id'] == $registrationTypeId);
+  $registrationTypeId = isset($participant['accommodation']['registration_type_id']) ? $participant['accommodation']['registration_type_id'] : null;
+  $registrationTypes = isset($conferenceData['registration_types']) ? $conferenceData['registration_types'] : [];
+
+  $regInfo = array_filter($registrationTypes, function ($r) use ($registrationTypeId) {
+    return $r['id'] == $registrationTypeId;
+  });
   $regInfo = reset($regInfo);
 
   if ($regInfo) {
-    $isLast = end($registrationTypes)['id'] == $registrationTypeId;
+    $lastItem = end($registrationTypes);
+    $isLast = $lastItem['id'] == $registrationTypeId;
     $registrationDescription = $isLast ? "(no accommodation)" : "+ " . $regInfo['description'];
     $price = floatval($regInfo['price']);
-    $lateFee = $participant['is_early_bird'] === "0" ? floatval($conferenceData['costs']['after_early_birds']) : 0;
+    $lateFee = (isset($participant['is_early_bird']) && $participant['is_early_bird'] === "0")
+      ? floatval($conferenceData['costs']['after_early_birds'])
+      : 0;
     $totalRoomCost = $price + $lateFee;
   }
 }
 
+// --- WORKSHOPS ---
 $workshopCost = 0;
 $selectedWorkshops = [];
-foreach ($participant['workshops'] ?? [] as $workshop) {
-  $price = $isOnline ? floatval($workshop['price_online']) : floatval($workshop['price']);
-  $workshopCost += $price;
-  $selectedWorkshops[] = [
-    'title' => $workshop['title'],
-    'price' => $price
-  ];
+
+if (!empty($participant['workshops']) && is_array($participant['workshops'])) {
+  foreach ($participant['workshops'] as $workshop) {
+    $price = $isOnline ? floatval($workshop['price_online']) : floatval($workshop['price']);
+    $workshopCost += $price;
+    $selectedWorkshops[] = [
+      'title' => $workshop['title'],
+      'price' => $price
+    ];
+  }
 }
 
+// --- T-SHIRT ---
 $tshirtCost = 0;
 $tshirtSize = '';
+
 if (!empty($participant['extra_options']['buy_tshirt'])) {
   $tshirtCost = floatval($conferenceData['costs']['tshirts']['price']);
-  $tshirtSize = $participant['extra_options']['tshirt_size'] ?? '';
+  $tshirtSize = isset($participant['extra_options']['tshirt_size']) ? $participant['extra_options']['tshirt_size'] : '';
 }
 
-$printedPosters = array_filter($participant['contributions'] ?? [], fn($c) => $c['print'] === "1" || $c['print'] === true);
-$printedPosterCount = count($printedPosters);
-$printedPosterCost = $printedPosterCount * floatval($conferenceData['poster_print']['price']);
+// --- PRINTED POSTERS ---
+$printedPosterCount = 0;
+$printedPosterCost = 0;
 
+if (!empty($participant['contributions']) && is_array($participant['contributions'])) {
+  foreach ($participant['contributions'] as $contribution) {
+    if ($contribution['print'] === "1" || $contribution['print'] === true) {
+      $printedPosterCount++;
+    }
+  }
+  $printedPosterCost = $printedPosterCount * floatval($conferenceData['poster_print']['price']);
+}
+
+// --- PAYPAL FEE ---
 $totalCost = $totalRoomCost + $workshopCost + $tshirtCost + $printedPosterCost;
-$paymentMethod = strtolower($participant['payment_method_name'] ?? 'unknown');
+$paymentMethod = strtolower(isset($participant['payment_method_name']) ? $participant['payment_method_name'] : 'unknown');
 $isPaypal = $paymentMethod === 'paypal';
 
-$paypalAdjustedTotal = $isPaypal ? round(($totalCost + (0.034 * $totalCost + 0.35) / 0.966) * 100) / 100 : $totalCost;
-$paypalFee = $paypalAdjustedTotal - $totalCost;
+if ($isPaypal) {
+  $paypalAdjustedTotal = round(($totalCost + (0.034 * $totalCost + 0.35) / 0.966) * 100) / 100;
+  $paypalFee = $paypalAdjustedTotal - $totalCost;
+} else {
+  $paypalAdjustedTotal = $totalCost;
+  $paypalFee = 0;
+}
+
 $grandTotal = $totalCost + $paypalFee;
 
-// HTML starts here
+// --- HTML ---
 $html = <<<EOD
 <style>
-  body {
-    font-family: Helvetica, Arial, sans-serif;
-    font-size: 12px;
-    color: #333;
-  }
-  h1 {
-    text-align: center;
-    margin-bottom: 35px;
-  }
-  .address {
-    margin-bottom: 20px;
-  }
-  .details {
-    margin-bottom: 30px;
-  }
-  .details p {
-    margin: 0 0 5px;
-  }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 20px;
-  }
-  th, td {
-    border: 1px solid #aaa;
-    padding: 8px;
-    text-align: left;
-  }
-  th {
-    background-color: #f0f0f0;
-  }
-  .total {
-    text-align: right;
-    font-weight: bold;
-  }
-  .footer {
-    margin-top: 40px;
-    font-style: italic;
-    text-align: center;
-  }
+  body { font-family: Helvetica, Arial, sans-serif; font-size: 12px; color: #333; }
+  h1 { text-align: center; margin-bottom: 35px; }
+  .address { margin-bottom: 20px; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+  th, td { border: 1px solid #aaa; padding: 8px; text-align: left; }
+  th { background-color: #f0f0f0; }
+  .total { text-align: right; font-weight: bold; }
+  .footer { margin-top: 40px; font-style: italic; text-align: center; }
 </style>
 
 <h1>Payment Receipt</h1>
@@ -180,16 +151,13 @@ $html = <<<EOD
 </div>
 
 <table>
-<thead>
-  <tr>
-    <th>Description</th>
-    <th style="text-align:right;">Price</th>
-  </tr>
-</thead>
-<tbody>
+  <thead>
+    <tr><th>Description</th><th style="text-align:right;">Price</th></tr>
+  </thead>
+  <tbody>
 EOD;
 
-// Add rows dynamically
+// --- DYNAMIC TABLE ROWS ---
 if (!$isOnline) {
   $html .= "<tr><td>Conference Registration {$registrationDescription}</td><td style='text-align:right;'>" . number_format($totalRoomCost, 2) . "€</td></tr>";
 } else {
@@ -223,7 +191,7 @@ $html .= <<<EOD
 </div>
 EOD;
 
-// Output PDF
+// --- OUTPUT ---
 $pdf->Ln(50);
 $pdf->writeHTML($html, true, false, true, false, '');
 $pdf->Output('payment_receipt.pdf', 'I');
