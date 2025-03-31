@@ -42,7 +42,7 @@ try {
   echo json_encode(["success" => false, "message" => $e->getMessage()]);
 }
 
-print_p($participant);
+print_r($participant);
 return;
 
 // Replace these with real data from your database
