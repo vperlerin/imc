@@ -161,6 +161,10 @@ if ($isPaypal) {
 
 $grandTotal = $totalCost + $paypalFee;
 
+$startDate = date("F j", strtotime($conferenceData['dates']['start']));
+$endDate = date("F j, Y", strtotime($conferenceData['dates']['end']));
+$conferenceDates = "$startDate–$endDate, {$conferenceData['location']}";
+
 // --- HTML ---
 $html = <<<EOD
 <style>
@@ -175,15 +179,26 @@ $html = <<<EOD
 </style>
 
 <h1>Payment Receipt</h1>
-
-<div class="address"><strong>International Meteor Organization</strong><br/>
+ 
+<div class="address"><strong>{$conferenceData['name_display']}</strong><br/>
   Jozef Mattheessensstraat 60, 2540 Hove, Belgium<br />
   Email: treasurer@imo.net
 </div>
 
 <div class="address">
-  <strong>Object:</strong> International Meteor Organization $currentYear - 
-  <a href="https://imc$currentYear.imo.net">IMC $currentYear</a>
+  <strong>Object:</strong> {$conferenceData['name_display']} {$conferenceData['year']} - 
+  <a href="https://imc{$conferenceData['year']}.imo.net">IMC {$conferenceData['year']}</a><br/>
+  {$conferenceData['hotel']}, {$conferenceData['location']}<br/>
+  {$conferenceDates}
+</div>
+
+<div class="address"><strong>International Meteor Organization</strong><br/> 
+  Email: treasurer@imo.net
+</div>
+
+<div class="address">
+  <strong>Object:</strong> International Meteor Organization {$conferenceData['year']} - 
+  <a href="https://imc{$conferenceData['year']}.imo.net">IMC {$conferenceData['year']}</a>
 </div>
 
 <table>
