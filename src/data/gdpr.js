@@ -17,7 +17,7 @@ export const gdpr = (
         You have the right to request from the controller via email to imc{cd.year}@imo.net access to and rectification or erasure of personal data or restriction of processing concerning of your personal data or to object to processing as well as the right to data portability.
       </li>
       <li className="mb-2">
-        You may withdraw the consent we seek for processing your personal data at any time by simple request to the controller via email to imc2024@imo.net (without affecting the lawfulness of the processing of your personal data based on your consent before its withdrawal).
+        You may withdraw the consent we seek for processing your personal data at any time by simple request to the controller via email to imc{cd.year}@imo.net (without affecting the lawfulness of the processing of your personal data based on your consent before its withdrawal).
       </li>
       <li className="mb-2">
         Information on registration fee payments included in the IMO's bookkeeping will not be erased since accounting data must be kept according to the applicable accounting regulations. This information is not public however and will not be disclosed unless legally required. </li>
