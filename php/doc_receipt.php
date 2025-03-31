@@ -150,20 +150,6 @@ $html = <<<EOD
 </div>
 EOD;
 
-// Place the SVG logo centered at the top
-$pdf->ImageSVG(
-  'https://imc2025.imo.net/4e6d9aa30b27a18d93d0.svg',
-  $x = 80,   // X position (adjust for centering)
-  $y = 20,   // Y position
-  $w = 50,   // Width in mm
-  $h = '',   // Height auto
-  $link = '',
-  $align = '',
-  $palign = '',
-  $border = 0,
-  $fitonpage = false
-);
-
 // Move cursor down to avoid overlap with content
 $pdf->Ln(50);
 
