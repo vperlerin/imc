@@ -20,6 +20,25 @@ require_once __DIR__ . "/../vendor/autoload.php";
 // TCPDF
 use TCPDF;
 
+// Validate participant ID
+$participantId = $_GET['id'] ?? null;
+if (!$participantId || !is_numeric($participantId)) {
+    echo json_encode(["success" => false, "message" => "Invalid participant ID"]);
+    exit;
+}
+
+try {
+  $participantManager = new ParticipantManager($pdo);
+  $participant = $participantManager->getParticipantDetails($participantId);
+
+  echo json_encode(["success" => true, "data" => $participant]);
+} catch (Exception $e) {
+  echo json_encode(["success" => false, "message" => $e->getMessage()]);
+}
+
+print_r($participant);
+return;
+
 try {
   $pdo = Connect::getPDO();
 } catch (Exception $e) {
