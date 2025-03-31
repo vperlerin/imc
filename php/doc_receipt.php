@@ -128,6 +128,9 @@ if (!empty($participant['workshops']) && is_array($participant['workshops'])) {
 $tshirtCost = 0;
 $tshirtSize = '';
 
+print_r($conferenceData);
+exit;
+
 if (!empty($participant['extra_options']['buy_tshirt'])) {
   $tshirtCost = floatval($conferenceData['costs']['tshirts']['price']);
   $tshirtSize = isset($participant['extra_options']['tshirt_size']) ? $participant['extra_options']['tshirt_size'] : '';
