@@ -57,7 +57,10 @@ if (!file_exists($conferenceJsonPath)) {
 $conferenceDataRaw = file_get_contents($conferenceJsonPath); 
 $conferenceData =  json_decode($conferenceDataRaw, true);
 
+print_r("\n-----------------------------------------------\n");
 print_r($conferenceData);
+print_r("\n-----------------------------------------------\n");
+
 return;
 
 if (!$conferenceData) {
