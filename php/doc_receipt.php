@@ -54,17 +54,10 @@ if (!file_exists($conferenceJsonPath)) {
 
 $conferenceDataRaw = file_get_contents($conferenceJsonPath); 
 $conferenceData =  json_decode($conferenceDataRaw, true);
-
-print_r("\n-----------------------------------------------\n");
-print_r($conferenceData['year']);
-print_r("\n-----------------------------------------------\n");
-
-return;
-
+ 
 if (!$conferenceData) {
   die("Invalid JSON in conference-data.json");
 }
-
 
 // Replace these with real data from your DB logic
 $participant = $participant; 
