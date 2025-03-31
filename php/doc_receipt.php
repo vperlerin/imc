@@ -40,8 +40,6 @@ try {
 try {
   $participantManager = new ParticipantManager($pdo);
   $participant = $participantManager->getParticipantDetails($participantId);
-
-  echo json_encode(["success" => true, "data" => $participant]);
 } catch (Exception $e) {
   echo json_encode(["success" => false, "message" => $e->getMessage()]);
 }
