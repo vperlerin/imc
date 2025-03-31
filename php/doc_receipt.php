@@ -47,9 +47,6 @@ try {
   exit;
 }
 
-print_r($registrationTypes);
-exit;
-
 $conferenceJsonPath = __DIR__ . '/../imc/src/data/conference-data.json';
 if (!file_exists($conferenceJsonPath)) {
   die("Conference data not found.");
@@ -85,8 +82,6 @@ $registrationDescription = "";
 
 if (!$isOnline) {
   $registrationTypeId = $participant['accommodation']['registration_type_id'] ?? null;
-  $registrationTypes = $conferenceData['registration_types'] ?? [];
-
   foreach ($registrationTypes as $reg) {
     if ($reg['id'] == $registrationTypeId) {
       $registrationDescription = $reg['description'];
@@ -94,7 +89,6 @@ if (!$isOnline) {
       break;
     }
   }
-
   $lateFee = ($participant['is_early_bird'] ?? "1") === "0" ? floatval($conferenceData['costs']['after_early_birds']) : 0;
   $totalRoomCost = isset($price) ? $price + $lateFee : $lateFee;
 }
