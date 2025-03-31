@@ -47,7 +47,7 @@ try {
   exit;
 }
 
-print_p($registrationTypes);
+print_r($registrationTypes);
 
 $conferenceJsonPath = __DIR__ . '/../imc/src/data/conference-data.json';
 if (!file_exists($conferenceJsonPath)) {
