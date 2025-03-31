@@ -143,7 +143,7 @@ $html = <<<EOD
   .footer { margin-top: 40px; font-style: italic; text-align: center; }
 </style>
 
-<h1>Inter
+<h1>International Meteor Organization</h1>
 
 <h1>Payment Receipt</h1>
  
