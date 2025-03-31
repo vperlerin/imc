@@ -120,6 +120,9 @@ $printedPosterCost = $printedPosterCount * floatval($conferenceData['poster_prin
 
 $totalCost = $totalRoomCost + $workshopCost + $tshirtCost + $printedPosterCost;
 $paymentMethod = strtolower($participant['payment_method_name'] ?? 'unknown');
+print_r('PAYMENT METHO \n');
+print_r($paymentMethod);
+exit;
 $isPaypal = $paymentMethod === 'paypal';
 
 $paypalAdjustedTotal = $isPaypal ? round(($totalCost + (0.034 * $totalCost + 0.35) / 0.966) * 100) / 100 : $totalCost;
