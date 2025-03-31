@@ -93,8 +93,7 @@ $html = <<<EOD
 
 <h1>Payment Receipt</h1>
 
-<div classs="address">
-   <strong>International Meteor Organization,<strong>
+<div classs="address"><strong>International Meteor Organization,</strong>
    Jozef Mattheessensstraat 60, 2540 Hove, Belgium<br />
    Bank account at BNP Paribas Fortis Bank Belgium<br />
    BIC bank code: GEBABEBB<br />
