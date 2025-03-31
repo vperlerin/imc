@@ -54,7 +54,11 @@ if (!file_exists($conferenceJsonPath)) {
   die("Conference data not found.");
 }
 
-$conferenceData = file_get_contents($conferenceJsonPath); 
+$conferenceDataRaw = file_get_contents($conferenceJsonPath); 
+$conferenceData =  json_decode($conferenceDataRaw, true);
+
+print_r($conferenceData);
+return;
 
 if (!$conferenceData) {
   die("Invalid JSON in conference-data.json");
@@ -125,10 +129,7 @@ if (!empty($participant['workshops']) && is_array($participant['workshops'])) {
 // --- T-SHIRT ---
 $tshirtCost = 0;
 $tshirtSize = '';
-
-print_r($conferenceData);
-print_r($conferenceData['costs']);
-exit;
+ 
  
 if (!empty($participant['extra_options']['buy_tshirt'])) {
   $tshirtCost = floatval($conferenceData['costs']['tshirts']['price']);
