@@ -32,6 +32,12 @@ if (!$participantId || !is_numeric($participantId)) {
 }
 
 try {
+  $pdo = Connect::getPDO();
+} catch (Exception $e) {
+  die($e->getMessage());
+}
+
+try {
   $participantManager = new ParticipantManager($pdo);
   $participant = $participantManager->getParticipantDetails($participantId);
 
@@ -43,11 +49,7 @@ try {
 print_r($participant);
 return;
 
-try {
-  $pdo = Connect::getPDO();
-} catch (Exception $e) {
-  die($e->getMessage());
-}
+
 
 // Replace these with real data from your DB logic
 $participant = [];         // ← You should replace this
