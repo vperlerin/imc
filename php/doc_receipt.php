@@ -160,7 +160,7 @@ $grandTotal = $totalCost + $paypalFee;
 
 $startDate = date("F j", strtotime($conferenceData['dates']['start']));
 $endDate = date("F j, Y", strtotime($conferenceData['dates']['end']));
-$conferenceDates = "$startDate–$endDate, {$conferenceData['location']}";
+$conferenceDates = "$startDate - $endDate, {$conferenceData['location']}";
 
 // --- HTML ---
 $html = <<<EOD
