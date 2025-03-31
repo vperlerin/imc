@@ -62,8 +62,7 @@ if (!$conferenceData) {
 
 
 // Replace these with real data from your DB logic
-$participant = $participant;
-$conferenceData = [];      // ← You should replace this
+$participant = $participant; 
 $isOnline = false;         // ← You should replace this
 
 ob_clean();
