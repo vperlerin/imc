@@ -127,6 +127,7 @@ $tshirtCost = 0;
 $tshirtSize = '';
 
 print_r($conferenceData);
+print_r($conferenceData['costs']);
 exit;
  
 if (!empty($participant['extra_options']['buy_tshirt'])) {
