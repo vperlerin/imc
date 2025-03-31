@@ -56,14 +56,7 @@ $html = <<<EOD
     font-family: Helvetica, Arial, sans-serif;
     font-size: 12px;
     color: #333;
-  }
-  .logo {
-    text-align: center;
-    margin-bottom: 30px;
-  }
-  .logo img {
-    height: 60px;
-  }
+  }  
   h1 {
     text-align: center;
     margin-bottom: 20px;
@@ -98,11 +91,16 @@ $html = <<<EOD
   }
 </style>
 
-<div class="logo">
-  <img src="https://imc2025.imo.net/assets/logo.png" alt="IMO Logo" />
-</div>
-
 <h1>Payment Receipt</h1>
+
+<div classs="address">
+   <strong>International Meteor Organization,<strong>
+   Jozef Mattheessensstraat 60, 2540 Hove, Belgium<br />
+   Bank account at BNP Paribas Fortis Bank Belgium<br />
+   BIC bank code: GEBABEBB<br />
+   IBAN account number: BE30 0014 7327 5911<br />
+   e-mail: treasurer@imo.net
+</div>
 
 <div class="details">
   <p><strong>Participant:</strong> {$participantName}</p>
