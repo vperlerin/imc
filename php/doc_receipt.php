@@ -24,17 +24,39 @@ require_once __DIR__ . "/../vendor/autoload.php";
 // TCPDF
 use TCPDF;
 
+// Validate participant ID
+$participantId = $_GET['id'] ?? null;
+if (!$participantId || !is_numeric($participantId)) {
+    echo json_encode(["success" => false, "message" => "Invalid participant ID"]);
+    exit;
+}
+
+try {
+  $participantManager = new ParticipantManager($pdo);
+  $participant = $participantManager->getParticipantDetails($participantId);
+
+  echo json_encode(["success" => true, "data" => $participant]);
+} catch (Exception $e) {
+  echo json_encode(["success" => false, "message" => $e->getMessage()]);
+}
+
+print_r($participant);
+return;
+
 try {
   $pdo = Connect::getPDO();
 } catch (Exception $e) {
   die($e->getMessage());
 }
 
-// Start output buffering
+// Replace these with real data from your DB logic
+$participant = [];         // ← You should replace this
+$conferenceData = [];      // ← You should replace this
+$isOnline = false;         // ← You should replace this
+
 ob_clean();
 ob_start();
 
-// TCPDF initialization
 $currentYear = date("Y");
 
 $pdf = new TCPDF();
@@ -49,62 +71,99 @@ $pdf->SetMargins(20, 20, 20);
 $pdf->AddPage();
 $pdf->SetFont('helvetica', '', 12);
 
-// Sample receipt data (replace with DB values in production)
-$participantName = "Joost Hartman";
-$receiptNumber = "2025-00123";
-$amountPaid = "€265.00";
-$paymentMethod = "PayPal";
-$transactionDate = date("F j, Y");
+// --- REGISTRATION COST ---
+$totalRoomCost = 0;
+$registrationDescription = "";
 
-// HTML content for receipt
+if (!$isOnline) {
+  $registrationTypeId = isset($participant['accommodation']['registration_type_id']) ? $participant['accommodation']['registration_type_id'] : null;
+  $registrationTypes = isset($conferenceData['registration_types']) ? $conferenceData['registration_types'] : [];
+
+  $regInfo = array_filter($registrationTypes, function ($r) use ($registrationTypeId) {
+    return $r['id'] == $registrationTypeId;
+  });
+  $regInfo = reset($regInfo);
+
+  if ($regInfo) {
+    $lastItem = end($registrationTypes);
+    $isLast = $lastItem['id'] == $registrationTypeId;
+    $registrationDescription = $isLast ? "(no accommodation)" : "+ " . $regInfo['description'];
+    $price = floatval($regInfo['price']);
+    $lateFee = (isset($participant['is_early_bird']) && $participant['is_early_bird'] === "0")
+      ? floatval($conferenceData['costs']['after_early_birds'])
+      : 0;
+    $totalRoomCost = $price + $lateFee;
+  }
+}
+
+// --- WORKSHOPS ---
+$workshopCost = 0;
+$selectedWorkshops = [];
+
+if (!empty($participant['workshops']) && is_array($participant['workshops'])) {
+  foreach ($participant['workshops'] as $workshop) {
+    $price = $isOnline ? floatval($workshop['price_online']) : floatval($workshop['price']);
+    $workshopCost += $price;
+    $selectedWorkshops[] = [
+      'title' => $workshop['title'],
+      'price' => $price
+    ];
+  }
+}
+
+// --- T-SHIRT ---
+$tshirtCost = 0;
+$tshirtSize = '';
+
+if (!empty($participant['extra_options']['buy_tshirt'])) {
+  $tshirtCost = floatval($conferenceData['costs']['tshirts']['price']);
+  $tshirtSize = isset($participant['extra_options']['tshirt_size']) ? $participant['extra_options']['tshirt_size'] : '';
+}
+
+// --- PRINTED POSTERS ---
+$printedPosterCount = 0;
+$printedPosterCost = 0;
+
+if (!empty($participant['contributions']) && is_array($participant['contributions'])) {
+  foreach ($participant['contributions'] as $contribution) {
+    if ($contribution['print'] === "1" || $contribution['print'] === true) {
+      $printedPosterCount++;
+    }
+  }
+  $printedPosterCost = $printedPosterCount * floatval($conferenceData['poster_print']['price']);
+}
+
+// --- PAYPAL FEE ---
+$totalCost = $totalRoomCost + $workshopCost + $tshirtCost + $printedPosterCost;
+$paymentMethod = strtolower(isset($participant['payment_method_name']) ? $participant['payment_method_name'] : 'unknown');
+$isPaypal = $paymentMethod === 'paypal';
+
+if ($isPaypal) {
+  $paypalAdjustedTotal = round(($totalCost + (0.034 * $totalCost + 0.35) / 0.966) * 100) / 100;
+  $paypalFee = $paypalAdjustedTotal - $totalCost;
+} else {
+  $paypalAdjustedTotal = $totalCost;
+  $paypalFee = 0;
+}
+
+$grandTotal = $totalCost + $paypalFee;
+
+// --- HTML ---
 $html = <<<EOD
 <style>
-  body {
-    font-family: Helvetica, Arial, sans-serif;
-    font-size: 12px;
-    color: #333;
-  }
-  h1 {
-    text-align: center;
-    margin-bottom: 20px;
-  }
-  .address {
-    margin-bottom: 20px;
-  }
-  .details {
-    margin-bottom: 30px;
-  }
-  .details p {
-    margin: 0 0 5px;
-  }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 20px;
-  }
-  th, td {
-    border: 1px solid #aaa;
-    padding: 8px;
-    text-align: left;
-  }
-  th {
-    background-color: #f0f0f0;
-  }
-  .total {
-    text-align: right;
-    font-weight: bold;
-  }
-  .footer {
-    margin-top: 40px;
-    font-style: italic;
-    text-align: center;
-  }
+  body { font-family: Helvetica, Arial, sans-serif; font-size: 12px; color: #333; }
+  h1 { text-align: center; margin-bottom: 35px; }
+  .address { margin-bottom: 20px; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+  th, td { border: 1px solid #aaa; padding: 8px; text-align: left; }
+  th { background-color: #f0f0f0; }
+  .total { text-align: right; font-weight: bold; }
+  .footer { margin-top: 40px; font-style: italic; text-align: center; }
 </style>
 
 <h1>Payment Receipt</h1>
 
-<div class="address">
-  <strong>International Meteor Organization</strong><br/>
+<div class="address"><strong>International Meteor Organization</strong><br/>
   Jozef Mattheessensstraat 60, 2540 Hove, Belgium<br />
   Email: treasurer@imo.net
 </div>
@@ -114,53 +173,48 @@ $html = <<<EOD
   <a href="https://imc$currentYear.imo.net">IMC $currentYear</a>
 </div>
 
-<div class="details">
-  <p><strong>Participant:</strong> {$participantName}</p>
-  <p><strong>Payment Method:</strong> {$paymentMethod}</p>
-  <p><strong>Date:</strong> {$transactionDate}</p>
-  <p><strong>Receipt #:</strong> {$receiptNumber}</p>
-</div>
-
 <table>
   <thead>
-    <tr>
-      <th>Item</th>
-      <th>Description</th>
-      <th style="text-align:right;">Amount</th>
-    </tr>
+    <tr><th>Description</th><th style="text-align:right;">Price</th></tr>
   </thead>
   <tbody>
-    <tr>
-      <td>Registration</td>
-      <td>Full conference access</td>
-      <td style="text-align:right;">€200.00</td>
-    </tr>
-    <tr>
-      <td>Workshop</td>
-      <td>Spectroscopy workshop</td>
-      <td style="text-align:right;">€50.00</td>
-    </tr>
-    <tr>
-      <td>T-Shirt</td>
-      <td>Size L</td>
-      <td style="text-align:right;">€15.00</td>
-    </tr>
-  </tbody>
-  <tfoot>
-    <tr>
-      <td colspan="2" class="total">Total Paid</td>
-      <td style="text-align:right;"><strong>{$amountPaid}</strong></td>
-    </tr>
-  </tfoot>
-</table>
+EOD;
 
+// --- DYNAMIC TABLE ROWS ---
+if (!$isOnline) {
+  $html .= "<tr><td>Conference Registration {$registrationDescription}</td><td style='text-align:right;'>" . number_format($totalRoomCost, 2) . "€</td></tr>";
+} else {
+  $onlineCost = floatval($conferenceData['costs']['online']);
+  $html .= "<tr><td>Online Conference Registration</td><td style='text-align:right;'>" . number_format($onlineCost, 2) . "€</td></tr>";
+}
+
+foreach ($selectedWorkshops as $workshop) {
+  $html .= "<tr><td>{$workshop['title']}</td><td style='text-align:right;'>" . number_format($workshop['price'], 2) . "€</td></tr>";
+}
+
+if ($printedPosterCount > 0) {
+  $html .= "<tr><td>Printed Poster" . ($printedPosterCount > 1 ? "s" : "") . " x {$printedPosterCount}</td><td style='text-align:right;'>" . number_format($printedPosterCost, 2) . "€</td></tr>";
+}
+
+if ($tshirtCost > 0 && $tshirtSize) {
+  $html .= "<tr><td>T-Shirt ({$tshirtSize})</td><td style='text-align:right;'>" . number_format($tshirtCost, 2) . "€</td></tr>";
+}
+
+if ($isPaypal) {
+  $html .= "<tr><td>PayPal Fee (3.4% + 0.35€)</td><td style='text-align:right;'>" . number_format($paypalFee, 2) . "€</td></tr>";
+}
+
+$html .= "<tr><td><strong>TOTAL</strong></td><td style='text-align:right;'><strong>" . number_format($grandTotal, 2) . "€</strong></td></tr>";
+$html .= "</tbody></table>";
+
+$html .= <<<EOD
 <div class="footer">
   Thank you for your registration!<br>
   International Meteor Organization
 </div>
 EOD;
 
-// Write and output PDF
+// --- OUTPUT ---
 $pdf->Ln(50);
 $pdf->writeHTML($html, true, false, true, false, '');
 $pdf->Output('payment_receipt.pdf', 'I');
