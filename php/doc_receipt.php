@@ -15,7 +15,10 @@ header("Access-Control-Allow-Credentials: true");
 require_once __DIR__ . "/config.php";
 require_once __DIR__ . "/class/Connect.class.php";
 require_once __DIR__ . "/class/Participant.class.php";
-require __DIR__ . "/../vendor/autoload.php";
+require_once __DIR__ . "/../vendor/autoload.php";
+
+// TCPDF
+use TCPDF;
 
 try {
   $pdo = Connect::getPDO();
@@ -23,12 +26,11 @@ try {
   die($e->getMessage());
 }
 
+// Start output buffering
 ob_clean();
 ob_start();
 
-// TCPDF logic
-use TCPDF;
-
+// TCPDF initialization
 $currentYear = date("Y");
 
 $pdf = new TCPDF();
@@ -43,22 +45,26 @@ $pdf->SetMargins(20, 20, 20);
 $pdf->AddPage();
 $pdf->SetFont('helvetica', '', 12);
 
-// Receipt data (in a real app, you'd retrieve this from DB)
+// Sample receipt data (replace with DB values in production)
 $participantName = "Joost Hartman";
 $receiptNumber = "2025-00123";
 $amountPaid = "€265.00";
 $paymentMethod = "PayPal";
 $transactionDate = date("F j, Y");
 
+// HTML content for receipt
 $html = <<<EOD
 <style>
   body {
     font-family: Helvetica, Arial, sans-serif;
     font-size: 12px;
     color: #333;
-  }  
+  }
   h1 {
     text-align: center;
+    margin-bottom: 20px;
+  }
+  .address {
     margin-bottom: 20px;
   }
   .details {
@@ -93,12 +99,15 @@ $html = <<<EOD
 
 <h1>Payment Receipt</h1>
 
-<div classs="address"><strong>International Meteor Organization,</strong>
-   Jozef Mattheessensstraat 60, 2540 Hove, Belgium<br />
-   Bank account at BNP Paribas Fortis Bank Belgium<br />
-   BIC bank code: GEBABEBB<br />
-   IBAN account number: BE30 0014 7327 5911<br />
-   e-mail: treasurer@imo.net
+<div class="address">
+  <strong>International Meteor Organization</strong><br/>
+  Jozef Mattheessensstraat 60, 2540 Hove, Belgium<br />
+  Email: treasurer@imo.net
+</div>
+
+<div class="address">
+  <strong>Object:</strong> International Meteor Organization - $currentYear<br/>
+  <a href="https://imc$currentYear.imo.net">IMC $currentYear</a>
 </div>
 
 <div class="details">
@@ -147,9 +156,8 @@ $html = <<<EOD
 </div>
 EOD;
 
-// Move cursor down to avoid overlap with content
+// Write and output PDF
 $pdf->Ln(50);
-
 $pdf->writeHTML($html, true, false, true, false, '');
 $pdf->Output('payment_receipt.pdf', 'I');
 
