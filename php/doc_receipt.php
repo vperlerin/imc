@@ -54,10 +54,7 @@ if (!file_exists($conferenceJsonPath)) {
   die("Conference data not found.");
 }
 
-$conferenceDataRaw = file_get_contents($conferenceJsonPath);
-
-print_r($conferenceDataRaw);
-$conferenceData = json_decode($conferenceDataRaw, true);
+$conferenceData = file_get_contents($conferenceJsonPath); 
 
 if (!$conferenceData) {
   die("Invalid JSON in conference-data.json");
