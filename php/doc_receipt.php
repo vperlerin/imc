@@ -46,13 +46,24 @@ try {
   echo json_encode(["success" => false, "message" => $e->getMessage()]);
 }
 
-print_r($participant);
-return;
+// Conference data 
+// Warning: ../src
+$conferenceJsonPath = __DIR__ . '/../imc/src/data/conference-data.json';
 
+if (!file_exists($conferenceJsonPath)) {
+  die("Conference data not found.");
+}
+
+$conferenceDataRaw = file_get_contents($conferenceJsonPath);
+$conferenceData = json_decode($conferenceDataRaw, true);
+
+if (!$conferenceData) {
+  die("Invalid JSON in conference-data.json");
+}
 
 
 // Replace these with real data from your DB logic
-$participant = [];         // ← You should replace this
+$participant = $participant;
 $conferenceData = [];      // ← You should replace this
 $isOnline = false;         // ← You should replace this
 
