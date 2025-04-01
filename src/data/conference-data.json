@@ -19,11 +19,11 @@
     "half_reimbursement_before": "2025-07-15",
     "early_birds": "2025-05-01"
   },
-  "poster_dim": "A1 size (59.4cm x 84.1cm / 23.4″ x 33.1″)",
+  "poster_dim": "A0 size (84.1cm x 118.9cm  / 33.1″ x 46.8″)",
   "poster_print": {
-    "desc": "Maximum size A1 (59.4cm x 84.1cm / 23.4″ x 33.1″), uploaded in PDF, deadline for sending September 1.",
+    "desc": "Maximum size A0 (84.1cm x 118.9cm / 33.1″ x 46.8″), uploaded in PDF, deadline for sending September 1.",
     "price": 35,
-    "size": "A1 size (59.4cm x 84.1cm / 23.4″ x 33.1″)"
+    "size": "A0 size (84.1cm x 118.9cm / 33.1″ x 46.8″)"
   },
   "sessions": [
     "Video meteor work",
