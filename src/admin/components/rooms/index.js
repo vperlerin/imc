@@ -46,7 +46,7 @@ const AvailableRooms = ({ className, showLink = false }) => {
           {availableRooms?.filter((room) => room.registration_type !== "no")
             .map((room) => {
               const roomType = room.registration_type.toLowerCase();
-              const isRoomAvailable = Math.floor(room.available_rooms) === 0;
+              const isRoomAvailable = Math.floor(room.available_rooms) <= 0;
 
               return (
                 <div

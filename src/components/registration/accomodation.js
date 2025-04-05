@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import cssForm from "styles/components/form.module.scss";
-import React, { useEffect } from "react";
+import React from "react";
 import StepDislay from "components/registration/stepDisplay";
 
 const AccomodationForm = ({
@@ -25,6 +25,8 @@ const AccomodationForm = ({
     trigger();
   };
 
+  const toHide = ['single'];
+
   return (
     <>
       {!isAdmin && (
@@ -46,7 +48,7 @@ const AccomodationForm = ({
           <div className="mb-4 mt-2">
             <label className="fw-bold mb-2">Registration Type</label>
             <div className="d-flex flex-column gap-2">
-              {registrationTypes.map((registration, index) => (
+              {registrationTypes.filter((registration) => !toHide.includes(registration.type)).map((registration, index) => (
                 <div key={registration.id} className="form-check">
                   <input
                     type="radio"

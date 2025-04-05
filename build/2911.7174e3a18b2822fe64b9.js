@@ -15,7 +15,7 @@ return(0,d.jsxs)("div",{className:"text-danger",children:["Error: ",h]});
 // Function to format room availability
 const p=(e,t)=>{const a={single:1,double:2,quadruple:4}[e]||1,s=Math.floor(t),r=Math.round((t-s)*a);// Default to 1 if type is unknown
 let o=`${s} rooms left`;return r>0&&(o+=` + ${r} bed${r>1?"s":""}`),o};
-return(0,d.jsxs)("div",{className:r()(t,"position-relative",a&&" border rounded-2 p-3 "),children:[m&&(0/* default */,d.jsx)(l.A,{}),a&&(0,d.jsx)("h5",{children:(0/* Link */,d.jsx)(n.N_,{to:"/admin/accomodations",children:"Available Rooms by Type"})}),h&&(0,d.jsx)("div",{className:"alert alert-danger fw-bolder",children:h}),!h&&!m&&(0,d.jsx)("div",{className:"d-flex flex-column flex-md-row gap-2",children:s?.filter((e=>"no"!==e.registration_type)).map((e=>{const t=e.registration_type.toLowerCase(),a=0===Math.floor(e.available_rooms);
+return(0,d.jsxs)("div",{className:r()(t,"position-relative",a&&" border rounded-2 p-3 "),children:[m&&(0/* default */,d.jsx)(l.A,{}),a&&(0,d.jsx)("h5",{children:(0/* Link */,d.jsx)(n.N_,{to:"/admin/accomodations",children:"Available Rooms by Type"})}),h&&(0,d.jsx)("div",{className:"alert alert-danger fw-bolder",children:h}),!h&&!m&&(0,d.jsx)("div",{className:"d-flex flex-column flex-md-row gap-2",children:s?.filter((e=>"no"!==e.registration_type)).map((e=>{const t=e.registration_type.toLowerCase(),a=Math.floor(e.available_rooms)<=0;
 return(0,d.jsxs)("div",{className:r()("p-3 border rounded-2",{"text-danger":a}),children:[t.charAt(0).toUpperCase()+t.slice(1),":",(0,d.jsxs)("strong",{children:[" ",p(t,parseFloat(e.available_rooms))]}),(0,d.jsxs)("small",{className:"text-muted",children:[" / ",e.total_rooms]})]},e.registration_type_id)}))})]})};
 /* harmony default export */}
 /***/,
