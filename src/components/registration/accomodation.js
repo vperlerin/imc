@@ -20,12 +20,12 @@ const AccomodationForm = ({
 }) => {
 
   const fillTestData = () => {
-    setValue("registration_type_id", registrationTypes.length > 1 ? registrationTypes[1].id : ""); 
-    setValue("payment_method_id", paymentMethods.length > 0 ? paymentMethods[paymentMethods.length - 1].id : ""); 
+    setValue("registration_type_id", registrationTypes.length > 1 ? registrationTypes[1].id : "");
+    setValue("payment_method_id", paymentMethods.length > 0 ? paymentMethods[paymentMethods.length - 1].id : "");
     trigger();
   };
 
-  const toHide = ['single'];
+  const hiddenRegistrationTypes  = ['single'];
 
   return (
     <>
@@ -48,7 +48,10 @@ const AccomodationForm = ({
           <div className="mb-4 mt-2">
             <label className="fw-bold mb-2">Registration Type</label>
             <div className="d-flex flex-column gap-2">
-              {registrationTypes.filter((registration) => !toHide.includes(registration.type)).map((registration, index) => (
+              {registrationTypes.filter((registration) => {
+                if (isAdmin) return true; 
+                return !hiddenRegistrationTypes.includes(registration.type); 
+              }).map((registration, index) => (
                 <div key={registration.id} className="form-check">
                   <input
                     type="radio"
