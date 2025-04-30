@@ -68,7 +68,7 @@ class ParticipantManager
     public function saveParticipant($data, $passwordHash)
     {
         try {
-            // 1. Handle boolean fields: convert "true"/"false" (or any truthy/falsy string) to 1 or 0.
+            // 1. Handle boolean fields (without can_be_public)
             $booleanFields = ['excursion', 'buy_tshirt', 'is_online', 'is_early_bird', 'confirmation_sent'];
             foreach ($booleanFields as $field) {
                 if (!isset($data[$field])) {
@@ -78,30 +78,30 @@ class ParticipantManager
                     $data[$field] = ($flag === null ? 0 : ($flag ? 1 : 0));
                 }
             }
-
+    
             $this->pdo->beginTransaction();
-
-            // Check if email exists
+    
+            // 2. Check if email exists
             if ($this->emailExists($data['email'])) {
                 throw new Exception("The email address '{$data['email']}' is already registered. Please use a different email or log in.");
             }
-
-            // Insert participant
-            $stmt = $this->pdo->prepare("
-                INSERT INTO participants (
-                    title, first_name, last_name, gender, dob, email, phone, address, postal_code, city, country, 
-                    organization, admin_notes, is_online, is_early_bird, confirmation_sent, confirmation_date, 
-                    password_hash, paypal_fee, total_due, total_paid, total_reimbursed, status, deleted_at, 
-                    comments, guardian_name, guardian_contact, guardian_email, payment_method_id,  created_at, updated_at
-                ) VALUES (
-                    :title, :first_name, :last_name, :gender, :dob, :email, :phone, :address, :postal_code, :city, :country, 
-                    :organization, NULL, :is_online, :is_early_bird, FALSE, NULL, 
-                    :password_hash, :paypal_fee, :total_due, 0.00, 0.00, 'active', NULL, 
-                    :comments, :guardian_name, :guardian_contact, :guardian_email, :payment_method_id, NOW(), NOW()
-                )
-            ");
-
-            $stmt->execute([
+    
+            // 3. Prepare dynamic columns and values
+            $columns = [
+                'title', 'first_name', 'last_name', 'gender', 'dob', 'email', 'phone', 'address', 'postal_code', 'city', 'country',
+                'organization', 'admin_notes', 'is_online', 'is_early_bird', 'confirmation_sent', 'confirmation_date',
+                'password_hash', 'paypal_fee', 'total_due', 'total_paid', 'total_reimbursed', 'status', 'deleted_at',
+                'comments', 'guardian_name', 'guardian_contact', 'guardian_email', 'payment_method_id', 'created_at', 'updated_at'
+            ];
+    
+            $values = [
+                ':title', ':first_name', ':last_name', ':gender', ':dob', ':email', ':phone', ':address', ':postal_code', ':city', ':country',
+                ':organization', 'NULL', ':is_online', ':is_early_bird', ':confirmation_sent', 'NULL',
+                ':password_hash', ':paypal_fee', ':total_due', '0.00', '0.00', "'active'", 'NULL',
+                ':comments', ':guardian_name', ':guardian_contact', ':guardian_email', ':payment_method_id', 'NOW()', 'NOW()'
+            ];
+    
+            $params = [
                 ':title' => $data['title'],
                 ':first_name' => $data['first_name'],
                 ':last_name' => $data['last_name'],
@@ -114,8 +114,9 @@ class ParticipantManager
                 ':city' => $data['city'],
                 ':country' => $data['country'],
                 ':organization' => $data['organization'] ?? null,
-                ':is_online' => filter_var($data['is_online'], FILTER_VALIDATE_BOOLEAN),
-                ':is_early_bird' => filter_var($data['is_early_bird'], FILTER_VALIDATE_BOOLEAN),
+                ':is_online' => $data['is_online'],
+                ':is_early_bird' => $data['is_early_bird'],
+                ':confirmation_sent' => $data['confirmation_sent'],
                 ':password_hash' => $passwordHash,
                 ':paypal_fee' => $data['paypal_fee'] ?? 0,
                 ':total_due' => $data['total_due'],
@@ -124,17 +125,33 @@ class ParticipantManager
                 ':guardian_contact' => $data['guardian_contact'] ?? null,
                 ':guardian_email' => $data['guardian_email'] ?? null,
                 ':payment_method_id' => (int) ($data['payment_method_id'] ?? 0),
-            ]);
-
+            ];
+    
+            // 4. If can_be_public exists, add it dynamically
+            if (array_key_exists('can_be_public', $data)) {
+                $columns[] = 'can_be_public';
+                $values[] = ':can_be_public';
+                $flag = filter_var($data['can_be_public'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+                $params[':can_be_public'] = ($flag === null ? 0 : ($flag ? 1 : 0));
+            }
+    
+            // 5. Insert participant
+            $stmt = $this->pdo->prepare("
+                INSERT INTO participants (" . implode(", ", $columns) . ")
+                VALUES (" . implode(", ", $values) . ")
+            ");
+    
+            $stmt->execute($params);
+    
             $participantId = $this->pdo->lastInsertId();
-
-            // Insert workshops participation
+    
+            // 6. Insert workshops participation
             if (!empty($data['workshops']) && is_array($data['workshops'])) {
                 $stmt = $this->pdo->prepare("
-                INSERT INTO participant_workshops (participant_id, workshop_id, attending) 
-                VALUES (:participant_id, :workshop_id, TRUE)
-            ");
-
+                    INSERT INTO participant_workshops (participant_id, workshop_id, attending) 
+                    VALUES (:participant_id, :workshop_id, TRUE)
+                ");
+    
                 foreach ($data['workshops'] as $workshopId) {
                     $stmt->execute([
                         ':participant_id' => $participantId,
@@ -142,8 +159,8 @@ class ParticipantManager
                     ]);
                 }
             }
-
-            // **Insert payment details**
+    
+            // 7. Insert payment details
             $stmt = $this->pdo->prepare("
                 INSERT INTO payments (participant_id, payment_date, amount, payment_method_id, created_at, updated_at)
                 VALUES (:participant_id, NULL, :amount, :payment_method_id, NOW(), NOW())
@@ -153,8 +170,8 @@ class ParticipantManager
                 ':amount' => 0,
                 ':payment_method_id' => (int) ($data['payment_method_id'] ?? 0)
             ]);
-
-            // Insert arrival details
+    
+            // 8. Insert arrival details
             $stmt = $this->pdo->prepare("
                 INSERT INTO arrival (participant_id, arrival_date, arrival_hour, arrival_minute, 
                     departure_date, departure_hour, departure_minute, travelling, travelling_details, created_at, updated_at)
@@ -172,8 +189,8 @@ class ParticipantManager
                 ':travelling' => $data['travelling'],
                 ':travelling_details' => $data['travelling_details'] ?? null
             ]);
-
-            // Insert accommodation details
+    
+            // 9. Insert accommodation details
             $stmt = $this->pdo->prepare("
                 INSERT INTO accommodation (participant_id, registration_type_id, created_at, updated_at)
                 VALUES (:participant_id, :registration_type_id, NOW(), NOW())
@@ -182,83 +199,71 @@ class ParticipantManager
                 ':participant_id' => $participantId,
                 ':registration_type_id' => (int) $data['registration_type_id']
             ]);
-
-            // Insert extra options
+    
+            // 10. Insert extra options
             $stmt = $this->pdo->prepare("
                 INSERT INTO extra_options (participant_id, excursion, buy_tshirt, tshirt_size, created_at, updated_at)
                 VALUES (:participant_id, :excursion, :buy_tshirt, :tshirt_size, NOW(), NOW())
             ");
-
-            // Normalize boolean values (ensure only "1" or "0" is stored)
-            $excursionValue = !empty($data['excursion']) && ($data['excursion'] === 1 || $data['excursion'] === "1" || $data['excursion'] === "true") ? 1 : 0;
-            $buytshirtValue = !empty($data['buy_tshirt']) && ($data['buy_tshirt'] === 1 || $data['buy_tshirt'] === "1" || $data['buy_tshirt'] === "true") ? 1 : 0;
-
-            // Execute the prepared statement
             $stmt->execute([
                 ':participant_id' => $participantId,
-                ':excursion' => $excursionValue,
-                ':buy_tshirt' => $buytshirtValue,
-                ':tshirt_size' => !empty($data['tshirt_size']) ? $data['tshirt_size'] : null, // Avoid inserting empty strings
+                ':excursion' => $data['excursion'],
+                ':buy_tshirt' => $data['buy_tshirt'],
+                ':tshirt_size' => !empty($data['tshirt_size']) ? $data['tshirt_size'] : null,
             ]);
-
-            // Insert contributions (talks & posters)
+    
+            // 11. Insert contributions (talks & posters)
             $stmt = $this->pdo->prepare("
                 INSERT INTO contributions (participant_id, type, title, authors, abstract, session_id, duration, print, created_at, updated_at)
                 VALUES (:participant_id, :type, :title, :authors, :abstract, :session_id, :duration, :print, NOW(), NOW())
             ");
-
-            // Insert talks
+    
             if (!empty($data['talks']) && is_array($data['talks'])) {
                 foreach ($data['talks'] as $talk) {
-                    $sessionId = isset($talk['session_id']) ? (int) $talk['session_id'] : NULL;
-                    $duration = isset($talk['duration']) ? $talk['duration'] : NULL;
-
-                    $stmt->bindValue(':participant_id', $participantId, PDO::PARAM_INT);
-                    $stmt->bindValue(':type', 'talk', PDO::PARAM_STR);
-                    $stmt->bindValue(':title', $talk['title'], PDO::PARAM_STR);
-                    $stmt->bindValue(':authors', $talk['authors'], PDO::PARAM_STR);
-                    $stmt->bindValue(':abstract', $talk['abstract'], PDO::PARAM_STR);
-                    $stmt->bindValue(':session_id', $sessionId, $sessionId !== NULL ? PDO::PARAM_INT : PDO::PARAM_NULL);
-                    $stmt->bindValue(':duration', $duration, $duration !== NULL ? PDO::PARAM_STR : PDO::PARAM_NULL);
-                    $stmt->bindValue(':print', 0, PDO::PARAM_BOOL);
-                    $stmt->execute();
+                    $stmt->execute([
+                        ':participant_id' => $participantId,
+                        ':type' => 'talk',
+                        ':title' => $talk['title'],
+                        ':authors' => $talk['authors'],
+                        ':abstract' => $talk['abstract'],
+                        ':session_id' => $talk['session_id'] ?? null,
+                        ':duration' => $talk['duration'] ?? null,
+                        ':print' => 0
+                    ]);
                 }
             }
-
+    
             if (!empty($data['posters']) && is_array($data['posters'])) {
                 foreach ($data['posters'] as $poster) {
-                    $printValue = isset($poster['print']) ? filter_var($poster['print'], FILTER_VALIDATE_BOOLEAN) : FALSE;
-
-                    $sessionId = isset($poster['session_id']) ? (int) $poster['session_id'] : NULL;
-                    $duration = isset($poster['duration']) ? $poster['duration'] : NULL;
-
-                    $stmt->bindValue(':participant_id', $participantId, PDO::PARAM_INT);
-                    $stmt->bindValue(':type', 'poster', PDO::PARAM_STR);
-                    $stmt->bindValue(':title', $poster['title'], PDO::PARAM_STR);
-                    $stmt->bindValue(':authors', $poster['authors'], PDO::PARAM_STR);
-                    $stmt->bindValue(':abstract', $poster['abstract'], PDO::PARAM_STR);
-                    $stmt->bindValue(':session_id', $sessionId, $sessionId !== NULL ? PDO::PARAM_INT : PDO::PARAM_NULL);
-                    $stmt->bindValue(':duration', $duration, $duration !== NULL ? PDO::PARAM_STR : PDO::PARAM_NULL);
-                    $stmt->bindValue(':print', $printValue ? 1 : 0, PDO::PARAM_INT);
-                    $stmt->execute();
+                    $stmt->execute([
+                        ':participant_id' => $participantId,
+                        ':type' => 'poster',
+                        ':title' => $poster['title'],
+                        ':authors' => $poster['authors'],
+                        ':abstract' => $poster['abstract'],
+                        ':session_id' => $poster['session_id'] ?? null,
+                        ':duration' => $poster['duration'] ?? null,
+                        ':print' => !empty($poster['print']) ? 1 : 0
+                    ]);
                 }
             }
-
-
+    
             $this->pdo->commit();
             return $participantId;
+    
         } catch (Exception $e) {
             $this->pdo->rollBack();
             throw new Exception("Error saving participant: " . $e->getMessage());
         }
     }
+    
 
     public function saveOnlineParticipant($data, $passwordHash)
     {
         try {
             $this->pdo->beginTransaction();
-
-            // 1. Handle boolean fields: convert "true"/"false" (or any truthy/falsy string) to 1 or 0.
+    
+            // 1. Handle boolean fields (without can_be_public)
             $booleanFields = ['is_online', 'confirmation_sent'];
             foreach ($booleanFields as $field) {
                 if (!isset($data[$field])) {
@@ -268,28 +273,23 @@ class ParticipantManager
                     $data[$field] = ($flag === null ? 0 : ($flag ? 1 : 0));
                 }
             }
-
-            // Check if email exists
-            if ($this->emailExists($data['email'])) {
-                throw new Exception("The email address '{$data['email']}' is already registered. Please use a different email or log in.");
-            }
-
-            // Insert participant
-            $stmt = $this->pdo->prepare("
-                INSERT INTO participants (
-                    title, first_name, last_name, gender, dob, email, country, 
-                    organization, is_online, is_early_bird, confirmation_sent, confirmation_date, 
-                    password_hash, paypal_fee, total_due, total_paid, total_reimbursed, status, deleted_at, 
-                    comments, payment_method_id,  created_at, updated_at
-                ) VALUES (
-                    :title, :first_name, :last_name, :gender, :dob, :email, :country, 
-                    :organization, :is_online, :is_early_bird, FALSE, NULL, 
-                    :password_hash, :paypal_fee, :total_due, 0.00, 0.00, 'active', NULL, 
-                    :comments, :payment_method_id,  NOW(), NOW()
-                )
-            ");
-
-            $stmt->execute([
+    
+            // 2. Prepare dynamic columns and values
+            $columns = [
+                'title', 'first_name', 'last_name', 'gender', 'dob', 'email', 'country',
+                'organization', 'is_online', 'is_early_bird', 'confirmation_sent', 'confirmation_date',
+                'password_hash', 'paypal_fee', 'total_due', 'total_paid', 'total_reimbursed',
+                'status', 'deleted_at', 'comments', 'payment_method_id', 'created_at', 'updated_at'
+            ];
+    
+            $values = [
+                ':title', ':first_name', ':last_name', ':gender', ':dob', ':email', ':country',
+                ':organization', ':is_online', ':is_early_bird', ':confirmation_sent', 'NULL',
+                ':password_hash', ':paypal_fee', ':total_due', '0.00', '0.00',
+                "'active'", 'NULL', ':comments', ':payment_method_id', 'NOW()', 'NOW()'
+            ];
+    
+            $params = [
                 ':title' => $data['title'],
                 ':first_name' => $data['first_name'],
                 ':last_name' => $data['last_name'],
@@ -298,33 +298,55 @@ class ParticipantManager
                 ':email' => $data['email'],
                 ':country' => $data['country'],
                 ':organization' => $data['organization'] ?? null,
-                ':is_online' => filter_var($data['is_online'], FILTER_VALIDATE_BOOLEAN),
+                ':is_online' => $data['is_online'],
                 ':is_early_bird' => filter_var($data['is_early_bird'], FILTER_VALIDATE_BOOLEAN),
+                ':confirmation_sent' => $data['confirmation_sent'],
                 ':password_hash' => $passwordHash,
                 ':paypal_fee' => $data['paypal_fee'] ?? 0,
                 ':total_due' => $data['total_due'],
                 ':comments' => $data['comments'] ?? null,
-                ':payment_method_id' => (int) ($data['payment_method_id'] ?? 0),
-            ]);
-
+                ':payment_method_id' => (int)($data['payment_method_id'] ?? 0),
+            ];
+    
+            // 3. If can_be_public exists in $data, add it
+            if (array_key_exists('can_be_public', $data)) {
+                $columns[] = 'can_be_public';
+                $values[] = ':can_be_public';
+                $flag = filter_var($data['can_be_public'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+                $params[':can_be_public'] = ($flag === null ? 0 : ($flag ? 1 : 0));
+            }
+    
+            // 4. Check if email exists
+            if ($this->emailExists($data['email'])) {
+                throw new Exception("The email address '{$data['email']}' is already registered. Please use a different email or log in.");
+            }
+    
+            // 5. Insert participant
+            $stmt = $this->pdo->prepare("
+                INSERT INTO participants (" . implode(", ", $columns) . ")
+                VALUES (" . implode(", ", $values) . ")
+            ");
+    
+            $stmt->execute($params);
+    
             $participantId = $this->pdo->lastInsertId();
-
-            // Insert only workshops where price_online > 0
+    
+            // 6. Insert only workshops where price_online > 0
             if (!empty($data['workshops']) && is_array($data['workshops'])) {
                 $stmt = $this->pdo->prepare("
-                INSERT INTO participant_workshops (participant_id, workshop_id, attending) 
-                SELECT :participant_id, id, TRUE FROM workshops WHERE id = :workshop_id AND price_online > 0
-            ");
-
+                    INSERT INTO participant_workshops (participant_id, workshop_id, attending) 
+                    SELECT :participant_id, id, TRUE FROM workshops WHERE id = :workshop_id AND price_online > 0
+                ");
+    
                 foreach ($data['workshops'] as $workshopId) {
                     $stmt->execute([
                         ':participant_id' => $participantId,
-                        ':workshop_id' => (int) $workshopId
+                        ':workshop_id' => (int)$workshopId
                     ]);
                 }
             }
-
-            // **Insert payment details**
+    
+            // 7. Insert payment details
             $stmt = $this->pdo->prepare("
                 INSERT INTO payments (participant_id, payment_date, amount, payment_method_id, created_at, updated_at)
                 VALUES (:participant_id, NULL, :amount, :payment_method_id, NOW(), NOW())
@@ -332,35 +354,37 @@ class ParticipantManager
             $stmt->execute([
                 ':participant_id' => $participantId,
                 ':amount' => 0,
-                ':payment_method_id' => (int) ($data['payment_method_id'] ?? 0)
+                ':payment_method_id' => (int)($data['payment_method_id'] ?? 0)
             ]);
-
-            // Insert **only online contributions (talks)**
+    
+            // 8. Insert online contributions (talks)
             if (!empty($data['talks']) && is_array($data['talks'])) {
                 $stmt = $this->pdo->prepare("
-                INSERT INTO contributions (participant_id, type, title, authors, abstract, session_id, duration, print, created_at, updated_at)
-                VALUES (:participant_id, 'talk', :title, :authors, :abstract, :session_id, :duration, 0, NOW(), NOW())
-            ");
-
+                    INSERT INTO contributions (participant_id, type, title, authors, abstract, session_id, duration, print, created_at, updated_at)
+                    VALUES (:participant_id, 'talk', :title, :authors, :abstract, :session_id, :duration, 0, NOW(), NOW())
+                ");
+    
                 foreach ($data['talks'] as $talk) {
                     $stmt->execute([
                         ':participant_id' => $participantId,
                         ':title' => $talk['title'],
                         ':authors' => $talk['authors'],
                         ':abstract' => $talk['abstract'],
-                        ':session_id' => (int) $talk['session_id'],
+                        ':session_id' => (int)$talk['session_id'],
                         ':duration' => $talk['duration']
                     ]);
                 }
             }
-
+    
             $this->pdo->commit();
             return $participantId;
+    
         } catch (Exception $e) {
             $this->pdo->rollBack();
             throw new Exception("Error saving online participant: " . $e->getMessage());
         }
     }
+    
 
     public function updateParticipant($participantId, $data)
     {
@@ -838,7 +862,8 @@ class ParticipantManager
 
         // Apply filtering for confirmed participants
         if ($confirmedOnly) {
-            $query .= " AND p.confirmation_sent = 1 ORDER BY p.country, p.last_name, p.first_name";
+            $query .= " AND p.confirmation_sent = 1 AND p.can_be_public = 1"; 
+            $query .= " ORDER BY p.country, p.last_name, p.first_name";
         } else {
             $query .= " GROUP BY p.id ORDER BY 
                             CASE 
@@ -900,7 +925,8 @@ class ParticipantManager
 
         // Apply filtering for confirmed participants
         if ($confirmedOnly) {
-            $query .= " AND p.confirmation_sent = 1 ORDER BY p.country, p.last_name, p.first_name"; // ✅ FIX: Removed GROUP BY
+            $query .= " AND p.confirmation_sent = 1 AND p.can_be_public = 1";
+            $query .= " ORDER BY p.country, p.last_name, p.first_name";
         } else {
             $query .= " GROUP BY p.id ORDER BY 
                         CASE 

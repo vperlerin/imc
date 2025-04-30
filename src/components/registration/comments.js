@@ -42,6 +42,8 @@ const Comments = ({
 
       // Set service agreement default value
       setValue("service_agreement", initialData.service_agreement ?? false);
+      // Public default value
+      setValue("can_be_public", initialData.can_be_public ?? true);
 
       // Check if the participant is under 16
       const age = calculateAge(initialData.dob);
@@ -92,7 +94,7 @@ const Comments = ({
       <div className="mx-md-3 mb-3">
         <div className="mb-4">
           <label className="form-label fw-bold pb-0">Preferred Roommates, Comments, or Specific Instructions</label>
-          <p class="text-info fw-bolder mb-1">If you selected to stay with us in a double, triple, or quadruple room,
+          <p className="text-info fw-bolder mb-1">If you selected to stay with us in a double, triple, or quadruple room,
             please enter the names of your preferred roommates below.</p>
           <textarea
             className="form-control"
@@ -183,6 +185,20 @@ const Comments = ({
             {errors.service_agreement && <p className="text-danger">{errors.service_agreement.message}</p>}
           </>
         )}
+
+        <div className="form-check mt-4">
+          <input
+            className="form-check-input"
+            defaultChecked={true}
+            id="canBePublic"
+            {...register("can_be_public")}
+            type="checkbox"
+          />
+          <label className="form-check-label" htmlFor="canBePublic">
+            By ticking this box, I agree that my first and last name, affiliation, and country will be publicly displayed on the <a href="/community/participants" target="_blank">participants page</a>.
+          </label>
+        </div>
+        {errors.can_be_public && <p className="text-danger">{errors.can_be_public.message}</p>}
       </div>
     </div>
   );

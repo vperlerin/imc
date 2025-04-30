@@ -106,7 +106,7 @@ const Workshops = ({
             Read more about the <a href="/program/workshops/radio" target="_blank">Radio Workshop</a>
             {!isOnline && (
               <>
-                {" "}and the <a href="/program/workshops/specto" target="_blank">Spectroscopy Workshop</a>
+                {" "}and the <a href="/program/workshops/spectro" target="_blank">Spectroscopy Workshop</a>
               </>
             )}
             .

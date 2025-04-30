@@ -25,7 +25,7 @@ const AccomodationForm = ({
     trigger();
   };
 
-  const hiddenRegistrationTypes  = ['single'];
+  const hiddenRegistrationTypes  = ['single', 'double']; 
 
   return (
     <>
