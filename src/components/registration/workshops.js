@@ -73,30 +73,45 @@ const Workshops = ({
             <div className="mb-5 row" key={workshopId}>
               <label className={classNames("text-md-center", cssForm.balance)}>
                 <b>The {workshop.title}</b> will be held on <b>{formatFullDate(workshop.date)}</b> from <b>{workshop.period}</b>.
-                <br /> Would you like to attend {isOnline && "online"} for an extra price of {parseFloat(
-                  isOnline ? workshop.price_online : workshop.price
-                ).toFixed(2)}€?
+                {workshop.title === 'Radio Workshop' && isAdmin && (
+                  <>
+                    <br /> Would you like to attend {isOnline && "online"} for an extra price of {parseFloat(
+                      isOnline ? workshop.price_online : workshop.price
+                    ).toFixed(2)}€?
+                  </>
+                )}
               </label>
 
-              <div className="text-center d-block mt-3">
-                {/* Checkbox for selecting multiple workshops */}
-                <input
-                  type="checkbox"
-                  className="btn-check"
-                  id={`workshop-${workshopId}`}
-                  checked={isSelected}
-                  onChange={() => toggleWorkshop(workshopId)}
-                />
-                <label className="btn btn-outline-primary fw-bolder" htmlFor={`workshop-${workshopId}`}>
-                  {isSelected ? "YES!" : "No :("}
-                </label>
-              </div>
+              {workshop.title === 'Radio Workshop' && !isAdmin ? (
+                <div className="text-danger">
+                  The {workshop.title} registration is now closed as we have reached the maximum number of participants.
+                </div>
 
-              {errors.workshops?.some((id) => id === workshopId) && (
-                <p className="text-danger fw-bold text-center">
-                  <small>{errors.workshops.message}</small>
-                </p>
+              ) : (
+                <>
+                  <div className="text-center d-block mt-3">
+                    {/* Checkbox for selecting multiple workshops */}
+                    <input
+                      type="checkbox"
+                      className="btn-check"
+                      id={`workshop-${workshopId}`}
+                      checked={isSelected}
+                      onChange={() => toggleWorkshop(workshopId)}
+                    />
+                    <label className="btn btn-outline-primary fw-bolder" htmlFor={`workshop-${workshopId}`}>
+                      {isSelected ? "YES!" : "No :("}
+                    </label>
+                  </div>
+
+                  {errors.workshops?.some((id) => id === workshopId) && (
+                    <p className="text-danger fw-bold text-center">
+                      <small>{errors.workshops.message}</small>
+                    </p>
+                  )}
+                </>
               )}
+
+
             </div>
           );
         })}
