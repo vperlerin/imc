@@ -73,7 +73,7 @@ const Workshops = ({
             <div className="mb-5 row" key={workshopId}>
               <label className={classNames("text-md-center", cssForm.balance)}>
                 <b>The {workshop.title}</b> will be held on <b>{formatFullDate(workshop.date)}</b> from <b>{workshop.period}</b>.
-                {workshop.title === 'Radio Workshop' && isAdmin && (
+                {workshop.title === 'Spectroscopy Workshop' && isAdmin && (
                   <>
                     <br /> Would you like to attend {isOnline && "online"} for an extra price of {parseFloat(
                       isOnline ? workshop.price_online : workshop.price
@@ -82,7 +82,7 @@ const Workshops = ({
                 )}
               </label>
 
-              {workshop.title === 'Radio Workshop' && !isAdmin ? (
+              {workshop.title === 'Spectroscopy Workshop' && !isAdmin ? (
                 <div className="text-danger">
                   The {workshop.title} registration is now closed as we have reached the maximum number of participants.
                 </div>
