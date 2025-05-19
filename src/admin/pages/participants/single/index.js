@@ -222,6 +222,8 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
   const hasAdminNotes = !!participant?.participant?.admin_notes;
  
 
+  console.log("participant?.participant.is_early_bird? ", participant?.participant.is_early_bird);
+
   return (
     <PageContain
       breadcrumb={breadcrumb}
@@ -341,7 +343,7 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
               <Accommodation
                 isAdmin
                 isOnline={isOnline}
-                isEarlyBird={participant?.participant.is_early_bird}
+                isEarlyBird={participant?.participant.is_early_bird === 1 || participant?.participant.is_early_bird === '1'}
                 conferenceData={cd}
                 control={control}
                 register={register}
@@ -417,7 +419,7 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
                 <Summary
                   isAdmin
                   isOnline={isOnline}
-                  isEarlyBird={participant?.participant.is_early_bird}
+                  isEarlyBird={participant?.participant.is_early_bird === 1 || participant?.participant.is_early_bird === '1'}
                   conferenceData={cd}
                   getValues={getValues}
                   setValue={setValue}

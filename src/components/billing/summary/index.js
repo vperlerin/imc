@@ -55,7 +55,7 @@ const Summary = ({
 
   // Registration & Accommodation Cost
   const { description: registration_description, price: registration_price } = getRegInfo(registration_type, registrationTypes);
-  const lateFee = !isEarlyBird ? conferenceData.costs.after_early_birds : 0;
+  const lateFee = (!isEarlyBird || isEarlyBird === '0') ? conferenceData.costs.after_early_birds : 0;
   const totalRoomCost = registration_price + lateFee;
 
   // Workshops Costs

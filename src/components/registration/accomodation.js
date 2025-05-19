@@ -18,7 +18,6 @@ const AccomodationForm = ({
   paymentMethods,
   registrationTypes,
 }) => {
-
   const fillTestData = () => {
     setValue("registration_type_id", registrationTypes.length > 1 ? registrationTypes[1].id : "");
     setValue("payment_method_id", paymentMethods.length > 0 ? paymentMethods[paymentMethods.length - 1].id : "");
