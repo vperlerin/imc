@@ -136,7 +136,7 @@ const AdminTable = ({ participants, withActions = true, customActions = null, on
                       </div>
                     </td>
                   )}
-                  {customActions && (
+                  {customActions && participant.status !== 'cancelled' && (
                     <>{customActions}</>
                   )}
                 </tr>

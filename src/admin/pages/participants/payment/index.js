@@ -330,7 +330,7 @@ const Payments = ({ isCurOnline = false }) => {
 
           <div className="d-flex flex-column flex-md-row gap-3 align-items-strecht">
             <div className="border p-3 rounded-2 flex-grow-1">
-              <h4 className="mb-3">{editingPayment ? "Edit Payment" : "Add a New Payment"}</h4>
+              <h4 className="mb-3">{editingPayment ? "Edit" : "Add a New Payment/Reimbursement"}</h4>
               <form onSubmit={handleSubmit(submitForm)}>
                 <div className="mb-3 row">
                   <label className="col-sm-3 col-form-label fw-bold">Amount (€)</label>
@@ -343,7 +343,7 @@ const Payments = ({ isCurOnline = false }) => {
                   <label className="col-sm-3 col-form-label fw-bold">Payment Method</label>
                   <div className="col-sm-6">
                     <select className="form-select" {...register("paymentMethodId", { required: true })}>
-                      <option value="">Select a payment method</option>
+                      <option value="">Select a payment/Reimbursement method</option>
                       {paymentMethods.map((method) => (
                         <option key={method.id} value={method.id}>{method.method}</option>
                       ))}

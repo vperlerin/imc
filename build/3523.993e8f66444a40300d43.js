@@ -33,8 +33,13 @@ return(0/* default */,C.jsx)(l.A,{title:"Participants",children:(0,C.jsxs)("div"
 /* harmony export */E:()=>/* binding */i
 /* harmony export */});
 /* harmony import */var o=n(3318),c=n(6540),d=n(1083);
-/* harmony import */const i=(e=!1)=>{const[a,n]=(0,c.useState)([]),[i,t]=(0,c.useState)(!0),[m,s]=(0,c.useState)(null);// Runs only once when the component mounts
-return(0,c.useEffect)((()=>{(async()=>{try{const a=e?"?confirmed_only=1":"",c=await(0,o/* .retry */.L)((()=>d/* ["default"] */.A.get(`https://imc2025.imo.net/php/admin/api/onsite_participants.php${a}`)));if(!c.data.success||!Array.isArray(c.data.data))throw new Error(c.data.message||"Database access error, please try again.");n(c.data.data)}catch(e){s(e.message||"Failed to fetch participants. Please refresh the page.")}finally{t(!1)}})()}),[]),{participants:a,loading:i,error:m,setParticipants:n}};
+/* harmony import */
+/**
+ * Fetch on-site participants.
+ * @param {boolean} confirmedOnly - If true, only confirmed participants are returned.
+ * @param {boolean} includeCancelled - If true, includes cancelled participants.
+ */
+const i=(e=!1,a=!1)=>{const[n,i]=(0,c.useState)([]),[t,m]=(0,c.useState)(!0),[s,r]=(0,c.useState)(null);return(0,c.useEffect)((()=>{(async()=>{try{const n=new URLSearchParams;e&&n.append("confirmed_only","1"),a&&n.append("include_cancelled","1");const c=await(0,o/* .retry */.L)((()=>d/* ["default"] */.A.get(`https://imc2025.imo.net/php/admin/api/onsite_participants.php?${n.toString()}`)));if(!c.data.success||!Array.isArray(c.data.data))throw new Error(c.data.message||"Database access error, please try again.");i(c.data.data)}catch(e){r(e.message||"Failed to fetch participants. Please refresh the page.")}finally{m(!1)}})()}),[e,a]),{participants:n,loading:t,error:s,setParticipants:i}};
 /***/},
 /***/4265:
 /***/(e,a,n)=>{
@@ -42,8 +47,14 @@ return(0,c.useEffect)((()=>{(async()=>{try{const a=e?"?confirmed_only=1":"",c=aw
 /* harmony export */$:()=>/* binding */i
 /* harmony export */});
 /* harmony import */var o=n(3318),c=n(6540),d=n(1083);
-/* harmony import */const i=(e=!1)=>{const[a,n]=(0,c.useState)([]),[i,t]=(0,c.useState)(!0),[m,s]=(0,c.useState)(null);// Re-run if confirmedOnly changes
-return(0,c.useEffect)((()=>{(async()=>{try{const a=e?"?confirmed_only=1":"",c=await(0,o/* .retry */.L)((()=>d/* ["default"] */.A.get(`https://imc2025.imo.net/php/admin/api/online_participants.php${a}`)));if(!c.data.success||!Array.isArray(c.data.data))throw new Error(c.data.message||"Database access error, please try again.");n(c.data.data)}catch(e){s(e.message||"Failed to fetch participants. Please refresh the page.")}finally{t(!1)}})()}),[e]),{participants:a,loading:i,error:m,setParticipants:n}};
+/* harmony import */
+/**
+ * Fetch online participants.
+ * @param {boolean} confirmedOnly - If true, only confirmed participants are returned.
+ * @param {boolean} includeCancelled - If true, includes cancelled participants.
+ */
+const i=(e=!1,a=!1)=>{const[n,i]=(0,c.useState)([]),[t,m]=(0,c.useState)(!0),[s,r]=(0,c.useState)(null);// Re-fetch on changes
+return(0,c.useEffect)((()=>{(async()=>{try{const n=new URLSearchParams;e&&n.append("confirmed_only","1"),a&&n.append("include_cancelled","1");const c=await(0,o/* .retry */.L)((()=>d/* ["default"] */.A.get(`https://imc2025.imo.net/php/admin/api/online_participants.php?${n.toString()}`)));if(!c.data.success||!Array.isArray(c.data.data))throw new Error(c.data.message||"Database access error, please try again.");i(c.data.data)}catch(e){r(e.message||"Failed to fetch participants. Please refresh the page.")}finally{m(!1)}})()}),[e,a]),{participants:n,loading:t,error:s,setParticipants:i}};
 /***/},
 /***/5625:
 /***/(e,a,n)=>{
