@@ -982,18 +982,18 @@ class ParticipantManager
 
 
 
-/**
- * Retrieve all online participants with payment method.
- * If `$confirmedOnly` is true, only return confirmed participants.
- * If `$includeCancelled` is true, include both 'active' and 'cancelled' participants.
- */
-public function getOnlineParticipants($confirmedOnly = false, $includeCancelled = false)
-{
-    // Select fields based on $confirmedOnly
-    if ($confirmedOnly) {
-        $selectFields = "p.id, p.title, p.first_name, p.last_name, p.organization, p.country";
-    } else {
-        $selectFields = "
+    /**
+     * Retrieve all online participants with payment method.
+     * If `$confirmedOnly` is true, only return confirmed participants.
+     * If `$includeCancelled` is true, include both 'active' and 'cancelled' participants.
+     */
+    public function getOnlineParticipants($confirmedOnly = false, $includeCancelled = false)
+    {
+        // Select fields based on $confirmedOnly
+        if ($confirmedOnly) {
+            $selectFields = "p.id, p.title, p.first_name, p.last_name, p.organization, p.country";
+        } else {
+            $selectFields = "
             p.id,
             p.created_at,
             p.title, 
@@ -1008,15 +1008,15 @@ public function getOnlineParticipants($confirmedOnly = false, $includeCancelled 
             p.status,
             COALESCE(pm.method, 'Unknown') AS payment_method_name
         ";
-    }
+        }
 
-    // Status condition
-    $statusCondition = $includeCancelled
-        ? "p.status IN ('active', 'cancelled')"
-        : "p.status = 'active'";
+        // Status condition
+        $statusCondition = $includeCancelled
+            ? "p.status IN ('active', 'cancelled')"
+            : "p.status = 'active'";
 
-    // Base Query with JOIN to get latest payment method
-    $query = "
+        // Base Query with JOIN to get latest payment method
+        $query = "
         SELECT $selectFields
         FROM participants p
         LEFT JOIN (
@@ -1031,24 +1031,24 @@ public function getOnlineParticipants($confirmedOnly = false, $includeCancelled 
         WHERE p.is_online = 1 AND $statusCondition
     ";
 
-    // Apply filtering for confirmed participants
-    if ($confirmedOnly) {
-        $query .= " AND p.confirmation_sent = 1 AND p.can_be_public = 1";
-        $query .= " ORDER BY p.country, p.last_name, p.first_name";
-    } else {
-        $query .= " GROUP BY p.id ORDER BY 
+        // Apply filtering for confirmed participants
+        if ($confirmedOnly) {
+            $query .= " AND p.confirmation_sent = 1 AND p.can_be_public = 1";
+            $query .= " ORDER BY p.country, p.last_name, p.first_name";
+        } else {
+            $query .= " GROUP BY p.id ORDER BY 
                         CASE 
                             WHEN p.confirmation_sent = 1 AND p.confirmation_date IS NOT NULL THEN 1 
                             ELSE 0 
                         END ASC, 
                         p.created_at DESC";
+        }
+
+        $stmt = $this->pdo->prepare($query);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-
-    $stmt = $this->pdo->prepare($query);
-    $stmt->execute();
-
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
 
 
 
