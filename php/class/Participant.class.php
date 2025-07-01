@@ -959,7 +959,7 @@ class ParticipantManager
      */
     public function softDeleteParticipant($participantId)
     {
-        $stmt = $this->pdo->prepare("UPDATE participants SET status = 'deleted', deleted_at = NOW() WHERE id = ?");
+        $stmt = $this->pdo->prepare("UPDATE participants SET status = 'cancelled', deleted_at = NOW() WHERE id = ?");
         $stmt->execute([$participantId]);
 
         return $stmt->rowCount() > 0;
