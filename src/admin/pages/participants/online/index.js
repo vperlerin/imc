@@ -18,7 +18,7 @@ const AdminParticipantsOnline = () => {
   const [success, setSuccess] = useState('');
   const [errorDeletion, setErrorDeletion] = useState('');
 
-  const { participants, loading, error, setParticipants } = useApiOnlineParticipants();
+  const { participants, loading, error, setParticipants } = useApiOnsiteParticipants(false, true);
   const { deleteParticipant, errorDelete, isDeleting } = useApiDeleteParticipant(setParticipants, setFilteredParticipants);
 
   useEffect(() => {
@@ -51,15 +51,27 @@ const AdminParticipantsOnline = () => {
 
     try {
       const response = await deleteParticipant(selectedParticipant, deleteType);
+
       if (response?.data?.success) {
         setSuccess(response.data.message || "Participant deleted successfully!");
+        setErrorDeletion('');
       } else {
         setErrorDeletion(response?.data?.message || "Impossible to delete the participant for now, please try again later.");
       }
     } catch (error) {
       setErrorDeletion("An unexpected error occurred while deleting the participant.");
+    } finally {
+      // Close the correct modal depending on type
+      if (deleteType === 'soft') {
+        setShowDeleteModal(false);
+      } else {
+        setShowHardDeleteConfirm(false);
+      }
+
+      setSelectedParticipant(null);
     }
   };
+
 
   const breadcrumb = [
     { url: "/admin/participants/online", name: "Online Participants" },
@@ -97,16 +109,16 @@ const AdminParticipantsOnline = () => {
         <>
           {errorDelete && <p className="alert alert-danger">{errorDelete}</p>}
           <div className="d-flex flex-column flex-md-row gap-2 mb-3">
-             
-              <select
-                className="form-select w-auto"
-                value={searchType}
-                onChange={(e) => setSearchType(e.target.value)}
-              >
-                <option value="last_name">Search by Last Name</option>
-                <option value="email">Search by Email</option>
-              </select>
-            
+
+            <select
+              className="form-select w-auto"
+              value={searchType}
+              onChange={(e) => setSearchType(e.target.value)}
+            >
+              <option value="last_name">Search by Last Name</option>
+              <option value="email">Search by Email</option>
+            </select>
+
             <div className="position-relative w-auto">
               <input
                 type="text"
@@ -138,24 +150,18 @@ const AdminParticipantsOnline = () => {
                 <button type="button" className="btn-close" onClick={() => setShowDeleteModal(false)}></button>
               </div>
               <div className="modal-body">
-                {false && (
-                  <>
-                    <p>Are you sure you want to cancel <b>{selectedParticipant.first_name} {selectedParticipant.last_name}</b>'s registration?</p>
-                    <p><strong>Choose:</strong></p>
-                    <ul>
-                      <li><strong className="text-warning">Soft Delete:</strong> Keeps record but marks as 'cancelled' - so we can keep track of the reimbursement.</li>
-                      <li><strong className="text-danger">Hard Delete:</strong> Permanently removes data.</li>
-                    </ul>*
-                  </>
-                )}
-                Are you sure you want to permanently delete all data related to this participant?
+
+
+                <p>Are you sure you want to cancel <b>{selectedParticipant.first_name} {selectedParticipant.last_name}</b>'s registration?</p>
+                <p><strong>Choose:</strong></p>
+                <ul>
+                  <li><strong className="text-warning">Soft Delete:</strong> Keeps record but marks as 'cancelled' - so we can keep track of the reimbursement.</li>
+                  <li><strong className="text-danger">Hard Delete:</strong> Permanently removes data.</li>
+                </ul>
               </div>
               <div className="modal-footer">
                 <button className="btn btn-outline-secondary fw-bolder" onClick={() => setShowDeleteModal(false)}>Cancel</button>
-                {false && (
-                  <button className="btn btn-outline-warning fw-bolder" onClick={() => onDeleteParticipant("soft")}>Soft Delete</button>
-                )}
-
+                <button className="btn btn-outline-warning fw-bolder" onClick={() => onDeleteParticipant("soft")}>Soft Delete</button>
                 <button className="btn btn-outline-danger fw-bolder ms-auto" onClick={() => { setShowDeleteModal(false); setShowHardDeleteConfirm(true); }}>Hard Delete</button>
               </div>
             </div>

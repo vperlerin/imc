@@ -2,7 +2,12 @@ import { retry } from "utils/retry.js";
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-export const useApiOnsiteParticipants = (confirmedOnly = false) => {
+/**
+ * Fetch on-site participants.
+ * @param {boolean} confirmedOnly - If true, only confirmed participants are returned.
+ * @param {boolean} includeCancelled - If true, includes cancelled participants.
+ */
+export const useApiOnsiteParticipants = (confirmedOnly = false, includeCancelled = false) => {
   const [participants, setParticipants] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -10,11 +15,12 @@ export const useApiOnsiteParticipants = (confirmedOnly = false) => {
   useEffect(() => {
     const fetchParticipants = async () => {
       try {
-        const queryParam = confirmedOnly ? "?confirmed_only=1" : "";
+        const params = new URLSearchParams();
+        if (confirmedOnly) params.append("confirmed_only", "1");
+        if (includeCancelled) params.append("include_cancelled", "1");
+
         const response = await retry(() =>
-          axios.get(
-            `${process.env.REACT_APP_API_URL}/admin/api/onsite_participants.php${queryParam}`,
-          ),
+          axios.get(`${process.env.REACT_APP_API_URL}/admin/api/onsite_participants.php?${params.toString()}`),
         );
 
         if (response.data.success && Array.isArray(response.data.data)) {
@@ -35,7 +41,7 @@ export const useApiOnsiteParticipants = (confirmedOnly = false) => {
     };
 
     fetchParticipants();
-  }, []); // Runs only once when the component mounts
+  }, [confirmedOnly, includeCancelled]);  
 
   return { participants, loading, error, setParticipants };
 };

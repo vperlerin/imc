@@ -18,7 +18,7 @@ require_once __DIR__ . "/../../class/Participant.class.php";
 try {
     $pdo = Connect::getPDO();
 } catch (Exception $e) {
-    die($e->getMessage()); 
+    die($e->getMessage());
 }
 
 try {
@@ -26,9 +26,11 @@ try {
 
     // Check if "confirmed_only" is set in the GET request
     $confirmedOnly = isset($_GET['confirmed_only']) && $_GET['confirmed_only'] == '1';
+    $includeCancelled = isset($_GET['include_cancelled']) && $_GET['include_cancelled'] == '1';
+
 
     // Fetch participants with optional filter
-    $participants = $participantManager->getOnlineParticipants($confirmedOnly);
+    $participants = $participantManager->getOnlineParticipants($confirmedOnly, $includeCancelled);
 
     echo json_encode([
         "success" => true,
@@ -40,4 +42,3 @@ try {
         "message" => $e->getMessage()
     ]);
 }
-?>

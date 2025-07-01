@@ -24,18 +24,32 @@ export const useApiDeleteParticipant = (
       );
 
       if (response.data.success) {
-        setParticipants((prev) =>
-          prev.filter((p) => p.id !== selectedParticipant.id),
-        );
-        setFilteredParticipants((prev) =>
-          prev.filter((p) => p.id !== selectedParticipant.id),
-        );
-      } else {
-        setErrorDelete(
-          response.data.message || "Failed to delete participant.",
-        );
+        if (deleteType === 'hard') {
+          setParticipants((prev) =>
+            prev.filter((p) => p.id !== selectedParticipant.id),
+          );
+          setFilteredParticipants((prev) =>
+            prev.filter((p) => p.id !== selectedParticipant.id),
+          );
+        } else {
+          // Soft delete: update participant's status to 'cancelled'
+          setParticipants((prev) =>
+            prev.map((p) =>
+              p.id === selectedParticipant.id
+                ? { ...p, status: 'cancelled' }
+                : p
+            )
+          );
+          setFilteredParticipants((prev) =>
+            prev.map((p) =>
+              p.id === selectedParticipant.id
+                ? { ...p, status: 'cancelled' }
+                : p
+            )
+          );
+        }
       }
-
+ 
       return response;
     } catch (err) {
       const errorMessage =

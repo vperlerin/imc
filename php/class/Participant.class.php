@@ -78,29 +78,83 @@ class ParticipantManager
                     $data[$field] = ($flag === null ? 0 : ($flag ? 1 : 0));
                 }
             }
-    
+
             $this->pdo->beginTransaction();
-    
+
             // 2. Check if email exists
             if ($this->emailExists($data['email'])) {
                 throw new Exception("The email address '{$data['email']}' is already registered. Please use a different email or log in.");
             }
-    
+
             // 3. Prepare dynamic columns and values
             $columns = [
-                'title', 'first_name', 'last_name', 'gender', 'dob', 'email', 'phone', 'address', 'postal_code', 'city', 'country',
-                'organization', 'admin_notes', 'is_online', 'is_early_bird', 'confirmation_sent', 'confirmation_date',
-                'password_hash', 'paypal_fee', 'total_due', 'total_paid', 'total_reimbursed', 'status', 'deleted_at',
-                'comments', 'guardian_name', 'guardian_contact', 'guardian_email', 'payment_method_id', 'created_at', 'updated_at'
+                'title',
+                'first_name',
+                'last_name',
+                'gender',
+                'dob',
+                'email',
+                'phone',
+                'address',
+                'postal_code',
+                'city',
+                'country',
+                'organization',
+                'admin_notes',
+                'is_online',
+                'is_early_bird',
+                'confirmation_sent',
+                'confirmation_date',
+                'password_hash',
+                'paypal_fee',
+                'total_due',
+                'total_paid',
+                'total_reimbursed',
+                'status',
+                'deleted_at',
+                'comments',
+                'guardian_name',
+                'guardian_contact',
+                'guardian_email',
+                'payment_method_id',
+                'created_at',
+                'updated_at'
             ];
-    
+
             $values = [
-                ':title', ':first_name', ':last_name', ':gender', ':dob', ':email', ':phone', ':address', ':postal_code', ':city', ':country',
-                ':organization', 'NULL', ':is_online', ':is_early_bird', ':confirmation_sent', 'NULL',
-                ':password_hash', ':paypal_fee', ':total_due', '0.00', '0.00', "'active'", 'NULL',
-                ':comments', ':guardian_name', ':guardian_contact', ':guardian_email', ':payment_method_id', 'NOW()', 'NOW()'
+                ':title',
+                ':first_name',
+                ':last_name',
+                ':gender',
+                ':dob',
+                ':email',
+                ':phone',
+                ':address',
+                ':postal_code',
+                ':city',
+                ':country',
+                ':organization',
+                'NULL',
+                ':is_online',
+                ':is_early_bird',
+                ':confirmation_sent',
+                'NULL',
+                ':password_hash',
+                ':paypal_fee',
+                ':total_due',
+                '0.00',
+                '0.00',
+                "'active'",
+                'NULL',
+                ':comments',
+                ':guardian_name',
+                ':guardian_contact',
+                ':guardian_email',
+                ':payment_method_id',
+                'NOW()',
+                'NOW()'
             ];
-    
+
             $params = [
                 ':title' => $data['title'],
                 ':first_name' => $data['first_name'],
@@ -126,7 +180,7 @@ class ParticipantManager
                 ':guardian_email' => $data['guardian_email'] ?? null,
                 ':payment_method_id' => (int) ($data['payment_method_id'] ?? 0),
             ];
-    
+
             // 4. If can_be_public exists, add it dynamically
             if (array_key_exists('can_be_public', $data)) {
                 $columns[] = 'can_be_public';
@@ -134,24 +188,24 @@ class ParticipantManager
                 $flag = filter_var($data['can_be_public'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
                 $params[':can_be_public'] = ($flag === null ? 0 : ($flag ? 1 : 0));
             }
-    
+
             // 5. Insert participant
             $stmt = $this->pdo->prepare("
                 INSERT INTO participants (" . implode(", ", $columns) . ")
                 VALUES (" . implode(", ", $values) . ")
             ");
-    
+
             $stmt->execute($params);
-    
+
             $participantId = $this->pdo->lastInsertId();
-    
+
             // 6. Insert workshops participation
             if (!empty($data['workshops']) && is_array($data['workshops'])) {
                 $stmt = $this->pdo->prepare("
                     INSERT INTO participant_workshops (participant_id, workshop_id, attending) 
                     VALUES (:participant_id, :workshop_id, TRUE)
                 ");
-    
+
                 foreach ($data['workshops'] as $workshopId) {
                     $stmt->execute([
                         ':participant_id' => $participantId,
@@ -159,7 +213,7 @@ class ParticipantManager
                     ]);
                 }
             }
-    
+
             // 7. Insert payment details
             $stmt = $this->pdo->prepare("
                 INSERT INTO payments (participant_id, payment_date, amount, payment_method_id, created_at, updated_at)
@@ -170,7 +224,7 @@ class ParticipantManager
                 ':amount' => 0,
                 ':payment_method_id' => (int) ($data['payment_method_id'] ?? 0)
             ]);
-    
+
             // 8. Insert arrival details
             $stmt = $this->pdo->prepare("
                 INSERT INTO arrival (participant_id, arrival_date, arrival_hour, arrival_minute, 
@@ -189,7 +243,7 @@ class ParticipantManager
                 ':travelling' => $data['travelling'],
                 ':travelling_details' => $data['travelling_details'] ?? null
             ]);
-    
+
             // 9. Insert accommodation details
             $stmt = $this->pdo->prepare("
                 INSERT INTO accommodation (participant_id, registration_type_id, created_at, updated_at)
@@ -199,7 +253,7 @@ class ParticipantManager
                 ':participant_id' => $participantId,
                 ':registration_type_id' => (int) $data['registration_type_id']
             ]);
-    
+
             // 10. Insert extra options
             $stmt = $this->pdo->prepare("
                 INSERT INTO extra_options (participant_id, excursion, buy_tshirt, tshirt_size, created_at, updated_at)
@@ -211,13 +265,13 @@ class ParticipantManager
                 ':buy_tshirt' => $data['buy_tshirt'],
                 ':tshirt_size' => !empty($data['tshirt_size']) ? $data['tshirt_size'] : null,
             ]);
-    
+
             // 11. Insert contributions (talks & posters)
             $stmt = $this->pdo->prepare("
                 INSERT INTO contributions (participant_id, type, title, authors, abstract, session_id, duration, print, created_at, updated_at)
                 VALUES (:participant_id, :type, :title, :authors, :abstract, :session_id, :duration, :print, NOW(), NOW())
             ");
-    
+
             if (!empty($data['talks']) && is_array($data['talks'])) {
                 foreach ($data['talks'] as $talk) {
                     $stmt->execute([
@@ -232,7 +286,7 @@ class ParticipantManager
                     ]);
                 }
             }
-    
+
             if (!empty($data['posters']) && is_array($data['posters'])) {
                 foreach ($data['posters'] as $poster) {
                     $stmt->execute([
@@ -247,22 +301,21 @@ class ParticipantManager
                     ]);
                 }
             }
-    
+
             $this->pdo->commit();
             return $participantId;
-    
         } catch (Exception $e) {
             $this->pdo->rollBack();
             throw new Exception("Error saving participant: " . $e->getMessage());
         }
     }
-    
+
 
     public function saveOnlineParticipant($data, $passwordHash)
     {
         try {
             $this->pdo->beginTransaction();
-    
+
             // 1. Handle boolean fields (without can_be_public)
             $booleanFields = ['is_online', 'confirmation_sent'];
             foreach ($booleanFields as $field) {
@@ -273,22 +326,60 @@ class ParticipantManager
                     $data[$field] = ($flag === null ? 0 : ($flag ? 1 : 0));
                 }
             }
-    
+
             // 2. Prepare dynamic columns and values
             $columns = [
-                'title', 'first_name', 'last_name', 'gender', 'dob', 'email', 'country',
-                'organization', 'is_online', 'is_early_bird', 'confirmation_sent', 'confirmation_date',
-                'password_hash', 'paypal_fee', 'total_due', 'total_paid', 'total_reimbursed',
-                'status', 'deleted_at', 'comments', 'payment_method_id', 'created_at', 'updated_at'
+                'title',
+                'first_name',
+                'last_name',
+                'gender',
+                'dob',
+                'email',
+                'country',
+                'organization',
+                'is_online',
+                'is_early_bird',
+                'confirmation_sent',
+                'confirmation_date',
+                'password_hash',
+                'paypal_fee',
+                'total_due',
+                'total_paid',
+                'total_reimbursed',
+                'status',
+                'deleted_at',
+                'comments',
+                'payment_method_id',
+                'created_at',
+                'updated_at'
             ];
-    
+
             $values = [
-                ':title', ':first_name', ':last_name', ':gender', ':dob', ':email', ':country',
-                ':organization', ':is_online', ':is_early_bird', ':confirmation_sent', 'NULL',
-                ':password_hash', ':paypal_fee', ':total_due', '0.00', '0.00',
-                "'active'", 'NULL', ':comments', ':payment_method_id', 'NOW()', 'NOW()'
+                ':title',
+                ':first_name',
+                ':last_name',
+                ':gender',
+                ':dob',
+                ':email',
+                ':country',
+                ':organization',
+                ':is_online',
+                ':is_early_bird',
+                ':confirmation_sent',
+                'NULL',
+                ':password_hash',
+                ':paypal_fee',
+                ':total_due',
+                '0.00',
+                '0.00',
+                "'active'",
+                'NULL',
+                ':comments',
+                ':payment_method_id',
+                'NOW()',
+                'NOW()'
             ];
-    
+
             $params = [
                 ':title' => $data['title'],
                 ':first_name' => $data['first_name'],
@@ -307,7 +398,7 @@ class ParticipantManager
                 ':comments' => $data['comments'] ?? null,
                 ':payment_method_id' => (int)($data['payment_method_id'] ?? 0),
             ];
-    
+
             // 3. If can_be_public exists in $data, add it
             if (array_key_exists('can_be_public', $data)) {
                 $columns[] = 'can_be_public';
@@ -315,29 +406,29 @@ class ParticipantManager
                 $flag = filter_var($data['can_be_public'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
                 $params[':can_be_public'] = ($flag === null ? 0 : ($flag ? 1 : 0));
             }
-    
+
             // 4. Check if email exists
             if ($this->emailExists($data['email'])) {
                 throw new Exception("The email address '{$data['email']}' is already registered. Please use a different email or log in.");
             }
-    
+
             // 5. Insert participant
             $stmt = $this->pdo->prepare("
                 INSERT INTO participants (" . implode(", ", $columns) . ")
                 VALUES (" . implode(", ", $values) . ")
             ");
-    
+
             $stmt->execute($params);
-    
+
             $participantId = $this->pdo->lastInsertId();
-    
+
             // 6. Insert only workshops where price_online > 0
             if (!empty($data['workshops']) && is_array($data['workshops'])) {
                 $stmt = $this->pdo->prepare("
                     INSERT INTO participant_workshops (participant_id, workshop_id, attending) 
                     SELECT :participant_id, id, TRUE FROM workshops WHERE id = :workshop_id AND price_online > 0
                 ");
-    
+
                 foreach ($data['workshops'] as $workshopId) {
                     $stmt->execute([
                         ':participant_id' => $participantId,
@@ -345,7 +436,7 @@ class ParticipantManager
                     ]);
                 }
             }
-    
+
             // 7. Insert payment details
             $stmt = $this->pdo->prepare("
                 INSERT INTO payments (participant_id, payment_date, amount, payment_method_id, created_at, updated_at)
@@ -356,14 +447,14 @@ class ParticipantManager
                 ':amount' => 0,
                 ':payment_method_id' => (int)($data['payment_method_id'] ?? 0)
             ]);
-    
+
             // 8. Insert online contributions (talks)
             if (!empty($data['talks']) && is_array($data['talks'])) {
                 $stmt = $this->pdo->prepare("
                     INSERT INTO contributions (participant_id, type, title, authors, abstract, session_id, duration, print, created_at, updated_at)
                     VALUES (:participant_id, 'talk', :title, :authors, :abstract, :session_id, :duration, 0, NOW(), NOW())
                 ");
-    
+
                 foreach ($data['talks'] as $talk) {
                     $stmt->execute([
                         ':participant_id' => $participantId,
@@ -375,16 +466,15 @@ class ParticipantManager
                     ]);
                 }
             }
-    
+
             $this->pdo->commit();
             return $participantId;
-    
         } catch (Exception $e) {
             $this->pdo->rollBack();
             throw new Exception("Error saving online participant: " . $e->getMessage());
         }
     }
-    
+
 
     public function updateParticipant($participantId, $data)
     {
@@ -822,72 +912,14 @@ class ParticipantManager
      * Retrieve all on-site active participants with payment method.
      * If `$confirmedOnly` is true, only return confirmed participants.
      */
-    public function getOnsiteParticipants($confirmedOnly = false)
+    /**
+     * Retrieve all on-site participants.
+     * If `$confirmedOnly` is true, only return confirmed participants.
+     * If `$includeCancelled` is true, include both 'active' and 'cancelled' participants.
+     */
+    public function getOnsiteParticipants($confirmedOnly = false, $includeCancelled = false)
     {
         // Select fields based on $confirmedOnly
-        if ($confirmedOnly) {
-            $selectFields = "p.id, p.title, p.first_name, p.last_name, p.organization, p.country";
-        } else {
-            $selectFields = "
-                p.id,
-                p.created_at,
-                p.title, 
-                p.first_name, 
-                p.last_name, 
-                p.email,
-                p.confirmation_sent, 
-                p.confirmation_date,
-                p.total_due, 
-                p.total_paid,
-                p.paypal_fee,
-                COALESCE(pm.method, 'Unknown') AS payment_method_name
-            ";
-        }
-
-        // Base Query with JOIN to get latest payment method
-        $query = "
-            SELECT $selectFields
-            FROM participants p
-            LEFT JOIN (
-                SELECT pay.participant_id, pm.method
-                FROM payments pay
-                JOIN payment_methods pm ON pay.payment_method_id = pm.id
-                WHERE pay.id = (
-                    SELECT MAX(sub_pay.id) FROM payments sub_pay 
-                    WHERE sub_pay.participant_id = pay.participant_id
-                )
-            ) AS pm ON pm.participant_id = p.id
-            WHERE p.is_online = 0 AND p.status = 'active'
-        ";
-
-        // Apply filtering for confirmed participants
-        if ($confirmedOnly) {
-            $query .= " AND p.confirmation_sent = 1 AND p.can_be_public = 1"; 
-            $query .= " ORDER BY p.country, p.last_name, p.first_name";
-        } else {
-            $query .= " GROUP BY p.id ORDER BY 
-                            CASE 
-                                WHEN p.confirmation_sent = 1 AND p.confirmation_date IS NOT NULL THEN 1 
-                                ELSE 0 
-                            END ASC, 
-                            p.created_at DESC";
-        }
-
-        $stmt = $this->pdo->prepare($query);
-        $stmt->execute();
-
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-
-
-    /**
-     * Retrieve all online active participants with payment method.
-     * If `$confirmedOnly` is true, only return confirmed participants.
-     */
-    public function getOnlineParticipants($confirmedOnly = false)
-    {
-        // Select fields based on confirmedOnly
         if ($confirmedOnly) {
             $selectFields = "p.id, p.title, p.first_name, p.last_name, p.organization, p.country";
         } else {
@@ -902,12 +934,18 @@ class ParticipantManager
             p.confirmation_date,
             p.total_due, 
             p.total_paid,
-            p.paypal_fee, 
+            p.paypal_fee,
+            p.status,
             COALESCE(pm.method, 'Unknown') AS payment_method_name
         ";
         }
 
-        // Base Query with JOIN to get latest payment method
+        // Status condition
+        $statusCondition = $includeCancelled
+            ? "p.status IN ('active', 'cancelled')"
+            : "p.status = 'active'";
+
+        // Base query
         $query = "
         SELECT $selectFields
         FROM participants p
@@ -920,10 +958,9 @@ class ParticipantManager
                 WHERE sub_pay.participant_id = pay.participant_id
             )
         ) AS pm ON pm.participant_id = p.id
-        WHERE p.is_online = 1 AND p.status = 'active'
+        WHERE p.is_online = 0 AND $statusCondition
     ";
 
-        // Apply filtering for confirmed participants
         if ($confirmedOnly) {
             $query .= " AND p.confirmation_sent = 1 AND p.can_be_public = 1";
             $query .= " ORDER BY p.country, p.last_name, p.first_name";
@@ -941,6 +978,78 @@ class ParticipantManager
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+
+
+
+/**
+ * Retrieve all online participants with payment method.
+ * If `$confirmedOnly` is true, only return confirmed participants.
+ * If `$includeCancelled` is true, include both 'active' and 'cancelled' participants.
+ */
+public function getOnlineParticipants($confirmedOnly = false, $includeCancelled = false)
+{
+    // Select fields based on $confirmedOnly
+    if ($confirmedOnly) {
+        $selectFields = "p.id, p.title, p.first_name, p.last_name, p.organization, p.country";
+    } else {
+        $selectFields = "
+            p.id,
+            p.created_at,
+            p.title, 
+            p.first_name, 
+            p.last_name, 
+            p.email,
+            p.confirmation_sent, 
+            p.confirmation_date,
+            p.total_due, 
+            p.total_paid,
+            p.paypal_fee,
+            p.status,
+            COALESCE(pm.method, 'Unknown') AS payment_method_name
+        ";
+    }
+
+    // Status condition
+    $statusCondition = $includeCancelled
+        ? "p.status IN ('active', 'cancelled')"
+        : "p.status = 'active'";
+
+    // Base Query with JOIN to get latest payment method
+    $query = "
+        SELECT $selectFields
+        FROM participants p
+        LEFT JOIN (
+            SELECT pay.participant_id, pm.method
+            FROM payments pay
+            JOIN payment_methods pm ON pay.payment_method_id = pm.id
+            WHERE pay.id = (
+                SELECT MAX(sub_pay.id) FROM payments sub_pay 
+                WHERE sub_pay.participant_id = pay.participant_id
+            )
+        ) AS pm ON pm.participant_id = p.id
+        WHERE p.is_online = 1 AND $statusCondition
+    ";
+
+    // Apply filtering for confirmed participants
+    if ($confirmedOnly) {
+        $query .= " AND p.confirmation_sent = 1 AND p.can_be_public = 1";
+        $query .= " ORDER BY p.country, p.last_name, p.first_name";
+    } else {
+        $query .= " GROUP BY p.id ORDER BY 
+                        CASE 
+                            WHEN p.confirmation_sent = 1 AND p.confirmation_date IS NOT NULL THEN 1 
+                            ELSE 0 
+                        END ASC, 
+                        p.created_at DESC";
+    }
+
+    $stmt = $this->pdo->prepare($query);
+    $stmt->execute();
+
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
 
 
     /**

@@ -24,9 +24,11 @@ try {
 try {
     $participantManager = new ParticipantManager($pdo);
     
-    // Check if "confirmed_only" is set in the GET request
     $confirmedOnly = isset($_GET['confirmed_only']) && $_GET['confirmed_only'] == '1';
-    $participants = $participantManager->getOnsiteParticipants($confirmedOnly);
+    $includeCancelled = isset($_GET['include_cancelled']) && $_GET['include_cancelled'] == '1';
+ 
+
+    $participants = $participantManager->getOnsiteParticipants($confirmedOnly, $includeCancelled);
 
     echo json_encode([
         "success" => true,

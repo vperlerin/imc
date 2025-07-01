@@ -2,7 +2,12 @@ import { retry } from "utils/retry.js";
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-export const useApiOnlineParticipants = (confirmedOnly = false) => {
+/**
+ * Fetch online participants.
+ * @param {boolean} confirmedOnly - If true, only confirmed participants are returned.
+ * @param {boolean} includeCancelled - If true, includes cancelled participants.
+ */
+export const useApiOnlineParticipants = (confirmedOnly = false, includeCancelled = false) => {
   const [participants, setParticipants] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -10,11 +15,12 @@ export const useApiOnlineParticipants = (confirmedOnly = false) => {
   useEffect(() => {
     const fetchParticipants = async () => {
       try {
-        const queryParam = confirmedOnly ? "?confirmed_only=1" : "";
+        const params = new URLSearchParams();
+        if (confirmedOnly) params.append("confirmed_only", "1");
+        if (includeCancelled) params.append("include_cancelled", "1");
+
         const response = await retry(() =>
-          axios.get(
-            `${process.env.REACT_APP_API_URL}/admin/api/online_participants.php${queryParam}`,
-          ),
+          axios.get(`${process.env.REACT_APP_API_URL}/admin/api/online_participants.php?${params.toString()}`),
         );
 
         if (response.data.success && Array.isArray(response.data.data)) {
@@ -26,8 +32,7 @@ export const useApiOnlineParticipants = (confirmedOnly = false) => {
         }
       } catch (err) {
         setError(
-          err.message ||
-            "Failed to fetch participants. Please refresh the page.",
+          err.message || "Failed to fetch participants. Please refresh the page.",
         );
       } finally {
         setLoading(false);
@@ -35,7 +40,7 @@ export const useApiOnlineParticipants = (confirmedOnly = false) => {
     };
 
     fetchParticipants();
-  }, [confirmedOnly]); // Re-run if confirmedOnly changes
+  }, [confirmedOnly, includeCancelled]); // Re-fetch on changes
 
   return { participants, loading, error, setParticipants };
 };
