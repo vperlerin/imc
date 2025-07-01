@@ -29,8 +29,8 @@ const b=()=>(0/* default */,u.jsx)(h.A,{showRegBtn:!1,children:(0,u.jsx)(p,{})})
 /* harmony export */A:()=>d
 /* harmony export */});
 /* harmony import */var t=a(6540),l=a(3),r=a(6942),n=a.n(r),o=a(4848);
-/* harmony import */const d=e=>{let{value:s,onChange:a,placeholder:r="Enter password",disabled:d=!1,className:c="",props:i}=e;const[m,u]=(0,t.useState)(!1);
-return(0,o.jsxs)("div",{className:n()("position-relative",c),children:[(0,o.jsx)("input",{type:m?"text":"password",className:"form-control pe-5",placeholder:r,value:s,onChange:a,disabled:d,...i}),(0,o.jsx)("button",{type:"button",className:"btn position-absolute end-0 top-50 translate-middle-y p-2 border-0 bg-transparent",onClick:()=>u(!m),"aria-label":m?"Hide password":"Show password",children:m?(0/* .FiEyeOff */,o.jsx)(l._NO,{}):(0/* .FiEye */,o.jsx)(l.Vap,{})})]})};
+/* harmony import */const d=({value:e,onChange:s,placeholder:a="Enter password",disabled:r=!1,className:d="",props:c})=>{const[i,m]=(0,t.useState)(!1);
+return(0,o.jsxs)("div",{className:n()("position-relative",d),children:[(0,o.jsx)("input",{type:i?"text":"password",className:"form-control pe-5",placeholder:a,value:e,onChange:s,disabled:r,...c}),(0,o.jsx)("button",{type:"button",className:"btn position-absolute end-0 top-50 translate-middle-y p-2 border-0 bg-transparent",onClick:()=>m(!i),"aria-label":i?"Hide password":"Show password",children:i?(0/* .FiEyeOff */,o.jsx)(l._NO,{}):(0/* .FiEye */,o.jsx)(l.Vap,{})})]})};
 /* harmony default export */}
 /***/,
 /***/8232:
