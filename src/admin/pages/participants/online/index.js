@@ -18,7 +18,7 @@ const AdminParticipantsOnline = () => {
   const [success, setSuccess] = useState('');
   const [errorDeletion, setErrorDeletion] = useState('');
 
-  const { participants, loading, error, setParticipants } = useApiOnsiteParticipants(false, true);
+  const { participants, loading, error, setParticipants } = useApiOnlineParticipants(false, true);
   const { deleteParticipant, errorDelete, isDeleting } = useApiDeleteParticipant(setParticipants, setFilteredParticipants);
 
   useEffect(() => {
