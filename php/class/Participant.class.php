@@ -482,7 +482,7 @@ class ParticipantManager
             $this->pdo->beginTransaction();
 
             // Handle boolean fields (convert "true"/"false" to 1 or 0)
-            $booleanFields = ['excursion', 'buy_tshirt', 'is_online', 'is_early_bird', 'confirmation_sent'];
+            $booleanFields = ['excursion', 'buy_tshirt', 'is_online', 'is_early_bird', 'confirmation_sent', 'can_be_public'];
             foreach ($booleanFields as $field) {
                 if (!isset($data[$field])) {
                     $data[$field] = 0;
@@ -503,6 +503,7 @@ class ParticipantManager
             // Prepare fields for update
             $fields = [
                 'title = :title',
+                'can_be_public = :can_be_public',
                 'first_name = :first_name',
                 'last_name = :last_name',
                 'gender = :gender',
@@ -536,6 +537,7 @@ class ParticipantManager
             // Bind parameters
             $params = [
                 ':participant_id' => $participantId,
+                ':can_be_public' => $data['can_be_public'],
                 ':title' => $data['title'],
                 ':first_name' => $data['first_name'],
                 ':last_name' => $data['last_name'],
