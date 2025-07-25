@@ -1132,6 +1132,8 @@ class ParticipantManager
             return null;
         }
 
+        $participant['can_be_public'] = filter_var($participant['can_be_public'], FILTER_VALIDATE_BOOLEAN);
+
         // 2. Fetch workshops the participant is registered for
         $stmt = $this->pdo->prepare("  
             SELECT *
