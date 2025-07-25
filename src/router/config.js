@@ -91,13 +91,16 @@ const routeConfig = [
   { path: "/admin/accomodations", element: <ProtectedRoute allowedRoles={["admin", "loc"]}><lazyPages.AdminAccomodations /></ProtectedRoute> },
   { path: "/admin/dashboard", element: <ProtectedRoute allowedRoles={["admin"]}><lazyPages.AdminDashboard /></ProtectedRoute> },
   { path: "/admin/participants/online", element: <ProtectedRoute allowedRoles={["admin"]}><lazyPages.AdminParticipantsOnline /></ProtectedRoute> },
-  { path: "/admin/participants/onsite", element: <ProtectedRoute allowedRoles={["admin"]}><lazyPages.AdminParticipantsOnsite /></ProtectedRoute> },
+  
+  { path: "/admin/participants/onsite/edit/:participantId/:tab?", element: (<ProtectedRoute allowedRoles={["admin"]}><lazyPages.AdminParticipantsUser isCurOnline={false} /></ProtectedRoute>) },
   { path: "/admin/participants/onsite/:tab?", element: <ProtectedRoute allowedRoles={["admin"]}><lazyPages.AdminParticipantsOnsite /></ProtectedRoute> },
+  
   { path: "/admin/participants/workshops/radio", element: <ProtectedRoute allowedRoles={["admin", "loc"]}><lazyPages.AdminParticipantsWorkshops workshopId={2} /></ProtectedRoute> },
   { path: "/admin/participants/workshops/spectro", element: <ProtectedRoute allowedRoles={["admin", "loc"]}><lazyPages.AdminParticipantsWorkshops workshopId={1} /></ProtectedRoute> },
-  { path: "/admin/participants/onsite/:participantId/:tab?", element: (<ProtectedRoute allowedRoles={["admin"]}><lazyPages.AdminParticipantsUser isCurOnline={false} /></ProtectedRoute>) },
-  { path: "/admin/participants/online/:participantId/:tab?", element: (<ProtectedRoute allowedRoles={["admin"]}><lazyPages.AdminParticipantsUser isCurOnline/></ProtectedRoute>) }, 
+  
+  { path: "/admin/participants/online/edit/:participantId/:tab?", element: (<ProtectedRoute allowedRoles={["admin"]}><lazyPages.AdminParticipantsUser isCurOnline/></ProtectedRoute>) }, 
   { path: "/admin/participants/onsite/payment/:participantId", element: (<ProtectedRoute allowedRoles={["admin"]}><lazyPages.AdminParticipantsPayment isCurOnline={false} /></ProtectedRoute>) },
+
   { path: "/admin/participants/online/payment/:participantId", element: (<ProtectedRoute allowedRoles={["admin"]}><lazyPages.AdminParticipantsPayment isCurOnline /></ProtectedRoute>) }, 
   { path: "/admin/contributions/talks", element: (<ProtectedRoute allowedRoles={["admin", "soc", "loc"]}><lazyPages.AdminTalks /></ProtectedRoute>) },
   { path: "/admin/contributions/posters", element: (<ProtectedRoute allowedRoles={["admin", "soc", "loc"]}><lazyPages.AdminPosters /></ProtectedRoute>) },

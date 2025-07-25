@@ -125,7 +125,7 @@ const AdminTable = ({ participants, withActions = true, customActions = null, on
                           <a href={`/admin/participants/${participant.is_online ? 'online' : 'onsite'}/payment/${participant.id}`} className="btn btn-sm btn-outline-success fw-bolder">Payments</a>
                         )}
 
-                        <a href={`/admin/participants/${participant.is_online ? 'online' : 'onsite'}/${participant.id}`} className="btn btn-sm btn-outline-primary fw-bolder">Edit</a>
+                        <a href={`/admin/participants/${participant.is_online ? 'online' : 'onsite'}/edit/${participant.id}`} className="btn btn-sm btn-outline-primary fw-bolder">Edit</a>
                         <button
                           className="btn btn-sm btn-outline-danger d-inline-flex align-items-center"
                           onClick={() => handleDeleteClick(participant)}

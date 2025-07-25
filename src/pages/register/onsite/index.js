@@ -417,6 +417,7 @@ const MainForm = () => {
                 stepTotal={totalStep}
                 setValue={setValue}
                 trigger={trigger}
+                watch={watch}
               />
             </>
           )}

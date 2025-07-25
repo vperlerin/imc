@@ -11,7 +11,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import DocButton from "@/admin/components/doc-button";
 
 const AdminParticipantsOnsite = () => {
-  const { tab } = useParams();
+  const { tab } = useParams(); 
   //
   const [activeTab, setActiveTab] = useState(tab || "unconfirmed");
   const [filteredParticipants, setFilteredParticipants] = useState([]);
@@ -25,6 +25,7 @@ const AdminParticipantsOnsite = () => {
   const navigate = useNavigate();
   const { participants, loading, error, setParticipants } = useApiOnsiteParticipants(false, true);
   const { deleteParticipant, errorDelete, isDeleting } = useApiDeleteParticipant(setParticipants, setFilteredParticipants);
+ 
 
   useEffect(() => {
     setActiveTab(tab || "unconfirmed");

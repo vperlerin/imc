@@ -65,8 +65,10 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
   }, [watch]);
 
   useEffect(() => {
-    if (!tab) {
-      navigate(`/admin/participants/onsite/${participantId}/summary`, { replace: true });
+    const isValidId = Number.isInteger(Number(participantId)) && Number(participantId) > 0;
+
+    if (!tab && isValidId) {
+      navigate(`/admin/participants/onsite/edit/${participantId}/summary`, { replace: true });
     }
   }, [tab, participantId, navigate]);
 
@@ -99,7 +101,7 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
 
     // On the "participants" list
     if (participantDetails.can_be_public !== undefined) {
-      setValue("can_be_public", participantDetails.can_be_public ? "true" : "false");
+      setValue("can_be_public", Boolean(Number(participantDetails.can_be_public)));
     }
 
     // Handle Workshops
@@ -273,10 +275,10 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
                       activeTab === key && cssTabs.active,
                     )
                   }
-                  href={`/admin/participants/onsite/${participantId}/${key}`}
+                  href={`/admin/participants/onsite/edit/${participantId}/${key}`}
                   onClick={(e) => {
                     e.preventDefault();
-                    navigate(`/admin/participants/onsite/${participantId}/${key}`);
+                    navigate(`/admin/participants/onsite/edit/${participantId}/${key}`);
                   }}
                 >
 
@@ -310,6 +312,9 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
                   register={register}
                   setValue={setValue}
                   errors={errors}
+                  trigger={trigger}
+                  initialData={participant?.participant}
+                  watch={watch}
                 />
               </>
             )}
