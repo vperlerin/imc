@@ -922,7 +922,8 @@ class ParticipantManager
             p.title,
             CASE WHEN p.can_be_public = 1 THEN p.first_name ELSE '' END AS first_name,
             CASE WHEN p.can_be_public = 1 THEN p.last_name ELSE 'Anonymous' END AS last_name,
-            p.organization,
+            CASE WHEN p.can_be_public = 1 THEN p.organization ELSE '' END AS organization, 
+            CASE WHEN p.can_be_public = 1 THEN p.title ELSE '' END AS title, 
             p.country
         ";
         } else {
@@ -987,10 +988,10 @@ class ParticipantManager
         if ($confirmedOnly) {
             $selectFields = "
             p.id,
-            p.title,
             CASE WHEN p.can_be_public = 1 THEN p.first_name ELSE '' END AS first_name,
             CASE WHEN p.can_be_public = 1 THEN p.last_name ELSE 'Anonymous' END AS last_name,
-            p.organization,
+            CASE WHEN p.can_be_public = 1 THEN p.organization ELSE '' END AS organization, 
+            CASE WHEN p.can_be_public = 1 THEN p.title ELSE '' END AS title, 
             p.country
         ";
         } else {
