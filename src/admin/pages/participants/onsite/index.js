@@ -1,14 +1,19 @@
-import { CiSearch } from "react-icons/ci";
 import AdminTable from '@/admin/components/admin-table';
+import classNames from 'classnames';
+import cssTabs from 'styles/components/tabs.module.scss';
 import PageContain from "@/admin/components/page-contain";
 import Loader from "components/loader";
 import React, { useEffect, useState } from "react";
+import { CiSearch } from "react-icons/ci";
 import { useApiOnsiteParticipants } from "api/participants/onsite.js";
 import { useApiDeleteParticipant } from "@/admin/api/participants/delete";
+import { useParams, useNavigate } from "react-router-dom";
 import DocButton from "@/admin/components/doc-button";
 
-
 const AdminParticipantsOnsite = () => {
+  const { tab } = useParams();
+  //
+  const [activeTab, setActiveTab] = useState(tab || "unconfirmed");
   const [filteredParticipants, setFilteredParticipants] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchType, setSearchType] = useState("last_name");
@@ -17,28 +22,45 @@ const AdminParticipantsOnsite = () => {
   const [showHardDeleteConfirm, setShowHardDeleteConfirm] = useState(false);
   const [success, setSuccess] = useState('');
   const [errorDeletion, setErrorDeletion] = useState('');
-
+  const navigate = useNavigate();
   const { participants, loading, error, setParticipants } = useApiOnsiteParticipants(false, true);
   const { deleteParticipant, errorDelete, isDeleting } = useApiDeleteParticipant(setParticipants, setFilteredParticipants);
 
+  useEffect(() => {
+    setActiveTab(tab || "unconfirmed");
+  }, [tab]);
 
   useEffect(() => {
+    const baseList = participants.filter((p) => {
+      if (activeTab === "confirmed") {
+        return p.confirmation_sent === "1" && p.status !== "cancelled";
+      }
+      if (activeTab === "cancelled") {
+        return p.status === "cancelled";
+      }
+      // Default: unconfirmed
+      return p.confirmation_sent !== "1" && p.status !== "cancelled";
+    });
+
     if (!searchQuery) {
-      setFilteredParticipants(participants);
+      setFilteredParticipants(baseList);
     } else {
       const lowerQuery = searchQuery.toLowerCase();
       setFilteredParticipants(
-        participants.filter((participant) => {
-          const fieldValue = participant[searchType] ? String(participant[searchType]).toLowerCase() : "";
+        baseList.filter((participant) => {
+          const fieldValue = participant[searchType]
+            ? String(participant[searchType]).toLowerCase()
+            : "";
           return fieldValue.includes(lowerQuery);
         })
       );
     }
-  }, [searchQuery, searchType, participants]);
+  }, [searchQuery, searchType, participants, activeTab]);
 
   // Calculate totals
-  const totalParticipants = participants.length;
-  const totalConfirmed = participants.filter((p) => p.confirmation_sent === "1").length;
+  const totalCancelled = participants.filter(p => p.status === "cancelled").length;
+  const totalConfirmed = participants.filter(p => p.confirmation_sent === "1" && p.status !== "cancelled").length;
+  const totalUnconfirmed = participants.filter(p => p.confirmation_sent !== "1" && p.status !== "cancelled").length;
 
   // Handle delete button click
   const handleDeleteClick = (participant) => {
@@ -47,31 +69,31 @@ const AdminParticipantsOnsite = () => {
   };
 
   // Perform deletion 
-const onDeleteParticipant = async (deleteType) => {
-  if (!selectedParticipant) return;
+  const onDeleteParticipant = async (deleteType) => {
+    if (!selectedParticipant) return;
 
-  try {
-    const response = await deleteParticipant(selectedParticipant, deleteType);
+    try {
+      const response = await deleteParticipant(selectedParticipant, deleteType);
 
-    if (response?.data?.success) {
-      setSuccess(response.data.message || "Participant deleted successfully!");
-      setErrorDeletion('');
-    } else {
-      setErrorDeletion(response?.data?.message || "Impossible to delete the participant for now, please try again later.");
+      if (response?.data?.success) {
+        setSuccess(response.data.message || "Participant deleted successfully!");
+        setErrorDeletion('');
+      } else {
+        setErrorDeletion(response?.data?.message || "Impossible to delete the participant for now, please try again later.");
+      }
+    } catch (error) {
+      setErrorDeletion("An unexpected error occurred while deleting the participant.");
+    } finally {
+      // Close the correct modal depending on type
+      if (deleteType === 'soft') {
+        setShowDeleteModal(false);
+      } else {
+        setShowHardDeleteConfirm(false);
+      }
+
+      setSelectedParticipant(null);
     }
-  } catch (error) {
-    setErrorDeletion("An unexpected error occurred while deleting the participant.");
-  } finally {
-    // Close the correct modal depending on type
-    if (deleteType === 'soft') {
-      setShowDeleteModal(false);
-    } else {
-      setShowHardDeleteConfirm(false);
-    }
-
-    setSelectedParticipant(null);
-  }
-};
+  };
 
 
   const breadcrumb = [
@@ -85,7 +107,12 @@ const onDeleteParticipant = async (deleteType) => {
       title="ON-SITE Participants"
       rightContent={
         <>
-          <strong>Confirmed:</strong> <strong className="text-success">{totalConfirmed}</strong> / {totalParticipants}
+          <>
+            <strong>Confirmed:</strong> <strong className="text-success">{totalConfirmed}</strong>{' '}
+            | <strong>Unconfirmed:</strong> <strong className="text-warning">{totalUnconfirmed}</strong>{' '}
+            | <strong>Cancelled:</strong> <strong className="text-danger">{totalCancelled}</strong>{' '}
+            | <strong>Total:</strong> <strong>{participants.length}</strong>
+          </>
         </>
       }
     >
@@ -134,6 +161,50 @@ const onDeleteParticipant = async (deleteType) => {
               link={`${process.env.REACT_APP_API_URL}/doc_participants.php`}
             />
           </div>
+
+
+          <ul className={classNames('nav nav-tabs mb-3 mt-2', cssTabs.tab, 'flex-column flex-sm-row w-100')}>
+            <li className="nav-item">
+              <a
+                className={`nav-link ${activeTab === "unconfirmed" ? cssTabs.active : ""}`}
+                href={`/admin/participants/onsite`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate(`/admin/participants/onsite`);
+                }}
+              >
+                Unconfirmed
+                <span className="badge text-bg-warning ms-2">{totalUnconfirmed}</span>
+              </a>
+            </li>
+            <li className="nav-item">
+              <a
+                className={`nav-link ${activeTab === "confirmed" ? cssTabs.active : ""}`}
+                href={`/admin/participants/onsite/confirmed`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate(`/admin/participants/onsite/confirmed`)
+                }}
+              >
+                Confirmed
+                <span className="badge text-bg-success ms-2">{totalConfirmed}</span>
+              </a>
+            </li>
+            <li className="nav-item">
+              <a
+                className={`nav-link ${activeTab === "cancelled" ? cssTabs.active : ""}`}
+                href={`/admin/participants/onsite/cancelled`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate(`/admin/participants/onsite/cancelled`)
+                }}
+              >
+                Cancelled
+                <span className="badge text-bg-danger ms-2">{totalCancelled}</span>
+              </a>
+            </li>
+          </ul>
+
           <AdminTable participants={filteredParticipants} onDelete={handleDeleteClick} />
         </>
       )}

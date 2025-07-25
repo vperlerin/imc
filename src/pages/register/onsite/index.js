@@ -3,10 +3,11 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useLocation } from "react-router-dom";
-import { formatFullDate } from "utils/date"; 
+import { formatFullDate } from "utils/date";
 import Accomodation from "components/registration/accomodation.js";
 import Arrival from "components/registration/arrival.js";
 import Comments from "components/registration/comments";
+import Consent from "components/registration/consent";
 import Contribution from "components/registration/contribution.js";
 import Extras from "components/registration/extras.js";
 import Identity from "components/registration/identity.js";
@@ -39,7 +40,7 @@ const calculateAge = (dob) => {
   }
   return age;
 };
- 
+
 
 const MainForm = () => {
   const location = useLocation();
@@ -112,9 +113,9 @@ const MainForm = () => {
         talks: formData.talks || [],
         posters: formData.posters || [],
         total_due: total.toFixed(2),
-        paypal_fee: paypalFee?.toFixed(2) || 0, 
+        paypal_fee: paypalFee?.toFixed(2) || 0,
       };
- 
+
       const response = await axios.post(apiUrl, formattedData, {
         headers: { "Content-Type": "application/json" },
       });
@@ -397,17 +398,27 @@ const MainForm = () => {
           )}
 
           {step === 7 && (
-            <Comments
-              register={register}
-              errors={errors}
-              isDebugMode={isDebugMode}
-              isUnder16={isUnder16}
-              showGdpr={true}
-              step={step}
-              stepTotal={totalStep}
-              setValue={setValue}
-              trigger={trigger}
-            />
+            <>
+              <Comments
+                register={register}
+                errors={errors}
+                isDebugMode={isDebugMode}
+                isUnder16={isUnder16}
+                showGdpr={true}
+                step={step}
+                stepTotal={totalStep}
+                setValue={setValue}
+                trigger={trigger}
+              />
+              <Consent
+                register={register}
+                errors={errors}
+                step={step}
+                stepTotal={totalStep}
+                setValue={setValue}
+                trigger={trigger}
+              />
+            </>
           )}
 
           {step === 8 && !successMsg && (

@@ -31,7 +31,6 @@ const Comments = ({
 }) => {
   const [isCurUnder16, setIsCurUnder16] = useState(isUnder16 || false);
 
-
   useEffect(() => {
     if (initialData) {
       Object.entries(initialData).forEach(([key, value]) => {
@@ -42,9 +41,7 @@ const Comments = ({
 
       // Set service agreement default value
       setValue("service_agreement", initialData.service_agreement ?? false);
-      // Public default value
-      setValue("can_be_public", initialData.can_be_public ?? true);
-
+    
       // Check if the participant is under 16
       const age = calculateAge(initialData.dob);
       if (age !== null && age < 16) {
@@ -186,19 +183,7 @@ const Comments = ({
           </>
         )}
 
-        <div className="form-check mt-4">
-          <input
-            className="form-check-input"
-            defaultChecked={true}
-            id="canBePublic"
-            {...register("can_be_public")}
-            type="checkbox"
-          />
-          <label className="form-check-label" htmlFor="canBePublic">
-            By ticking this box, I agree that my first and last name, affiliation, and country will be publicly displayed on the <a href="/community/participants" target="_blank">participants page</a>.
-          </label>
-        </div>
-        {errors.can_be_public && <p className="text-danger">{errors.can_be_public.message}</p>}
+        
       </div>
     </div>
   );

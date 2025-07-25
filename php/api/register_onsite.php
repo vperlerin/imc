@@ -70,6 +70,7 @@ try {
             "tshirt_size" => "Men S",
             "comments" => "",
             "service_agreement" => true,
+            "can_be_public" => true,
             "total_due" => "265.00",
             "paypal_fee" => "9.69"
         ];
@@ -87,19 +88,22 @@ try {
         }
     }
 
+    // Default "can_be_public" to true if not provided
+    if (!isset($data['can_be_public'])) {
+        $data['can_be_public'] = true;
+    }
+
     // Generate a random password
     $plain_password = bin2hex(random_bytes(4));
     $password_hash = password_hash($plain_password, PASSWORD_DEFAULT);
     $data['password'] = $plain_password;
 
-    // Initialize ParticipantManager using existing $pdo from Connect.class.php
     $participantManager = new ParticipantManager($pdo);
 
     if ($participantManager->emailExists($data['email'])) {
         throw new Exception("The email address '{$data['email']}' is already in use. Please use a different email.");
     }
 
-    // Save participant
     $participant_id = $participantManager->saveParticipant($data, $password_hash);
 
     echo json_encode([

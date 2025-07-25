@@ -15,6 +15,7 @@ import { Link } from "react-router-dom";
 import Identitity from "components/registration/identity";
 import Workshops from "components/registration/workshops";
 import Arrival from "components/registration/arrival";
+import Consent from "components/registration/consent";
 import Contribution from "components/registration/contribution";
 import Accommodation from "components/registration/accomodation";
 import Extras from "components/registration/extras";
@@ -29,26 +30,25 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
   const [successMsg, setSuccessMsg] = useState(null);
   const [unsavedChanges, setUnsavedChanges] = useState(false);
   const [total, setTotal] = useState(0);
-  const [paypalFee, setPaypalFee] = useState(0); 
-  const [fetchParticipantTrigger, setFetchParticipantTrigger] = useState(false); 
+  const [paypalFee, setPaypalFee] = useState(0);
+  const [fetchParticipantTrigger, setFetchParticipantTrigger] = useState(false);
   const activeTab = tab || "identity";
   const navigate = useNavigate();
 
   useBlockNavigation(unsavedChanges);
- 
 
   const { workshops, paymentMethods, registrationTypes, loading: specificdataLoading, sessions, error: specificDataError } = useApiSpecificData();
   const { participant, loading: participantLoading, error: participantError } = useApiParticipant(participantId, isCurOnline, fetchParticipantTrigger, true);
   const { control, register, handleSubmit, getValues, setValue, formState: { errors }, trigger, watch } = useForm();
   const isOnline = participant?.participant?.is_online === "1";
- 
- 
+
+
   const loading = specificdataLoading || participantLoading || isSaving;
   const error = [
     errorMsg,
     participantError,
     specificDataError,
-  ].filter(Boolean); 
+  ].filter(Boolean);
 
   // Paypal fess
   useEffect(() => {
@@ -97,6 +97,11 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
       });
     }
 
+    // On the "participants" list
+    if (participantDetails.can_be_public !== undefined) {
+      setValue("can_be_public", participantDetails.can_be_public ? "true" : "false");
+    }
+
     // Handle Workshops
     if (workshops && Array.isArray(workshops)) {
       const participantWorkshops = workshops.map(workshop => String(workshop.id));
@@ -124,7 +129,7 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
       const updatedPosters = contributions
         .filter(contribution => contribution.type === "poster")
         .map(poster => ({ ...poster }));
- 
+
 
       // Set values in form so they persist on submit
       setValue("talks", updatedTalks);
@@ -220,9 +225,8 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
   );
 
   const hasAdminNotes = !!participant?.participant?.admin_notes;
- 
 
-  console.log("participant?.participant.is_early_bird? ", participant?.participant.is_early_bird);
+
 
   return (
     <PageContain
@@ -241,7 +245,7 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
             </ul>
           </div>
         )}
- 
+
         {successMsg && !loading && (
           <div className="alert alert-success">{successMsg}</div>
         )}
@@ -292,14 +296,22 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
           {/* Tab Content */}
           <div className={classNames('tab-content mx-auto', cssTabs.contentMxw)}>
             {tab === "identity" && (
-              <Identitity
-                isAdmin
-                isOnline={isOnline}
-                register={register}
-                errors={errors}
-                setValue={setValue}
-                trigger={trigger}
-              />
+              <>
+                <Identitity
+                  isAdmin
+                  isOnline={isOnline}
+                  register={register}
+                  errors={errors}
+                  setValue={setValue}
+                  trigger={trigger}
+                />
+                <Consent
+                  isAdmin
+                  register={register}
+                  setValue={setValue}
+                  errors={errors}
+                />
+              </>
             )}
             {tab === "workshops" && (
               <Workshops
@@ -379,59 +391,59 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
                 />
               </div>
             )}
-            
-              <div className={classNames(css.mxW, 'mx-auto', tab === "summary" && isSummaryReady ? 'visible': "invisible h-0 w-0 overflow-hidden")}>
-                <div className="d-flex mt-3 align-items-center justify-content-between w-100 mb-3">
-                  <div>
-                    <strong>
+
+            <div className={classNames(css.mxW, 'mx-auto', tab === "summary" && isSummaryReady ? 'visible' : "invisible h-0 w-0 overflow-hidden")}>
+              <div className="d-flex mt-3 align-items-center justify-content-between w-100 mb-3">
+                <div>
+                  <strong>
                     {participant?.participant?.first_name
                       ? participant.participant.first_name.charAt(0).toUpperCase() +
                       participant.participant.first_name.slice(1)
                       : ""}
 
                     {' '}{participant?.participant?.last_name || ""}
-                    </strong>
-                    {' '}
-                    {participant.participant.confirmation_sent === "1" ? (
-                      <>
-                        {`has been confirmed on `} 
-                        <span className="text-success">{participant.participant.confirmation_date && formatFullDate(participant.participant.confirmation_date)}</span>
+                  </strong>
+                  {' '}
+                  {participant.participant.confirmation_sent === "1" ? (
+                    <>
+                      {`has been confirmed on `}
+                      <span className="text-success">{participant.participant.confirmation_date && formatFullDate(participant.participant.confirmation_date)}</span>
 
-                      </>
-                    ) : (
-                      <>
-                        ❌  has NOT been confirmed yet.
-                      </>
-                    )} 
-                  </div>
-
-                  {participant.participant.confirmation_sent !== "1" && (
-                    <div>
-                      <Link
-                        className="btn btn-outline-success fw-bolder"
-                        to={`/admin/participants/${isOnline ? 'online' : 'onsite'}/payment/${participantId}`}
-                      >
-                        Go to Payments to confirm
-                      </Link>
-                    </div>
+                    </>
+                  ) : (
+                    <>
+                      ❌  has NOT been confirmed yet.
+                    </>
                   )}
                 </div>
-                <Summary
-                  isAdmin
-                  isOnline={isOnline}
-                  isEarlyBird={participant?.participant.is_early_bird === 1 || participant?.participant.is_early_bird === '1'}
-                  conferenceData={cd}
-                  getValues={getValues}
-                  setValue={setValue}
-                  setTotal={setTotal}
-                  setPaypalFee={setPaypalFee}
-                  workshops={workshops}
-                  registrationTypes={registrationTypes}
-                  paymentMethods={paymentMethods}
-                  watch={watch}
-                />
+
+                {participant.participant.confirmation_sent !== "1" && (
+                  <div>
+                    <Link
+                      className="btn btn-outline-success fw-bolder"
+                      to={`/admin/participants/${isOnline ? 'online' : 'onsite'}/payment/${participantId}`}
+                    >
+                      Go to Payments to confirm
+                    </Link>
+                  </div>
+                )}
               </div>
- 
+              <Summary
+                isAdmin
+                isOnline={isOnline}
+                isEarlyBird={participant?.participant.is_early_bird === 1 || participant?.participant.is_early_bird === '1'}
+                conferenceData={cd}
+                getValues={getValues}
+                setValue={setValue}
+                setTotal={setTotal}
+                setPaypalFee={setPaypalFee}
+                workshops={workshops}
+                registrationTypes={registrationTypes}
+                paymentMethods={paymentMethods}
+                watch={watch}
+              />
+            </div>
+
             {tab === "admin_notes" && (
               <div className={classNames(css.mxW, 'mx-auto mb-3')}>
                 <label htmlFor="admin_notes" className="form-label fw-bold">

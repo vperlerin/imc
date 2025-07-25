@@ -20,6 +20,7 @@ const Home = () => {
   );
 
   const orgImages = [org1, org2];
+  const showEarlyBirdNotice = new Date() < new Date(cd.deadlines.early_birds);
 
   return (
     <PageContain homeIllus>
@@ -43,18 +44,21 @@ const Home = () => {
             Its objectives are to encourage, support and coordinate meteor observing, to improve the quality of amateur observations, to disseminate observations and results to other amateurs and professionals and to make global analyses of observations received world-wide. The program includes talks on the latest developments, poster sessions and entertainment.
           </p>
 
-          <div className="d-flex flex-column align-items-center justify-content-center mb-3 border rounded-2 p-3">
+          <div className={classnames('d-flex flex-column align-items-center justify-content-center mb-3 p-3', showEarlyBirdNotice && ' border rounded-2')}>
             <Link
               aria-label="Register"
-              className="btn btn-outline-primary fw-bolder d-block mb-2"
+              className={classnames('btn btn-outline-primary fw-bolder d-block', showEarlyBirdNotice && 'mb-2')}
               to="/register"
               title="Register Now"
             >
               Register before {formatFullDate(cd.deadlines.reg)}
             </Link>
-            <b className="fw-bolder d-block text-md-start text-center">
-              Enjoy an early bird discount of {cd.costs.after_early_birds}€ by signing up before <span className="text-info">{formatFullDate(cd.deadlines.early_birds)}</span>!
-            </b>
+            {showEarlyBirdNotice && (
+              <b className="fw-bolder d-block text-md-start text-center">
+                Enjoy an early bird discount of {cd.costs.after_early_birds}€ by signing up before{' '}
+                <span className="text-info">{formatFullDate(cd.deadlines.early_birds)}</span>!
+              </b>
+            )}
           </div>
 
           <p>
