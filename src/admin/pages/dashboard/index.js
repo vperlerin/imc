@@ -106,7 +106,7 @@ const AdminDashboard = () => {
                             <td>
                               <div className="d-flex gap-2 justify-content-end">
                                 <a href={`/admin/participants/onsite/payment/${p.id}`} className="btn btn-sm btn-outline-success fw-bolder">Payments</a>
-                                <a href={`/admin/participants/online/${p.id}`} className="btn btn-sm btn-outline-primary fw-bolder">Edit</a>
+                                <a href={`/admin/participants/online/edit/${p.id}`} className="btn btn-sm btn-outline-primary fw-bolder">Edit</a>
                               </div>
                             </td>
                           </tr>
@@ -159,7 +159,7 @@ const AdminDashboard = () => {
                           <td>
                             <div className="d-flex gap-2 justify-content-end">
                               <a href={`/admin/participants/onsite/payment/${p.id}`} className="btn btn-sm btn-outline-success fw-bolder">Payments</a>
-                              <a href={`/admin/participants/online/${p.id}`} className="btn btn-sm btn-outline-primary fw-bolder">Edit</a>
+                              <a href={`/admin/participants/online/edit/${p.id}`} className="btn btn-sm btn-outline-primary fw-bolder">Edit</a>
                             </div>
                           </td>
                         </tr>
