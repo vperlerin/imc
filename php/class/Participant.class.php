@@ -181,14 +181,13 @@ class ParticipantManager
                 ':payment_method_id' => (int) ($data['payment_method_id'] ?? 0),
             ];
 
-            // 4. Ensure can_be_public is set (default to true if not provided)
-            $flag = filter_var($data['can_be_public'] ?? true, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-            $data['can_be_public'] = ($flag === null ? 0 : ($flag ? 1 : 0));
-
-            // Always insert can_be_public
-            $columns[] = 'can_be_public';
-            $values[] = ':can_be_public';
-            $params[':can_be_public'] = $data['can_be_public'];
+            // 4. If can_be_public exists, add it dynamically
+            if (array_key_exists('can_be_public', $data)) {
+                $columns[] = 'can_be_public';
+                $values[] = ':can_be_public';
+                $flag = filter_var($data['can_be_public'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+                $params[':can_be_public'] = ($flag === null ? 0 : ($flag ? 1 : 0));
+            }
 
             // 5. Insert participant
             $stmt = $this->pdo->prepare("
@@ -483,7 +482,7 @@ class ParticipantManager
             $this->pdo->beginTransaction();
 
             // Handle boolean fields (convert "true"/"false" to 1 or 0)
-            $booleanFields = ['excursion', 'buy_tshirt', 'is_online', 'is_early_bird', 'confirmation_sent', 'can_be_public'];
+            $booleanFields = ['excursion', 'buy_tshirt', 'is_online', 'is_early_bird', 'confirmation_sent'];
             foreach ($booleanFields as $field) {
                 if (!isset($data[$field])) {
                     $data[$field] = 0;
@@ -503,7 +502,6 @@ class ParticipantManager
 
             // Prepare fields for update
             $fields = [
-                'can_be_public = :can_be_public',
                 'title = :title',
                 'first_name = :first_name',
                 'last_name = :last_name',
@@ -537,7 +535,6 @@ class ParticipantManager
 
             // Bind parameters
             $params = [
-                ':can_be_public' => $data['can_be_public'],
                 ':participant_id' => $participantId,
                 ':title' => $data['title'],
                 ':first_name' => $data['first_name'],
@@ -911,20 +908,23 @@ class ParticipantManager
     }
 
 
-    /**
-     * Retrieve all on-site active participants with payment method.
-     * If `$confirmedOnly` is true, only return confirmed participants.
-     */
-    /**
-     * Retrieve all on-site participants.
-     * If `$confirmedOnly` is true, only return confirmed participants.
-     * If `$includeCancelled` is true, include both 'active' and 'cancelled' participants.
-     */
-    public function getOnsiteParticipants($confirmedOnly = false, $includeCancelled = false)
+
+
+    public function getOnlineParticipants($confirmedOnly = false, $includeCancelled = false)
     {
-        // Select fields based on $confirmedOnly
+        $statusCondition = $includeCancelled
+            ? "p.status IN ('active', 'cancelled')"
+            : "p.status = 'active'";
+
         if ($confirmedOnly) {
-            $selectFields = "p.id, p.title, p.first_name, p.last_name, p.organization, p.country";
+            $selectFields = "
+            p.id,
+            p.title,
+            CASE WHEN p.can_be_public = 1 THEN p.first_name ELSE '' END AS first_name,
+            CASE WHEN p.can_be_public = 1 THEN p.last_name ELSE 'Anonymous' END AS last_name,
+            p.organization,
+            p.country
+        ";
         } else {
             $selectFields = "
             p.id,
@@ -943,12 +943,6 @@ class ParticipantManager
         ";
         }
 
-        // Status condition
-        $statusCondition = $includeCancelled
-            ? "p.status IN ('active', 'cancelled')"
-            : "p.status = 'active'";
-
-        // Base query
         $query = "
         SELECT $selectFields
         FROM participants p
@@ -957,23 +951,24 @@ class ParticipantManager
             FROM payments pay
             JOIN payment_methods pm ON pay.payment_method_id = pm.id
             WHERE pay.id = (
-                SELECT MAX(sub_pay.id) FROM payments sub_pay 
+                SELECT MAX(sub_pay.id)
+                FROM payments sub_pay 
                 WHERE sub_pay.participant_id = pay.participant_id
             )
         ) AS pm ON pm.participant_id = p.id
-        WHERE p.is_online = 0 AND $statusCondition
+        WHERE p.is_online = 1 AND $statusCondition
     ";
 
         if ($confirmedOnly) {
-            $query .= " AND p.confirmation_sent = 1 AND p.can_be_public = 1";
+            $query .= " AND p.confirmation_sent = 1";
             $query .= " ORDER BY p.country, p.last_name, p.first_name";
         } else {
             $query .= " GROUP BY p.id ORDER BY 
-                        CASE 
-                            WHEN p.confirmation_sent = 1 AND p.confirmation_date IS NOT NULL THEN 1 
-                            ELSE 0 
-                        END ASC, 
-                        p.created_at DESC";
+                    CASE 
+                        WHEN p.confirmation_sent = 1 AND p.confirmation_date IS NOT NULL THEN 1 
+                        ELSE 0 
+                    END ASC, 
+                    p.created_at DESC";
         }
 
         $stmt = $this->pdo->prepare($query);
@@ -983,18 +978,21 @@ class ParticipantManager
     }
 
 
-
-
-    /**
-     * Retrieve all online participants with payment method.
-     * If `$confirmedOnly` is true, only return confirmed participants.
-     * If `$includeCancelled` is true, include both 'active' and 'cancelled' participants.
-     */
-    public function getOnlineParticipants($confirmedOnly = false, $includeCancelled = false)
+    public function getOnsiteParticipants($confirmedOnly = false, $includeCancelled = false)
     {
-        // Select fields based on $confirmedOnly
+        $statusCondition = $includeCancelled
+            ? "p.status IN ('active', 'cancelled')"
+            : "p.status = 'active'";
+
         if ($confirmedOnly) {
-            $selectFields = "p.id, p.title, p.first_name, p.last_name, p.organization, p.country";
+            $selectFields = "
+            p.id,
+            p.title,
+            CASE WHEN p.can_be_public = 1 THEN p.first_name ELSE '' END AS first_name,
+            CASE WHEN p.can_be_public = 1 THEN p.last_name ELSE 'Anonymous' END AS last_name,
+            p.organization,
+            p.country
+        ";
         } else {
             $selectFields = "
             p.id,
@@ -1013,12 +1011,6 @@ class ParticipantManager
         ";
         }
 
-        // Status condition
-        $statusCondition = $includeCancelled
-            ? "p.status IN ('active', 'cancelled')"
-            : "p.status = 'active'";
-
-        // Base Query with JOIN to get latest payment method
         $query = "
         SELECT $selectFields
         FROM participants p
@@ -1027,24 +1019,24 @@ class ParticipantManager
             FROM payments pay
             JOIN payment_methods pm ON pay.payment_method_id = pm.id
             WHERE pay.id = (
-                SELECT MAX(sub_pay.id) FROM payments sub_pay 
+                SELECT MAX(sub_pay.id)
+                FROM payments sub_pay 
                 WHERE sub_pay.participant_id = pay.participant_id
             )
         ) AS pm ON pm.participant_id = p.id
-        WHERE p.is_online = 1 AND $statusCondition
+        WHERE p.is_online = 0 AND $statusCondition
     ";
 
-        // Apply filtering for confirmed participants
         if ($confirmedOnly) {
-            $query .= " AND p.confirmation_sent = 1 AND p.can_be_public = 1";
+            $query .= " AND p.confirmation_sent = 1";
             $query .= " ORDER BY p.country, p.last_name, p.first_name";
         } else {
             $query .= " GROUP BY p.id ORDER BY 
-                        CASE 
-                            WHEN p.confirmation_sent = 1 AND p.confirmation_date IS NOT NULL THEN 1 
-                            ELSE 0 
-                        END ASC, 
-                        p.created_at DESC";
+                    CASE 
+                        WHEN p.confirmation_sent = 1 AND p.confirmation_date IS NOT NULL THEN 1 
+                        ELSE 0 
+                    END ASC, 
+                    p.created_at DESC";
         }
 
         $stmt = $this->pdo->prepare($query);
@@ -1131,7 +1123,6 @@ class ParticipantManager
         if (!$participant) {
             return null;
         }
-        
 
         // 2. Fetch workshops the participant is registered for
         $stmt = $this->pdo->prepare("  
