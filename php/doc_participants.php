@@ -123,9 +123,9 @@ function createSheet($spreadsheet, $sheetName, $participants, $includeAccommodat
             $p["email"],
             $p["country"],
             $confirmedStatus,
-            number_format($total, 2) . "€",
-            number_format($total - $totalPaid, 2) . "€",
-            number_format($totalPaid, 2) . "€",
+            number_format($grandTotal, 2) . "€",      // Corrected Total
+            number_format($remainingDue, 2) . "€",    // Remaining Due
+            number_format($totalPaid, 2) . "€",       // Total Paid
             $paymentMethod,
             $comments
         ];
