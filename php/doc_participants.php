@@ -77,7 +77,7 @@ function createSheet($spreadsheet, $sheetName, $participants, $includeAccommodat
     $spreadsheet->setActiveSheetIndex($spreadsheet->getIndex($sheet)); // Ensure it's active
 
     // Define column headers
-    $headers = ["Full Name", "Email", "Country", "Confirmed", "Total Cost", "Total Paid", "Total Due", "Payment Method", "Comments"];
+    $headers = ["Full Name", "Email", "Country", "Confirmed", "Total Cost", "Total Paid", "Remaining Due", "Payment Method", "Comments"];
     if ($includeAccommodation) {
         $headers[] = "Accommodation"; // Add accommodation column for onsite participants
     }
@@ -108,21 +108,9 @@ function createSheet($spreadsheet, $sheetName, $participants, $includeAccommodat
         // Confirmation status
         $confirmedStatus = isset($p["confirmation_sent"]) && $p["confirmation_sent"] == "1" ? "YES" : "NO";
 
-        $totalDueRaw = isset($p["total_due"]) ? (float) $p["total_due"] : 0;
+        $totalDue = isset($p["total_due"]) ? (float) $p["total_due"] : 0;   // includes PayPal fees already
         $totalPaid = isset($p["total_paid"]) ? (float) $p["total_paid"] : 0;
-
-        $paymentMethod = strtolower($p["payment_method_name"] ?? '');
-        $isPaypal = $paymentMethod === 'paypal';
-
-        if ($isPaypal) {
-            // Apply PayPal fee to get TOTAL COST
-            $paypalFee = (0.034 * $totalDueRaw + 0.35) / 0.966;
-            $totalCost = round(($totalDueRaw + $paypalFee) * 100) / 100;
-        } else {
-            $totalCost = $totalDueRaw;
-        }
-
-        $remainingDue = $totalCost - $totalPaid;
+        $remainingDue = $totalDue - $totalPaid;
 
         $paymentMethod = $p["payment_method_name"] ?? "n/a";
         $comments = $p["comments"] ?? "n/a";
@@ -133,7 +121,7 @@ function createSheet($spreadsheet, $sheetName, $participants, $includeAccommodat
             $p["email"],
             $p["country"],
             $confirmedStatus,
-            number_format($totalCost, 2) . "€",      // TOTAL COST
+            number_format($totalDue, 2) . "€",       // TOTAL COST (with eventual PayPal fee)
             number_format($totalPaid, 2) . "€",      // TOTAL PAID
             number_format($remainingDue, 2) . "€",   // TOTAL DUE
             $p["payment_method_name"] ?? "n/a",
