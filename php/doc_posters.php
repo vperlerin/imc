@@ -56,12 +56,11 @@ $sheet = $spreadsheet->getActiveSheet();
 $sheet->setTitle("All Posters");
 
 // Define column headers
-$headers = ["Session", "Presenter", "Title", "Authors", "Abstract", "Confirmed"];
+$headers = ["Session", "Presenter", "Title", "Authors", "Abstract", "Confirmed", "TO PRINT BY LOC"];
 
 // Write headers
 $sheet->fromArray([$headers], NULL, 'A1');
 
-// ✅ **Apply header styling**
 $headerStyle = [
     'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
     'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '4F81BD']],
@@ -69,7 +68,8 @@ $headerStyle = [
     'borders' => ['bottom' => ['borderStyle' => Border::BORDER_THIN]]
 ];
 
-$sheet->getStyle('A1:F1')->applyFromArray($headerStyle);
+// Apply header styling
+$sheet->getStyle('A1:G1')->applyFromArray($headerStyle);
 
 // Insert poster data
 $row = 2;
@@ -77,43 +77,47 @@ foreach ($posters as $session => $posterList) {
     foreach ($posterList as $poster) {
         $presenter = trim("{$poster['first_name']} {$poster['last_name']}");
         $confirmed = isset($poster["confirmation_sent"]) && $poster["confirmation_sent"] == "1" ? "YES" : "NO";
-        $abstract = isset($poster["abstract"]) ? $poster["abstract"] : "No abstract available";
-        $authors = isset($poster["authors"]) ? $poster["authors"] : "No author available";
+        $printFlag = isset($poster['print']) && (int)$poster['print'] === 1 ? 'YES' : 'NO';
+
+        // Truncate fields
+        $title = isset($poster["title"]) ? mb_strimwidth($poster["title"], 0, 300, '…') : "Untitled";
+        $authors = isset($poster["authors"]) ? mb_strimwidth($poster["authors"], 0, 300, '…') : "No author available";
+        $abstract = isset($poster["abstract"]) ? mb_strimwidth($poster["abstract"], 0, 1000, '…') : "No abstract available";
 
         $sheet->fromArray([
             $session,
             $presenter,
-            isset($poster["title"]) ? $poster["title"] : "Untitled",
+            $title,
             $authors,
             $abstract,
-            $confirmed
+            $confirmed,
+            $printFlag
         ], NULL, "A$row");
 
-        // ✅ **Enable text wrapping for Abstract & Authors columns (E & D)**
-        $sheet->getStyle("E$row")->getAlignment()->setWrapText(true);
-        $sheet->getStyle("D$row")->getAlignment()->setWrapText(true);
+        // Enable wrap and dynamic row height
+        foreach (['D', 'E'] as $col) {
+            $sheet->getStyle("{$col}{$row}")->getAlignment()->setWrapText(true);
+        }
 
-        // ✅ **Improve Row Height Calculation for Abstract**
-        $numLines = substr_count($abstract, "\n") + ceil(strlen($abstract) / 50); // Estimate line count
-        $rowHeight = max(20, min(200, $numLines * 15)); // Adjust dynamically (limit max height)
+        $numLines = substr_count($abstract, "\n") + ceil(strlen($abstract) / 50);
+        $rowHeight = max(20, min(200, $numLines * 15));
         $sheet->getRowDimension($row)->setRowHeight($rowHeight);
 
         $row++;
     }
 }
 
-// ✅ **Auto-size all columns except Abstract**
-foreach (range('A', 'F') as $col) {
-    if ($col !== 'E') { // Skip Abstract column
+// Auto-size all columns except Abstract (E)
+foreach (range('A', 'G') as $col) {
+    if ($col !== 'E') {
         $sheet->getColumnDimension($col)->setAutoSize(true);
     }
 }
-
-// ✅ **Set Abstract column width to max 250px (~35 Excel width units)**
 $sheet->getColumnDimension('E')->setWidth(35);
 
-// Set alignment for all columns
-$sheet->getStyle("A1:F$row")->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+// Align everything vertically center
+$sheet->getStyle("A1:G$row")->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+ 
 
 // ✅ **Generate and send file**
 ob_end_clean();

@@ -46,14 +46,14 @@ class ContributionManager
     {
         try {
             $this->pdo->beginTransaction();
- 
+
             $stmtCheck = $this->pdo->prepare("SELECT COUNT(*) FROM contributions WHERE participant_id = ?");
             $stmtCheck->execute([$participantId]);
             if ($stmtCheck->fetchColumn() > 0) {
                 $stmtDelete = $this->pdo->prepare("DELETE FROM contributions WHERE participant_id = ?");
                 $stmtDelete->execute([$participantId]);
             }
- 
+
             if (!empty($data['talks']) && is_array($data['talks'])) {
                 $stmtTalk = $this->pdo->prepare("
                     INSERT INTO contributions (participant_id, type, title, authors, abstract, session_id, duration, print, created_at, updated_at)
@@ -71,7 +71,7 @@ class ContributionManager
                     ]);
                 }
             }
- 
+
             if (!empty($data['posters']) && is_array($data['posters'])) {
                 $stmtPoster = $this->pdo->prepare("
                     INSERT INTO contributions (participant_id, type, title, authors, abstract, session_id, print, created_at, updated_at)
@@ -143,4 +143,31 @@ class ContributionManager
         }
     }
 
+
+    public function getPrintableContributions()  {
+        try {
+            $stmt = $this->pdo->prepare("
+            SELECT 
+                p.id AS participant_id,
+                p.title AS participant_title,
+                p.first_name,
+                p.last_name,
+                p.email,
+                p.country,
+                c.type AS contribution_type,
+                c.title AS contribution_title,
+                c.authors,
+                c.abstract,
+                c.duration
+            FROM contributions c
+            JOIN participants p ON c.participant_id = p.id
+            WHERE c.print = 1
+            ORDER BY p.last_name, p.first_name, c.title
+        ");
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            throw new Exception("Failed to fetch printable contributions: " . $e->getMessage());
+        }
+    }
 }
