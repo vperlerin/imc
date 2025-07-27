@@ -77,7 +77,7 @@ function createSheet($spreadsheet, $sheetName, $participants, $includeAccommodat
     $spreadsheet->setActiveSheetIndex($spreadsheet->getIndex($sheet)); // Ensure it's active
 
     // Define column headers
-    $headers = ["Full Name", "Email", "Country", "Confirmed", "Total Cost", "Total Paid", "Remaining Due", "Payment Method", "Comments"];
+$headers = ["Full Name", "Email", "Country", "Confirmed", "Total Cost", "Total Paid", "Remaining Due", "Payment Method", "Comments"];
     if ($includeAccommodation) {
         $headers[] = "Accommodation"; // Add accommodation column for onsite participants
     }
@@ -108,12 +108,16 @@ function createSheet($spreadsheet, $sheetName, $participants, $includeAccommodat
         // Confirmation status
         $confirmedStatus = isset($p["confirmation_sent"]) && $p["confirmation_sent"] == "1" ? "YES" : "NO";
 
-        $totalDue = isset($p["total_due"]) ? (float) $p["total_due"] : 0;   // includes PayPal fees already
+        $totalDue = isset($p["total_due"]) ? (float) $p["total_due"] : 0;
+        $paypalFee = isset($p["paypal_fee"]) ? (float) $p["paypal_fee"] : 0;
         $totalPaid = isset($p["total_paid"]) ? (float) $p["total_paid"] : 0;
-        $remainingDue = $totalDue - $totalPaid;
 
-        $paymentMethod = $p["payment_method_name"] ?? "n/a";
-        $comments = $p["comments"] ?? "n/a";
+        $paymentMethod = strtolower(trim($p["payment_method_name"] ?? ''));
+
+        // Only add PayPal fee if method is "paypal"
+        $totalCost = $paymentMethod === 'paypal' ? $totalDue + $paypalFee : $totalDue;
+
+        $remainingDue = $totalCost - $totalPaid;
 
         // Create row data
         $dataRow = [
@@ -121,9 +125,9 @@ function createSheet($spreadsheet, $sheetName, $participants, $includeAccommodat
             $p["email"],
             $p["country"],
             $confirmedStatus,
-            number_format($totalDue, 2) . "€",       // TOTAL COST (with eventual PayPal fee)
-            number_format($totalPaid, 2) . "€",      // TOTAL PAID
-            number_format($remainingDue, 2) . "€",   // TOTAL DUE
+            number_format($totalCost, 2) . "€",
+            number_format($totalPaid, 2) . "€",
+            number_format($remainingDue, 2) . "€",
             $p["payment_method_name"] ?? "n/a",
             $p["comments"] ?? "n/a"
         ];
