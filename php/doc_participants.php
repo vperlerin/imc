@@ -108,14 +108,22 @@ function createSheet($spreadsheet, $sheetName, $participants, $includeAccommodat
         // Confirmation status
         $confirmedStatus = isset($p["confirmation_sent"]) && $p["confirmation_sent"] == "1" ? "YES" : "NO";
 
-        // Compute totals
-        $totalDue = isset($p["total_due"]) ? $p["total_due"] : 0;
         $totalPaid = isset($p["total_paid"]) ? $p["total_paid"] : 0;
-        $remainingDue = $totalDue - $totalPaid;
-        $paymentMethod = isset($p["payment_method_name"]) ? $p["payment_method_name"] : "n/a";
+        $totalDueRaw = isset($p["total_due"]) ? $p["total_due"] : 0;
+        $totalCost = $totalPaid + $totalDueRaw;
 
-        // Get participant comments
-        $comments = isset($p["comments"]) ? $p["comments"] : "n/a";
+        $isPaypal = isset($p["payment_method_name"]) && strtolower($p["payment_method_name"]) === 'paypal';
+
+        if ($isPaypal) {
+            // Apply PayPal fee adjustment
+            $totalDue = round(($totalCost + (0.034 * $totalCost + 0.35) / 0.966) * 100) / 100;
+        } else {
+            $totalDue = $totalCost;
+        }
+
+        $remainingDue = $totalDue - $totalPaid;
+        $paymentMethod = $p["payment_method_name"] ?? "n/a";
+        $comments = $p["comments"] ?? "n/a";
 
         // Create row data
         $dataRow = [
