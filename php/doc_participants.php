@@ -77,7 +77,7 @@ function createSheet($spreadsheet, $sheetName, $participants, $includeAccommodat
     $spreadsheet->setActiveSheetIndex($spreadsheet->getIndex($sheet)); // Ensure it's active
 
     // Define column headers
-    $headers = ["Full Name", "Email", "Country", "Confirmed", "Total Due", "Total Paid", "Remaining Due", "Payment Method", "Comments"];
+    $headers = ["Full Name", "Email", "Country", "Confirmed", "Total Cost", "Total Paid", "Total Due", "Payment Method", "Comments"];
     if ($includeAccommodation) {
         $headers[] = "Accommodation"; // Add accommodation column for onsite participants
     }
@@ -108,20 +108,22 @@ function createSheet($spreadsheet, $sheetName, $participants, $includeAccommodat
         // Confirmation status
         $confirmedStatus = isset($p["confirmation_sent"]) && $p["confirmation_sent"] == "1" ? "YES" : "NO";
 
-        $totalPaid = isset($p["total_paid"]) ? $p["total_paid"] : 0;
-        $totalDueRaw = isset($p["total_due"]) ? $p["total_due"] : 0;
-        $totalCost = $totalPaid + $totalDueRaw;
+        $totalDueRaw = isset($p["total_due"]) ? (float) $p["total_due"] : 0;
+        $totalPaid = isset($p["total_paid"]) ? (float) $p["total_paid"] : 0;
 
-        $isPaypal = isset($p["payment_method_name"]) && strtolower($p["payment_method_name"]) === 'paypal';
+        $paymentMethod = strtolower($p["payment_method_name"] ?? '');
+        $isPaypal = $paymentMethod === 'paypal';
 
         if ($isPaypal) {
-            // Apply PayPal fee adjustment
-            $totalDue = round(($totalCost + (0.034 * $totalCost + 0.35) / 0.966) * 100) / 100;
+            // Apply PayPal fee to get TOTAL COST
+            $paypalFee = (0.034 * $totalDueRaw + 0.35) / 0.966;
+            $totalCost = round(($totalDueRaw + $paypalFee) * 100) / 100;
         } else {
-            $totalDue = $totalCost;
+            $totalCost = $totalDueRaw;
         }
 
-        $remainingDue = $totalDue - $totalPaid;
+        $remainingDue = $totalCost - $totalPaid;
+
         $paymentMethod = $p["payment_method_name"] ?? "n/a";
         $comments = $p["comments"] ?? "n/a";
 
@@ -131,11 +133,11 @@ function createSheet($spreadsheet, $sheetName, $participants, $includeAccommodat
             $p["email"],
             $p["country"],
             $confirmedStatus,
-            number_format($totalDue, 2) . "€",
-            number_format($totalPaid, 2) . "€",
-            number_format($remainingDue, 2) . "€",
-            $paymentMethod,
-            $comments
+            number_format($totalCost, 2) . "€",      // TOTAL COST
+            number_format($totalPaid, 2) . "€",      // TOTAL PAID
+            number_format($remainingDue, 2) . "€",   // TOTAL DUE
+            $p["payment_method_name"] ?? "n/a",
+            $p["comments"] ?? "n/a"
         ];
 
         if ($includeAccommodation) {
