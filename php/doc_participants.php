@@ -77,7 +77,7 @@ function createSheet($spreadsheet, $sheetName, $participants, $includeAccommodat
     $spreadsheet->setActiveSheetIndex($spreadsheet->getIndex($sheet)); // Ensure it's active
 
     // Define column headers
-    $headers = ["Full Name", "Email", "Country", "Confirmed", "Remaining Due", "Total Paid", "Payment Method", "Comments"];
+    $headers = ["Full Name", "Email", "Country", "Confirmed", "Total Due", "Total Paid", "Remaining Due", "Payment Method", "Comments"];
     if ($includeAccommodation) {
         $headers[] = "Accommodation"; // Add accommodation column for onsite participants
     }
@@ -109,8 +109,9 @@ function createSheet($spreadsheet, $sheetName, $participants, $includeAccommodat
         $confirmedStatus = isset($p["confirmation_sent"]) && $p["confirmation_sent"] == "1" ? "YES" : "NO";
 
         // Compute totals
+        $totalDue = isset($p["total_due"]) ? $p["total_due"] : 0;
         $totalPaid = isset($p["total_paid"]) ? $p["total_paid"] : 0;
-        $remainingDue = isset($p["total_due"]) ? $p["total_due"] : 0;
+        $remainingDue = $totalDue - $totalPaid;
         $paymentMethod = isset($p["payment_method_name"]) ? $p["payment_method_name"] : "n/a";
 
         // Get participant comments
@@ -122,8 +123,9 @@ function createSheet($spreadsheet, $sheetName, $participants, $includeAccommodat
             $p["email"],
             $p["country"],
             $confirmedStatus,
-            number_format($remainingDue, 2) . "€",
+            number_format($totalDue, 2) . "€",
             number_format($totalPaid, 2) . "€",
+            number_format($remainingDue, 2) . "€",
             $paymentMethod,
             $comments
         ];
