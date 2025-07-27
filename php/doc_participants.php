@@ -26,7 +26,7 @@ use PhpOffice\PhpSpreadsheet\Style\Border;
 try {
     $pdo = Connect::getPDO();
 } catch (Exception $e) {
-    die($e->getMessage()); 
+    die($e->getMessage());
 }
 
 // Initialize participant manager
@@ -93,7 +93,7 @@ function createSheet($spreadsheet, $sheetName, $participants, $includeAccommodat
         'borders' => ['bottom' => ['borderStyle' => Border::BORDER_THIN]]
     ];
     $sheet->getStyle('A1:' . \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex(count($headers)) . '1')
-          ->applyFromArray($headerStyle);
+        ->applyFromArray($headerStyle);
 
     // Insert participant data
     $dataRows = [];
@@ -109,8 +109,9 @@ function createSheet($spreadsheet, $sheetName, $participants, $includeAccommodat
         $confirmedStatus = isset($p["confirmation_sent"]) && $p["confirmation_sent"] == "1" ? "YES" : "NO";
 
         // Compute totals
-        $total = isset($p["total_due"]) ? $p["total_due"] : 0;
+        $remainingDue = isset($p["total_due"]) ? $p["total_due"] : 0;
         $totalPaid = isset($p["total_paid"]) ? $p["total_paid"] : 0;
+        $grandTotal = $remainingDue + $totalPaid;
         $paymentMethod = isset($p["payment_method_name"]) ? $p["payment_method_name"] : "n/a";
 
         // Get participant comments
