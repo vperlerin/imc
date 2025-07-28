@@ -83,7 +83,7 @@ try {
     $currentDate = date("d-m-Y");
 
     // Generate filename
-    $fileName = "IMC{$currentYear}-Tshirts-{$currentDate}.xlsx";
+    $filename = "IMC{$currentYear}-Tshirts-{$currentDate}.xlsx";
 
     // Output to browser
     header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
