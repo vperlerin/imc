@@ -85,13 +85,19 @@ try {
     // Generate filename
     $filename = "IMC{$currentYear}-Tshirts-{$currentDate}.xlsx";
 
-    // Output to browser
+    if (headers_sent($file, $line)) {
+        die("⚠ Headers already sent at $file:$line");
+    }
+    if (ob_get_length()) {
+        ob_end_clean();
+    }
+
     header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-    header("Content-Disposition: attachment; filename=\"$filename\"");
+    header("Content-Disposition: attachment; filename=\"$fileName\"");
     header("Cache-Control: max-age=0");
 
     $writer = new Xlsx($spreadsheet);
-    $writer->save('php://output');
+    $writer->save("php://output");
     exit;
 } catch (Exception $e) {
     http_response_code(500);
