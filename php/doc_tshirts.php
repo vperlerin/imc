@@ -1,9 +1,4 @@
 <?php
-
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
 // Enable CORS
 $allowed_origins = [
     "https://imc2025.imo.net",
@@ -84,14 +79,8 @@ try {
 
     // Generate filename
     $filename = "IMC{$currentYear}-Tshirts-{$currentDate}.xlsx";
-
-    if (headers_sent($file, $line)) {
-        die("⚠ Headers already sent at $file:$line");
-    }
-    if (ob_get_length()) {
-        ob_end_clean();
-    }
-
+ 
+    ob_end_clean();
     header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
     header("Content-Disposition: attachment; filename=\"$filename\"");
     header("Cache-Control: max-age=0");
