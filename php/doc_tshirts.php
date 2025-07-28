@@ -78,17 +78,21 @@ try {
     $sheet->getStyle("B2:B{$rowCount}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
     $sheet->getStyle("C2:C{$rowCount}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-    $filename = "IMC-Tshirt-Grouped-{$today}.xlsx";
+    // Get current year and date
+    $currentYear = date("Y");
+    $currentDate = date("d-m-Y");
+
+    // Generate filename
+    $fileName = "IMC{$currentYear}-Tshirts-{$currentDate}.xlsx";
 
     // Output to browser
-header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-header("Content-Disposition: attachment; filename=\"$filename\"");
-header("Cache-Control: max-age=0");
+    header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+    header("Content-Disposition: attachment; filename=\"$filename\"");
+    header("Cache-Control: max-age=0");
 
     $writer = new Xlsx($spreadsheet);
     $writer->save('php://output');
     exit;
-
 } catch (Exception $e) {
     http_response_code(500);
     echo "Error: " . $e->getMessage();
