@@ -25,68 +25,90 @@ try {
 
     $stmt = $pdo->prepare("
         SELECT 
+            eo.tshirt_size,
             CONCAT(p.title, ' ', p.first_name, ' ', p.last_name) AS full_name,
-            p.email,
-            eo.tshirt_size
+            p.email
         FROM participants p
         LEFT JOIN extra_options eo ON eo.participant_id = p.id
-        WHERE p.confirmation_sent = 1
+        WHERE p.confirmation_sent = 1 AND eo.buy_tshirt = 1 AND eo.tshirt_size IS NOT NULL
+        ORDER BY eo.tshirt_size ASC, p.last_name ASC
     ");
     $stmt->execute();
     $rows = $stmt->fetchAll();
 
+    // Group rows by t-shirt size
+    $grouped = [];
+    foreach ($rows as $row) {
+        $size = $row['tshirt_size'] ?: 'N/A';
+        if (!isset($grouped[$size])) {
+            $grouped[$size] = [];
+        }
+        $grouped[$size][] = [
+            'full_name' => $row['full_name'],
+            'email' => $row['email']
+        ];
+    }
+
     $spreadsheet = new Spreadsheet();
+    $spreadsheet->getProperties()
+        ->setCreator("IMC")
+        ->setTitle("Confirmed Participants with T-shirt")
+        ->setDescription("Confirmed participants who requested a T-shirt, grouped by size.");
+
     $sheet = $spreadsheet->getActiveSheet();
-    $sheet->setTitle('Confirmed Participants');
+    $sheet->setTitle('T-shirt Sizes');
 
-    // Headers
-    $headers = ['Full Name', 'Email', 'T-shirt size'];
-    $sheet->fromArray($headers, null, 'A1');
-
-    // Header styling
+    // Header style
     $headerStyle = [
-        'font' => ['bold' => true],
+        'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
+        'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '4F81BD']],
         'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
-        'fill' => [
-            'fillType' => Fill::FILL_SOLID,
-            'startColor' => ['argb' => 'FFE0E0E0']
-        ],
-        'borders' => [
-            'allBorders' => [
-                'borderStyle' => Border::BORDER_THIN,
-                'color' => ['argb' => 'FF888888']
-            ]
-        ]
+        'borders' => ['bottom' => ['borderStyle' => Border::BORDER_THIN]]
     ];
-    $sheet->getStyle('A1:C1')->applyFromArray($headerStyle);
 
-    // Data rows
-    $rowIndex = 2;
-    foreach ($rows as $r) {
-        $sheet->setCellValue("A{$rowIndex}", $r['full_name']);
-        $sheet->setCellValue("B{$rowIndex}", $r['email']);
-        $sheet->setCellValue("C{$rowIndex}", $r['tshirt_size']);
-        $rowIndex++;
+    $currentRow = 1;
+    foreach ($grouped as $size => $participants) {
+        // Group title
+        $sheet->mergeCells("A{$currentRow}:C{$currentRow}");
+        $sheet->setCellValue("A{$currentRow}", "T-shirt size: $size");
+        $sheet->getStyle("A{$currentRow}")->getFont()->setBold(true)->setSize(14);
+        $sheet->getStyle("A{$currentRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+        $currentRow++;
+
+        // Table header
+        $sheet->setCellValue("A{$currentRow}", "Full Name");
+        $sheet->setCellValue("B{$currentRow}", "Email");
+        $sheet->getStyle("A{$currentRow}:B{$currentRow}")->applyFromArray($headerStyle);
+        $currentRow++;
+
+        // Participants
+        foreach ($participants as $p) {
+            $sheet->setCellValue("A{$currentRow}", $p['full_name']);
+            $sheet->setCellValue("B{$currentRow}", $p['email']);
+            $sheet->getStyle("A{$currentRow}:B{$currentRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+            $currentRow++;
+        }
+
+        $currentRow++; // spacing
     }
 
     // Auto-size columns
-    foreach (range('A', 'C') as $col) {
+    foreach (['A', 'B'] as $col) {
         $sheet->getColumnDimension($col)->setAutoSize(true);
     }
 
-    // Align email & t-shirt columns left
-    $rowCount = count($rows) + 1;
-    $sheet->getStyle("B2:B{$rowCount}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
-    $sheet->getStyle("C2:C{$rowCount}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+    // Align vertically
+    $sheet->getStyle("A1:B{$currentRow}")->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
 
-    // Get current year and date
+    // Filename
     $currentYear = date("Y");
     $currentDate = date("d-m-Y");
-
-    // Generate filename
     $filename = "IMC{$currentYear}-Tshirts-{$currentDate}.xlsx";
 
-    ob_end_clean();
+    // Output XLSX
+    if (ob_get_length()) {
+        ob_end_clean();
+    }
     header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
     header("Content-Disposition: attachment; filename=\"$filename\"");
     header("Cache-Control: max-age=0");
@@ -94,6 +116,7 @@ try {
     $writer = new Xlsx($spreadsheet);
     $writer->save("php://output");
     exit;
+
 } catch (Exception $e) {
     http_response_code(500);
     echo "Error: " . $e->getMessage();
