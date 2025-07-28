@@ -61,7 +61,13 @@ try {
     $sheet->getStyle('A1:C1')->applyFromArray($headerStyle);
 
     // Data rows
-    $sheet->fromArray($rows, null, 'A2');
+    $rowIndex = 2;
+    foreach ($rows as $r) {
+        $sheet->setCellValue("A{$rowIndex}", $r['full_name']);
+        $sheet->setCellValue("B{$rowIndex}", $r['email']);
+        $sheet->setCellValue("C{$rowIndex}", $r['tshirt_size']);
+        $rowIndex++;
+    }
 
     // Auto-size columns
     foreach (range('A', 'C') as $col) {
@@ -79,7 +85,7 @@ try {
 
     // Generate filename
     $filename = "IMC{$currentYear}-Tshirts-{$currentDate}.xlsx";
- 
+
     ob_end_clean();
     header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
     header("Content-Disposition: attachment; filename=\"$filename\"");
