@@ -78,10 +78,12 @@ try {
     $sheet->getStyle("B2:B{$rowCount}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
     $sheet->getStyle("C2:C{$rowCount}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
+    $filename = "IMC-Tshirt-Grouped-{$today}.xlsx";
+
     // Output to browser
-    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    header('Content-Disposition: attachment;filename="confirmed_participants.xlsx"');
-    header('Cache-Control: max-age=0');
+header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+header("Content-Disposition: attachment; filename=\"$filename\"");
+header("Cache-Control: max-age=0");
 
     $writer = new Xlsx($spreadsheet);
     $writer->save('php://output');
