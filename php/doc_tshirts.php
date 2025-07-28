@@ -69,8 +69,9 @@ try {
     $currentRow = 1;
     foreach ($grouped as $size => $participants) {
         // Group title
+        $tshirtCount = count($participants);
         $sheet->mergeCells("A{$currentRow}:C{$currentRow}");
-        $sheet->setCellValue("A{$currentRow}", "T-shirt size: $size");
+        $sheet->setCellValue("A{$currentRow}", "{$size} ({$tshirtCount})");
         $sheet->getStyle("A{$currentRow}")->getFont()->setBold(true)->setSize(14);
         $sheet->getStyle("A{$currentRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
         $currentRow++;
@@ -116,7 +117,6 @@ try {
     $writer = new Xlsx($spreadsheet);
     $writer->save("php://output");
     exit;
-
 } catch (Exception $e) {
     http_response_code(500);
     echo "Error: " . $e->getMessage();
