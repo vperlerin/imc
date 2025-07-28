@@ -51,6 +51,13 @@ const AdminDownloads = () => {
         </div>
       </div>
 
+       <div className="mb-4">
+        <h5 className="mb-3">T-shirts</h5>
+        <div className="d-flex gap-2">
+          <DocButton className="d-block fw-bolder" link={`${process.env.REACT_APP_API_URL}/doc_tshirts.php`} title="T-shirts" /> 
+        </div>
+      </div>
+
     </PageContain>
   );
 };
