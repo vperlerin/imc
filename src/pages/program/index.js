@@ -8,7 +8,7 @@ import { Link, useParams, useNavigate } from "react-router-dom";
 import { Navigate } from "react-router-dom";
 import { programData as pd } from "data/program";
 import { useSwipeable } from "react-swipeable";
-import { motion, AnimatePresence } from "framer-motion"; // Import animation
+import { motion, AnimatePresence } from "framer-motion";
 
 const Program = () => {
   const { day } = useParams();
@@ -42,6 +42,52 @@ const Program = () => {
   if (!dayProgram) {
     return <Navigate to="/404" replace />;
   }
+
+  const goPrevDay = () => {
+    if (!prevDay) return;
+    setDirection(-1);
+    navigate(`/program/${prevDay}`);
+  };
+
+  const goNextDay = () => {
+    if (!nextDay) return;
+    setDirection(1);
+    navigate(`/program/${nextDay}`);
+  };
+
+  useEffect(() => {
+    const isEditable = (el) => {
+      if (!el) return false;
+      const tag = el.tagName;
+      return (
+        el.isContentEditable ||
+        tag === "INPUT" ||
+        tag === "TEXTAREA" ||
+        tag === "SELECT"
+      );
+    };
+    const onKeyDown = (e) => {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;      // don't hijack shortcuts
+      if (isEditable(document.activeElement)) return;       // don't interfere with forms
+      if (e.key === "ArrowLeft" && prevDay) {
+        e.preventDefault();
+        goPrevDay();
+      } else if (e.key === "ArrowRight" && nextDay) {
+        e.preventDefault();
+        goNextDay();
+      } else if (e.key === "Home" && days.length) {
+        e.preventDefault();
+        setDirection(-1);
+        navigate(`/program/${days[0]}`);
+      } else if (e.key === "End" && days.length) {
+        e.preventDefault();
+        setDirection(1);
+        navigate(`/program/${days[days.length - 1]}`);
+      }
+    };
+    window.addEventListener("keydown", onKeyDown, { passive: false });
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [prevDay, nextDay, days, navigate]);
 
   // Swipe handlers
   const handlers = useSwipeable({
@@ -152,7 +198,15 @@ const Program = () => {
                     ) : (
                       <>
                         <dt>{item.period}</dt>
-                        <dd className={classNames(item.type === 'sep' && css.sep, 'mt-1 mt-md-0 ms-2 ms-md-0 mb-4')}>{item.display}</dd>
+                        <dd className={classNames(item.type === 'sep' ? css.sep : 'fw-bolder', 'mt-1 mt-md-0 ms-2 ms-md-0 mb-4')}>
+                          {item?.linkTitle ? (
+                            <a href={item.linkTitle}>
+                              {item.display}
+                            </a>
+                          ) : (
+                            item.display
+                          )}
+                        </dd>
                       </>
                     )}
                   </div>
