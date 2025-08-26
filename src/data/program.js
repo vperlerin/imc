@@ -266,7 +266,7 @@ export const programData = {
         type: "sep",
       },
       {
-        session: "SESSION 7 - Meteor spectroscopy and meteor physics and dynamics - part I/II",
+        session: "SESSION 7 - Meteor spectroscopy and meteor physics and dynamics - part I",
         chair: "Pavel Koten",
         lectures: [
           { period: "10:00 - 10:10", title: "Meteor Spectroscopy Workshop: Summary", authors: "Joe Zender" },
@@ -280,7 +280,7 @@ export const programData = {
         type: "sep",
       },
       {
-        session: "SESSION 7 - Meteor spectroscopy and meteor physics and dynamics  - part II/II",
+        session: "SESSION 7 - Meteor spectroscopy and meteor physics and dynamics  - part II",
         chair: "Pavel Koten",
         lectures: [
           { period: "11:15 - 11:35", title: "A new mechanism of meteor persistent trails II", authors: "Nagatoshi Nogami, Shinsuke Abe" },
