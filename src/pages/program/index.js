@@ -76,7 +76,7 @@ const Program = () => {
         e.preventDefault();
         goNextDay();
       } else if (e.key === "Home" && days.length) {
-        e.preventDefault();
+        e.preventDefault(); 
         setDirection(-1);
         navigate(`/program/${days[0]}`);
       } else if (e.key === "End" && days.length) {

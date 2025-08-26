@@ -1,6 +1,7 @@
 // ---- Utilities ----
 const getDaySuffix = (day) => {
   const d = Number(day);
+  if (!Number.isFinite(d)) return "";
   if (d >= 11 && d <= 13) return "th";
   switch (d % 10) {
     case 1: return "st";
@@ -21,17 +22,17 @@ const parseDateSafe = (input) => {
       const [y, m, d] = input.split("-").map(Number);
       return new Date(Date.UTC(y, m - 1, d));
     }
-    // Try ISO; if there's a space, try replacing with 'T'
+    // Try native; if there's a space, try replacing with 'T'
     const try1 = new Date(input);
-    if (!Number.isNaN(try1)) return try1;
+    if (!Number.isNaN(try1.getTime())) return try1;
     const try2 = new Date(input.replace(" ", "T"));
-    if (!Number.isNaN(try2)) return try2;
+    if (!Number.isNaN(try2.getTime())) return try2;
   }
 
   return new Date(NaN);
 };
 
-const isValidDate = (d) => d instanceof Date && !Number.isNaN(d);
+const isValidDate = (d) => d instanceof Date && !Number.isNaN(d.getTime());
 
 // Get parts safely, defaulting to UTC for consistency with pure dates
 const getParts = (date, { locale = "en-US", timeZone = "UTC" } = {}) => {
@@ -44,12 +45,11 @@ const getParts = (date, { locale = "en-US", timeZone = "UTC" } = {}) => {
 
 // Add days in UTC (DST-proof)
 const addDaysUTC = (date, days) => {
-  const d = new Date(Date.UTC(
+  return new Date(Date.UTC(
     date.getUTCFullYear(),
     date.getUTCMonth(),
     date.getUTCDate() + Number(days)
   ));
-  return d;
 };
 
 // ---- Formatters ----
@@ -61,7 +61,7 @@ const formatDate = (
   { locale = "en-US", timeZone = "UTC" } = {}
 ) => {
   const date = parseDateSafe(dateInput);
-  if (!isValidDate(date)) return ""; // or return a fallback like "—"
+  if (!isValidDate(date)) return ""; // safe fallback
 
   const { day, monthName, weekday, year } = getParts(date, { locale, timeZone });
   const formattedDay = `${day}${getDaySuffix(day)}`;
@@ -69,21 +69,29 @@ const formatDate = (
   return `${includeWeekday ? `${weekday}, ` : ""}${formattedDay}${includeMonth ? ` ${monthName}` : ""}${includeYear ? ` ${year}` : ""}`;
 };
 
+const parseDateYMD = (str) => {
+  const [y, m, d] = String(str).split("-").map(Number);
+  return new Date(Date.UTC(y, m - 1, d));
+};
+
 export const formatConferenceDates = (start, end, { locale = "en-US", timeZone = "UTC" } = {}) => {
-  const s = parseDateSafe(start);
-  const e = parseDateSafe(end);
-  if (!isValidDate(s) || !isValidDate(e)) return "";
+  const startDate = parseDateYMD(start);
+  const endDate = parseDateYMD(end);
+  if (!isValidDate(startDate) || !isValidDate(endDate)) return "";
 
-  const sParts = getParts(s, { locale, timeZone });
-  const eParts = getParts(e, { locale, timeZone });
+  const s = getParts(startDate, { locale, timeZone });
+  const e = getParts(endDate, { locale, timeZone });
 
-  const sameMonth = sParts.monthName === eParts.monthName && s.getUTCFullYear() === e.getUTCFullYear();
+  const sameMonth = s.monthName === e.monthName && startDate.getUTCFullYear() === endDate.getUTCFullYear();
 
   if (sameMonth) {
-    return `${sParts.monthName} ${sParts.day}${getDaySuffix(sParts.day)} - ${eParts.day}${getDaySuffix(eParts.day)}`;
+    return `${s.monthName} ${s.day}${getDaySuffix(s.day)} - ${e.day}${getDaySuffix(e.day)}`;
   }
-  // Different months (or years)
-  return `${sParts.monthName} ${sParts.day}${getDaySuffix(sParts.day)} - ${eParts.monthName} ${eParts.day}${getDaySuffix(eParts.day)}`;
+
+  // Different month and/or year
+  const left = `${s.monthName} ${s.day}${getDaySuffix(s.day)}${startDate.getUTCFullYear() !== endDate.getUTCFullYear() ? ` ${s.year}` : ""}`;
+  const right = `${e.monthName} ${e.day}${getDaySuffix(e.day)} ${e.year}`;
+  return `${left} - ${right}`;
 };
 
 export const formatFullDate = (
