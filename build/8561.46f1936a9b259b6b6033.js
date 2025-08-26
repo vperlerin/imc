@@ -4,7 +4,7 @@
 // ESM COMPAT FLAG
 t.r(i),
 // EXPORTS
-t.d(i,{default:()=>/* binding */k});
+t.d(i,{default:()=>/* binding */x});
 // EXTERNAL MODULE: ./node_modules/react-icons/sl/index.mjs
 var r=t(4157),a=t(6942),o=t.n(a);
 // EXTERNAL MODULE: ./node_modules/classnames/index.js
@@ -20,17 +20,30 @@ const g={day1:{date:"09-17-2025",program:[{period:"13:00 - …",display:"Arrival
 var f=t(188),v=t(6221),S=t(4373),b=t(4848);
 // EXTERNAL MODULE: ./node_modules/framer-motion/dist/es/components/AnimatePresence/index.mjs + 3 modules
 // ./src/pages/program/index.js
-const k=()=>{const{day:e}=(0,u/* useParams */.g)(),i=(0,u/* useNavigate */.Zp)(),t=Object.keys(g),a=t.indexOf(e||"day1"),k=a>0?t[a-1]:null,x=a<t.length-1?t[a+1]:null,M=e||"day1",j=g[M],[w,A]=(0,c.useState)(M),[N,E]=(0,c.useState)(0);if(// Controls swipe direction
-// Controls swipe direction
-(0,c.useEffect)((()=>{A(M)}),[M]),(0,c.useEffect)((()=>{const i=new Date,t=`${String(i.getMonth()+1).padStart(2,"0")}-${String(i.getDate()).padStart(2,"0")}-${i.getFullYear()}`,r=Object.entries(g).find((([e,i])=>i.date===t))?.[0]||"day1";A(e||r)}),[e]),!j)
-return(0/* Navigate */,b.jsx)(u.C5,{to:"/404",replace:!0});(0,c.useEffect)((()=>{const e=e=>{e.metaKey||e.ctrlKey||e.altKey||(e=>{if(!e)return!1;const i=e.tagName;return e.isContentEditable||"INPUT"===i||"TEXTAREA"===i||"SELECT"===i})(document.activeElement)||(// don't interfere with forms
-"ArrowLeft"===e.key&&k?(e.preventDefault(),k&&(E(-1),i(`/program/${k}`))):"ArrowRight"===e.key&&x?(e.preventDefault(),x&&(E(1),i(`/program/${x}`))):"Home"===e.key&&t.length?(e.preventDefault(),E(-1),i(`/program/${t[0]}`)):"End"===e.key&&t.length&&(e.preventDefault(),E(1),i(`/program/${t[t.length-1]}`)));// don't hijack shortcuts
-};return window.addEventListener("keydown",e,{passive:!1}),()=>window.removeEventListener("keydown",e)}),[k,x,t,i]);
-// Swipe handlers
-const D=(0,f/* useSwipeable */.uh)({onSwipedLeft:()=>{x&&(E(1),// Swipe left
-i(`/program/${x}`))},onSwipedRight:()=>{k&&(E(-1),// Swipe right
-i(`/program/${k}`))},preventDefaultTouchmoveEvent:!0,trackMouse:!0});
-// Animation variants
-return(0/* default */,b.jsxs)(m.A,{title:"Daily Program",children:[(0,b.jsx)("p",{children:"Times are in CEST = UTC + 2h"}),(0,b.jsxs)("div",{...D,children:[(0,b.jsxs)("div",{className:o()(p,"d-flex justify-content-between align-items-center mb-4 mt-3 d-md-none"),children:[k?(0/* Link */,b.jsx)(y.N_,{to:`/program/${k}`,className:d,onClick:()=>E(-1),children:(0/* SlArrowLeft */,b.jsx)(r.SnO,{})}):(0,b.jsx)("div",{}),(0,b.jsx)("h3",{className:"m-0",children:(0,h/* formatFullDate */.Lu)(j.date,!1)}),x?(0/* Link */,b.jsx)(y.N_,{to:`/program/${x}`,className:d,onClick:()=>E(1),children:(0/* SlArrowRight */,b.jsx)(r.dH8,{})}):(0,b.jsx)("div",{})]}),(0,b.jsx)("div",{className:o()("mt-3",n),children:(0/* AnimatePresence */,b.jsx)(v.N,{custom:N,initial:!1,mode:"popLayout",children:(0/* motion */,b.jsxs)(S.P.div,{custom:N,variants:{enter:e=>({x:e>0?"100%":"-100%",opacity:0}),center:{x:0,opacity:1},exit:e=>({x:e>0?"-100%":"100%",opacity:0})},initial:"enter",animate:"center",exit:"exit",transition:{type:"tween",ease:"easeInOut",duration:.4},children:[(0,b.jsxs)("h3",{className:"mt-0 mb-4 border-bottom pb-2 d-none d-md-flex align-items-center gap-3",children:[k&&(0/* Link */,b.jsx)(y.N_,{to:`/program/${k}`,className:d,onClick:()=>E(-1),children:(0/* SlArrowLeft */,b.jsx)(r.SnO,{})}),(0,h/* formatFullDate */.Lu)(j.date,!1),x?(0/* Link */,b.jsx)(y.N_,{to:`/program/${x}`,className:d,onClick:()=>E(1),children:(0/* SlArrowRight */,b.jsx)(r.dH8,{})}):(0,b.jsx)("div",{})]}),(0,b.jsx)("dl",{children:j.program.map(((e,i)=>(0,b.jsx)("div",{className:o()("d-flex flex-column flex-md-row",e?.lectures?.length>0&&"flex-column flex-md-column"),children:e.session?(0,b.jsxs)(b.Fragment,{children:[(0,b.jsxs)("div",{className:o()(e?.lectures?.length>0&&s,"border-bottom pb-2 mb-2"),children:[(0,b.jsx)("h5",{className:"mb-0 mt-3",children:e.session}),e.chair&&(0,b.jsxs)("p",{className:"mb-0",children:[(0,b.jsx)("b",{children:"Chair:"})," ",e.chair]})]}),e.lectures&&e.lectures.map(((i,t)=>(0,b.jsxs)("div",{className:"d-flex flex-column flex-md-row",children:[(0,b.jsx)("dt",{children:i.period}),(0,b.jsxs)("dd",{className:o()("sep"===e.type&&l,"mt-1 mt-md-0 ms-2 ms-md-0"),children:[(0,b.jsx)("strong",{className:"d-block",children:i.title}),(0,b.jsx)("i",{children:i.authors})," ",i.linkTitle&&(0,b.jsx)("a",{href:i.linkTitle,target:"_blank",rel:"noopener noreferrer",children:"[Link]"}),i.display]})]},t)))]}):(0,b.jsxs)(b.Fragment,{children:[(0,b.jsx)("dt",{children:e.period}),(0,b.jsx)("dd",{className:o()("sep"===e.type?l:"fw-bolder","mt-1 mt-md-0 ms-2 ms-md-0 mb-4"),children:e?.linkTitle?(0,b.jsx)("a",{href:e.linkTitle,children:e.display}):e.display})]})},i)))})]},w)})})]})]})};
-/* harmony default export */}
+/** --- Date helpers (Safari-safe) --- */
+// returns local date as 'YYYY-MM-DD'
+const k=e=>{if(e instanceof Date){const i=new Date(e.getTime());return i.setMinutes(i.getMinutes()-i.getTimezoneOffset()),i.toISOString().slice(0,10)}if("string"==typeof e){
+// already ISO?
+if(/^\d{4}-\d{2}-\d{2}$/.test(e))return e;
+// handle MM-DD-YYYY robustly (avoid native Date parsing)
+const i=/^(\d{1,2})-(\d{1,2})-(\d{4})$/.exec(e);if(i){const[e,t,r,a]=i.map(Number);return new Date(Date.UTC(a,t-1,r)).toISOString().slice(0,10)}}
+// fallback: try Date constructor but normalize to local ISO
+const i=new Date(e);return isNaN(i)?"":(i.setMinutes(i.getMinutes()-i.getTimezoneOffset()),i.toISOString().slice(0,10))}// triggers 404/guard if bad
+,x=()=>{const{day:e}=(0,u/* useParams */.g)(),i=(0,u/* useNavigate */.Zp)(),t=(0,c.useMemo)((()=>Object.keys(g)),[]),a=e||"day1",x=g[a],M=t.indexOf(a),j=M>0?t[M-1]:null,w=M<t.length-1?t[M+1]:null,[A,N]=(0,c.useState)(a),[D,E]=(0,c.useState)(0);if(
+// keep active tab in sync with the route
+// keep active tab in sync with the route
+(0,c.useEffect)((()=>{N(a)}),[a]),
+// if no 'day' in URL, pick today's program (by local date) if available
+// if no 'day' in URL, pick today's program (by local date) if available
+(0,c.useEffect)((()=>{if(e)return;const t=(()=>{const e=new Date;return e.setMinutes(e.getMinutes()-e.getTimezoneOffset()),e.toISOString().slice(0,10)})(),r=Object.entries(g).find((([e,i])=>{const r=k(i.date);return r&&r===t}));r?(N(r[0]),i(`/program/${r[0]}`,{replace:!0})):(
+// default to first day if today not found
+N("day1"),i("/program/day1",{replace:!0}));
+// eslint-disable-next-line react-hooks/exhaustive-deps
+}),[e,i]),!x)
+return(0/* Navigate */,b.jsx)(u.C5,{to:"/404",replace:!0});
+// normalize the displayed date once
+const I=k(x.date);(0,c.useEffect)((()=>{const e=e=>{e.metaKey||e.ctrlKey||e.altKey||(e=>{if(!e)return!1;const i=e.tagName;return e.isContentEditable||"INPUT"===i||"TEXTAREA"===i||"SELECT"===i})(document.activeElement)||("ArrowLeft"===e.key&&j?(e.preventDefault(),j&&(E(-1),i(`/program/${j}`))):"ArrowRight"===e.key&&w?(e.preventDefault(),w&&(E(1),i(`/program/${w}`))):"Home"===e.key&&t.length?(e.preventDefault(),E(-1),i(`/program/${t[0]}`)):"End"===e.key&&t.length&&(e.preventDefault(),E(1),i(`/program/${t[t.length-1]}`)))};return window.addEventListener("keydown",e,{passive:!1}),()=>window.removeEventListener("keydown",e)}),[j,w,t,i]);const O=(0,f/* useSwipeable */.uh)({onSwipedLeft:()=>w&&(E(1),i(`/program/${w}`)),onSwipedRight:()=>j&&(E(-1),i(`/program/${j}`)),preventDefaultTouchmoveEvent:!0,trackMouse:!0});
+return(0/* default */,b.jsxs)(m.A,{title:"Daily Program",children:[(0,b.jsx)("p",{children:"Times are in CEST = UTC + 2h"}),(0,b.jsxs)("div",{...O,children:[(0,b.jsxs)("div",{className:o()(p,"d-flex justify-content-between align-items-center mb-4 mt-3 d-md-none"),children:[j?(0/* Link */,b.jsx)(y.N_,{to:`/program/${j}`,className:d,onClick:()=>E(-1),children:(0/* SlArrowLeft */,b.jsx)(r.SnO,{})}):(0,b.jsx)("div",{}),(0,b.jsx)("h3",{className:"m-0",children:(0,h/* formatFullDate */.Lu)(I,!1)}),w?(0/* Link */,b.jsx)(y.N_,{to:`/program/${w}`,className:d,onClick:()=>E(1),children:(0/* SlArrowRight */,b.jsx)(r.dH8,{})}):(0,b.jsx)("div",{})]}),(0,b.jsx)("div",{className:o()("mt-3",n),children:(0/* AnimatePresence */,b.jsx)(v.N,{custom:D,initial:!1,mode:"popLayout",children:(0/* motion */,b.jsxs)(S.P.div,{custom:D,variants:{enter:e=>({x:e>0?"100%":"-100%",opacity:0}),center:{x:0,opacity:1},exit:e=>({x:e>0?"-100%":"100%",opacity:0})},initial:"enter",animate:"center",exit:"exit",transition:{type:"tween",ease:"easeInOut",duration:.4},children:[(0,b.jsxs)("h3",{className:"mt-0 mb-4 border-bottom pb-2 d-none d-md-flex align-items-center gap-3",children:[j&&(0/* Link */,b.jsx)(y.N_,{to:`/program/${j}`,className:d,onClick:()=>E(-1),children:(0/* SlArrowLeft */,b.jsx)(r.SnO,{})}),(0,h/* formatFullDate */.Lu)(I,!1),w?(0/* Link */,b.jsx)(y.N_,{to:`/program/${w}`,className:d,onClick:()=>E(1),children:(0/* SlArrowRight */,b.jsx)(r.dH8,{})}):(0,b.jsx)("div",{})]}),(0,b.jsx)("dl",{children:x.program.map(((e,i)=>(0,b.jsx)("div",{className:o()("d-flex flex-column flex-md-row",e?.lectures?.length>0&&"flex-column flex-md-column"),children:e.session?(0,b.jsxs)(b.Fragment,{children:[(0,b.jsxs)("div",{className:o()(e?.lectures?.length>0&&s,"border-bottom pb-2 mb-2"),children:[(0,b.jsx)("h5",{className:"mb-0 mt-3",children:e.session}),e.chair&&(0,b.jsxs)("p",{className:"mb-0",children:[(0,b.jsx)("b",{children:"Chair:"})," ",e.chair]})]}),e.lectures&&e.lectures.map(((i,t)=>(0,b.jsxs)("div",{className:"d-flex flex-column flex-md-row",children:[(0,b.jsx)("dt",{children:i.period}),(0,b.jsxs)("dd",{className:o()("sep"===e.type&&l,"mt-1 mt-md-0 ms-2 ms-md-0"),children:[(0,b.jsx)("strong",{className:"d-block",children:i.title}),(0,b.jsx)("i",{children:i.authors})," ",i.linkTitle&&(0,b.jsx)("a",{href:i.linkTitle,target:"_blank",rel:"noopener noreferrer",children:"[Link]"}),i.display]})]},t)))]}):(0,b.jsxs)(b.Fragment,{children:[(0,b.jsx)("dt",{children:e.period}),(0,b.jsx)("dd",{className:o()("sep"===e.type?l:"fw-bolder","mt-1 mt-md-0 ms-2 ms-md-0 mb-4"),children:e?.linkTitle?(0,b.jsx)("a",{href:e.linkTitle,children:e.display}):e.display})]})},i)))})]},A)})})]})]})};
+// accepts Date | 'YYYY-MM-DD' | 'MM-DD-YYYY' and returns 'YYYY-MM-DD'
+}
 /***/}]);
