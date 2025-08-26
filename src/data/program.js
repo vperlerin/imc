@@ -1,6 +1,6 @@
 export const programData = {
   day1: {
-    date: "09-17-2025",
+    date: "09-18-2025",
     program: [
       {
         period: "13:00 - …",
@@ -40,7 +40,7 @@ export const programData = {
     ],
   },
   day2: {
-    date: "09-18-2025",
+    date: "09-19-2025",
     program: [
       {
         period: "07:30 - 09:00",
@@ -200,7 +200,7 @@ export const programData = {
     ],
   },
   day3: {
-    date: "09-19-2025",
+    date: "09-20-2025",
     program: [
       {
         period: "07:30 - 08:45",
@@ -258,7 +258,7 @@ export const programData = {
     ],
   },
   day4: {
-    date: "09-20-2025",
+    date: "09-21-2025",
     program: [
       {
         period: "08:30 - 10:00",
