@@ -266,7 +266,7 @@ export const programData = {
         type: "sep",
       },
       {
-        session: "SESSION 7 - Meteor spectroscopy and meteor physics and dynamics",
+        session: "SESSION 7 - Meteor spectroscopy and meteor physics and dynamics - part I/II",
         chair: "Pavel Koten",
         lectures: [
           { period: "10:00 - 10:10", title: "Meteor Spectroscopy Workshop: Summary", authors: "Joe Zender" },
@@ -280,6 +280,8 @@ export const programData = {
         type: "sep",
       },
       {
+        session: "SESSION 7 - Meteor spectroscopy and meteor physics and dynamics  - part II/II",
+        chair: "Pavel Koten",
         lectures: [
           { period: "11:15 - 11:35", title: "A new mechanism of meteor persistent trails II", authors: "Nagatoshi Nogami, Shinsuke Abe" },
           { period: "11:35 - 11:55", title: "Compositional analysis of meteorite ablation spectra using radiative transfer model", authors: "Adriana Pisarčíková, Jiří Borovička, Pavol Matlovič" },
