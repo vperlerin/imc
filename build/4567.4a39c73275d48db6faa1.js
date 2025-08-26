@@ -1,0 +1,102 @@
+"use strict";(self.webpackChunkimc2025=self.webpackChunkimc2025||[]).push([[4567],{
+/***/1280:
+/***/(e,t,n)=>{
+/* harmony export */n.d(t,{
+/* harmony export */_v:()=>/* binding */i
+/* harmony export */});
+/* unused harmony exports onPreventDefault, onPreventStop */
+const i=e=>{e&&e.stopPropagation()}}
+/***/,
+/***/1801:
+/***/(e,t,n)=>{e.exports=n.p+"288f52d16b731bd58232.jpg";
+/***/},
+/***/3318:
+/***/(e,t,n)=>{
+/* harmony export */n.d(t,{
+/* harmony export */L:()=>/* binding */i
+/* harmony export */});const i=(e,{interval:t=100,retries:n=14}={})=>new Promise(((a,r)=>{e().then(a).catch((o=>{setTimeout((()=>{n?i(e,{interval:1.5*t,retries:n-1}).then(a,r):r(o)}),t)}))}));
+/***/},
+/***/3464:
+/***/(e,t,n)=>{e.exports=n.p+"702c5653d2360537e78f.svg";
+/***/},
+/***/4567:
+/***/(e,t,n)=>{
+// EXPORTS
+n.d(t,{A:()=>/* binding */Q});// ./src/components/page-contain/index.module.scss
+// extracted by mini-css-extract-plugin
+/* harmony default export */const i="index-module__pageContain--RGQvQ",a="index-module__illustration--Ik2GN",r="index-module__logo--LKSM6",o="index-module__title--dC_7J";
+// EXTERNAL MODULE: ./node_modules/classnames/index.js
+var s=n(6942),l=n.n(s),m=n(1801),c=n(4882),d=n(3464);// ./src/components/header/index.module.scss
+// extracted by mini-css-extract-plugin
+/* harmony default export */const u="index-module__minWrap--TQuiQ",p="index-module__header--NY734",h="index-module__title--w4iOx";
+// EXTERNAL MODULE: ./node_modules/react-icons/sl/index.mjs
+var g=n(4157);// ./src/components/header/menu/index.module.scss
+// extracted by mini-css-extract-plugin
+/* harmony default export */const x="300px",b="index-module__menuBtn--UHIOc",f="index-module__menuCloseBtn--zceA_",y="index-module__menuIcon--RAury",k="index-module__swipeWrap--ZwPLU",w="index-module__menuOpenOverlay--w4ed9",N="index-module__menu--InWlU",j="index-module__logo--XRVbT",v="index-module__active--lOweW",_="index-module__footer--GgMHd",C="index-module__menuItem--JJ3Di",L="index-module__menuItemTitle--HrQio",M="index-module__active--kl1rr",I="index-module__caret--IjA_P",$="index-module__rotate--W3GXi",D="index-module__menuItemsHolder--W0IwI";
+// EXTERNAL MODULE: ./node_modules/react/index.js
+var S=n(6540),P=n(4848);
+// EXTERNAL MODULE: ./node_modules/react/jsx-runtime.js
+// ./src/components/header/menu/item/index.js
+const T=S.forwardRef((({children:e,className:t,goTo:n=null,isLinkActive:i,title:a,url:r=null},o)=>{const[s,m]=(0,S.useState)(i),[c,d]=(0,S.useState)("0px"),u=(0,S.useRef)(null);(0,S.useEffect)((()=>{e&&d(s?`${u.current.scrollHeight}px`:"0px")}),[e,s,u]);const p=e=>(0,P.jsx)("div",{className:l()(e.className,s&&$),children:(0,P.jsx)("svg",{viewBox:"0 0 320 512",xmlns:"http://www.w3.org/2000/svg",children:(0,P.jsx)("path",{d:"M285.476 272.971L91.132 467.314c-9.373 9.373-24.569 9.373-33.941 0l-22.667-22.667c-9.357-9.357-9.375-24.522-.04-33.901L188.505 256 34.484 101.255c-9.335-9.379-9.317-24.544.04-33.901l22.667-22.667c9.373-9.373 24.569-9.373 33.941 0L285.475 239.03c9.373 9.372 9.373 24.568.001 33.941z",fill:e.fill})})});
+return(0,P.jsxs)("div",{className:l()(C,"d-flex flex-column",t),ref:o,children:[(0,P.jsxs)("a",{className:l()(L,"d-flex justify-content-between w-100 align-items-center px-3",i&&M),href:r||void 0,onClick:t=>{t.preventDefault(),e?m(!s):n&&r&&n(r)},children:[(0,P.jsx)("span",{className:"d-flex align-items-center",children:(0,P.jsx)("b",{children:a})}),e&&(0,P.jsx)(p,{className:I})]}),e&&(0,P.jsx)("div",{className:D,ref:u,style:e&&{maxHeight:`${c}`},children:e})]})}));
+/* harmony default export */
+// EXTERNAL MODULE: ./node_modules/@react-spring/web/dist/react-spring-web.esm.js
+var A=n(8321),F=n(1448),R=n(8983),U=n(5846),O=n(7767),W=n(4976);
+// EXTERNAL MODULE: ./node_modules/react-redux/es/index.js + 18 modules
+// ./src/data/menu.js
+const Z=[{title:"Program",link:"/program",subLinks:[{title:"Daily Program",link:"/program"},{title:"Posters & Demos",link:"/program/posters"},{title:"Radio Workshop",link:"/program/workshops/radio"},{title:"Spectroscopy Workshop",link:"/program/workshops/spectro"}]},{title:"Community & Activities",link:"/community",subLinks:[{title:"Participants",link:"/community/participants"},{title:"Excursion",link:"/community/excursion"},{title:"Scientific and Local Organizing Committee",link:"/community/soc"}]},{title:"Location",link:"/location",subLinks:[{title:"Conference Venue",link:"/location/venue"},{title:"Extra Accommodations",link:"/location/extra"},{title:"Travel Info",link:"/location/travel"},{title:"Practical Info",link:"/location/practical"},{title:"Sights & Surroundings",link:"/location/surroundings"}]},{title:"Registration",link:"/register",subLinks:[{title:"Onsite conference",link:"/register/onsite"},{title:"Online conference",link:"/register/online"},{title:"Payment",link:"/register/payment"},{title:"IMO Membership",link:"/register/membership"}]},{title:"Submissions",link:"/submission",subLinks:[{title:"Submission and Proceedings Guidelines",link:"/submission/guidelines"},{title:"Topics",link:"/submission/topics"}]},{title:"Contact",link:"/contact"},{title:"Login",link:"/login",hideFromMenu:!0},{title:"Service agreement & disclaimer",link:"/disclaimer",hideFromMenu:!0},{title:"Data Protection and Privacy",link:"/gdpr",hideFromMenu:!0},{title:"Program - Day 1",link:"/program/day1",hideFromMenu:!0},{title:"Program - Day 2",link:"/program/day2",hideFromMenu:!0},{title:"Program - Day 3",link:"/program/day3",hideFromMenu:!0},{title:"Program - Day 4",link:"/program/day4",hideFromMenu:!0}];
+// EXTERNAL MODULE: ./src/utils/event.js
+var z=n(1280),E=n(5619);
+// EXTERNAL MODULE: ./src/api/oauth/logout.js
+// ./src/components/header/menu/index.js
+const H=parseInt(x,10)||250,q=({cd:e})=>{const[t,n]=(0,S.useState)(!1),[i,a]=(0,S.useState)(!0),r=(0,O/* useLocation */.zy)(),o=(0,O/* useNavigate */.Zp)(),s=(0/* authSelectors */,F/* useSelector */.d4)(R.Pg.isAdmin),m=(0/* authSelectors */,F/* useSelector */.d4)(R.Pg.isLoc),d=(0/* authSelectors */,F/* useSelector */.d4)(R.Pg.isSoc),u=(0/* authSelectors */,F/* useSelector */.d4)(R.Pg.isParticipant),p=(0/* authSelectors */,F/* useSelector */.d4)(R.Pg.isLoggedIn),{logout:h,loading:x,error:C}=(0,E/* useApiLogout */.M)(),[L,M]=(0,A.useSpring)((()=>({right:-H,config:{tension:350,friction:30}})));(0,S.useEffect)((()=>(t?(a(!1),M.start({right:0}),document.body.classList.add("overflow-hidden"),document.documentElement.classList.add("overflow-hidden")):(M.start({right:-H,onRest:()=>a(!0)}),document.body.classList.remove("overflow-hidden"),document.documentElement.classList.remove("overflow-hidden")),()=>{document.body.classList.remove("overflow-hidden"),document.documentElement.classList.remove("overflow-hidden")})),[t,M]),(0,S.useEffect)((()=>{const e=()=>{n(!1)};return window.addEventListener("resize",e),()=>{window.removeEventListener("resize",e)}}),[]);const I=()=>{n((e=>!e))},$=e=>{o(e),I()};
+return(0,P.jsxs)(P.Fragment,{children:[(0,P.jsx)("button",{className:b,onClick:I,children:(0/* SlMenu */,P.jsx)(g.RAm,{className:y})}),!i&&(0,P.jsx)("div",{className:l()(w),onClick:I,onMouseDown:z/* onStopPropagation */._v,onTouchStart:z/* onStopPropagation */._v}),(0,P.jsx)(A.animated.div,{className:l()(k),style:L,children:(0,P.jsxs)("div",{className:l()(N,"d-flex flex-column h-100"),children:[(0,P.jsx)("button",{className:f,onClick:I,children:(0/* SlClose */,P.jsx)(g.ipV,{className:y})}),(0,P.jsxs)("div",{className:"mb-3",children:[(0,P.jsx)("img",{className:l()(j,"d-block mx-auto my-2"),src:c,alt:`${e.name} ${e.year}`}),(0,P.jsxs)("div",{className:"mx-3 text-center mb-3",children:[(0,P.jsxs)("h4",{className:"fw-bolder m-0",children:["IMC ",e.year]}),(0,P.jsxs)("small",{className:"m-0",children:[(0,U/* formatConferenceDates */.p6)(e.dates.start,e.dates.end),(0,P.jsx)("br",{}),e.location]})]}),Z.map((e=>{const t=r.pathname.startsWith(e.link)||e.subLinks&&e.subLinks.some((e=>r.pathname.startsWith(e.link)));return e.hideFromMenu?null:(0,P.jsx)(T,{className:"py-2",isLinkActive:t,goTo:$,title:e.title,url:e.link,children:e.subLinks&&(0,P.jsx)(P.Fragment,{children:e.subLinks.map((e=>{const t=r.pathname===e.link;
+return(0/* Link */,P.jsx)(W.N_,{"aria-label":e.title,onClick:I,to:e.link,className:l()(t&&v),title:e.title,children:e.title},e.link)}))})},e.link)}))]}),(0,P.jsxs)("div",{className:l()(_,"mt-auto"),children:[(0,P.jsx)("div",{className:"d-flex flex-column justify-content-center mb-3 p-3 gap-2 px-4",children:p?(0,P.jsxs)(P.Fragment,{children:[s&&(0/* Link */,P.jsx)(W.N_,{"aria-label":"Admin",className:"btn btn-outline-tertiary px-3 fw-bolder",to:"/admin/dashboard",onClick:e=>{e.preventDefault(),$("/admin/dashboard")},title:"Admin",children:"Admin"}),m&&(0/* Link */,P.jsx)(W.N_,{"aria-label":"Admin",className:"btn btn-outline-tertiary px-3 fw-bolder",to:"/admin/accomodations",onClick:e=>{e.preventDefault(),$("/admin/accomodations")},title:"Admin",children:"LOC Admin"}),d&&(0/* Link */,P.jsx)(W.N_,{"aria-label":"Admin",className:"btn btn-outline-tertiary px-3 fw-bolder",to:"/admin/contributions/talks",onClick:e=>{e.preventDefault(),$("/admin/contributions/talks")},title:"Admin",children:"SOC Admin"}),u&&(0/* Link */,P.jsx)(W.N_,{"aria-label":"Edit your record",className:"btn btn-outline-tertiary px-3 fw-bolder",to:"/update-registration",onClick:e=>{e.preventDefault(),$("/update-registration")},title:"Register",children:"Update Your Record"}),(0,P.jsx)("button",{"aria-label":"Logout",className:"btn btn-outline-danger px-3 fw-bolder",onClick:async()=>{await h(),n(!1)},title:"Logout",disabled:x,children:x?"Logging out...":"Logout"}),C&&(0,P.jsx)("p",{className:"text-danger mt-2",children:C})]}):(0,P.jsx)("div",{className:"d-flex justify-content-center mb-3 p-3",children:(0/* Link */,P.jsx)(W.N_,{"aria-label":"Login",className:"btn btn-outline-primary px-3 fw-bolder",to:"/login",onClick:e=>{e.preventDefault(),$("/login")},title:"Login",children:"Login"})})}),(0,P.jsxs)("div",{className:"border-top p-3",children:[(0/* Link */,P.jsx)(W.N_,{"aria-label":"Service agreement & disclaimer",className:"d-block",onClick:()=>$("/disclaimer"),to:"/disclaimer",title:"Service agreement & disclaimer",children:"Service agreement & disclaimer"}),(0/* Link */,P.jsx)(W.N_,{"aria-label":"Data Protection and Privacy",className:"d-block",onClick:()=>$("/gdpr"),to:"/gdpr",title:"Data Protection and Privacy",children:"Data Protection and Privacy"}),(0,P.jsx)("br",{}),"developed & maintained by",(0,P.jsx)("br",{}),"Vincent Perlerin for",(0,P.jsx)("br",{}),(0,P.jsx)("a",{href:"https://www.mikehankey.com/html/",target:"_blank",rel:"noopener noreferrer",children:"Mike Hankey & Associates"}),", LLC © ",e.year]})]})]})})]})};
+// EXTERNAL MODULE: ./src/data/conference-data.js + 1 modules
+var B=n(7762);// ./src/components/header/index.js
+const V=({showRegBtn:e=!0})=>{const t=(0/* authSelectors */,F/* useSelector */.d4)(R.Pg.isLoggedIn),n=`${B/* conferenceData */.p.name} ${B/* conferenceData */.p.year}`;
+return(0,P.jsxs)(P.Fragment,{children:[(0,P.jsxs)("div",{className:l()(e&&u,"d-flex align-items-center justify-content-between"),children:[(0,P.jsx)("nav",{className:"p-0 flex-wrap","aria-label":"Main navigation",children:(0,P.jsx)("div",{className:l()(p,"d-flex flex-row flew-wrap px-2 mb-1 justify-content-between"),children:(0/* Link */,P.jsxs)(W.N_,{"aria-label":"IMC Homepage",className:l()("d-flex align-items-center text-dark text-decoration-none gap-2",h),to:"/",title:"IMC Homepage",children:[(0,P.jsx)("img",{src:d,alt:n,className:"rounded-circle border border-2 p-1"}),(0,P.jsxs)("div",{className:"d-flex flex-column",children:[(0,P.jsxs)("h1",{className:"m-0 fw-bolder",children:[B/* conferenceData */.p.name," ",B/* conferenceData */.p.year]}),(0,P.jsxs)("h2",{className:"m-0 d-none d-md-block",children:[(0/* conferenceData */,U/* formatConferenceDates */.p6)(B.p.dates.start,B/* conferenceData */.p.dates.end)," - ",B/* conferenceData */.p.location]})]})]})})}),e&&!t&&(0/* Link */,P.jsxs)(W.N_,{"aria-label":"Register",className:"btn btn-outline-primary fw-bolder",to:"/register",title:"Register",children:["Register ",(0,P.jsx)("span",{className:"d-none d-sm-inline-block",children:"Now!"})]})]}),(0,P.jsx)(q,{cd:B/* conferenceData */.p})]})};
+/* harmony default export */
+// EXTERNAL MODULE: ./node_modules/react-helmet-async/lib/index.esm.js
+var G=n(5902);// ./src/components/page-contain/index.js
+const J=(0,P.jsx)("div",{className:l()(a,"d-flex align-items-center justify-content-center mt-2"),style:{backgroundImage:`url(${m})`},children:(0,P.jsx)("img",{className:l()(r,"d-block mx-auto"),src:c,alt:`${B/* conferenceData */.p.name} ${B/* conferenceData */.p.year}`})}),Q=({padding:e=!1,title:t="",homeIllus:n=!1,children:a,showRegBtn:r=!0})=>{const s=t?`${t} | ${B/* conferenceData */.p.name_display} ${B/* conferenceData */.p.year}`:`${B/* conferenceData */.p.name_display} ${B/* conferenceData */.p.year}`,d=`Welcome to the ${B/* conferenceData */.p.num} ${B/* conferenceData */.p.name_display}, the annual gathering for meteor enthusiasts, researchers, and professionals. Join us from ${B/* conferenceData */.p.dates.start} to ${B/* conferenceData */.p.dates.end} to explore the latest in meteor science.`;
+return(0,P.jsxs)(P.Fragment,{children:[(0/* Helmet */,P.jsxs)(G.mg,{children:[(0,P.jsx)("title",{children:s}),(0,P.jsx)("meta",{name:"description",content:d}),(0,P.jsx)("meta",{name:"keywords",content:"IMC, International Meteor Conference, meteor astronomy, meteor research, IMO"}),(0,P.jsx)("meta",{name:"author",content:"International Meteor Organization (IMO)"}),(0,P.jsx)("meta",{name:"theme-color",content:"#002B36"}),(0,P.jsx)("meta",{property:"og:title",content:s}),(0,P.jsx)("meta",{property:"og:description",content:d}),(0,P.jsx)("meta",{property:"og:image",content:c}),(0,P.jsx)("meta",{property:"og:type",content:"website"}),(0,P.jsx)("meta",{property:"og:url",content:`https://imc{${B/* conferenceData */.p.year}.imo.net`}),(0,P.jsx)("meta",{name:"twitter:card",content:"summary_large_image"}),(0,P.jsx)("meta",{name:"twitter:title",content:s}),(0,P.jsx)("meta",{name:"twitter:description",content:d}),(0,P.jsx)("meta",{name:"twitter:image",content:c}),(0,P.jsx)("link",{rel:"icon",type:"image/png",href:c})]}),(0,P.jsxs)("div",{className:l()(i,"position-relative"),children:[(0,P.jsx)(V,{showRegBtn:r}),t&&(0,P.jsx)("div",{className:l()(o,"p-3 p-md-4"),style:{backgroundImage:`url(${m})`},children:(0,P.jsx)("h2",{className:"m-0",children:t})}),n&&J,(0,P.jsx)("div",{className:l()({"p-3":e},"mx-md-4 my-3 h-100 flex-grow-1 d-flex flex-column px-3 px-md-0"),children:a})]})]})}}
+/***/,
+/***/4882:
+/***/(e,t,n)=>{e.exports=n.p+"83f5845f29996c6b61d0.svg";
+/***/},
+/***/5619:
+/***/(e,t,n)=>{
+/* harmony export */n.d(t,{
+/* harmony export */M:()=>/* binding */m
+/* harmony export */});
+/* harmony import */var i=n(3318),a=n(6540),r=n(1083),o=n(1448),s=n(8983),l=n(7767);
+/* harmony import */const m=()=>{const[e,t]=(0,a.useState)(!1),[n,m]=(0,a.useState)(null),c=(0,o/* .useDispatch */.wA)(),d=(0,l/* .useNavigate */.Zp)();return{logout:(0,a.useCallback)((async()=>{t(!0),m(null);try{const e=await(0,i/* .retry */.L)((()=>r/* ["default"] */.A.get("https://imc2025.imo.net/php/auth/logout.php",{withCredentials:!0})));if(!e.data.success)throw new Error(e.data.message||"An error occurred.");c(s/* .authActions */.I2.logout()),localStorage.removeItem("session"),d("/")}catch(e){m(e.message||"Failed to logout")}finally{t(!1)}}),[c,d]),loading:e,error:n}};
+/***/},
+/***/5846:
+/***/(e,t,n)=>{
+/* harmony export */n.d(t,{
+/* harmony export */Ai:()=>/* binding */m
+/* harmony export */,Lu:()=>/* binding */l
+/* harmony export */,p6:()=>/* binding */s
+/* harmony export */});
+// ---- Utilities ----
+const i=e=>{const t=Number(e);if(t>=11&&t<=13)return"th";switch(t%10){case 1:return"st";case 2:return"nd";case 3:return"rd";default:return"th"}},a=e=>{if(e instanceof Date)return new Date(e.getTime());if("number"==typeof e)return new Date(e);if("string"==typeof e){
+// Pure date: force UTC to avoid TZ drift across platforms
+if(/^\d{4}-\d{2}-\d{2}$/.test(e)){const[t,n,i]=e.split("-").map(Number);return new Date(Date.UTC(t,n-1,i))}
+// Try ISO; if there's a space, try replacing with 'T'
+const t=new Date(e);if(!Number.isNaN(t))return t;const n=new Date(e.replace(" ","T"));if(!Number.isNaN(n))return n}return new Date(NaN)},r=e=>e instanceof Date&&!Number.isNaN(e)
+// Get parts safely, defaulting to UTC for consistency with pure dates
+,o=(e,{locale:t="en-US",timeZone:n="UTC"}={})=>({day:Number(new Intl.DateTimeFormat(t,{day:"numeric",timeZone:n}).format(e)),monthName:new Intl.DateTimeFormat(t,{month:"long",timeZone:n}).format(e),weekday:new Intl.DateTimeFormat(t,{weekday:"long",timeZone:n}).format(e),year:Number(new Intl.DateTimeFormat(t,{year:"numeric",timeZone:n}).format(e))}),s=(e,t,{locale:n="en-US",timeZone:s="UTC"}={})=>{const l=a(e),m=a(t);if(!r(l)||!r(m))return"";const c=o(l,{locale:n,timeZone:s}),d=o(m,{locale:n,timeZone:s});return c.monthName===d.monthName&&l.getUTCFullYear()===m.getUTCFullYear()?`${c.monthName} ${c.day}${i(c.day)} - ${d.day}${i(d.day)}`:`${c.monthName} ${c.day}${i(c.day)} - ${d.monthName} ${d.day}${i(d.day)}`;
+// Different months (or years)
+},l=(e,t=!0,n=!1,s={})=>((e,t=!1,n=!0,s=!1,{locale:l="en-US",timeZone:m="UTC"}={})=>{const c=a(e);if(!r(c))return"";// or return a fallback like "—"
+const{day:d,monthName:u,weekday:p,year:h}=o(c,{locale:l,timeZone:m});return`${t?`${p}, `:""}${d}${i(d)}${n?` ${u}`:""}${s?` ${h}`:""}`})(e,!0,t,n,s),m=(e,t,n=!0,i=!0,{locale:o="en-US",timeZone:s="UTC"}={})=>{const m=a(e);if(!r(m))return"";const c=(d=m,u=t,new Date(Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate()+Number(u))));var d,u;return l(c,n,i,{locale:o,timeZone:s})};
+// Robust date parser (handles Date | number | string)
+}
+/***/,
+/***/7762:
+/***/(e,t,n)=>{
+// EXPORTS
+n.d(t,{p:()=>/* reexport */i});// ./src/data/conference-data.json
+const i=JSON.parse('{"year":2025,"num":"44th","welcome":"Welkom!","thank_you":"Bedankt!","name":"IMC","name_display":"International Meteor Conference","dates":{"start":"2025-09-17","end":"2025-09-20"},"location":"Soest, the Netherlands","hotel":"Stayokay hostel","consulat":"Dutch consulate","deadlines":{"reg":"2025-08-09","paper":"2025-10-31","full_reimbursement_before":"2025-05-01","half_reimbursement_before":"2025-07-15","early_birds":"2025-05-01"},"poster_dim":"A0 size (84.1cm x 118.9cm  / 33.1″ x 46.8″)","poster_print":{"desc":"Maximum size A0 (84.1cm x 118.9cm / 33.1″ x 46.8″), uploaded in PDF, deadline for sending September 1.","price":35,"size":"A0 size (84.1cm x 118.9cm / 33.1″ x 46.8″)"},"sessions":["Video meteor work","Radio meteor work","Visual meteor work","Meteor physics and dynamics","Meteor stream analyses and modelling","Meteor related software and hardware","Ongoing meteor work","Miscellaneous"],"costs":{"after_early_birds":30,"admin":"15€","online":20,"rooms":[{"price":250,"description":"Quadruple room in the IMC host","number":68,"type":"quadruple"},{"price":350,"description":"Double room in the IMC host","number":12,"type":"double"},{"price":500,"description":"Single room in the IMC host","number":8,"type":"single"},{"price":200,"description":"No accommodation","type":"no"}],"tshirts":{"models":["men","women"],"sizes":["S","M","L","XL","XXL"],"price":15},"printed_proceedings":20},"co_organizer":[{"abbr":"IMO","name":"International meteor organization","website":"https://imo.net"},{"abbr":"WGM","name":"KNVWS Meteor Section","website":"https://werkgroepmeteoren.nl/english"}],"workshops":[{"title":"Spectroscopy Workshop","date":"2025-09-18","period":"09:30 to 12:30 CEST","cost":22.5,"description":"including coffee break and lunch","email_to":{"name":"Joe Zender","email":"joe.zender@esa.int"}},{"title":"Radio Workshop","date":"2025-09-17","period":"09:30 to 17:00 CEST","cost":26.5,"cost_online":5,"description":"including coffee break and lunch","email_to":{"name":"Hervé Lamy","email":"herve.lamy@aeronomie.be"}}],"contact":[{"q":"a question about the website or a technical difficulty","email":"vperlerin@gmail.com","name":"V. Perlerin"},{"q":"a question about the conference or accommodation","email":"imc2025@imo.net","name":"IMC 2025 Team"},{"q":"a question about payment or your registration","email":"marc.gyssens@uhasselt.be","name":"IMO Treasurer"},{"q":"a question about any other topic","email":"imc2025@imo.net","name":"IMC 2025 Team"}]}')}// ./src/data/conference-data.js
+/***/}]);
