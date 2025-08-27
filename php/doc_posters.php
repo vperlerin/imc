@@ -59,7 +59,7 @@ foreach ($rows as $row) {
 // Get current year and date
 $currentYear = date("Y");
 $currentDate = date("d-m-Y");
-$fileName = "IMC{$currentYear}-Tshirts-{$currentDate}.xlsx";
+$fileName = "IMC{$currentYear}-Posters-{$currentDate}.xlsx";
 
 // Create Spreadsheet
 $spreadsheet = new Spreadsheet();
