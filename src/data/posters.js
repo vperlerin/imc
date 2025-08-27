@@ -21,7 +21,7 @@ export const postersData = [
   },
   {
     title: "IMC's first Spectroscopy Workshop",
-    authors: "Joe Zender, Adriana Pisarčíková, Gert J. Netjes",
+    authors: "Joe Zender, Ariane Courtot, Adriana Pisarčíková, Gert J. Netjes",
   },
   {
     title: "Mapping meteorite colors using Munsell color charts and multi-color sensors",
