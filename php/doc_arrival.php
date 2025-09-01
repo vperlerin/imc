@@ -2,7 +2,7 @@
 /**
  * doc_arrival.php
  * Exports an Excel file titled "Arrival..." with columns:
- * Title | First name | Last name | Gender | Time of Arrival | Time of Departure | Accomodation
+ * Title | First name | Last name | Gender | Email | Time of Arrival | Time of Departure | Accommodation
  *
  * Requirements:
  * - ONLY ONSITE participants: p.is_online = 0
@@ -52,6 +52,7 @@ $sql = "
         p.first_name,
         p.last_name,
         p.gender,
+        p.email,
         ar.arrival_date,
         ar.arrival_hour,
         ar.arrival_minute,
@@ -110,9 +111,10 @@ $headers = [
     "First name",
     "Last name",
     "Gender",
+    "Email",
     "Arrival",
     "Departure",
-    "Accommodation"  
+    "Accommodation" 
 ];
 $sheet->fromArray([$headers], null, 'A1');
 
@@ -123,7 +125,7 @@ $headerStyle = [
     'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
     'borders' => ['bottom' => ['borderStyle' => Border::BORDER_THIN]]
 ];
-$sheet->getStyle('A1:G1')->applyFromArray($headerStyle);
+$sheet->getStyle('A1:H1')->applyFromArray($headerStyle);
 
 // Data rows
 $data = [];
@@ -136,9 +138,10 @@ foreach ($rows as $r) {
         $r['first_name'] ?? '',
         $r['last_name'] ?? '',
         $r['gender'] ?? '',
+        $r['email'] ?? '',
         $arrival,
         $depart,
-        $r['accomodation'] ?? '-',
+        $r['accomodation'] ?? '-', // keep key name as selected alias
     ];
 }
 if (!empty($data)) {
@@ -146,7 +149,7 @@ if (!empty($data)) {
 }
 
 // Auto-size columns
-foreach (range('A', 'G') as $col) {
+foreach (range('A', 'H') as $col) {
     $sheet->getColumnDimension($col)->setAutoSize(true);
 }
 
