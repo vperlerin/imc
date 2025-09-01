@@ -1,17 +1,27 @@
 <?php
+/**
+ * doc_arrival.php
+ * Exports an Excel file titled "Arrival..." with columns:
+ * Title | First name | Last name | Gender | Email | Time of Arrival | Time of Departure | Accommodation
+ *
+ * Rules:
+ * - ONLY ONSITE participants: p.is_online = 0
+ * - ONLY CONFIRMED participants: p.confirmation_sent = 1
+ * - Include those without accommodation (show "No")
+ * - Sort by Last name, then First name (A→Z)
+ */
 
-// Enable CORS for local development & production
+// --- CORS ---
 $allowed_origins = [
     "https://imc2025.imo.net",
-    "http://localhost:3000"
+    "http://localhost:3000",
 ];
-
 if (isset($_SERVER['HTTP_ORIGIN']) && in_array($_SERVER['HTTP_ORIGIN'], $allowed_origins)) {
     header("Access-Control-Allow-Origin: " . $_SERVER['HTTP_ORIGIN']);
 }
 header("Access-Control-Allow-Credentials: true");
 
-// Include dependencies
+// --- Includes ---
 require_once __DIR__ . "/config.php";
 require_once __DIR__ . "/class/Connect.class.php";
 require_once __DIR__ . "/class/Participant.class.php";
@@ -23,156 +33,132 @@ use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 
+// --- DB ---
 try {
     $pdo = Connect::getPDO();
 } catch (Exception $e) {
     die($e->getMessage());
 }
 
-// Initialize participant manager
-$participantManager = new ParticipantManager($pdo);
-$participants = $participantManager->getAllParticipants($pdo);
+/**
+ * Fetch rows:
+ * - Onsite only
+ * - Confirmed only (confirmation_sent = 1)
+ * - Keep participants without a room via LEFT JOINs
+ * - Map missing/“no” accommodation to “No”
+ * - Sort alphabetically
+ */
+$sql = "
+    SELECT
+        p.title,
+        p.first_name,
+        p.last_name,
+        p.gender,
+        p.email,
+        ar.arrival_date,
+        ar.arrival_hour,
+        ar.arrival_minute,
+        ar.departure_date,
+        ar.departure_hour,
+        ar.departure_minute,
+        CASE
+            WHEN rt.type IS NULL OR rt.type = 'no' THEN 'No'
+            ELSE rt.type
+        END AS accommodation
+    FROM participants p
+    LEFT JOIN arrival ar            ON ar.participant_id = p.id
+    LEFT JOIN accommodation a       ON a.participant_id = p.id
+    LEFT JOIN registration_types rt ON rt.id = a.registration_type_id
+    WHERE p.is_online = 0
+      AND p.confirmation_sent = 1
+    ORDER BY p.last_name ASC, p.first_name ASC
+";
+$stmt = $pdo->prepare($sql);
+$stmt->execute();
+$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Separate Online and Onsite participants (ensure indexed arrays)
-$onlineParticipants = array_values(array_filter($participants, function ($p) {
-    return isset($p["is_online"]) && $p["is_online"] == "1";
-}));
-$onsiteParticipants = array_values(array_filter($participants, function ($p) {
-    return isset($p["is_online"]) && $p["is_online"] == "0";
-}));
+/**
+ * Build "YYYY-MM-DD HH:MM" from date + hour + minute.
+ * If hour is missing, return just the date. If date is empty, return ''.
+ */
+function formatDateTimeParts($date, $hour, $minute): string
+{
+    if (empty($date)) return '';
+    $h = ($hour === null || $hour === '') ? '' : str_pad((string)$hour, 2, '0', STR_PAD_LEFT);
+    $m = ($minute === null || $minute === '') ? '00' : str_pad((string)$minute, 2, '0', STR_PAD_LEFT);
+    return $h === '' ? $date : ($date . ' ' . $h . ':' . $m);
+}
 
-// Get current year and date
+// --- Spreadsheet metadata & setup ---
 $currentYear = date("Y");
-$currentDate = date("d-m-Y");
+$currentDate = date("Y-m-d");
+$fileName = "IMC{$currentYear}-Arrival-{$currentDate}.xlsx";
 
-// Generate filename
-$fileName = "IMC{$currentYear}-Participants-Finance-{$currentDate}.xlsx";
-
-// Create new Spreadsheet
 $spreadsheet = new Spreadsheet();
 $spreadsheet->getProperties()
     ->setCreator("IMC {$currentYear}")
     ->setLastModifiedBy("IMC {$currentYear}")
-    ->setTitle("IMC Participants {$currentYear}")
-    ->setSubject("Participants List")
-    ->setDescription("Excel export for participant data.")
-    ->setKeywords("conference participants export")
-    ->setCategory("Participant Data");
+    ->setTitle("Arrival...")
+    ->setSubject("Arrivals / Departures")
+    ->setDescription("Arrival list export (onsite + confirmed only).")
+    ->setCategory("Logistics");
 
-// Remove the default empty sheet
-$spreadsheet->removeSheetByIndex(0);
+// Use default first sheet
+$sheet = $spreadsheet->getActiveSheet();
+$sheet->setTitle("Arrivals");
 
-/**
- * Create a sheet with participant data
- */
-function createSheet($spreadsheet, $sheetName, $participants, $includeAccommodation = false)
-{
-    if (empty($participants)) {
-        return; // Skip empty sheets
-    }
+// Headers (exact order requested)
+$headers = [
+    "Title",
+    "First name",
+    "Last name",
+    "Gender",
+    "Email",
+    "Arrival",
+    "Departure",
+    "Accommodation"
+];
+$sheet->fromArray([$headers], null, 'A1');
 
-    // Create a new sheet
-    $sheet = $spreadsheet->createSheet();
-    $sheet->setTitle($sheetName);
-    $spreadsheet->setActiveSheetIndex($spreadsheet->getIndex($sheet)); // Ensure it's active
+// Header style
+$headerStyle = [
+    'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
+    'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '4F81BD']],
+    'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+    'borders' => ['bottom' => ['borderStyle' => Border::BORDER_THIN]]
+];
+$sheet->getStyle('A1:H1')->applyFromArray($headerStyle);
 
-    // Define column headers
-$headers = ["Full Name", "Email", "Country", "Confirmed", "Total Cost", "Total Paid", "Remaining Due", "Payment Method", "Comments"];
-    if ($includeAccommodation) {
-        $headers[] = "Accommodation"; // Add accommodation column for onsite participants
-    }
+// Data rows
+$data = [];
+foreach ($rows as $r) {
+    $arrival = formatDateTimeParts($r['arrival_date'] ?? '', $r['arrival_hour'] ?? '', $r['arrival_minute'] ?? '');
+    $depart  = formatDateTimeParts($r['departure_date'] ?? '', $r['departure_hour'] ?? '', $r['departure_minute'] ?? '');
 
-    // Write headers
-    $sheet->fromArray([$headers], NULL, 'A1');
-
-    // Apply header styles
-    $headerStyle = [
-        'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
-        'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '4F81BD']],
-        'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
-        'borders' => ['bottom' => ['borderStyle' => Border::BORDER_THIN]]
+    $data[] = [
+        $r['title'] ?? '',
+        $r['first_name'] ?? '',
+        $r['last_name'] ?? '',
+        $r['gender'] ?? '',
+        $r['email'] ?? '',
+        $arrival,
+        $depart,
+        $r['accommodation'] ?? 'No',
     ];
-    $sheet->getStyle('A1:' . \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex(count($headers)) . '1')
-        ->applyFromArray($headerStyle);
-
-    // Insert participant data
-    $dataRows = [];
-    foreach ($participants as $p) {
-        if (!isset($p["first_name"], $p["last_name"], $p["email"], $p["country"])) {
-            continue; // Skip if required fields are missing
-        }
-
-        // Format full name
-        $fullName = trim("{$p['title']} {$p['last_name']} {$p['first_name']}");
-
-        // Confirmation status
-        $confirmedStatus = isset($p["confirmation_sent"]) && $p["confirmation_sent"] == "1" ? "YES" : "NO";
-
-        $totalDue = isset($p["total_due"]) ? (float) $p["total_due"] : 0;
-        $paypalFee = isset($p["paypal_fee"]) ? (float) $p["paypal_fee"] : 0;
-        $totalPaid = isset($p["total_paid"]) ? (float) $p["total_paid"] : 0;
-
-        $paymentMethod = strtolower(trim($p["payment_method_name"] ?? ''));
-
-        // Only add PayPal fee if method is "paypal"
-        $totalCost = $paymentMethod === 'paypal' ? $totalDue + $paypalFee : $totalDue;
-
-        $remainingDue = $totalCost - $totalPaid;
-
-        // Create row data
-        $dataRow = [
-            $fullName,
-            $p["email"],
-            $p["country"],
-            $confirmedStatus,
-            number_format($totalCost, 2) . "€",
-            number_format($totalPaid, 2) . "€",
-            number_format($remainingDue, 2) . "€",
-            $p["payment_method_name"] ?? "n/a",
-            $p["comments"] ?? "n/a"
-        ];
-
-        if ($includeAccommodation) {
-            $dataRow[] = $p["accommodation"] ?? "Not Assigned"; // Handle missing accommodation
-        }
-
-        $dataRows[] = $dataRow;
-    }
-
-    // Write data rows
-    if (!empty($dataRows)) {
-        $sheet->fromArray($dataRows, NULL, 'A2'); // Start data from row 2
-    }
-
-    // Auto-size columns for better readability
-    $columnCount = count($headers);
-    for ($i = 1; $i <= $columnCount; $i++) {
-        $col = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($i);
-        $sheet->getColumnDimension($col)->setAutoSize(true);
-    }
+}
+if (!empty($data)) {
+    $sheet->fromArray($data, null, 'A2');
 }
 
-// Only create "Onsite Participants" sheet if they exist
-if (!empty($onsiteParticipants)) {
-    createSheet($spreadsheet, "Onsite Participants", $onsiteParticipants, true);
+// Auto-size columns
+foreach (range('A', 'H') as $col) {
+    $sheet->getColumnDimension($col)->setAutoSize(true);
 }
 
-// Only create "Online Participants" sheet if they exist
-if (!empty($onlineParticipants)) {
-    createSheet($spreadsheet, "Online Participants", $onlineParticipants);
+// --- Output ---
+if (function_exists('ob_get_level') && ob_get_level() > 0) {
+    ob_end_clean();
 }
-
-// Ensure at least one sheet exists
-if ($spreadsheet->getSheetCount() == 0) {
-    $spreadsheet->createSheet()->setTitle("No Participants");
-    $spreadsheet->setActiveSheetIndex(0);
-    $spreadsheet->getActiveSheet()->setCellValue('A1', 'No participants found.');
-}
-
-// Set the first sheet as active
-$spreadsheet->setActiveSheetIndex(0);
-
-ob_end_clean();
 header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
 header("Content-Disposition: attachment; filename=\"$fileName\"");
 header("Cache-Control: max-age=0");
