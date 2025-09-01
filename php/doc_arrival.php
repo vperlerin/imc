@@ -125,7 +125,7 @@ foreach ($rows as $r) {
         $r['gender'] ?? '',
         $arrival,
         $depart,
-        $r['accomodation'] ?? 'No', // guaranteed to be single/double/quadruple by WHERE
+        $r['accomodation'] ?? '', // guaranteed to be single/double/quadruple by WHERE
     ];
 }
 if (!empty($data)) {
@@ -133,4 +133,16 @@ if (!empty($data)) {
 }
 
 // Auto-size columns
-foreach (range('A'
+foreach (range('A', 'G') as $col) {
+    $sheet->getColumnDimension($col)->setAutoSize(true);
+}
+
+// --- Output ---
+ob_end_clean();
+header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+header("Content-Disposition: attachment; filename=\"$fileName\"");
+header("Cache-Control: max-age=0");
+
+$writer = new Xlsx($spreadsheet);
+$writer->save("php://output");
+exit;
