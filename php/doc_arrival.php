@@ -4,9 +4,11 @@
  * Exports an Excel file titled "Arrival..." with columns:
  * Title | First name | Last name | Gender | Time of Arrival | Time of Departure | Accomodation
  *
- * IMPORTANT per request:
- * - Use INNER JOIN accommodation AS a ON p.id = a.participant_id
- * - Only keep rows where registration_types.type IN ('single','double','quadruple')
+ * Requirements:
+ * - Include ALL active participants (even with NO accommodation).
+ * - Column "Accomodation": show the registration_types.type when it's one of
+ *   ('single','double','quadruple', etc.), otherwise show "No".
+ * - Sort alphabetically by Last name, then First name.
  */
 
 // --- CORS (same as your pattern) ---
@@ -22,7 +24,7 @@ header("Access-Control-Allow-Credentials: true");
 // --- Includes ---
 require_once __DIR__ . "/config.php";
 require_once __DIR__ . "/class/Connect.class.php";
-require_once __DIR__ . "/class/Participant.class.php"; // not strictly needed for this file, but kept for parity
+require_once __DIR__ . "/class/Participant.class.php"; // keeps parity with other exports
 require __DIR__ . "/../vendor/autoload.php";
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -38,7 +40,14 @@ try {
     die($e->getMessage());
 }
 
-// --- Fetch rows with the exact JOIN/filters requested ---
+/**
+ * Fetch rows:
+ * - LEFT JOIN accommodation & registration_types so participants without accommodation are included.
+ * - Map accommodation to:
+ *     * "No" if registration_types.type is NULL or equals 'no'
+ *     * otherwise the actual type (e.g., 'single', 'double', 'quadruple', ...)
+ * - Sort by last name, then first name (alphabetical).
+ */
 $sql = "
     SELECT
         p.title,
@@ -51,20 +60,25 @@ $sql = "
         ar.departure_date,
         ar.departure_hour,
         ar.departure_minute,
-        r.type AS accomodation
+        CASE
+            WHEN rt.type IS NULL OR rt.type = 'no' THEN 'No'
+            ELSE rt.type
+        END AS accomodation
     FROM participants p
-    INNER JOIN accommodation a ON p.id = a.participant_id
-    INNER JOIN registration_types r ON r.id = a.registration_type_id
-    LEFT JOIN arrival ar ON ar.participant_id = p.id
+    LEFT JOIN arrival ar            ON ar.participant_id = p.id
+    LEFT JOIN accommodation a       ON a.participant_id = p.id
+    LEFT JOIN registration_types rt ON rt.id = a.registration_type_id
     WHERE p.status = 'active'
-      AND r.type IN ('single','double','quadruple')
-    ORDER BY p.last_name, p.first_name
+    ORDER BY p.last_name ASC, p.first_name ASC
 ";
 $stmt = $pdo->prepare($sql);
 $stmt->execute();
 $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// --- Helper: format "YYYY-MM-DD HH:MM" from date + hour + minute ---
+/**
+ * Format "YYYY-MM-DD HH:MM" from date + hour + minute.
+ * If hour is missing, return just the date. If date is empty, return ''.
+ */
 function formatDateTimeParts($date, $hour, $minute): string
 {
     if (empty($date)) return '';
@@ -97,9 +111,9 @@ $headers = [
     "First name",
     "Last name",
     "Gender",
-    "Time of Arrival",
-    "Time of Departure",
-    "Accomodation", // use r.type directly: single | double | quadruple
+    "Arrival",
+    "Departure",
+    "Accommodation" // (spelled as requested)
 ];
 $sheet->fromArray([$headers], null, 'A1');
 
@@ -108,7 +122,7 @@ $headerStyle = [
     'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
     'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '4F81BD']],
     'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
-    'borders' => ['bottom' => ['borderStyle' => Border::BORDER_THIN]],
+    'borders' => ['bottom' => ['borderStyle' => Border::BORDER_THIN]]
 ];
 $sheet->getStyle('A1:G1')->applyFromArray($headerStyle);
 
@@ -125,7 +139,7 @@ foreach ($rows as $r) {
         $r['gender'] ?? '',
         $arrival,
         $depart,
-        $r['accomodation'] ?? '', // guaranteed to be single/double/quadruple by WHERE
+        $r['accomodation'] ?? 'No',
     ];
 }
 if (!empty($data)) {
