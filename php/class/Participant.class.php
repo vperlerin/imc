@@ -1048,33 +1048,7 @@ class ParticipantManager
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-
-
-    public function getAllParticipantsForArrivalList()
-    {
-        $sql = "
-        SELECT
-            p.title,
-            p.first_name,
-            p.last_name,
-            p.gender,
-            a.arrival_date,
-            a.arrival_hour,
-            a.arrival_minute,
-            a.departure_date,
-            a.departure_hour,
-            a.departure_minute
-        FROM participants p
-        LEFT JOIN arrival a ON a.participant_id = p.id
-        WHERE p.status = 'active'
-        ORDER BY p.last_name, p.first_name
-    ";
-
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
+    
 
 
     /**

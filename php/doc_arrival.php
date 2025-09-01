@@ -3,16 +3,16 @@
  * doc_arrival.php
  * Exports an Excel file titled "Arrival..." with columns:
  * Title | First name | Last name | Gender | Time of Arrival | Time of Departure | Accomodation
- * 
- * Uses your existing ParticipantManager. If the helper method
- * getAllParticipantsForArrivalList() is present, it will use it.
- * Otherwise, it falls back to a local query.
+ *
+ * IMPORTANT per request:
+ * - Use INNER JOIN accommodation AS a ON p.id = a.participant_id
+ * - Only keep rows where registration_types.type IN ('single','double','quadruple')
  */
 
-// --- CORS (same pattern as your other scripts) ---
+// --- CORS (same as your pattern) ---
 $allowed_origins = [
     "https://imc2025.imo.net",
-    "http://localhost:3000"
+    "http://localhost:3000",
 ];
 if (isset($_SERVER['HTTP_ORIGIN']) && in_array($_SERVER['HTTP_ORIGIN'], $allowed_origins)) {
     header("Access-Control-Allow-Origin: " . $_SERVER['HTTP_ORIGIN']);
@@ -22,7 +22,7 @@ header("Access-Control-Allow-Credentials: true");
 // --- Includes ---
 require_once __DIR__ . "/config.php";
 require_once __DIR__ . "/class/Connect.class.php";
-require_once __DIR__ . "/class/Participant.class.php";
+require_once __DIR__ . "/class/Participant.class.php"; // not strictly needed for this file, but kept for parity
 require __DIR__ . "/../vendor/autoload.php";
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -31,51 +31,40 @@ use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 
+// --- DB ---
 try {
     $pdo = Connect::getPDO();
 } catch (Exception $e) {
     die($e->getMessage());
 }
 
-$pm = new ParticipantManager($pdo);
+// --- Fetch rows with the exact JOIN/filters requested ---
+$sql = "
+    SELECT
+        p.title,
+        p.first_name,
+        p.last_name,
+        p.gender,
+        ar.arrival_date,
+        ar.arrival_hour,
+        ar.arrival_minute,
+        ar.departure_date,
+        ar.departure_hour,
+        ar.departure_minute,
+        r.type AS accomodation
+    FROM participants p
+    INNER JOIN accommodation a ON p.id = a.participant_id
+    INNER JOIN registration_types r ON r.id = a.registration_type_id
+    LEFT JOIN arrival ar ON ar.participant_id = p.id
+    WHERE p.status = 'active'
+      AND r.type IN ('single','double','quadruple')
+    ORDER BY p.last_name, p.first_name
+";
+$stmt = $pdo->prepare($sql);
+$stmt->execute();
+$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// --- Helper: fetch rows (prefer class method if available) ---
-function fetchArrivalRows(PDO $pdo, ParticipantManager $pm): array
-{
-    if (method_exists($pm, 'getAllParticipantsForArrivalList')) {
-        return $pm->getAllParticipantsForArrivalList();
-    }
-
-    // Fallback query if the method is not added to ParticipantManager yet
-    $sql = "
-        SELECT
-            p.title,
-            p.first_name,
-            p.last_name,
-            p.gender,
-            ar.arrival_date,
-            ar.arrival_hour,
-            ar.arrival_minute,
-            ar.departure_date,
-            ar.departure_hour,
-            ar.departure_minute,
-            CASE
-                WHEN rt.description IS NULL OR rt.description = '' THEN 'NO'
-                ELSE rt.description
-            END AS accomodation
-        FROM participants p
-        LEFT JOIN arrival ar ON ar.participant_id = p.id
-        LEFT JOIN accommodation acc ON acc.participant_id = p.id
-        LEFT JOIN registration_types rt ON acc.registration_type_id = rt.id
-        WHERE p.status = 'active'
-        ORDER BY p.last_name, p.first_name
-    ";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute();
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
-
-// --- Helper: format "YYYY-MM-DD HH:MM" from separate parts ---
+// --- Helper: format "YYYY-MM-DD HH:MM" from date + hour + minute ---
 function formatDateTimeParts($date, $hour, $minute): string
 {
     if (empty($date)) return '';
@@ -84,9 +73,7 @@ function formatDateTimeParts($date, $hour, $minute): string
     return $h === '' ? $date : ($date . ' ' . $h . ':' . $m);
 }
 
-$rows = fetchArrivalRows($pdo, $pm);
-
-// --- Spreadsheet ---
+// --- Spreadsheet metadata & setup ---
 $currentYear = date("Y");
 $currentDate = date("Y-m-d");
 $fileName = "IMC{$currentYear}-Arrival-{$currentDate}.xlsx";
@@ -112,7 +99,7 @@ $headers = [
     "Gender",
     "Time of Arrival",
     "Time of Departure",
-    "Accomodation" // (spelled as requested)
+    "Accomodation", // use r.type directly: single | double | quadruple
 ];
 $sheet->fromArray([$headers], null, 'A1');
 
@@ -121,7 +108,7 @@ $headerStyle = [
     'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
     'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '4F81BD']],
     'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
-    'borders' => ['bottom' => ['borderStyle' => Border::BORDER_THIN]]
+    'borders' => ['bottom' => ['borderStyle' => Border::BORDER_THIN]],
 ];
 $sheet->getStyle('A1:G1')->applyFromArray($headerStyle);
 
@@ -138,7 +125,7 @@ foreach ($rows as $r) {
         $r['gender'] ?? '',
         $arrival,
         $depart,
-        $r['accomodation'] ?? 'NO',
+        $r['accomodation'] ?? 'No', // guaranteed to be single/double/quadruple by WHERE
     ];
 }
 if (!empty($data)) {
@@ -146,16 +133,4 @@ if (!empty($data)) {
 }
 
 // Auto-size columns
-foreach (range('A', 'G') as $col) {
-    $sheet->getColumnDimension($col)->setAutoSize(true);
-}
-
-// --- Output ---
-ob_end_clean();
-header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-header("Content-Disposition: attachment; filename=\"$fileName\"");
-header("Cache-Control: max-age=0");
-
-$writer = new Xlsx($spreadsheet);
-$writer->save("php://output");
-exit;
+foreach (range('A'
