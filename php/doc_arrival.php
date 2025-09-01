@@ -5,13 +5,12 @@
  * Title | First name | Last name | Gender | Time of Arrival | Time of Departure | Accomodation
  *
  * Requirements:
- * - Include ALL active participants (even with NO accommodation).
- * - Column "Accomodation": show the registration_types.type when it's one of
- *   ('single','double','quadruple', etc.), otherwise show "No".
- * - Sort alphabetically by Last name, then First name.
+ * - ONLY ONSITE participants: p.is_online = 0
+ * - Include those without accommodation (show "No")
+ * - Sort by Last name, then First name (A→Z)
  */
 
-// --- CORS (same as your pattern) ---
+// --- CORS ---
 $allowed_origins = [
     "https://imc2025.imo.net",
     "http://localhost:3000",
@@ -24,7 +23,7 @@ header("Access-Control-Allow-Credentials: true");
 // --- Includes ---
 require_once __DIR__ . "/config.php";
 require_once __DIR__ . "/class/Connect.class.php";
-require_once __DIR__ . "/class/Participant.class.php"; // keeps parity with other exports
+require_once __DIR__ . "/class/Participant.class.php"; // keeps parity with your other exporters
 require __DIR__ . "/../vendor/autoload.php";
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -42,11 +41,10 @@ try {
 
 /**
  * Fetch rows:
- * - LEFT JOIN accommodation & registration_types so participants without accommodation are included.
- * - Map accommodation to:
- *     * "No" if registration_types.type is NULL or equals 'no'
- *     * otherwise the actual type (e.g., 'single', 'double', 'quadruple', ...)
- * - Sort by last name, then first name (alphabetical).
+ * - ONSITE only (p.is_online = 0)
+ * - LEFT JOIN accommodation + registration_types to keep participants without a room
+ * - Map accommodation to 'No' when NULL or equal to 'no'
+ * - Sort alphabetically by last name, then first name
  */
 $sql = "
     SELECT
@@ -69,6 +67,7 @@ $sql = "
     LEFT JOIN accommodation a       ON a.participant_id = p.id
     LEFT JOIN registration_types rt ON rt.id = a.registration_type_id
     WHERE p.status = 'active'
+      AND p.is_online = 0
     ORDER BY p.last_name ASC, p.first_name ASC
 ";
 $stmt = $pdo->prepare($sql);
@@ -98,14 +97,14 @@ $spreadsheet->getProperties()
     ->setLastModifiedBy("IMC {$currentYear}")
     ->setTitle("Arrival...")
     ->setSubject("Arrivals / Departures")
-    ->setDescription("Arrival list export.")
+    ->setDescription("Arrival list export (onsite only).")
     ->setCategory("Logistics");
 
 // Use default first sheet
 $sheet = $spreadsheet->getActiveSheet();
 $sheet->setTitle("Arrivals");
 
-// Headers (exact labels & order requested)
+// Headers (exact order requested)
 $headers = [
     "Title",
     "First name",
@@ -113,7 +112,7 @@ $headers = [
     "Gender",
     "Arrival",
     "Departure",
-    "Accommodation" // (spelled as requested)
+    "Accommodation"  
 ];
 $sheet->fromArray([$headers], null, 'A1');
 
@@ -139,7 +138,7 @@ foreach ($rows as $r) {
         $r['gender'] ?? '',
         $arrival,
         $depart,
-        $r['accomodation'] ?? 'No',
+        $r['accomodation'] ?? '-',
     ];
 }
 if (!empty($data)) {
