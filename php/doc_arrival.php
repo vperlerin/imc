@@ -6,6 +6,7 @@
  *
  * Requirements:
  * - ONLY ONSITE participants: p.is_online = 0
+ * - Exclude cancelled and not confirmed participants
  * - Include those without accommodation (show "No")
  * - Sort by Last name, then First name (A→Z)
  */
@@ -23,7 +24,7 @@ header("Access-Control-Allow-Credentials: true");
 // --- Includes ---
 require_once __DIR__ . "/config.php";
 require_once __DIR__ . "/class/Connect.class.php";
-require_once __DIR__ . "/class/Participant.class.php"; // keeps parity with your other exporters
+require_once __DIR__ . "/class/Participant.class.php";
 require __DIR__ . "/../vendor/autoload.php";
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -42,6 +43,7 @@ try {
 /**
  * Fetch rows:
  * - ONSITE only (p.is_online = 0)
+ * - EXCLUDE p.status in ('cancelled','not_confirmed')  (NULLs allowed)
  * - LEFT JOIN accommodation + registration_types to keep participants without a room
  * - Map accommodation to 'No' when NULL or equal to 'no'
  * - Sort alphabetically by last name, then first name
@@ -62,13 +64,13 @@ $sql = "
         CASE
             WHEN rt.type IS NULL OR rt.type = 'no' THEN 'No'
             ELSE rt.type
-        END AS accomodation
+        END AS accommodation
     FROM participants p
     LEFT JOIN arrival ar            ON ar.participant_id = p.id
     LEFT JOIN accommodation a       ON a.participant_id = p.id
     LEFT JOIN registration_types rt ON rt.id = a.registration_type_id
-    WHERE p.status = 'active'
-      AND p.is_online = 0
+    WHERE p.is_online = 0
+      AND (p.status IS NULL OR p.status NOT IN ('cancelled','not_confirmed'))
     ORDER BY p.last_name ASC, p.first_name ASC
 ";
 $stmt = $pdo->prepare($sql);
@@ -114,7 +116,7 @@ $headers = [
     "Email",
     "Arrival",
     "Departure",
-    "Accommodation" 
+    "Accommodation"
 ];
 $sheet->fromArray([$headers], null, 'A1');
 
@@ -141,7 +143,7 @@ foreach ($rows as $r) {
         $r['email'] ?? '',
         $arrival,
         $depart,
-        $r['accomodation'] ?? '-', // keep key name as selected alias
+        $r['accommodation'] ?? 'No',
     ];
 }
 if (!empty($data)) {
@@ -154,7 +156,9 @@ foreach (range('A', 'H') as $col) {
 }
 
 // --- Output ---
-ob_end_clean();
+if (function_exists('ob_get_level') && ob_get_level() > 0) {
+    ob_end_clean();
+}
 header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
 header("Content-Disposition: attachment; filename=\"$fileName\"");
 header("Cache-Control: max-age=0");
