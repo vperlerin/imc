@@ -131,7 +131,7 @@ const AdminParticipantsOnline = () => {
             </div>
             <DocButton
               className="ms-auto"
-              link={`${process.env.REACT_APP_API_URL}/doc_participants.php`}
+              link={`${process.env.REACT_APP_API_URL}/doc_online_participants.php`}
             />
           </div>
           <AdminTable participants={filteredParticipants} onDelete={handleDeleteClick} />
