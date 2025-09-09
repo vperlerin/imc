@@ -2,7 +2,7 @@
 /**
  * doc_online_confirmed.php
  * Exports an Excel file titled "IMC{YYYY}-Online-Confirmed-{YYYY-MM-DD}.xlsx"
- * Columns: Title | First name | Last name | Organization
+ * Columns: Title | First name | Last name | Email | Organization | Email (for copy-paste)
  *
  * Rules:
  * - ONLY ONLINE participants: p.is_online = 1
@@ -39,17 +39,13 @@ try {
     die($e->getMessage());
 }
 
-/**
- * Fetch rows:
- * - Online only
- * - Confirmed only (confirmation_sent = 1)
- * - Sort alphabetically
- */
+// --- Fetch rows ---
 $sql = "
     SELECT
         p.title,
         p.first_name,
         p.last_name,
+        p.email,
         p.organization
     FROM participants p
     WHERE p.is_online = 1
@@ -60,7 +56,7 @@ $stmt = $pdo->prepare($sql);
 $stmt->execute();
 $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// --- Spreadsheet metadata & setup ---
+// --- Spreadsheet metadata ---
 $currentYear = date('Y');
 $currentDate = date('Y-m-d');
 $fileName = "IMC{$currentYear}-Online-Confirmed-{$currentDate}.xlsx";
@@ -74,44 +70,61 @@ $spreadsheet->getProperties()
     ->setDescription("Confirmed online participants export.")
     ->setCategory("Registration");
 
-// Use default first sheet
 $sheet = $spreadsheet->getActiveSheet();
 $sheet->setTitle("Online Confirmed");
 
-// Headers (same style approach as doc_arrival.php)
+// --- Headers ---
 $headers = [
     "Title",
     "First name",
     "Last name",
+    "Email",
     "Organization",
+    "Email (copy-paste)",
 ];
-$sheet->fromArray([$headers], null, 'A1');
+$sheet->fromArray([$headers], null, 'A2');
 
-// Header style (copied pattern)
+// Header style
 $headerStyle = [
     'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
     'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '4F81BD']],
     'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
     'borders' => ['bottom' => ['borderStyle' => Border::BORDER_THIN]],
 ];
-$sheet->getStyle('A1:D1')->applyFromArray($headerStyle);
+$sheet->getStyle('A2:F2')->applyFromArray($headerStyle);
 
-// Data rows
+// --- Data rows ---
 $data = [];
+$allEmails = [];
 foreach ($rows as $r) {
+    $email = $r['email'] ?? '';
+    if ($email !== '') {
+        $allEmails[] = $email;
+    }
+
     $data[] = [
         $r['title'] ?? '',
         $r['first_name'] ?? '',
         $r['last_name'] ?? '',
+        $email,
         $r['organization'] ?? '',
+        $email,
     ];
 }
 if (!empty($data)) {
-    $sheet->fromArray($data, null, 'A2');
+    $sheet->fromArray($data, null, 'A3');
 }
 
-// Auto-size columns
-foreach (range('A', 'D') as $col) {
+// --- Master email list in first row ---
+if (!empty($allEmails)) {
+    $sheet->setCellValue('A1', 'All emails (copy-paste)');
+    $sheet->mergeCells('B1:F1');
+    $sheet->setCellValue('B1', implode(', ', $allEmails));
+    $sheet->getStyle('A1:B1')->getFont()->setBold(true);
+}
+
+// --- Auto-size columns ---
+foreach (range('A', 'F') as $col) {
     $sheet->getColumnDimension($col)->setAutoSize(true);
 }
 
