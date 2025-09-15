@@ -19,6 +19,10 @@ const Posters = () => {
                 <p>By: {poster.authors}</p>
               </li>
             ))}
+            <li>
+              <h5 className="mb-1">An Analysis of Forward Scatter Radio Meteoroid Head Echoes Using Video Meteor Trails</h5>
+              <p>By: Mike German</p>
+            </li>
           </ol>
         </>
       ) : (
