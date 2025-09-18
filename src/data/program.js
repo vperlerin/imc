@@ -193,11 +193,11 @@ export const programData = {
       },
       {
         period: "21:00 - 22:00",
-        display: "International Meteor Organization General Assembly Meeting",
+        display: "Quiz",
       },
       {
         period: "22:00 - …",
-        display: "Quiz",
+        display: "Free time",
         type: "sep",
       },
     ],
