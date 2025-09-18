@@ -79,7 +79,7 @@ export const programData = {
         type: "sep",
       },
       {
-         session: "SESSION 2 - Meteoroid Streams - part II",
+        session: "SESSION 2 - Meteoroid Streams - part II",
         chair: "Francisco Ocaña",
         lectures: [
           {
@@ -180,7 +180,7 @@ export const programData = {
       },
       {
         period: "17:20 - 18:30",
-        display: "Poster Session", 
+        display: "Poster Session",
       },
       {
         period: "18:30 - 19:45",
@@ -192,8 +192,12 @@ export const programData = {
         display: "International Meteor Organization General Assembly Meeting",
       },
       {
-        period: "21:00 - …",
-        display: "Free time",
+        period: "21:00 - 22:00",
+        display: "International Meteor Organization General Assembly Meeting",
+      },
+      {
+        period: "22:00 - …",
+        display: "Quiz",
         type: "sep",
       },
     ],
@@ -232,7 +236,7 @@ export const programData = {
       },
       {
         period: "11:45 - 12:00",
-        display: "Group photo", 
+        display: "Group photo",
       },
       {
         period: "12:00 - 13:00",
@@ -241,7 +245,7 @@ export const programData = {
       },
       {
         period: "13:00 - 18:30",
-        display: "Excursion", 
+        display: "Excursion",
         linkTitle: "/community/excursion"
       },
       {
