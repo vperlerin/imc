@@ -71,7 +71,7 @@ module.exports = (env, argv) => {
                                 postcssOptions: {
                                     plugins: [
                                         'autoprefixer',
-                                        'postcss-discard-duplicates' 
+                                        'postcss-discard-duplicates'
                                     ],
                                 },
                             },
@@ -98,7 +98,7 @@ module.exports = (env, argv) => {
                                 postcssOptions: {
                                     plugins: [
                                         'autoprefixer',
-                                        'postcss-discard-duplicates'  
+                                        'postcss-discard-duplicates'
                                     ],
                                 },
                             },
@@ -129,6 +129,7 @@ module.exports = (env, argv) => {
                         }
                     ]
                 },
+                { test: /\.pdf$/i, type: 'asset/resource' },
             ],
         },
         optimization: {
@@ -152,11 +153,15 @@ module.exports = (env, argv) => {
         },
         devServer: {
             historyApiFallback: true,
-            static: path.resolve(__dirname, 'build'),
+            static: {
+                directory: path.resolve(__dirname, 'public'),
+                publicPath: '/',
+                watch: true,
+            },
             compress: true,
             hot: true,
             port: 3000,
             open: false,
-        },
+        }
     };
 };

@@ -1,6 +1,7 @@
 import { SlArrowLeft, SlArrowRight } from "react-icons/sl";
 import classNames from "classnames";
 import css from "./index.module.scss";
+import bookletPdf from '@/assets/files/abstracts_booklet.pdf';
 import React, { useState, useEffect, useMemo } from "react";
 import PageContain from "components/page-contain";
 import { formatFullDate } from "utils/date";
@@ -145,7 +146,10 @@ const Program = () => {
 
   return (
     <PageContain title="Daily Program">
-      <p>Times are in CEST = UTC + 2h</p>
+      <div className="d-flex flex-column flex-md-row gap-2 align-items-between align-items-md-start">
+        <span>Times are in CEST = UTC + 2h</span>
+        <a href={bookletPdf} target="_blank" rel="noopener noreferrer"><b>Download Abstract Booklet (PDF)</b></a>
+      </div>
 
       <div {...handlers}>
         <div className={classNames(css.arrows, "d-flex justify-content-between align-items-center mb-4 mt-3 d-md-none")}>
