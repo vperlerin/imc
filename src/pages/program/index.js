@@ -9,7 +9,9 @@ import { Link, useParams, useNavigate, Navigate } from "react-router-dom";
 import { programData as pd } from "data/program";
 import { useSwipeable } from "react-swipeable";
 import { motion, AnimatePresence } from "framer-motion";
-
+import { resolveLectureHref, getFileExtTag } from 'utils/resolve-lecture-href';
+ 
+ 
 /** --- Date helpers (Safari-safe) --- */
 // returns local date as 'YYYY-MM-DD'
 const getTodayLocalISO = () => {
@@ -44,6 +46,9 @@ const toISODateString = (input) => {
   }
   return ""; // triggers 404/guard if bad
 };
+
+ 
+
 
 const Program = () => {
   const { day } = useParams();
@@ -145,7 +150,7 @@ const Program = () => {
   };
 
   return (
-    <PageContain title="Daily Program">
+    <PageContain title="Daily Program">  
       <div className="d-flex flex-column flex-md-row gap-1 justify-content-md-between mb-3">
         <span>Times are in CEST = UTC + 2h</span>
         <a href={bookletPdf} target="_blank" rel="noopener noreferrer"><b>Download Abstract Booklet (PDF)</b></a>
@@ -224,13 +229,24 @@ const Program = () => {
                             <div className="d-flex flex-column flex-md-row" key={idx}>
                               <dt>{lecture.period}</dt>
                               <dd className={classNames(item.type === "sep" && css.sep, "mt-1 mt-md-0 ms-2 ms-md-0")}>
-                                <strong className="d-block">{lecture.title}</strong>
+                                <strong className="d-block">
+                                  {(() => {
+                                    const href = resolveLectureHref(lecture.link);
+                                    const ext = getFileExtTag(lecture.link || href);
+                                    const badge = ext ? <span className={css.fileBadge}>[{ext}]</span> : null;
+
+                                    return href ? (
+                                      <a href={href} target="_blank" rel="noopener noreferrer">
+                                        {lecture.title} {badge}
+                                      </a>
+                                    ) : (
+                                      <>
+                                        {lecture.title} {badge}
+                                      </>
+                                    );
+                                  })()}
+                                </strong>
                                 <i>{lecture.authors}</i>{" "}
-                                {lecture.linkTitle && (
-                                  <a href={lecture.linkTitle} target="_blank" rel="noopener noreferrer">
-                                    [Link]
-                                  </a>
-                                )}
                                 {lecture.display}
                               </dd>
                             </div>

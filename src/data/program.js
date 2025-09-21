@@ -52,8 +52,9 @@ export const programData = {
         chair: "Francisco Ocaña",
         lectures: [
           {
+            link: 'lectures/ryabova_icm2025_.pptx',
             period: "09:00 - 09:20",
-            title: "Why Geminids are a comet stream (online)",
+            title: "Why Geminids are a comet stream",
             authors: "Galina Ryabova",
           },
           {
@@ -215,9 +216,19 @@ export const programData = {
         chair: "Simon Anghel",
         lectures: [
           { period: "08:45 - 09:15", title: "To catch a falling star: The search for cosmic dust on Earth", authors: "Guido Jonker, Tim Schipper, Daphne Lagendijk, Steven Goderis, Jeroen van der Lubbe, Wim van Westrenen" },
-          { period: "09:15 - 09:37", title: "Almost a fireball: Asteroid 2024 YR4", authors: "Detlef Koschny" },
+          {
+            period: "09:15 - 09:37",
+            link: 'lectures/Almost a fireball Asteroid 2024 YR4 Detlef Koschny.pptx',
+            title: "Almost a fireball: Asteroid 2024 YR4",
+            authors: "Detlef Koschny"
+          },
           { period: "09:37 - 09:59", title: "Re-entry of space debris and the meteor community", authors: "Daniel Kastinen, Juha Vierinen, Johan Kero" },
-          { period: "09:59 - 10:15", title: "Recent planetary defence activities at ESA’s Planetary Defence Office", authors: "Francisco Ocaña" },
+          {
+            link: 'lectures/Ocana_IMC_2025.pdf',
+            period: "09:59 - 10:15",
+            title: "Recent planetary defence activities at ESA’s Planetary Defence Office",
+            authors: "Francisco Ocaña"
+          },
         ],
       },
       {
