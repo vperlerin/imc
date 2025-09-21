@@ -109,6 +109,7 @@ export const programData = {
             authors: "Filip Hlobik, Jérémie Vaubaillon",
           },
           {
+            link: 'lectures/Calders_fitting_2025.pptx',
             period: "11:49 - 12:00",
             title: "Improving meteor shower characterization from radio meteor counts in a multi-observer network",
             authors: "Stijn Calders, Johan De Keyser, Hervé Lamy, Katrien Kolenberg",
