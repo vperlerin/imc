@@ -36,6 +36,14 @@ const Home = () => {
         </div>
         <div>
           <h2 className="mb-3 fw-bolder">{cd.welcome}</h2>
+
+          The International Meteor Conference 2025 in Soest was a great success, bringing together professional and amateur meteor enthusiasts from around the world.
+You can relive the best moments through our shared photo gallery:
+          <div className="my-3">
+          <a href="https://www.flickr.com/photos/203547527@N07/"> <img src="https://live.staticflickr.com/65535/54811827937_a8c898d7f8_c.jpg" alt="IMC2025 Group Photo" class="img-fluid w-100"/></a> 
+        </div>
+        
+          {/*
           <p>
             The {cd.num} International Meteor Conference (IMC {cd.year}) will be held in {cd.location} from {formatConferenceDates(cd.dates.start, cd.dates.end)}.
             The IMC is the annual meeting of the IMO, which brings together amateurs from all over the world who engage in meteor observation, analysis and instrumentation.
@@ -60,9 +68,10 @@ const Home = () => {
               </b>
             )}
           </div>
+            */}
 
           <p>
-            IMC {cd.year} is jointly organized by
+            IMC {cd.year} was jointly organized by
             {cd.co_organizer.map((org, index) => (
               <React.Fragment key={org.abbr}>
                 {index === 0 ? " " : " and "}
