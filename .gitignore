@@ -17,3 +17,6 @@ build/report.html
 ./DRAFT.txt  
 vendor/
 php/config/
+/build/lectures/*
+/src/assets/lectures/*
+!src/assets/lectures/README.md

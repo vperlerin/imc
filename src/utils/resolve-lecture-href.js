@@ -1,7 +1,7 @@
 // src/utils/lectures/resolve-lecture-href.js
 
 // Grab all supported lecture files from src/assets/lectures (no subdirs; set 3rd arg true if you have subfolders)
-const ctx = require.context('@/assets/lectures', false, /\.(pdf|pptx?|docx?|xlsx?)$/i);
+const ctx = require.context('@/assets/lectures', false, /\.(pdf|pptx?|docx?|zip|xlsx?)$/i);
 
 const normalizeKey = (s) =>
   String(s || '')

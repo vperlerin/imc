@@ -142,10 +142,8 @@ module.exports = (env, argv) => {
             }
           ]
         },
-
-        // ✅ STEP A: handle Office/PDF files from anywhere under src
         {
-          test: /\.(pdf|pptx?|docx?|xlsx?)$/i,
+           test: /\.(pdf|pptx?|docx?|xlsx?|zip)$/i,
           type: 'asset/resource',
           generator: {
             // Emits to /build/lectures/<original name>.<ext>

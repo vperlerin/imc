@@ -21,11 +21,13 @@ export const programData = {
         chair: "Felix Bettonvil",
         lectures: [
           {
+            link: "001-2025-09-18_Kenworthy_IMC_Exoring_diversity.zip",
             period: "20:00 - 20:55",
             title: "Invited talk: The curious case of transits by giant disks of dust",
             authors: "Matthew Kenworthy",
           },
           {
+            link: "002-DART-Didymos-IMC-2025.pptx",
             period: "20:55 - 21:15",
             title: "Invited talk: Material from the DART impact on asteroid Dimorphos can reach Earth (online)",
             authors: "Paul Wiegert",
@@ -52,7 +54,7 @@ export const programData = {
         chair: "Francisco Ocaña",
         lectures: [
           {
-            link: 'lectures/ryabova_icm2025_.pptx',
+            link: 'ryabova_icm2025_.pptx',
             period: "09:00 - 09:20",
             title: "Why Geminids are a comet stream",
             authors: "Galina Ryabova",
@@ -63,6 +65,7 @@ export const programData = {
             authors: "Chih-Ming Lin, I-Ching Yang",
           },
           {
+            link: "2-03-IMC_2025_Ashimbekova.pdf",
             period: "09:30 - 09:45",
             title: "916 meteor showers: investigating their reality and implications to the near-Earth environment",
             authors: "Aishabibi Ashimbekova, Jérémie Vaubaillon",
@@ -84,16 +87,19 @@ export const programData = {
         chair: "Francisco Ocaña",
         lectures: [
           {
+            link: "2-05-IMC2025_Koten.pptx",
             period: "10:30 - 10:47",
             title: "A single-station 2002 Leonid meteor cluster",
             authors: "Pavel Koten, David Čapek, Bernd Gährken, Jérémie Vaubaillon",
           },
           {
+            link :'2-06-IMC2025_Shrbeny.pdf',
             period: "10:47 - 11:04",
             title: "Lyrid meteor shower observed by the European Fireball Network",
             authors: "Lukáš Shrbený, Pavel Spurný, Jiří Borovička",
           },
           {
+            link :'2-07-Voros IMC 2025.pptx',
             period: "11:04 - 11:21",
             title: "Determination of physical properties of Eta-Virginids from AMOS all-sky meteor observations",
             authors: "Tomáš Vörös, Juraj Tóth",
@@ -104,12 +110,13 @@ export const programData = {
             authors: "Gabriel Borderes Motta, Jiří Borovička",
           },
           {
+            link: "2-09-IMC_Friday_Hlobik.zip",
             period: "11:32 - 11:49",
             title: "Dynamical history of Kappa-Cygnid and August Draconid meteoroids",
             authors: "Filip Hlobik, Jérémie Vaubaillon",
           },
           {
-            link: 'lectures/Calders_fitting_2025.pptx',
+            link: 'Calders_fitting_2025.pptx',
             period: "11:49 - 12:00",
             title: "Improving meteor shower characterization from radio meteor counts in a multi-observer network",
             authors: "Stijn Calders, Johan De Keyser, Hervé Lamy, Katrien Kolenberg",
@@ -126,26 +133,31 @@ export const programData = {
         chair: "Norton O. Szabó",
         lectures: [
           {
+            link: "2-11-Anghel-IMC_2025_ML.zip",
             period: "13:30 - 14:00",
             title: "Machine learning in meteor science: A review",
             authors: "Simon Anghel",
           },
           {
+            link: "2-12-Michael Fruehauf_Updates_on_AllBert_EinStein_creating_a_fireball_with_an_artificial_meteoroid.pptx",
             period: "14:00 - 14:11",
             title: "Updates on AllBert EinStein: creating a fireball with an artificial meteoroid",
             authors: "Michael Frühauf, Detlef Koschny, Luca Mansel, Zijin Shao, Vidisha Baviskar",
           },
           {
+            link: "2-13-GMNmeteorNet.pptx",
             period: "14:11 - 14:22",
             title: "Improving meteor candidate filtering in Global Meteor Network pipeline",
             authors: "Dino Gržinić",
           },
           {
+            link: "2-14-MeteorLog.pptx",
             period: "14:22 - 14:33",
             title: "MeteorLog - Mobile app for streamlining visual meteor observations",
             authors: "Dino Gržinić",
           },
           {
+            link: "2-15-Project MERLIN_Roman Piffl_2025.pdf",
             period: "14:33 - 14:44",
             title: "Project MERLIN - MEteoR Lightcurve INvestigation",
             authors: "Roman Piffl",
@@ -167,12 +179,27 @@ export const programData = {
         chair: "Cis Verbeeck",
         lectures: [
           { period: "15:30 - 15:40", title: "Radio Meteor Workshop: Summary", authors: "Hervé Lamy" },
-          { period: "15:40 - 15:55", title: "Determining the speed of a meteor using the phase of the Fourier spectrum: application to BRAMS data", authors: "Hervé Lamy, Joachim Balis" },
-          { period: "15:55 - 16:10", title: "Anomalous long duration communication meteor scatter echoes at 432 MHz", authors: "Bill Ward" },
-          { period: "16:10 - 16:20", title: "Solving the “epsilon” mystery", authors: "Christian Steyaert" },
-          { period: "16:20 - 16:35", title: "Simultaneous forward scatter observations of two beacons during March 2025", authors: "Christian Steyaert, Johan Bogaerts" },
-          { period: "16:35 - 16:50", title: "BRAMS interferometer calibration survey", authors: "Johannes Sebastian Laur, Hervé Lamy, Michel Anciaux, Joachim Balis" },
-          { period: "16:50 - 17:05", title: "Improved meteoroid trajectory and speed reconstruction with BRAMS: pre-t0 phase and uncertainty analysis", authors: "Joachim Balis, Hervé Lamy, Michel Anciaux, Emmanuel Jehin, Johan De Keyser, Daniel Kastinen, Peter G. Brown" },
+          { 
+            link: "2-18-Lamy_190925.pptx",
+            period: "15:40 - 15:55", 
+            title: "Determining the speed of a meteor using the phase of the Fourier spectrum: application to BRAMS data", 
+            authors: "Hervé Lamy, Joachim Balis" },
+          { 
+            link: "Long duration reflections IMC 2025 BW.pptx",
+            period: "15:55 - 16:10", title: "Anomalous long duration communication meteor scatter echoes at 432 MHz", authors: "Bill Ward" },
+          { 
+            link : "2-20-Solving the ‘epsilon’ mystery.pptx",
+            period: "16:10 - 16:20", title: "Solving the “epsilon” mystery", authors: "Christian Steyaert" },
+          {
+            link: "2-21 Simultaneous forward scatter observations of two beacons during March 2025.pptx",
+            period: "16:20 - 16:35", title: "Simultaneous forward scatter observations of two beacons during March 2025", authors: "Christian Steyaert, Johan Bogaerts" },
+          { 
+            link: "2-22-IMC2025_LaurJohannes.pptx",
+            period: "16:35 - 16:50", title: "BRAMS interferometer calibration survey", authors: "Johannes Sebastian Laur, Hervé Lamy, Michel Anciaux, Joachim Balis" },
+          { 
+            
+            link: "2-23-Friday_1650_Balis_IMC2025.pptx",
+            period: "16:50 - 17:05", title: "Improved meteoroid trajectory and speed reconstruction with BRAMS: pre-t0 phase and uncertainty analysis", authors: "Joachim Balis, Hervé Lamy, Michel Anciaux, Emmanuel Jehin, Johan De Keyser, Daniel Kastinen, Peter G. Brown" },
         ],
       },
       {
@@ -216,16 +243,18 @@ export const programData = {
         session: "SESSION 5 - Ongoing Meteor Work, Miscellaneous",
         chair: "Simon Anghel",
         lectures: [
-          { period: "08:45 - 09:15", title: "To catch a falling star: The search for cosmic dust on Earth", authors: "Guido Jonker, Tim Schipper, Daphne Lagendijk, Steven Goderis, Jeroen van der Lubbe, Wim van Westrenen" },
+          { 
+            link: "3-01 Guido Jonker - To catch a falling star - IMC 2025_v2.zip",
+            period: "08:45 - 09:15", title: "To catch a falling star: The search for cosmic dust on Earth", authors: "Guido Jonker, Tim Schipper, Daphne Lagendijk, Steven Goderis, Jeroen van der Lubbe, Wim van Westrenen" },
           {
             period: "09:15 - 09:37",
-            link: 'lectures/Almost a fireball Asteroid 2024 YR4 Detlef Koschny.pptx',
+            link: 'Almost a fireball Asteroid 2024 YR4 Detlef Koschny.pptx',
             title: "Almost a fireball: Asteroid 2024 YR4",
             authors: "Detlef Koschny"
           },
           { period: "09:37 - 09:59", title: "Re-entry of space debris and the meteor community", authors: "Daniel Kastinen, Juha Vierinen, Johan Kero" },
           {
-            link: 'lectures/Ocana_IMC_2025.pdf',
+            link: 'Ocana_IMC_2025.pdf',
             period: "09:59 - 10:15",
             title: "Recent planetary defence activities at ESA’s Planetary Defence Office",
             authors: "Francisco Ocaña"
@@ -241,9 +270,15 @@ export const programData = {
         session: "SESSION 6 - Video Meteor Work",
         chair: "Maximilian Vovk",
         lectures: [
-          { period: "10:45 - 11:07", title: "AMOS global meteor network: Status and results", authors: "Juraj Tóth, Pavol Matlovič, Leonard Kornoš, Tomáš Paulech, Pavol Zigo, Martin Baláž, Tomáš Vörös, Mária Paprskárová, Filip Hlobik, Adriana Pisarčíková, Veronika Pazderová, Jaroslav Šimon" },
-          { period: "11:07 - 11:18", title: "Event-based camera for meteor sciences", authors: "Jérémie Vaubaillon, Laure Acin, Aishabibi Ashimbekova, Meryem Guennoun, Camille Simon-Chane, Aymeric Histace" },
-          { period: "11:18 - 11:45", title: "What have AllSky7 and the Gartner Hype Cycle in common?", authors: "Sirko Molau" },
+          { 
+            link: "TOTH- IMC 2025-NEW.pdf",
+            period: "10:45 - 11:07", title: "AMOS global meteor network: Status and results", authors: "Juraj Tóth, Pavol Matlovič, Leonard Kornoš, Tomáš Paulech, Pavol Zigo, Martin Baláž, Tomáš Vörös, Mária Paprskárová, Filip Hlobik, Adriana Pisarčíková, Veronika Pazderová, Jaroslav Šimon" },
+          { 
+            link: "3-06-IMC2025-Vaubaillon.pptx",
+            period: "11:07 - 11:18", title: "Event-based camera for meteor sciences", authors: "Jérémie Vaubaillon, Laure Acin, Aishabibi Ashimbekova, Meryem Guennoun, Camille Simon-Chane, Aymeric Histace" },
+          { 
+            link: "3-07-imc2025_gartner_AS7.pptx",
+            period: "11:18 - 11:45", title: "What have AllSky7 and the Gartner Hype Cycle in common?", authors: "Sirko Molau" },
         ],
       },
       {
@@ -285,8 +320,18 @@ export const programData = {
         chair: "Pavel Koten",
         lectures: [
           { period: "10:00 - 10:10", title: "Meteor Spectroscopy Workshop: Summary", authors: "Joe Zender" },
-          { period: "10:10 - 10:30", title: "A fragmentation and differential ablation model for simulating dynamics and light emission of meteoroids", authors: "Mária Paprskárová, Juraj Tóth" },
-          { period: "10:30 - 10:45", title: "Unveiling meteoroid properties through dynamic nested sampling: A probabilistic approach to optical meteor data", authors: "Maximilian Vovk, Peter G. Brown, Denis Vida" },
+          { 
+            link: "04-02-imc-2025-paprskarova.pptx",
+            period: "10:10 - 10:30",
+            title: "A fragmentation and differential ablation model for simulating dynamics and light emission of meteoroids", 
+            authors: "Mária Paprskárová, Juraj Tóth" 
+          },
+          {
+            link: "04-03-Vovk-meteors-dynesty-fun.zip",
+            period: "10:30 - 10:45", 
+            title: "Unveiling meteoroid properties through dynamic nested sampling: A probabilistic approach to optical meteor data", 
+            authors: "Maximilian Vovk, Peter G. Brown, Denis Vida"
+           },
         ],
       },
       {
@@ -298,7 +343,12 @@ export const programData = {
         session: "SESSION 7 - Meteor spectroscopy and meteor physics and dynamics  - part II",
         chair: "Pavel Koten",
         lectures: [
-          { period: "11:15 - 11:35", title: "A new mechanism of meteor persistent trails II", authors: "Nagatoshi Nogami, Shinsuke Abe" },
+          {
+            link: "04-05-2025 IMC A mechanism of meteor persistent trail.pptx",
+            period: "11:15 - 11:35", 
+            title: "A new mechanism of meteor persistent trails II", 
+            authors: "Nagatoshi Nogami, Shinsuke Abe" 
+          },
           { period: "11:35 - 11:55", title: "Compositional analysis of meteorite ablation spectra using radiative transfer model", authors: "Adriana Pisarčíková, Jiří Borovička, Pavol Matlovič" },
         ],
       },
