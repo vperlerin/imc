@@ -93,8 +93,7 @@ export const programData = {
             authors: "Pavel Koten, David Čapek, Bernd Gährken, Jérémie Vaubaillon",
           },
           {
-            link :'2-06-IMC2025_Shrbeny.pdf',
-            period: "10:47 - 11:04",
+             period: "10:47 - 11:04",
             title: "Lyrid meteor shower observed by the European Fireball Network",
             authors: "Lukáš Shrbený, Pavel Spurný, Jiří Borovička",
           },
