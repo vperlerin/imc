@@ -162,6 +162,7 @@ export const programData = {
             authors: "Roman Piffl",
           },
           {
+            link: "IMC-2025-Export.pptx", 
             period: "14:44 - 15:00",
             title: "Meteor Detection based on Forward Scattering with SDR and the BRAMS Beacon (online)",
             authors: "Maximilian Bundscherer, Thomas Schmitt, Benjamin Blaga, Thomas Müller, Thomas Lauterbach",
