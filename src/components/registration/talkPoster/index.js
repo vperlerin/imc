@@ -42,7 +42,7 @@ const TalkPosterForm = ({
 
   return (
     <div className="border rounded-2 p-3 mb-3 mx-md-5">
-      <h5 className="fw-bold d-flex justify-content-between align-items-start mb-3 border-bottom pb-2">
+      <h5 className="fw-bold d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
         <span>{isTalk ? "Talk" : "Poster"} #{index + 1}</span>
         <button
           title={`Delete ${isTalk ? "Talk" : "Poster"} #${index + 1}`}
@@ -170,7 +170,7 @@ const TalkPosterForm = ({
                       onChange={() => setValue(`${type}s.${index}.print`, "true", { shouldValidate: true, shouldDirty: true })}
                       checked={isPrinted}
                     />
-                    <label className="btn btn-outline-neutral" htmlFor={`printYes${index}`}>
+                    <label className="btn btn-outline-neutral fw-bolder" htmlFor={`printYes${index}`}>
                       Yes
                     </label>
 
@@ -184,7 +184,7 @@ const TalkPosterForm = ({
                       onChange={() => setValue(`${type}s.${index}.print`, "false", { shouldValidate: true, shouldDirty: true })}
                       checked={!isPrinted}
                     />
-                    <label className="btn btn-outline-neutral" htmlFor={`printNo${index}`}>
+                    <label className="btn btn-outline-neutral fw-bolder" htmlFor={`printNo${index}`}>
                       No
                     </label>
                   </>

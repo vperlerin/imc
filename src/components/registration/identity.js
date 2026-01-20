@@ -45,7 +45,7 @@ const IdentityForm = ({
       setValue("last_name", "Perlerin");
       setValue("email", "vperlerin@gmail.com");
       setValue("gender", "Female");
-      setValue("country", "FR"); 
+      setValue("country", "FR");
       setValue("dobDay", "10");
       setValue("dobMonth", "9");
       setValue("dobYear", "1976");
@@ -53,6 +53,7 @@ const IdentityForm = ({
 
     trigger();
   };
+  
 
   return (
     <>
@@ -163,7 +164,7 @@ const IdentityForm = ({
             </div>
           </div>
         )}
- 
+
         {/* Email */}
         <div className="mb-3 row">
           <label className="col-sm-2 col-form-label fw-bold">Email</label>
@@ -177,7 +178,7 @@ const IdentityForm = ({
             {errors.email && <p className="text-danger mb-0"><small>{errors.email.message}</small></p>}
             {isOnline && !isAdmin && (
               <div className="form-text fw-bold">
-                We will use this email to send you the access details for the online conference.
+                ⚠ We will use this email to send you the access details for the online conference.
               </div>
             )}
           </div>
@@ -252,11 +253,32 @@ const IdentityForm = ({
 
         {/* Date of Birth */}
         <div className="mb-3 row">
+          <input
+            type="date"
+            autoComplete="bday"
+            tabIndex={-1}
+            className="position-absolute"
+            style={{ opacity: 0, pointerEvents: "none", height: 0, width: 0 }}
+            {...register("dob", {
+              onChange: (e) => {
+                const v = e.target.value; // "YYYY-MM-DD"
+                if (!v) return;
+                const [yy, mm, dd] = v.split("-");
+                setValue("dobYear", yy, { shouldDirty: true, shouldValidate: true });
+                setValue("dobMonth", String(parseInt(mm, 10)), { shouldDirty: true, shouldValidate: true });
+                setValue("dobDay", String(parseInt(dd, 10)), { shouldDirty: true, shouldValidate: true });
+                trigger(["dobYear", "dobMonth", "dobDay"]);
+              },
+            })}
+          />
+
+
           <label className="col-sm-2 col-form-label fw-bold">Date of Birth</label>
           <div className="col-sm-10 ">
             <div className="d-flex gap-2">
               {/* Day */}
               <select
+                autoComplete="bday-day"
                 className={classNames('form-select', errors.dobDay && "is-invalid", cssForm.mdAuto)}
                 {...register("dobDay", { required: "Day is required" })} onBlur={() => trigger("dobDay")}>
                 <option value="">Day</option>
@@ -267,8 +289,8 @@ const IdentityForm = ({
 
               {/* Month */}
               <select
+                autoComplete="bday-month"
                 className={classNames('form-select', errors.dobMonth && "is-invalid", cssForm.mdAuto)}
-
                 {...register("dobMonth", { required: "Month is required" })} onBlur={() => trigger("dobMonth")}>
                 <option value="">Month</option>
                 {months.map((month, index) => (
@@ -278,6 +300,7 @@ const IdentityForm = ({
 
               {/* Year */}
               <select
+                autoComplete="bday-year"
                 className={classNames('form-select', errors.dobYear && "is-invalid", cssForm.mdAuto)}
                 {...register("dobYear", { required: "Year is required" })} onBlur={() => trigger("dobYear")}>
                 <option value="">Year</option>

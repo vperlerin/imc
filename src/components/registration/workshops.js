@@ -25,10 +25,12 @@ const Workshops = ({
     : workshops;
 
   // Function to toggle selection
-  const toggleWorkshop = (workshopId) => {
-    const updatedWorkshops = selectedWorkshops.includes(workshopId)
-      ? selectedWorkshops.filter((id) => id !== workshopId) // Remove if already selected
-      : [...selectedWorkshops, workshopId]; // Add if not selected
+  const toggleWorkshop = (workshopId, shouldSelect) => {
+    const updatedWorkshops = shouldSelect
+      ? selectedWorkshops.includes(workshopId)
+        ? selectedWorkshops
+        : [...selectedWorkshops, workshopId]
+      : selectedWorkshops.filter((id) => id !== workshopId);
 
     setValue("workshops", updatedWorkshops, {
       shouldDirty: true,
@@ -69,59 +71,86 @@ const Workshops = ({
           const workshopId = workshop.id.toString();
           const isSelected = selectedWorkshops.includes(workshopId);
 
+          // unique ids for the btn-check radios
+          const yesId = `workshop-${workshopId}-yes`;
+          const noId = `workshop-${workshopId}-no`;
+          // group name for the two radios (per workshop)
+          const groupName = `workshop-choice-${workshopId}`;
+
           return (
             <div className="mb-5 row" key={workshopId}>
               <label className={classNames("text-md-center", cssForm.balance)}>
-                <b>The {workshop.title}</b> will be held on <b>{formatFullDate(workshop.date)}</b> from <b>{workshop.period}</b>.
-                {(workshop.title !== 'Spectroscopy Workshop' || isAdmin) && (
+                <b>The {workshop.title}</b> will be held on <b>{formatFullDate(workshop.date)}</b> from{" "}
+                <b>{workshop.period}</b>.
+                {(workshop.title !== "Spectroscopy Workshop" || isAdmin) && (
                   <>
-                    <br /> Would you like to attend {isOnline && "online"} for an extra price of {parseFloat(
-                      isOnline ? workshop.price_online : workshop.price
-                    ).toFixed(2)}€?
+                    <br /> Would you like to attend {isOnline && "online"} for an extra price of{" "}
+                    {parseFloat(isOnline ? workshop.price_online : workshop.price).toFixed(2)}€?
                   </>
                 )}
               </label>
 
-              {workshop.title === 'Spectroscopy Workshop' && !isAdmin ? (
-                <div className="text-danger">
-                  The {workshop.title} registration is now closed as we have reached the maximum number of participants.
-                </div>
+              <div className="text-center btn-group d-block mt-3" role="group" aria-label={`Workshop ${workshop.title}`}>
+                {/* YES */}
+                <input
+                  type="radio"
+                  className="btn-check"
+                  id={yesId}
+                  name={groupName}
+                  checked={isSelected}
+                  onChange={() => toggleWorkshop(workshopId, true)}
+                />
+                <label
+                  className={classNames("btn fw-bolder", {
+                    "btn-primary": isSelected,
+                    "btn-outline-primary": !isSelected,
+                  })}
+                  htmlFor={yesId}
+                >
+                  Yes
+                </label>
 
-              ) : (
-                <>
-                  <div className="text-center d-block mt-3">
-                    {/* Checkbox for selecting multiple workshops */}
-                    <input
-                      type="checkbox"
-                      className="btn-check"
-                      id={`workshop-${workshopId}`}
-                      checked={isSelected}
-                      onChange={() => toggleWorkshop(workshopId)}
-                    />
-                    <label className="btn btn-outline-primary fw-bolder" htmlFor={`workshop-${workshopId}`}>
-                      {isSelected ? "YES!" : "No :("}
-                    </label>
-                  </div>
+                {/* NO */}
+                <input
+                  type="radio"
+                  className="btn-check"
+                  id={noId}
+                  name={groupName}
+                  checked={!isSelected}
+                  onChange={() => toggleWorkshop(workshopId, false)}
+                />
+                <label
+                  className={classNames("btn fw-bolder", {
+                    "btn-primary": !isSelected,
+                    "btn-outline-primary": isSelected,
+                  })}
+                  htmlFor={noId}
+                >
+                  No
+                </label>
+              </div>
 
-                  {errors.workshops?.some((id) => id === workshopId) && (
-                    <p className="text-danger fw-bold text-center">
-                      <small>{errors.workshops.message}</small>
-                    </p>
-                  )}
-                </>
+              {errors.workshops?.some((id) => id === workshopId) && (
+                <p className="text-danger fw-bold text-center">
+                  <small>{errors.workshops.message}</small>
+                </p>
               )}
-
-
             </div>
           );
         })}
 
         {!isAdmin && (
           <p className="text-center">
-            Read more about the <a href="/program/workshops/radio" target="_blank">Radio Workshop</a>
+            Read more about the{" "}
+            <a href="/program/workshops/radio" target="_blank" rel="noreferrer">
+              Radio Workshop
+            </a>
             {!isOnline && (
               <>
-                {" "}and the <a href="/program/workshops/spectro" target="_blank">Spectroscopy Workshop</a>
+                {" "}and the{" "}
+                <a href="/program/workshops/spectro" target="_blank" rel="noreferrer">
+                  Spectroscopy Workshop
+                </a>
               </>
             )}
             .
