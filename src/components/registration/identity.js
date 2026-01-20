@@ -191,7 +191,7 @@ const IdentityForm = ({
               <input className={classNames('form-control', errors.address && "is-invalid")} placeholder="Address" {...register("address", { required: "Address is required" })} onBlur={() => trigger("address")} />
               {errors.address && <p className="text-danger mb-0"><small>{errors.address.message}</small></p>}
               {!isAdmin && (
-                <div className="form-text">If you need a <b>visa invitation letter</b>, the address above should be your <b>official legal domicile or your professional contact address at your institute</b>.</div>
+                <div className="form-text">If you need a <b>visa invitation letter</b>, the address in this form should be your <b>official legal domicile or your professional contact address at your institute</b>.</div>
               )}
             </div>
           </div>

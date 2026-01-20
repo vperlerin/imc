@@ -13,6 +13,20 @@ export const sendEmail = async ({
   bcc = [],
   token = null,
 }) => {
+  console.log("EMAIL ",  {
+        subject,
+        message,
+        to,
+        to_name: toName,
+        from_name: fromName,
+        reply_to: replyTo,
+        reply_name: replyName,
+        bcc,
+        token,
+      });
+      return;
+
+
   try {
     const response = await axios.post(
       API_URL,

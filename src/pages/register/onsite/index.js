@@ -41,7 +41,6 @@ const calculateAge = (dob) => {
   return age;
 };
 
-
 const MainForm = () => {
   const location = useLocation();
   const isDebugMode = new URLSearchParams(location.search).get("debug") === "1";
@@ -49,27 +48,30 @@ const MainForm = () => {
   const [emailStatus, setEmailStatus] = useState({
     teamEmailSent: null,
     participantEmailSent: null,
-    error: null
+    error: null,
   });
-  const [errorMsg, setErrorMsg] = useState('');
+  const [errorMsg, setErrorMsg] = useState("");
   const [isSaving, setisSaving] = useState(false);
   const [participantId, setParticipantId] = useState(null);
   const [paypalFee, setPaypalFee] = useState(0);
-  const [password, setPassword] = useState('');
+  const [password, setPassword] = useState("");
   const [step, setStep] = useState(1);
   const [successMsg, setSuccessMsg] = useState(null);
   const [total, setTotal] = useState(0);
 
-  const { workshops, paymentMethods, registrationTypes, loading: specificdataLoading, sessions, error: specificDataError } = useApiSpecificData();
+  const {
+    workshops,
+    paymentMethods,
+    registrationTypes,
+    loading: specificdataLoading,
+    sessions,
+    error: specificDataError,
+  } = useApiSpecificData();
+
   const { participant, loading: participantLoading, error: participantError } = useApiParticipant(participantId);
 
   const loading = specificdataLoading || participantLoading || isSaving;
-  const error = [
-    errorMsg,
-    emailStatus.error,
-    participantError,
-    specificDataError,
-  ].filter(Boolean);
+  const error = [errorMsg, emailStatus.error, participantError, specificDataError].filter(Boolean);
 
   const {
     control,
@@ -79,8 +81,14 @@ const MainForm = () => {
     getValues,
     setValue,
     trigger,
-    watch
-  } = useForm();
+    watch,
+  } = useForm({
+    defaultValues: {
+      // Food restrictions (used in Extras)
+      food_restrictions: [],
+      food_restrictions_other: "",
+    },
+  });
 
   // Watch the dob field
   const dob = watch("dob");
@@ -88,7 +96,33 @@ const MainForm = () => {
   const isUnder16 = age !== null && age < 16;
   const is_early_bird = new Date() < new Date(cd.deadlines.early_birds);
 
+  // Food restrictions watches (for step validation)
+  const foodRestrictions = watch("food_restrictions") ?? [];
+  const hasFoodOther = Array.isArray(foodRestrictions) && foodRestrictions.includes("other");
+
+  // When participant data arrives (admin/edit mode), map DB restrictions -> RHF fields
+  useEffect(() => {
+    // Adjust these paths if your API returns a different shape
+    const dbRestrictions = participant?.food_restrictions || participant?.participant?.food_restrictions;
+
+    if (!Array.isArray(dbRestrictions)) return;
+
+    const restrictions = dbRestrictions
+      .map((r) => r?.restriction)
+      .filter(Boolean);
+
+    const otherRow = dbRestrictions.find((r) => r?.restriction === "other");
+
+    setValue("food_restrictions", restrictions, { shouldDirty: false, shouldValidate: false });
+    setValue("food_restrictions_other", otherRow?.other_text ?? "", { shouldDirty: false, shouldValidate: false });
+  }, [participant, setValue]);
+
   const nextStep = async () => {
+    // If we are on Extras step, make sure the "other" text validates
+    if (step === 6 && hasFoodOther) {
+      await trigger("food_restrictions_other");
+    }
+
     const isValid = await trigger();
     if (!isValid) {
       return;
@@ -108,6 +142,11 @@ const MainForm = () => {
 
       const formattedData = {
         ...formData,
+
+        // make sure we always send predictable shapes
+        food_restrictions: Array.isArray(formData.food_restrictions) ? formData.food_restrictions : [],
+        food_restrictions_other: (formData.food_restrictions_other ?? "").trim(),
+
         is_early_bird: is_early_bird.toString(),
         is_online: "false",
         talks: formData.talks || [],
@@ -141,7 +180,14 @@ const MainForm = () => {
     const sendEmails = async () => {
       try {
         const emailToTeam = registrationEmailToTeam(participant, workshops, paymentMethods, registrationTypes, sessions);
-        const emailToParticipant = registrationEmailToParticipant(participant, workshops, paymentMethods, registrationTypes, sessions, password);
+        const emailToParticipant = registrationEmailToParticipant(
+          participant,
+          workshops,
+          paymentMethods,
+          registrationTypes,
+          sessions,
+          password
+        );
 
         const attendingWorkshops = participant.workshops?.filter((workshop) => workshop.attending === "1") || [];
 
@@ -194,20 +240,22 @@ const MainForm = () => {
           error: null,
         });
       } catch (error) {
-        setEmailStatus({ teamEmailSent: null, participantEmailSent: null, error: error.message || "Failed to send emails" });
+        setEmailStatus({
+          teamEmailSent: null,
+          participantEmailSent: null,
+          error: error.message || "Failed to send emails",
+        });
       }
     };
 
     sendEmails();
-  }, [participant, workshops, password]);
-
+  }, [participant, workshops, password, paymentMethods, registrationTypes, sessions]);
 
   if (!isDebugMode && false) {
     return <PageContain title="Register On-site">Come back soon…</PageContain>;
   }
 
   if (loading) return <Loader />;
-
 
   return (
     <PageContain title="Register On site" showRegBtn={false}>
@@ -219,16 +267,15 @@ const MainForm = () => {
             ))}
           </ul>
           <div className="mt-2">
-            If you think this is a mistake please try again or {' '} <Link
-              aria-label="Contact"
-              to="/contact"
-              title="Contact"
-            >
+            If you think this is a mistake please try again or{" "}
+            <Link aria-label="Contact" to="/contact" title="Contact">
               contact us
-            </Link>.
+            </Link>
+            .
           </div>
         </div>
       )}
+
       {step === totalStep && (
         <>
           {participant && (
@@ -237,15 +284,12 @@ const MainForm = () => {
               {successMsg && !errorMsg && <div className="alert alert-success fw-bolder">{successMsg}</div>}
               <p className="fw-bolder">
                 We just sent you an email with some instructions. This email contains a summary of your information as well as the password
-                required to eventually update your travel details and your contributions (talks & posters).
-                If you do not receive this email within the next 20 minutes{' '}
-                <Link
-                  aria-label="Contact"
-                  to="/contact"
-                  title="Contact"
-                >
+                required to eventually update your travel details and your contributions (talks & posters). If you do not receive this email
+                within the next 20 minutes{" "}
+                <Link aria-label="Contact" to="/contact" title="Contact">
                   contact us
-                </Link>{' '} immediately.
+                </Link>{" "}
+                immediately.
               </p>
 
               <div className="d-flex flex-column flex-md-row gap-3">
@@ -254,17 +298,23 @@ const MainForm = () => {
 
                   {participant.participant.payment_method_name.toLowerCase === "paypal" ? (
                     <div className="mb-3">
-                      <p >Click the button below to pay immediately with Paypal.</p>
-                      <PayPalForm amount={(total + paypalFee)} year={cd.year} />
+                      <p>Click the button below to pay immediately with Paypal.</p>
+                      <PayPalForm amount={total + paypalFee} year={cd.year} />
                     </div>
                   ) : (
                     <>
-                      <p><strong>  Please, transfer the total amount of {total}€ to confirm your registration immediately.</strong></p>
+                      <p>
+                        <strong>Please, transfer the total amount of {total}€ to confirm your registration immediately.</strong>
+                      </p>
                       <blockquote className="border rounded-2 p-3">
-                        International Meteor Organization, Jozef Mattheessensstraat 60, 2540 Hove, Belgium<br />
-                        Bank account at BNP Paribas Fortis Bank Belgium<br />
-                        BIC bank code: GEBABEBB<br />
-                        IBAN account number: BE30 0014 7327 5911<br />
+                        International Meteor Organization, Jozef Mattheessensstraat 60, 2540 Hove, Belgium
+                        <br />
+                        Bank account at BNP Paribas Fortis Bank Belgium
+                        <br />
+                        BIC bank code: GEBABEBB
+                        <br />
+                        IBAN account number: BE30 0014 7327 5911
+                        <br />
                         e-mail: treasurer@imo.net
                       </blockquote>
                     </>
@@ -279,7 +329,6 @@ const MainForm = () => {
                   registrationTypes={registrationTypes}
                   paymentMethods={paymentMethods}
                 />
-
               </div>
             </>
           )}
@@ -296,14 +345,19 @@ const MainForm = () => {
           {step === 1 && (
             <>
               <p className="border rounded-2 p-3">
-                <b>People who need an invitation letter for Visa</b> must send their request without any delay to imc{cd.year}@imo.net. Please, provide your legal private domicile or professional address, passport number and the address of the {cd.consulate} where your visa application will be submitted.
+                <b>People who need an invitation letter for Visa</b> must send their request without any delay to imc{cd.year}@imo.net. Please,
+                provide your legal private domicile or professional address, passport number and the address of the {cd.consulate} where your
+                visa application will be submitted.
               </p>
 
               {new Date() < new Date(cd.deadlines.early_birds) && (
                 <p className="d-flex border rounded-2 p-3 border-info text-info gap-2 mb-5">
                   <CiWarning className={css.warning} />
                   <span>
-                    <span className="d-block fw-bolder">Hurry up! After {formatFullDate(cd.deadlines.early_birds)}, a late booking fee of {cd.costs.after_early_birds}€ is added to the registration fee</span>
+                    <span className="d-block fw-bolder">
+                      Hurry up! After {formatFullDate(cd.deadlines.early_birds)}, a late booking fee of {cd.costs.after_early_birds}€ is added
+                      to the registration fee
+                    </span>
                     <small>— because the early birds got the discount, and the latecomers just get the worms (and a fee :).</small>
                   </span>
                 </p>
@@ -337,7 +391,8 @@ const MainForm = () => {
               workshops={workshops}
             />
           )}
-          {step === 3 &&
+
+          {step === 3 && (
             <Arrival
               conferenceData={cd}
               register={register}
@@ -348,8 +403,9 @@ const MainForm = () => {
               setValue={setValue}
               trigger={trigger}
             />
-          }
-          {step === 4 &&
+          )}
+
+          {step === 4 && (
             <Contribution
               conferenceData={cd}
               control={control}
@@ -364,8 +420,9 @@ const MainForm = () => {
               trigger={trigger}
               watch={watch}
             />
-          }
-          {step === 5 &&
+          )}
+
+          {step === 5 && (
             <Accomodation
               conferenceData={cd}
               control={control}
@@ -380,7 +437,7 @@ const MainForm = () => {
               setValue={setValue}
               trigger={trigger}
             />
-          }
+          )}
 
           {step === 6 && (
             <Extras
@@ -441,23 +498,35 @@ const MainForm = () => {
           <div className="mt-auto pt-3">
             <div className="d-flex gap-3 justify-content-end">
               {step > 1 && (
-                <button className="btn btn-outline-primary fw-bolder d-inline-flex align-items-center gap-2" type="button" onClick={prevStep}>
+                <button
+                  className="btn btn-outline-primary fw-bolder d-inline-flex align-items-center gap-2"
+                  type="button"
+                  onClick={prevStep}
+                >
                   <SlArrowLeft style={{ strokeWidth: "110px" }} /> Back
                 </button>
               )}
+
               {step < totalStep && (
-                <button className="btn btn-outline-primary fw-bolder d-inline-flex align-items-center gap-2" type="button" onClick={nextStep}>
+                <button
+                  className="btn btn-outline-primary fw-bolder d-inline-flex align-items-center gap-2"
+                  type="button"
+                  onClick={nextStep}
+                >
                   Continue <SlArrowRight style={{ strokeWidth: "110px" }} />
                 </button>
               )}
 
-              {step === totalStep && <button className="btn btn-primary fw-bolder" type="submit">Submit</button>}
+              {step === totalStep && (
+                <button className="btn btn-primary fw-bolder" type="submit">
+                  Submit
+                </button>
+              )}
             </div>
           </div>
         </form>
       )}
-
-    </PageContain >
+    </PageContain>
   );
 };
 

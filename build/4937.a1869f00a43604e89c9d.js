@@ -2,9 +2,9 @@
 /***/914:
 /***/(e,t,r)=>{"use strict";
 /* harmony export */r.d(t,{
-/* harmony export */Z:()=>/* binding */i
+/* harmony export */Z:()=>/* binding */n
 /* harmony export */});
-/* harmony import */var n=r(1083);const i=async({subject:e,message:t,to:r,toName:i,fromName:a,replyTo:s,replyName:o,bcc:c=[],token:l=null})=>{try{return"success"===(await n/* ["default"] */.A.post("https://www.imo.net/members/api/imc_mailer_api/send_email",{subject:e,message:t,to:r,to_name:i,from_name:a,reply_to:s,reply_name:o,bcc:c,token:l},{headers:{"Content-Type":"application/json"}})).data.status?{success:!0,message:"Email sent successfully."}:{success:!1,message:"Failed to send email."}}catch(e){return{success:!1,message:"An error occurred while sending the email."}}}}
+/* harmony import */r(1083);const n=async({subject:e,message:t,to:r,toName:n,fromName:i,replyTo:a,replyName:s,bcc:o=[],token:c=null})=>{}}
 /***/,
 /***/2694:
 /***/(e,t,r)=>{"use strict";
@@ -42,9 +42,9 @@ var b=r(4146),y=r.n(b);// ./node_modules/react-async-script/lib/esm/async-script
 function v(){return v=Object.assign||function(e){for(var t=1;t<arguments.length;t++){var r=arguments[t];for(var n in r)Object.prototype.hasOwnProperty.call(r,n)&&(e[n]=r[n])}return e},v.apply(this,arguments)}var x={},j=0;// A counter used to generate a unique id for each component that uses the function
 // ./node_modules/react-google-recaptcha/lib/esm/recaptcha-wrapper.js
 var w="onloadcallback";function N(){return"undefined"!=typeof window&&window.recaptchaOptions||{}}
-/* harmony default export */const _=(O=function(){var e=N(),t=e.useRecaptchaNet?"recaptcha.net":"www.google.com";return e.enterprise?"https://"+t+"/recaptcha/enterprise.js?onload="+w+"&render=explicit":"https://"+t+"/recaptcha/api.js?onload="+w+"&render=explicit"},C=(C={callbackName:w,globalName:"grecaptcha",attributes:N().nonce?{nonce:N().nonce}:{}})||{},function(e){var t=e.displayName||e.name||"Component",r=
+/* harmony default export */const O=(_=function(){var e=N(),t=e.useRecaptchaNet?"recaptcha.net":"www.google.com";return e.enterprise?"https://"+t+"/recaptcha/enterprise.js?onload="+w+"&render=explicit":"https://"+t+"/recaptcha/api.js?onload="+w+"&render=explicit"},C=(C={callbackName:w,globalName:"grecaptcha",attributes:N().nonce?{nonce:N().nonce}:{}})||{},function(e){var t=e.displayName||e.name||"Component",r=
 
-function(t){var r,n;function i(e,r){var n;return(n=t.call(this,e,r)||this).state={},n.__scriptURL="",n}n=t,(r=i).prototype=Object.create(n.prototype),r.prototype.constructor=r,r.__proto__=n;var a=i.prototype;return a.asyncScriptLoaderGetScriptLoaderID=function(){return this.__scriptLoaderID||(this.__scriptLoaderID="async-script-loader-"+j++),this.__scriptLoaderID},a.setupScriptURL=function(){return this.__scriptURL="function"==typeof O?O():O,this.__scriptURL},a.asyncScriptLoaderHandleLoad=function(e){var t=this;
+function(t){var r,n;function i(e,r){var n;return(n=t.call(this,e,r)||this).state={},n.__scriptURL="",n}n=t,(r=i).prototype=Object.create(n.prototype),r.prototype.constructor=r,r.__proto__=n;var a=i.prototype;return a.asyncScriptLoaderGetScriptLoaderID=function(){return this.__scriptLoaderID||(this.__scriptLoaderID="async-script-loader-"+j++),this.__scriptLoaderID},a.setupScriptURL=function(){return this.__scriptURL="function"==typeof _?_():_,this.__scriptURL},a.asyncScriptLoaderHandleLoad=function(e){var t=this;
 // use reacts setState callback to fire props.asyncScriptOnLoad with new state/entry
 this.setState(e,(function(){return t.props.asyncScriptOnLoad&&t.props.asyncScriptOnLoad(t.state)}))},a.asyncScriptLoaderTriggerOnScriptLoaded=function(){var e=x[this.__scriptURL];if(!e||!e.loaded)throw new Error("Script is not loaded.");for(var t in e.observers)e.observers[t](e);delete window[C.callbackName]},a.componentDidMount=function(){var e=this,t=this.setupScriptURL(),r=this.asyncScriptLoaderGetScriptLoaderID(),n=C,i=n.globalName,a=n.callbackName,s=n.scriptId;// check if script loading already
 if(// check if global object already attached to window
@@ -60,8 +60,8 @@ void(o.observers[r]=function(t){return e.asyncScriptLoaderHandleLoad(t)})}
 var e=this.__scriptURL;if(!0===C.removeOnUnmount)for(var t=document.getElementsByTagName("script"),r=0;r<t.length;r+=1)t[r].src.indexOf(e)>-1&&t[r].parentNode&&t[r].parentNode.removeChild(t[r]);// Clean the observer entry
 var n=x[e];n&&(delete n.observers[this.asyncScriptLoaderGetScriptLoaderID()],!0===C.removeOnUnmount&&delete x[e])},a.render=function(){var t=C.globalName,r=this.props,n=(r.asyncScriptOnLoad,r.forwardedRef),i=function(e,t){if(null==e)return{};var r,n,i={},a=Object.keys(e);for(n=0;n<a.length;n++)r=a[n],t.indexOf(r)>=0||(i[r]=e[r]);return i}(r,["asyncScriptOnLoad","forwardedRef"]);// remove asyncScriptOnLoad from childProps
 // eslint-disable-line no-unused-vars
-return t&&"undefined"!=typeof window&&(i[t]=void 0!==window[t]?window[t]:void 0),i.ref=n,(0,l.createElement)(e,i)},i}(l.Component),n=(0,l.forwardRef)((function(e,t){return(0,l.createElement)(r,v({},e,{forwardedRef:t}))}));return n.displayName="AsyncScriptLoader("+t+")",n.propTypes={asyncScriptOnLoad:p().func},y()(n,e)})(g);var O,C;// ./node_modules/react-google-recaptcha/lib/esm/index.js
-/* harmony default export */const R=_;
+return t&&"undefined"!=typeof window&&(i[t]=void 0!==window[t]?window[t]:void 0),i.ref=n,(0,l.createElement)(e,i)},i}(l.Component),n=(0,l.forwardRef)((function(e,t){return(0,l.createElement)(r,v({},e,{forwardedRef:t}))}));return n.displayName="AsyncScriptLoader("+t+")",n.propTypes={asyncScriptOnLoad:p().func},y()(n,e)})(g);var _,C;// ./node_modules/react-google-recaptcha/lib/esm/index.js
+/* harmony default export */const R=O;
 // EXTERNAL MODULE: ./node_modules/react-router-dom/dist/index.js
 var S=r(4976),L=r(914),k=r(9785),E=r(7762),I=r(4848);
 // EXTERNAL MODULE: ./src/hooks/send-email.js

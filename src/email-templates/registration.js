@@ -1,10 +1,59 @@
 const year = process.env.REACT_APP_YEAR || "2026";
 
 const getSessionName = (sessionId, sessions = []) => {
-  if (!Array.isArray(sessions) || sessions.length === 0)
-    return "Unknown Session";
+  if (!Array.isArray(sessions) || sessions.length === 0) return "Unknown Session";
   const session = sessions.find((s) => s.id === sessionId);
   return session ? session.name : "Unknown Session";
+};
+
+// NEW: format food restrictions (ON-SITE only)
+const formatFoodRestrictionsHtml = (participant) => {
+  // Expecting either participant.food_restrictions OR participant.participant.food_restrictions
+  const list =
+    participant?.food_restrictions ||
+    participant?.participant?.food_restrictions ||
+    [];
+
+  if (!Array.isArray(list) || list.length === 0) {
+    return "<strong>Food restrictions:</strong> None<br>";
+  }
+
+  const labels = {
+    vegetarian: "Vegetarian",
+    vegan: "Vegan",
+    coeliac: "Coeliac (gluten-free)",
+    lactose_intolerant: "Lactose intolerant",
+    other: "Other",
+  };
+
+  const items = list
+    .map((r) => {
+      const key = r?.restriction || r?.key || r; // allow string or object
+      if (!key) return null;
+
+      if (typeof key === "string" && key === "other") {
+        const otherText = (r?.other_text || r?.otherText || "").trim();
+        return otherText ? `Other: ${otherText}` : "Other";
+      }
+
+      if (typeof key === "string") {
+        return labels[key] || key;
+      }
+
+      return null;
+    })
+    .filter(Boolean);
+
+  if (items.length === 0) {
+    return "<strong>Food restrictions:</strong> None<br>";
+  }
+
+  return `
+    <strong>Food restrictions:</strong>
+    <ul style="margin-top:0; padding-left:15px;">
+      ${items.map((it) => `<li>${it}</li>`).join("")}
+    </ul>
+  `;
 };
 
 const registrationDetails = (
@@ -18,6 +67,8 @@ const registrationDetails = (
   paymentMethods,
   registrationTypes,
   sessions,
+  // NEW: pass participant wrapper so we can access food restrictions
+  participantWrapper,
 ) => {
   const isOnline = curParticipant.is_online === "1";
   const totalDue = parseFloat(curParticipant.total_due) || 0;
@@ -65,7 +116,10 @@ const registrationDetails = (
                           .map(
                             (talk) => `
                             <li><strong>${talk.title}</strong> by ${talk.authors} (${talk.duration})<br>
-                            ${talk.abstract}<br><strong>Session:</strong> ${getSessionName(talk.session_id, sessions)}</li>
+                            ${talk.abstract}<br><strong>Session:</strong> ${getSessionName(
+                              talk.session_id,
+                              sessions,
+                            )}</li>
                         `,
                           )
                           .join("")}
@@ -79,7 +133,10 @@ const registrationDetails = (
 
             <h3 style="margin-bottom:5px;">Payment Details</h3>
             <strong>Payment Method:</strong>  
-            ${paymentMethods.find((method) => method.id === curParticipant.payment_method_id)?.method || "Unknown"}<br>
+            ${
+              paymentMethods.find((method) => method.id === curParticipant.payment_method_id)
+                ?.method || "Unknown"
+            }<br>
 
             <strong>Total Due:</strong> 
             ${
@@ -88,7 +145,11 @@ const registrationDetails = (
                 : totalDue.toFixed(2)
             }€<br>
 
-            ${curParticipant.payment_method_id === "1" ? `including ${paypalFee.toFixed(2)}€ of PayPal fees<br>` : ""} 
+            ${
+              curParticipant.payment_method_id === "1"
+                ? `including ${paypalFee.toFixed(2)}€ of PayPal fees<br>`
+                : ""
+            } 
         `;
   }
 
@@ -105,7 +166,11 @@ const registrationDetails = (
         <strong>Locamotion:</strong>  by ${curParticipantArrival.travelling}
         <strong>Arrival:</strong> ${curParticipantArrival.arrival_date} at ${curParticipantArrival.arrival_hour}:${curParticipantArrival.arrival_minute}<br>
         <strong>Departure:</strong> ${curParticipantArrival.departure_date} at ${curParticipantArrival.departure_hour}:${curParticipantArrival.departure_minute}<br>
-        ${curParticipantArrival.travelling_details ? `<strong>Details:</strong> ${curParticipantArrival.travelling_details}<br>` : ""} 
+        ${
+          curParticipantArrival.travelling_details
+            ? `<strong>Details:</strong> ${curParticipantArrival.travelling_details}<br>`
+            : ""
+        } 
 
         <h3 style="margin-bottom:5px;">Workshops</h3>
         ${
@@ -142,7 +207,10 @@ const registrationDetails = (
                       .filter((c) => c.type === "talk")
                       .map(
                         (talk) => `
-                        <li><strong>${talk.title}</strong> by ${talk.authors} (${talk.duration})<br>${talk.abstract}<br><strong>Session:</strong> ${getSessionName(talk.session_id, sessions)}</li>
+                        <li><strong>${talk.title}</strong> by ${talk.authors} (${talk.duration})<br>${talk.abstract}<br><strong>Session:</strong> ${getSessionName(
+                          talk.session_id,
+                          sessions,
+                        )}</li>
                     `,
                       )
                       .join("")}
@@ -163,8 +231,15 @@ const registrationDetails = (
                         (poster) => `
                         <li>
                             <strong>${poster.title}</strong> by ${poster.authors}<br>
-                            ${poster.abstract}<br><strong>Session:</strong> ${getSessionName(poster.session_id, sessions)}
-                            ${poster.print === "1" ? "<br><strong>The poster will be printed on site by the LOC.</strong><br>" : ""}
+                            ${poster.abstract}<br><strong>Session:</strong> ${getSessionName(
+                              poster.session_id,
+                              sessions,
+                            )}
+                            ${
+                              poster.print === "1"
+                                ? "<br><strong>The poster will be printed on site by the LOC.</strong><br>"
+                                : ""
+                            }
                         </li>
                     `,
                       )
@@ -180,13 +255,30 @@ const registrationDetails = (
 
         <h3 style="margin-bottom:5px;">Additional Information</h3>
         <strong>Excursion:</strong> ${curParticipantOptions.excursion === "1" ? "Yes" : "No"}<br>
-        <strong>T-Shirt:</strong> ${curParticipantOptions.buy_tshirt === "1" ? `Yes (Size: ${curParticipantOptions.tshirt_size})` : "No"}<br>
+        <strong>T-Shirt:</strong> ${
+          curParticipantOptions.buy_tshirt === "1"
+            ? `Yes (Size: ${curParticipantOptions.tshirt_size})`
+            : "No"
+        }<br>
+
+        ${
+          // NEW: show food restrictions ONLY for ON-SITE participants
+          participantWrapper ? formatFoodRestrictionsHtml(participantWrapper) : ""
+        }
+
         <strong>Comments:</strong> ${curParticipantOptions.comments || "No comments provided."}<br><br>
 
         <h3 style="margin-bottom:5px;">Payment Details</h3>
-        <strong>Accommodation Type:</strong> ${curParticipantAccomodation.registration_type === "no" ? "No Accommodation" : `${curParticipantAccomodation.registration_type} room`}<br>
+        <strong>Accommodation Type:</strong> ${
+          curParticipantAccomodation.registration_type === "no"
+            ? "No Accommodation"
+            : `${curParticipantAccomodation.registration_type} room`
+        }<br>
        <strong>Payment Method:</strong>  
-        ${paymentMethods.find((method) => method.id === curParticipant.payment_method_id)?.method || "Unknown"}<br>
+        ${
+          paymentMethods.find((method) => method.id === curParticipant.payment_method_id)
+            ?.method || "Unknown"
+        }<br>
 
         <strong>Total Due:</strong> 
         ${
@@ -195,7 +287,11 @@ const registrationDetails = (
             : totalDue.toFixed(2)
         }€<br>
 
-        ${curParticipant.payment_method_id === "1" ? `including ${paypalFee.toFixed(2)}€ of PayPal fees<br>` : ""} 
+        ${
+          curParticipant.payment_method_id === "1"
+            ? `including ${paypalFee.toFixed(2)}€ of PayPal fees<br>`
+            : ""
+        } 
     `;
 };
 
@@ -236,6 +332,7 @@ export const registrationEmailToTeam = (
       paymentMethods,
       registrationTypes,
       sessions,
+      participant, // NEW
     )
   );
 };
@@ -324,6 +421,7 @@ export const registrationEmailToParticipant = (
           paymentMethods,
           registrationTypes,
           sessions,
+          participant, // NEW
         )}
     `;
 };
@@ -348,21 +446,10 @@ const participantIntro = (
           .join("")
       : "No contributions submitted.";
 
-  const _pronoun = you
-    ? "you"
-    : curParticipant.gender === "Female"
-      ? "she"
-      : "he";
-  const _pronoun2 = you
-    ? "yourself"
-    : curParticipant.gender === "Female"
-      ? "herself"
-      : "himself";
+  const _pronoun = you ? "you" : curParticipant.gender === "Female" ? "she" : "he";
+  const _pronoun2 = you ? "yourself" : curParticipant.gender === "Female" ? "herself" : "himself";
 
-  const _accomodation1 =
-    curParticipantAccomodation.registration_type === "no"
-      ? "not to stay"
-      : "to stay";
+  const _accomodation1 = curParticipantAccomodation.registration_type === "no" ? "not to stay" : "to stay";
   const _accomodation2 =
     curParticipantAccomodation.registration_type === "no"
       ? `. So, ${_pronoun.charAt(0).toUpperCase() + _pronoun.slice(1)} will take care of ${_pronoun2} accommodation.`
@@ -400,9 +487,9 @@ const participantIntro = (
     _extraDetails += `${_pronoun.charAt(0).toUpperCase() + _pronoun.slice(1)} would like a t-shirt (size: ${curParticipantOptions.tshirt_size}).<br>`;
   }
 
-  const title = you
-    ? "You"
-    : `${curParticipant.title} ${curParticipant.first_name} ${curParticipant.last_name}`;
+  // NOTE: intro intentionally unchanged (you asked: display restrictions only in registrationDetails)
+
+  const title = you ? "You" : `${curParticipant.title} ${curParticipant.first_name} ${curParticipant.last_name}`;
 
   return `
         ${title} chose <strong>${_accomodation1}</strong> at the LOC${_accomodation2}<br><br>

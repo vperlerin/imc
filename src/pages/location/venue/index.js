@@ -17,12 +17,12 @@ const Venue = () => {
   return (
     <PageContain title="Location Venue">
       <div
-        className="mt-3 mb-4 d-flex flex-column gap-3 align-items-stretch flex-md-row-reverse"
+        className="mt-3 mb-4 d-flex flex-column gap-3 align-items-stretch "
       >
         <div></div>
         <p>Come back soon</p>
       </div>
-        {/*
+        {/*flex-md-row-reverse
         <p>
           The IMC 2026 will take place in the cozy and spacious <a className="fw-bolder" href="https://www.stayokay.com/en/hostel/soest" target="_blank" rel="noopener noreferrer">Stayokay Soest</a> venue that combines the architecture of a historical school building with modern facilities, creating a vibrant conference atmosphere in a green and forested area. Nature-minded delegates will be able to absorb the sandy expanse of the nearby stunning Soesterduinen inland dune complex. The venue accommodates meeting rooms for plenary sessions with smaller rooms for ad hoc meetings, poster sessions or other activities. It will be available entirely for the conference and offers everything for a comfortable stay. From rooms with private bathrooms, a breakfast and dinner, to a nice terrace with a campfire. The venue is also a sustainable choice thanks to its sustainable solutions to facilitate our conference. Check out the <a className="fw-bolder" href="https://vimeo.com/175690257" target="_blank" rel="noopener noreferrer">venue's video</a> for an impression.   </p>
           

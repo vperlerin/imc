@@ -197,3 +197,18 @@ CREATE TABLE IF NOT EXISTS extra_options (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (participant_id) REFERENCES participants(id) ON DELETE CASCADE
 ) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- Food restrictions table
+CREATE TABLE IF NOT EXISTS participant_food_restrictions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    participant_id INT NOT NULL,
+    restriction ENUM('vegetarian', 'vegan', 'coeliac', 'lactose_intolerant', 'other') NOT NULL,
+    other_text VARCHAR(255) DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uniq_participant_restriction (participant_id, restriction),
+    FOREIGN KEY (participant_id) REFERENCES participants(id) ON DELETE CASCADE,
+    CHECK (
+      restriction <> 'other' OR (other_text IS NOT NULL AND LENGTH(TRIM(other_text)) > 0)
+    )
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

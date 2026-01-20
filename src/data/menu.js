@@ -5,8 +5,8 @@ export const menuItems = [
     subLinks: [
       { title: "Daily Program", link: "/program" },
       { title: "Posters & Demos", link: "/program/posters" },
-      //{ title: "Radio Workshop", link: "/program/workshops/radio" },
-      //{ title: "Spectroscopy Workshop", link: "/program/workshops/spectro" },
+      { title: "Radio Workshop", link: "/program/workshops/radio" },
+      { title: "Spectroscopy Workshop", link: "/program/workshops/spectro" },
     ],
   },
   {
