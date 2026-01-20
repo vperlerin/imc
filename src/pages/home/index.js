@@ -77,7 +77,7 @@ const Home = () => {
           )}
 
           <p>
-            IMC {cd.year} was jointly organized by
+            IMC {cd.year} is jointly organized by
             {cd.co_organizer.map((org, index) => (
               <React.Fragment key={org.abbr}>
                 {index === 0 ? " " : " and "}

@@ -60,7 +60,7 @@ const J=(0,S.jsx)("div",{className:l()(a,"d-flex align-items-center justify-cont
 return(0,S.jsxs)(S.Fragment,{children:[(0/* Helmet */,S.jsxs)(Y.mg,{children:[(0,S.jsx)("title",{children:s}),(0,S.jsx)("meta",{name:"description",content:d}),(0,S.jsx)("meta",{name:"keywords",content:"IMC, International Meteor Conference, meteor astronomy, meteor research, IMO"}),(0,S.jsx)("meta",{name:"author",content:"International Meteor Organization (IMO)"}),(0,S.jsx)("meta",{name:"theme-color",content:"#002B36"}),(0,S.jsx)("meta",{property:"og:title",content:s}),(0,S.jsx)("meta",{property:"og:description",content:d}),(0,S.jsx)("meta",{property:"og:image",content:c}),(0,S.jsx)("meta",{property:"og:type",content:"website"}),(0,S.jsx)("meta",{property:"og:url",content:`https://imc{${B/* conferenceData */.p.year}.imo.net`}),(0,S.jsx)("meta",{name:"twitter:card",content:"summary_large_image"}),(0,S.jsx)("meta",{name:"twitter:title",content:s}),(0,S.jsx)("meta",{name:"twitter:description",content:d}),(0,S.jsx)("meta",{name:"twitter:image",content:c}),(0,S.jsx)("link",{rel:"icon",type:"image/png",href:c})]}),(0,S.jsxs)("div",{className:l()(i,"position-relative"),children:[(0,S.jsx)(V,{showRegBtn:r}),t&&(0,S.jsx)("div",{className:l()(o,"p-3 p-md-4"),style:{backgroundImage:`url(${m})`},children:(0,S.jsx)("h2",{className:"m-0",children:t})}),n&&J,(0,S.jsx)("div",{className:l()({"p-3":e},"mx-md-4 my-3 h-100 flex-grow-1 d-flex flex-column px-3 px-md-0"),children:a})]})]})}}
 /***/,
 /***/5567:
-/***/(e,t,n)=>{e.exports=n.p+"fbb6b957b04a6dd087db.svg";
+/***/(e,t,n)=>{e.exports=n.p+"b17089a0ba1841c172a8.svg";
 /***/},
 /***/5619:
 /***/(e,t,n)=>{

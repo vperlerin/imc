@@ -153,7 +153,7 @@ const Program = () => {
     <PageContain title="Daily Program">  
       <div className="d-flex flex-column flex-md-row gap-1 justify-content-md-between mb-3">
         <span>Times are in CEST = UTC + 2h</span>
-        <a href={bookletPdf} target="_blank" rel="noopener noreferrer"><b>Download Abstract Booklet (PDF)</b></a>
+        {/*<a href={bookletPdf} target="_blank" rel="noopener noreferrer"><b>Download Abstract Booklet (PDF)</b></a>*/}
       </div>
 
       <div {...handlers}>
