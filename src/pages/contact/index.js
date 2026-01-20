@@ -66,7 +66,7 @@ const Contact = () => {
                   Message: ${data.message}<br>`,
         to: selectedRecipient.email,
         toName: selectedRecipient.name,
-        fromName: "IMC 2025",
+        fromName: `IMC ${cd.year}`,
         replyTo: data.email,
         replyName: data.name,
         bcc: process.env.REACT_APP_BCC_ALL ? process.env.REACT_APP_BCC_ALL.split(',').map(email => ({ email, name: 'BCC Recipient' })) : [],

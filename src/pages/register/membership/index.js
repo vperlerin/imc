@@ -5,7 +5,7 @@ import { conferenceData as cd } from "data/conference-data";
 const Membership = () => {
   return (
     <PageContain title="IMO Membership">
-      <h2>Join the International Meteor Organization and Enhance Your IMC 2025 Experience!</h2>
+      <h2>Join the International Meteor Organization and Enhance Your IMC {cd.year} Experience!</h2>
       <p>
         As a participant of the IMC {cd.year} in {cd.location}  you have a unique opportunity to become a member of the International Meteor Organization (IMO)!</p>
 

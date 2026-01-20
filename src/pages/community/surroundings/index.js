@@ -10,23 +10,20 @@ import React from "react";
 
 const Surroundings = () => {
   return (
-    <PageContain title="Sights & Surroundings">
-
-
-
+    <PageContain title="Sights & Surroundings">  
       <p>
         <b>
-          Do you want to stretch your legs or just want to enjoy some downtime from the programme? The immediate surrounding of Soest offers a unique natural environment with some notable sights.
+         Do you want to stretch your legs or simply enjoy some downtime from the programme? The immediate surroundings of Barcelonnette offer a spectacular alpine environment with a wealth of natural and cultural sights.
         </b>
       </p>
 
-      <p>At a few minutes walking distance from the venue you can enjoy a stretch of unspoiled nature: the <a className="fw-bolder" href="https://www.stayokay.com/en/tips/striding-in-the-loose-sand" target="_blank" rel="noopener noreferrer">Soesterduinen</a> are one of the most beautiful inland dunes in the Netherlands. It was marked as a Geological Monument by the province of Utrecht in 1997 and is part of the <a className="fw-bolder" href="https://en.wikipedia.org/wiki/Utrecht_Hill_Ridge" target="_blank" rel="noopener noreferrer">Utrecht Hill</a>, a push-morainic ridge from the Saalian ice age that stretches across the Utrecht province for some 50 kilometers.</p>
+      <p>Just a few minutes' walk from the conference venue, you will find yourself immersed in the <a href="https://en.wikipedia.org/wiki/Ubaye_Valley" className="fw-bolder" target="_bkank">Ubaye Valley</a>, renowned for its unspoiled mountain landscapes. Meadows, larch forests, and the Ubaye River itself provide an ideal setting for a short walk or a longer hike, with impressive views of the surrounding peaks of the southern Alps.</p>
 
-      <p>At a half hour's walk from the conference venue you can find the <a className="fw-bolder" href="https://www.windhond.nl/en-gb" target="_blank" rel="noopener noreferrer">'Windhond' corn mill</a>, which has been rendered in the logo of the IMC 2025. Mills for centuries determined the Dutch landscape and nearly all the polders have been dried with the help of watermills. Industry was also dependent on wind-power, leveraging the wind with mills to saw timber and grind corn for people and animals. The windmill in Soest was rebuilt in 2008, but its history can be traced back to the fifteenth century.</p>
+      <p>A pleasant stroll through <a href="https://www.ubaye.com/en/discover/barcelonnette/" className="fw-bolder" target="_blank">Barcelonnette</a> brings you to its historic centre, characterized by colorful façades and elegant villas built by locals who made their fortunes in Mexico during the 19th century. This unique architectural heritage gives the town a distinctive character, blending alpine traditions with unexpected transatlantic influences.</p>
 
-      <p>Situated at the northern outskirts of Soest, you can visit the <a className="fw-bolder" href="https://www.stayokay.com/en/tips/original-orange-palace" target="_blank" rel="noopener noreferrer">Soestdijk Palace</a>: from hunting lodge to French barracks and from summer retreat to the permanent residence of the late Princess Juliana and late Prince Bernhard: Soestdijk Palace has a long and interesting history.</p>
+      <p>Within a short distance from Barcelonnette lies the impressive <a href="https://en.wikipedia.org/wiki/Fort_de_Tournoux" className="fw-bolder" target="_blank">Fort de Tournoux</a>, perched high above the Ubaye Valley. Often referred to as the “Versailles of military fortresses,” this 19th-century defensive complex offers striking views and a fascinating insight into Alpine military history.</p>
 
-      <p>The nearby Airbase Park Soesterberg on the Utrecht Ridge is an unusual <a className="fw-bolder" href="https://www.stayokay.com/en/tips/roe-deer-and-radar" target="_blank" rel="noopener noreferrer">nature reserve</a>. After being an airbase for more than a century, the area was returned to nature in 2008. You can explore the former airbase on foot or by bicycle with or without a guide. The information centre for the nature reserve is situated in the <a className="fw-bolder" href="https://www.stayokay.com/en/tips/dutch-fighting-forces" target="_blank" rel="noopener noreferrer">National Military Museum.</a></p>
+     <p>For nature lovers, the nearby <a href="https://en.wikipedia.org/wiki/Mercantour_National_Park" target="_blank" className="fw-bolder">Mercantour National Park</a> provides endless opportunities for exploration. Easily accessible from Barcelonnette, the park is home to remarkable biodiversity, dramatic mountain scenery, and well-marked trails suitable for walking or cycling, with or without a guide. Whether you seek a gentle outing or a more adventurous excursion, the Ubaye region offers a refreshing alpine escape just outside the conference programme.</p>
 
 
       <div className={classNames('d-flex gap-3 mt-4', css.gallery)}>

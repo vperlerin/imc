@@ -18,18 +18,14 @@ const Posters = () => {
                 <h5 className="mb-1">{poster.title}</h5>
                 <p>By: {poster.authors}</p>
               </li>
-            ))}
-            <li>
-              <h5 className="mb-1">An Analysis of Forward Scatter Radio Meteoroid Head Echoes Using Video Meteor Trails</h5>
-              <p>By: Mike German</p>
-            </li>
+            ))} 
           </ol>
         </>
       ) : (
-        <p>No posters available.</p>
+        <p>No posters available for the moment.</p>
       )}
 
-      {demos.length > 0 ? (
+      {demos.length > 0 && (
         <>
           <h3>Demos </h3>
           <ol className="mt-3">
@@ -41,8 +37,6 @@ const Posters = () => {
             ))}
           </ol>
         </>
-      ) : (
-        <p>No demos available.</p>
       )}
     </PageContain>
   );

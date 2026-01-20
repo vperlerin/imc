@@ -16,6 +16,9 @@ const images = [ex1, ex2, ex3, ex4, ex5];
 const Excursion = () => {
   return (
     <PageContain title="Excursion">
+      <p>Come back soon.</p>
+
+      {/*
       <p>Due to an update in logistics, the originally planned boat trip on the river Vecht has been replaced with a rich cultural excursion to the historic city of Utrecht. While we were unable to secure a boat with sufficient capacity, we're excited to offer an alternative program that will be equally memorable and enriching.</p>
 
       <div className="mt-3 mb-4 d-flex flex-column gap-3 align-items-stretch flex-md-row">
@@ -101,7 +104,7 @@ const Excursion = () => {
         />
       </div>
 
-
+        */}
 
 
 

@@ -3,8 +3,8 @@
 
 :root {
   // Boot
-  --bs-body-bg: #141618; // input bg
-  --bs-border-color: rgb(88, 88, 88);
+  --bs-body-bg: #0f0f16; // input bg
+  --bs-border-color: #2c2c41;
   --bs-link-color-rgb: 233, 162, 47; // primary rgb
 
   --imc-primary: #{$primary};
@@ -13,7 +13,7 @@
   --imc: #FFF;
   --imc-border: var(--bs-border-color);
   --imc-muted: #ccc;
-  --imc-bg: #212529;
+  --imc-bg: #1c1c29;
   --imc-bg-darker: #000000; // Menu item hover
 
   // Gdpr 
@@ -69,7 +69,7 @@ html {
   font-weight: 900;
 }
 
-:global {
+:global {  
   .modal-backdrop {
     --bs-backdrop-bg: #CCCCCC; // modal overlay
   }

@@ -5,6 +5,8 @@ import { Link } from 'react-router-dom';
 const Pratical = () => {
   return (
     <PageContain title="Pratical Information"> 
+    <p>Come back soon</p>
+    {/*
       <h3>Weather</h3>
       <p>
         The Netherlands has a temperate maritime climate influenced by the North Sea and Atlantic Ocean, with cool summers and moderate winters. In September temperatures average around 15°C, but can reach 19.5 °C during daytime, and 10 °C at night. While September can bring sunny spells, rainfall is always a possibility so be sure to pack some rain gear. Please check the weather forecast before you travel. If you plan to join the sightseeing tour on Saturday afternoon, be sure to bring a pair of comfortable walking shoes.
@@ -37,7 +39,7 @@ const Pratical = () => {
         contact page
       </Link>.
       </p>
- 
+      */}
     </PageContain>
   );
 };
