@@ -1,0 +1,11 @@
+"use strict";(self.webpackChunkimc2026=self.webpackChunkimc2026||[]).push([[863],{
+/***/3520:
+/***/(e,o,i)=>{i.r(o),
+/* harmony export */i.d(o,{
+/* harmony export */default:()=>a
+/* harmony export */});
+/* harmony import */var r=i(4567),t=(i(6540),i(4976)),s=i(7762),n=i(4848);
+/* harmony import */const a=()=>{const e=s/* .conferenceData */.p.workshops.find((e=>"Radio Workshop"===e.title));
+return(0/* ["default"] */,n.jsxs)(r.A,{title:"Radio Workshop",children:[(0,n.jsxs)("div",{className:"mb-4",children:[(0,n.jsx)("p",{children:"This year, the radio workshop will mainly focus on head echoes produced by scattering of the radio waves on the ionized region moving in front of the incoming meteoroid.  However, any other topic related to radio observations of meteors is very welcome.  The final program will become available a few weeks before the event."}),(0,n.jsxs)("div",{className:"p-3 border rounded-2",children:["The ",(0,n.jsx)("strong",{children:e.title})," will take place on ",(0,n.jsx)("strong",{children:new Date(e.date).toLocaleDateString("en-US",{weekday:"long",year:"numeric",month:"long",day:"numeric"})}),", from ",(0,n.jsx)("strong",{children:e.period}),".",(0,n.jsx)("br",{}),"On-site participation:  ",(0,n.jsxs)("strong",{children:[e.cost.toFixed(2),"€ "]})," ",e.description&&`(${e.description})`,(0,n.jsx)("br",{}),e.cost_online?(0,n.jsxs)(n.Fragment,{children:["Online participation:  ",(0,n.jsxs)("strong",{children:[e.cost_online.toFixed(2),"€"]}),(0,n.jsx)("br",{})]}):(0,n.jsxs)(n.Fragment,{children:[(0,n.jsx)("i",{children:"Unfortunately, this workshop won't be available online."}),(0,n.jsx)("br",{})]}),(0,n.jsxs)("div",{className:"mt-3",children:["In case participants wish to stay at the ",s/* .conferenceData */.p.hotel," before the start of the IMC, they should book a room directly with the hostel."]})]})]}),(0,n.jsxs)("div",{className:"border border-primary p-3 rounded-2 text-center mb-4 d-flex flex-column align-items-center",children:["Participation in a workshop requires you to "," ",(0/* .Link */,n.jsx)(t.N_,{"aria-label":"Register",className:"btn btn-outline-primary fw-bolder mt-2 d-block",to:"/register",title:"Register Now",children:"Register"})]})]})};
+/* harmony default export */}
+/***/}]);
