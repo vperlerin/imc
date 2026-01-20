@@ -14,7 +14,7 @@ const i=e=>{e&&e.stopPropagation()}}
 /***/(e,t,n)=>{
 /* harmony export */n.d(t,{
 /* harmony export */L:()=>/* binding */i
-/* harmony export */});const i=(e,{interval:t=100,retries:n=14}={})=>new Promise(((a,r)=>{e().then(a).catch((o=>{setTimeout((()=>{n?i(e,{interval:1.5*t,retries:n-1}).then(a,r):r(o)}),t)}))}));
+/* harmony export */});const i=(e,{interval:t=1e3,retries:n=6}={})=>new Promise(((a,r)=>{e().then(a).catch((o=>{setTimeout((()=>{n?i(e,{interval:1.5*t,retries:n-1}).then(a,r):r(o)}),t)}))}));
 /***/},
 /***/4567:
 /***/(e,t,n)=>{
@@ -68,7 +68,7 @@ return(0,S.jsxs)(S.Fragment,{children:[(0/* Helmet */,S.jsxs)(Y.mg,{children:[(0
 /* harmony export */M:()=>/* binding */m
 /* harmony export */});
 /* harmony import */var i=n(3318),a=n(6540),r=n(1083),o=n(1448),s=n(8983),l=n(7767);
-/* harmony import */const m=()=>{const[e,t]=(0,a.useState)(!1),[n,m]=(0,a.useState)(null),c=(0,o/* .useDispatch */.wA)(),d=(0,l/* .useNavigate */.Zp)();return{logout:(0,a.useCallback)((async()=>{t(!0),m(null);try{const e=await(0,i/* .retry */.L)((()=>r/* ["default"] */.A.get("https://imc2025.imo.net/php/auth/logout.php",{withCredentials:!0})));if(!e.data.success)throw new Error(e.data.message||"An error occurred.");c(s/* .authActions */.I2.logout()),localStorage.removeItem("session"),d("/")}catch(e){m(e.message||"Failed to logout")}finally{t(!1)}}),[c,d]),loading:e,error:n}};
+/* harmony import */const m=()=>{const[e,t]=(0,a.useState)(!1),[n,m]=(0,a.useState)(null),c=(0,o/* .useDispatch */.wA)(),d=(0,l/* .useNavigate */.Zp)();return{logout:(0,a.useCallback)((async()=>{t(!0),m(null);try{const e=await(0,i/* .retry */.L)((()=>r/* ["default"] */.A.get("https://imc2026.imo.net/php/auth/logout.php",{withCredentials:!0})));if(!e.data.success)throw new Error(e.data.message||"An error occurred.");c(s/* .authActions */.I2.logout()),localStorage.removeItem("session"),d("/")}catch(e){m(e.message||"Failed to logout")}finally{t(!1)}}),[c,d]),loading:e,error:n}};
 /***/},
 /***/5846:
 /***/(e,t,n)=>{

@@ -1,6 +1,6 @@
 <?php
 $allowed_origins = [
-    "https://imc2025.imo.net",
+    "https://imc2026.imo.net",
     "http://localhost:3000"
 ];
 
@@ -52,10 +52,10 @@ try {
             "dobDay" => "10",
             "dobMonth" => "9",
             "dobYear" => "1976",
-            "arrival_date" => "2025-09-18",
+            "arrival_date" => "2026-09-18",
             "arrival_hour" => "14",
             "arrival_minute" => "30",
-            "departure_date" => "2025-09-21",
+            "departure_date" => "2026-09-21",
             "departure_hour" => "12",
             "departure_minute" => "00",
             "travelling" => "train",

@@ -1,4 +1,4 @@
-const year = process.env.REACT_APP_YEAR || "2025";
+const year = process.env.REACT_APP_YEAR || "2026";
 
 const getSessionName = (sessionId, sessions = []) => {
   if (!Array.isArray(sessions) || sessions.length === 0)

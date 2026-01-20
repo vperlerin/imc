@@ -8,7 +8,7 @@ const Travel = () => {
       <p>Come back soon</p>
       {/*
       <h3>How to travel to Soest</h3>
-      <p>he location of the IMC 2025 will be the small city of Soest, situated 10 kilometers away from Utrecht: the fourth largest city of the country, located in the centre of the Netherlands. Soest is easily reachable by road, train (thanks to the major railway hub Utrecht Central) and airplane (via Schiphol Airport and Rotterdam-The Hague Airport).</p>
+      <p>he location of the IMC 2026 will be the small city of Soest, situated 10 kilometers away from Utrecht: the fourth largest city of the country, located in the centre of the Netherlands. Soest is easily reachable by road, train (thanks to the major railway hub Utrecht Central) and airplane (via Schiphol Airport and Rotterdam-The Hague Airport).</p>
 
 
       <h4>By airplane</h4>

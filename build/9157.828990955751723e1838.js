@@ -21,7 +21,7 @@ const l=({step:e,stepTotal:s})=>(0,i.jsxs)("span",{className:r()(n.step),childre
 /* harmony export */});
 /* harmony import */var a=t(3318),r=t(6540),n=t(1083);
 /* harmony import */const i=()=>{const[e,s]=(0,r.useState)([]),[t,i]=(0,r.useState)([]),[l,o]=(0,r.useState)([]),[d,c]=(0,r.useState)([]),[m,u]=(0,r.useState)(!0),[p,h]=(0,r.useState)(null);// Runs only once when the component mounts
-return(0,r.useEffect)((()=>{(async()=>{try{const e=await(0,a/* .retry */.L)((()=>n/* ["default"] */.A.get("https://imc2025.imo.net/php/get_specific_data.php")));if(!e.data.success)throw new Error(e.data.message||"Failed to fetch specific IMC data. Please, refresh the page.");s(e.data.data.workshops||[]),i(e.data.data.payment_methods||[]),o(e.data.data.registration_types||[]),c(e.data.data.sessions||[])}catch(e){h(e.message||"Failed to fetch specific IMC data. Please, refresh the page.")}finally{u(!1)}})()}),[]),{workshops:e,paymentMethods:t,registrationTypes:l,sessions:d,loading:m,error:p}};
+return(0,r.useEffect)((()=>{(async()=>{try{const e=await(0,a/* .retry */.L)((()=>n/* ["default"] */.A.get("https://imc2026.imo.net/php/get_specific_data.php")));if(!e.data.success)throw new Error(e.data.message||"Failed to fetch specific IMC data. Please, refresh the page.");s(e.data.data.workshops||[]),i(e.data.data.payment_methods||[]),o(e.data.data.registration_types||[]),c(e.data.data.sessions||[])}catch(e){h(e.message||"Failed to fetch specific IMC data. Please, refresh the page.")}finally{u(!1)}})()}),[]),{workshops:e,paymentMethods:t,registrationTypes:l,sessions:d,loading:m,error:p}};
 /***/},
 /***/4972:
 /***/(e,s,t)=>{
@@ -29,7 +29,7 @@ return(0,r.useEffect)((()=>{(async()=>{try{const e=await(0,a/* .retry */.L)((()=
 /* harmony export */D:()=>/* binding */i
 /* harmony export */});
 /* harmony import */var a=t(3318),r=t(6540),n=t(1083);
-/* harmony import */const i=(e,s=!1,t=0,i=!1)=>{const[l,o]=(0,r.useState)(null),[d,c]=(0,r.useState)(!1),[m,u]=(0,r.useState)(null),p=(0,r.useCallback)((async()=>{if(e){c(!0),u(null);try{const t=s?"get_online_participant":"get_onsite_participant",r=await(0,a/* .retry */.L)((()=>n/* ["default"] */.A.get(`https://imc2025.imo.net/php/api/${t}.php`,{params:{id:e,admin_notes:i}})));u(null),r.data.success&&r.data.data?o(r.data.data):u(r.data.message||"Participant not found.")}catch(e){u(e.message||"Failed to fetch participant data.")}finally{c(!1)}}}),[e,s,i]);return(0,r.useEffect)((()=>{u(null),p()}),[p,t]),{participant:l,loading:d,error:m,setParticipant:o,refetchParticipant:p}};
+/* harmony import */const i=(e,s=!1,t=0,i=!1)=>{const[l,o]=(0,r.useState)(null),[d,c]=(0,r.useState)(!1),[m,u]=(0,r.useState)(null),p=(0,r.useCallback)((async()=>{if(e){c(!0),u(null);try{const t=s?"get_online_participant":"get_onsite_participant",r=await(0,a/* .retry */.L)((()=>n/* ["default"] */.A.get(`https://imc2026.imo.net/php/api/${t}.php`,{params:{id:e,admin_notes:i}})));u(null),r.data.success&&r.data.data?o(r.data.data):u(r.data.message||"Participant not found.")}catch(e){u(e.message||"Failed to fetch participant data.")}finally{c(!1)}}}),[e,s,i]);return(0,r.useEffect)((()=>{u(null),p()}),[p,t]),{participant:l,loading:d,error:m,setParticipant:o,refetchParticipant:p}};
 /***/},
 /***/5680:
 /***/(e,s,t)=>{

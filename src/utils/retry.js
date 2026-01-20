@@ -1,4 +1,4 @@
-export const retry = (fn, { interval = 100, retries = 14 } = {}) => {
+export const retry = (fn, { interval = 1000, retries = 6 } = {}) => {
   return new Promise((resolve, reject) => {
     fn()
       .then(resolve)

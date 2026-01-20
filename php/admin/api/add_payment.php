@@ -9,7 +9,7 @@ header("Access-Control-Allow-Methods: POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
 
 $allowed_origins = [
-    "https://imc2025.imo.net",
+    "https://imc2026.imo.net",
     "http://localhost:3000"
 ];
 

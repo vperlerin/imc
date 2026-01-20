@@ -1,6 +1,6 @@
 <?php
 
-// Load environment variables from /DATA/sites/imc2025.imo.net/env/.env
+// Load environment variables from /DATA/sites/imc202X.imo.net/env/.env
 $envPath = realpath(__DIR__ . '/../env/.env');   
 
 if (file_exists($envPath)) {

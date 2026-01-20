@@ -13,7 +13,7 @@
 
 // --- CORS ---
 $allowed_origins = [
-    "https://imc2025.imo.net",
+    "https://imc2026.imo.net",
     "http://localhost:3000",
 ];
 if (isset($_SERVER['HTTP_ORIGIN']) && in_array($_SERVER['HTTP_ORIGIN'], $allowed_origins)) {

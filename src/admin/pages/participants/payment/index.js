@@ -223,8 +223,8 @@ const Payments = ({ isCurOnline = false }) => {
         message: confirmationMessage,
         to: participant.participant.email,
         toName: "IMC Confirmed Participant",
-        fromName: "IMC 2025",
-        replyTo: "no-reply@imc2025.imo.net",
+        fromName: "IMC 2026",
+        replyTo: "no-reply@imc2026.imo.net",
         replyName: "no-reply",
         bcc: process.env.REACT_APP_BCC_ALL ? process.env.REACT_APP_BCC_ALL.split(',').map(email => ({ email, name: 'BCC Recipient' })) : [],
       });
@@ -262,8 +262,8 @@ const Payments = ({ isCurOnline = false }) => {
         message: confirmationMessage,
         to: participant.participant.email,
         toName: "IMC Confirmed Participant",
-        fromName: "IMC 2025",
-        replyTo: "no-reply@imc2025.imo.net",
+        fromName: "IMC 2026",
+        replyTo: "no-reply@imc2026.imo.net",
         replyName: "no-reply",
         bcc: process.env.REACT_APP_BCC_ALL ? process.env.REACT_APP_BCC_ALL.split(',').map(email => ({ email, name: 'BCC Recipient' })) : [],
       });

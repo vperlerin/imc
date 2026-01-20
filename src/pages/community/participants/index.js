@@ -62,10 +62,10 @@ const Participants = () => {
   return (
     <PageContain title="Participants">
 
-      <div className={classNames('d-grid gap-4 mt-3 align-items-start', css.grid)}>
+      {(errorOnline || errorOnsite) && <p className="rounded-3 fw-bolder text-danger border border-danger p-3">Error fetching participants. Please try again later.</p>}
 
-        {(errorOnline || errorOnsite) && <p className="text-danger">Error fetching participants. Please try again later.</p>}
- 
+
+      <div className={classNames('d-grid gap-4 mt-3 align-items-start', css.grid)}>  
         <div className={classNames('w-100 position-relative', css.searchBar)}>
           <input
             type="text"

@@ -2,7 +2,7 @@
 
 
 $allowed_origins = [
-    "https://imc2025.imo.net",
+    "https://imc2026.imo.net",
     "http://localhost:3000"
 ];
 
