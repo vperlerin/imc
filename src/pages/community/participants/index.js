@@ -2,7 +2,7 @@ import classNames from 'classnames';
 import css from './index.module.scss';
 import PageContain from "components/page-contain";
 import React, { useState } from "react";
-import { CiSearch } from "react-icons/ci"; 
+import { CiSearch } from "react-icons/ci";
 import { useApiOnlineParticipants } from "api/participants/online.js";
 import { useApiOnsiteParticipants } from "api/participants/onsite.js";
 import { useCountryName } from 'hooks/country-name';
@@ -17,8 +17,9 @@ const Participants = () => {
   const { participants: onlineParticipants, loading: loadingOnline, error: errorOnline } = useApiOnlineParticipants(true);
   const { participants: onsiteParticipants, loading: loadingOnsite, error: errorOnsite } = useApiOnsiteParticipants(true);
 
-  if (loadingOnline || loadingOnsite) return <Loader />;
-  if (errorOnline || errorOnsite) return <p className="text-danger">Error fetching participants. Please try again later.</p>;
+  if (loadingOnline || loadingOnsite) {
+    return <Loader />;
+  }
 
   const filterParticipants = (participants) => {
     return participants.filter((participant) => {
@@ -63,6 +64,8 @@ const Participants = () => {
 
       <div className={classNames('d-grid gap-4 mt-3 align-items-start', css.grid)}>
 
+        {(errorOnline || errorOnsite) && <p className="text-danger">Error fetching participants. Please try again later.</p>}
+ 
         <div className={classNames('w-100 position-relative', css.searchBar)}>
           <input
             type="text"
@@ -71,7 +74,7 @@ const Participants = () => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
-          <CiSearch className="position-absolute top-50 end-0 translate-middle-y me-2" /> 
+          <CiSearch className="position-absolute top-50 end-0 translate-middle-y me-2" />
         </div>
 
         {/* On-site Participants */}
