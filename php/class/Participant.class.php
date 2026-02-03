@@ -67,8 +67,8 @@ class ParticipantManager
     {
         if (!isset($data['food_restrictions']) || !is_array($data['food_restrictions'])) {
             return;
-        } 
-        
+        }
+
         $allowed = ['vegetarian', 'vegan', 'coeliac', 'lactose_intolerant', 'other'];
 
         $items = [];
@@ -143,7 +143,7 @@ class ParticipantManager
             ]);
         }
     }
- 
+
 
     public function saveParticipant($data, $passwordHash)
     {
@@ -1158,7 +1158,7 @@ class ParticipantManager
 
 
     /**
-     * Get participant INFO
+     * Get participant ONSITE INFO
      */
     public function getParticipantDetails($participantId, $withAdminNotes = false)
     {
@@ -1197,7 +1197,7 @@ class ParticipantManager
         p.updated_at';
 
         // 1. Fetch participant’s primary details with payment method name
-        $stmt = $this->pdo->prepare("  
+        $stmt = $this->pdo->prepare("
             SELECT {$columns}
             FROM participants p
             LEFT JOIN payment_methods pm ON p.payment_method_id = pm.id
@@ -1212,7 +1212,7 @@ class ParticipantManager
         }
 
         // 2. Fetch workshops the participant is registered for
-        $stmt = $this->pdo->prepare("  
+        $stmt = $this->pdo->prepare("
             SELECT *
             FROM participant_workshops pw
             INNER JOIN workshops w ON pw.workshop_id = w.id
@@ -1222,7 +1222,7 @@ class ParticipantManager
         $workshops = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         // 3. Fetch payments by this participant
-        $stmt = $this->pdo->prepare("  
+        $stmt = $this->pdo->prepare("
             SELECT pay.*, pm.method AS payment_method_name
             FROM payments pay
             INNER JOIN payment_methods pm ON pay.payment_method_id = pm.id
@@ -1233,7 +1233,7 @@ class ParticipantManager
         $payments = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         // 4. Fetch accommodation info
-        $stmt = $this->pdo->prepare("  
+        $stmt = $this->pdo->prepare("
             SELECT pa.*, rt.type AS registration_type, rt.price AS registration_price
             FROM accommodation pa
             INNER JOIN registration_types rt ON pa.registration_type_id = rt.id
@@ -1242,12 +1242,14 @@ class ParticipantManager
         $stmt->execute([':participant_id' => $participantId]);
         $accommodation = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        // Add payment_method_id and payment_method_name to accommodation
-        $accommodation['payment_method_id'] = $participant['payment_method_id'];
-        $accommodation['payment_method_name'] = $participant['payment_method_name'];
+        // Add payment_method_id and payment_method_name to accommodation (guard if null)
+        if (is_array($accommodation)) {
+            $accommodation['payment_method_id'] = $participant['payment_method_id'];
+            $accommodation['payment_method_name'] = $participant['payment_method_name'];
+        }
 
         // 5. Fetch arrival/departure info
-        $stmt = $this->pdo->prepare("  
+        $stmt = $this->pdo->prepare("
             SELECT *
             FROM arrival
             WHERE participant_id = :participant_id
@@ -1256,7 +1258,7 @@ class ParticipantManager
         $arrivalInfo = $stmt->fetch(PDO::FETCH_ASSOC);
 
         // 6. Fetch extra options (excursion, T-shirt, proceedings, etc.)
-        $stmt = $this->pdo->prepare("  
+        $stmt = $this->pdo->prepare("
             SELECT *
             FROM extra_options
             WHERE participant_id = :participant_id
@@ -1264,8 +1266,25 @@ class ParticipantManager
         $stmt->execute([':participant_id' => $participantId]);
         $extraOptions = $stmt->fetch(PDO::FETCH_ASSOC);
 
+        // 6bis. Fetch food restrictions (multiple)
+        // Assumes table: food_restrictions(participant_id, restriction)
+        $stmt = $this->pdo->prepare("
+            SELECT fr.restriction
+            FROM food_restrictions fr
+            WHERE fr.participant_id = :participant_id
+            ORDER BY fr.restriction ASC
+        ");
+        $stmt->execute([':participant_id' => $participantId]);
+        $foodRestrictions = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+        // Optional: if you also store the free text "other" in extra_options (adjust field name)
+        $foodOtherText = null;
+        if (is_array($extraOptions)) {
+            $foodOtherText = $extraOptions['food_other_text'] ?? null; // rename if needed
+        }
+
         // 7. Fetch contributions
-        $stmt = $this->pdo->prepare("  
+        $stmt = $this->pdo->prepare("
             SELECT c.*, s.name AS session_name
             FROM contributions c
             INNER JOIN imc_sessions s ON c.session_id = s.id
@@ -1276,17 +1295,20 @@ class ParticipantManager
 
         // Combine everything into a structured array
         $details = [
-            'participant'    => $participant,
-            'workshops'      => $workshops,
-            'payments'       => $payments,
-            'accommodation'  => $accommodation,
-            'arrival'        => $arrivalInfo,
-            'extra_options'  => $extraOptions,
-            'contributions'  => $contributions,
+            'participant'        => $participant,
+            'workshops'          => $workshops,
+            'payments'           => $payments,
+            'accommodation'      => $accommodation,
+            'arrival'            => $arrivalInfo,
+            'extra_options'      => $extraOptions,
+            'food_restrictions'  => $foodRestrictions, // array of strings
+            'food_other_text'    => $foodOtherText,    // optional
+            'contributions'      => $contributions,
         ];
 
         return $details;
     }
+
 
 
     /**
