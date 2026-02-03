@@ -754,10 +754,13 @@ class ParticipantManager
             }
 
             // sanitize + dedupe + keep only allowed values
-            $foodRestrictions = array_values(array_unique(array_filter(
-                array_map('strval', $foodRestrictions),
-                fn($r) => in_array($r, $allowedRestrictions, true)
-            )));
+            $foodRestrictions = array_map('strval', $foodRestrictions);
+
+            $foodRestrictions = array_filter($foodRestrictions, function ($r) use ($allowedRestrictions) {
+                return in_array($r, $allowedRestrictions, true);
+            });
+
+            $foodRestrictions = array_values(array_unique($foodRestrictions));
 
             $foodOtherText = isset($data['food_restrictions_other']) ? trim((string)$data['food_restrictions_other']) : null;
 
