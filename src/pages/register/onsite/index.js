@@ -72,7 +72,7 @@ const MainForm = () => {
 
   const loading = specificdataLoading || participantLoading || isSaving;
   const error = [errorMsg, emailStatus.error, participantError, specificDataError].filter(Boolean);
-
+ 
   const {
     control,
     register,
@@ -172,9 +172,12 @@ const MainForm = () => {
       setisSaving(false);
     }
   };
+ 
 
   useEffect(() => {
     if (!participant || !password) return;
+
+    console.log("WHERE IS THE FOOD? ", participant);
 
     const sendEmails = async () => {
       try {
@@ -219,6 +222,7 @@ const MainForm = () => {
           replyName: "Do not reply",
           bcc: bccRecipients,
         });
+ 
 
         const responseEmailParticipant = await sendEmail({
           subject: "New On-site IMC Registration",
@@ -230,6 +234,7 @@ const MainForm = () => {
           replyName: "Do not reply",
           bcc: bccRecipients,
         });
+ 
 
         await Promise.all(workshopEmailPromises);
 
@@ -238,7 +243,8 @@ const MainForm = () => {
           participantEmailSent: responseEmailParticipant,
           error: null,
         });
-      } catch (error) {
+      } catch (error) { 
+
         setEmailStatus({
           teamEmailSent: null,
           participantEmailSent: null,

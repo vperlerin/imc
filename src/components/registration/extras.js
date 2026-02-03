@@ -159,9 +159,8 @@ const ExtrasForm = ({
               );
             })}
           </div>
-
-          {/* Hidden register so RHF knows about the array field */}
-          <input type="hidden" {...register("food_restrictions")} />
+ 
+          <input type="hidden" defaultValue="[]" {...register("food_restrictions")} />
 
           {/* Other text */}
           {hasFoodOther && (

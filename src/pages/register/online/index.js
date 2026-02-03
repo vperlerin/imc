@@ -50,7 +50,7 @@ const MainForm = () => {
     participantError,
     specificDataError,
   ].filter(Boolean);
- 
+   
 
   const {
     control,

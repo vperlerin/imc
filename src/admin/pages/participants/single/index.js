@@ -42,7 +42,6 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
   const { control, register, handleSubmit, getValues, setValue, formState: { errors }, reset, trigger, watch } = useForm();
   const isOnline = participant?.participant?.is_online === "1";
 
-
   const loading = specificdataLoading || participantLoading || isSaving;
   const error = [
     errorMsg,
@@ -77,12 +76,14 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
     if (!participant || sessions.length === 0) return;
 
     const {
-      participant: participantDetails,
-      workshops,
+      accommodation,
       arrival,
       contributions,
-      accommodation,
-      extra_options
+      extra_options,
+      food_other_text,
+      food_restrictions,
+      participant: participantDetails,
+      workshops,
     } = participant || {};
 
     const defaults = {};
@@ -151,12 +152,15 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
       defaults.tshirt_size = extra_options.tshirt_size || "";
     }
 
+    defaults.food_restrictions = Array.isArray(food_restrictions) ? food_restrictions : [];
+    defaults.food_restrictions_other = food_other_text ?? "";
+
     reset(defaults, {
       keepDirty: false,
       keepTouched: false,
     });
 
-    setUnsavedChanges(false);  
+    setUnsavedChanges(false);
   }, [participant, sessions, reset]);
 
 

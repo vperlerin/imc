@@ -735,6 +735,63 @@ class ParticipantManager
                 ':tshirt_size' => $tshirtSize,
             ]);
 
+
+            // Update Food Restrictions (participant_food_restrictions)
+            // Expected fields from frontend:
+            // - $data['food_restrictions'] = array of strings
+            // - $data['food_restrictions_other'] = string (only if 'other' is selected) 
+            $allowedRestrictions = ['vegetarian', 'vegan', 'coeliac', 'lactose_intolerant', 'other'];
+
+            $foodRestrictions = [];
+            if (isset($data['food_restrictions'])) {
+                // If it comes as JSON string (sometimes happens), decode it
+                if (is_string($data['food_restrictions'])) {
+                    $decoded = json_decode($data['food_restrictions'], true);
+                    $foodRestrictions = is_array($decoded) ? $decoded : [];
+                } elseif (is_array($data['food_restrictions'])) {
+                    $foodRestrictions = $data['food_restrictions'];
+                }
+            }
+
+            // sanitize + dedupe + keep only allowed values
+            $foodRestrictions = array_values(array_unique(array_filter(
+                array_map('strval', $foodRestrictions),
+                fn($r) => in_array($r, $allowedRestrictions, true)
+            )));
+
+            $foodOtherText = isset($data['food_restrictions_other']) ? trim((string)$data['food_restrictions_other']) : null;
+
+            // Validate: if "other" selected, other text must be non-empty
+            if (in_array('other', $foodRestrictions, true) && (!$foodOtherText || $foodOtherText === '')) {
+                throw new Exception("Food restriction 'other' selected but no text provided.");
+            }
+
+            // Delete existing restrictions
+            $stmt = $this->pdo->prepare("
+                DELETE FROM participant_food_restrictions
+                WHERE participant_id = :participant_id
+            ");
+            $stmt->execute([':participant_id' => $participantId]);
+
+            // Insert new restrictions
+            if (!empty($foodRestrictions)) {
+                $stmt = $this->pdo->prepare("
+                    INSERT INTO participant_food_restrictions (participant_id, restriction, other_text, created_at)
+                    VALUES (:participant_id, :restriction, :other_text, NOW())
+                ");
+
+                foreach ($foodRestrictions as $restriction) {
+                    $otherText = ($restriction === 'other') ? $foodOtherText : null;
+
+                    $stmt->execute([
+                        ':participant_id' => $participantId,
+                        ':restriction'    => $restriction,
+                        ':other_text'     => $otherText,
+                    ]);
+                }
+            }
+
+
             // Delete existing contributions
             $stmtDelete = $this->pdo->prepare("DELETE FROM contributions WHERE participant_id = :participant_id");
             $stmtDelete->execute([':participant_id' => $participantId]);

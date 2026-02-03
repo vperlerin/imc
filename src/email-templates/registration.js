@@ -6,11 +6,9 @@ const getSessionName = (sessionId, sessions = []) => {
   return session ? session.name : "Unknown Session";
 };
 
- const formatFoodRestrictionsHtml = (participant) => {
-   const list =
-    participant?.food_restrictions ||
-    participant?.participant?.food_restrictions ||
-    [];
+const formatFoodRestrictionsHtml = (participantPayload) => {
+  const list = participantPayload?.food_restrictions ?? [];
+  const otherText = (participantPayload?.food_other_text ?? "").trim();
 
   if (!Array.isArray(list) || list.length === 0) {
     return "<strong>Food restrictions:</strong> None<br>";
@@ -25,20 +23,14 @@ const getSessionName = (sessionId, sessions = []) => {
   };
 
   const items = list
-    .map((r) => {
-      const key = r?.restriction || r?.key || r; // allow string or object
+    .map((key) => {
       if (!key) return null;
 
-      if (typeof key === "string" && key === "other") {
-        const otherText = (r?.other_text || r?.otherText || "").trim();
+      if (key === "other") {
         return otherText ? `Other: ${otherText}` : "Other";
       }
 
-      if (typeof key === "string") {
-        return labels[key] || key;
-      }
-
-      return null;
+      return labels[key] || key;
     })
     .filter(Boolean);
 
@@ -53,9 +45,8 @@ const getSessionName = (sessionId, sessions = []) => {
     </ul>
   `;
 };
-
-const isTruthyPrint = (v) => v === "1" || v === 1 || v === true || v === "true";
-
+ 
+ 
 const registrationDetails = (
   curParticipant,
   curParticipantAccomodation,
@@ -66,8 +57,7 @@ const registrationDetails = (
   workshops,
   paymentMethods,
   registrationTypes,
-  sessions,
-  
+  sessions, 
 ) => {
   const isOnline = curParticipant.is_online === "1";
   const totalDue = parseFloat(curParticipant.total_due) || 0;
@@ -260,10 +250,7 @@ const registrationDetails = (
             : "No"
         }<br>
 
-        ${
-          // NEW: show food restrictions ONLY for ON-SITE participants
-          participant ? formatFoodRestrictionsHtml(participant) : ""
-        }
+        ${curParticipant ? formatFoodRestrictionsHtml(curParticipant) : ""}
 
         <strong>Comments:</strong> ${curParticipantOptions.comments || "No comments provided."}<br><br>
 
