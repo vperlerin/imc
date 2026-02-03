@@ -39,7 +39,7 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
 
   const { workshops, paymentMethods, registrationTypes, loading: specificdataLoading, sessions, error: specificDataError } = useApiSpecificData();
   const { participant, loading: participantLoading, error: participantError } = useApiParticipant(participantId, isCurOnline, fetchParticipantTrigger, true);
-  const { control, register, handleSubmit, getValues, setValue, formState: { errors }, trigger, watch } = useForm();
+  const { control, register, handleSubmit, getValues, setValue, formState: { errors }, reset, trigger, watch } = useForm();
   const isOnline = participant?.participant?.is_online === "1";
 
 
@@ -74,88 +74,91 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
 
 
   useEffect(() => {
-    if (!participant || sessions.length === 0) {
-      return;
-    }
+    if (!participant || sessions.length === 0) return;
 
-    // Extract participant data safely
-    const { participant: participantDetails, workshops, arrival, contributions, accommodation, extra_options } = participant || {};
-    const { dob, ...otherDetails } = participantDetails || {};
+    const {
+      participant: participantDetails,
+      workshops,
+      arrival,
+      contributions,
+      accommodation,
+      extra_options
+    } = participant || {};
 
-    // Handle Date of Birth
+    const defaults = {};
+
+    // ----- DOB
+    const dob = participantDetails?.dob;
     if (dob) {
       const [year, month, day] = dob.split("-");
-      setValue("dobDay", String(Number(day)));
-      setValue("dobMonth", String(Number(month)));
-      setValue("dobYear", year);
+      defaults.dobDay = String(Number(day));
+      defaults.dobMonth = String(Number(month));
+      defaults.dobYear = year;
     }
 
-    // Set other participant details safely
-    if (otherDetails) {
-      Object.entries(otherDetails).forEach(([key, value]) => {
-        if (value !== null && value !== undefined) {
-          setValue(key, value);
-        }
+    // ----- other participant fields
+    if (participantDetails) {
+      Object.entries(participantDetails).forEach(([key, value]) => {
+        if (key === "dob") return;
+        if (value !== null && value !== undefined) defaults[key] = value;
       });
     }
 
-    // On the "participants" list
-    if (participantDetails.can_be_public !== undefined) {
-      setValue("can_be_public", Boolean(Number(participantDetails.can_be_public)));
+    // ----- boolean mapping
+    if (participantDetails?.can_be_public !== undefined) {
+      defaults.can_be_public = Boolean(Number(participantDetails.can_be_public));
     }
 
-    // Handle Workshops
-    if (workshops && Array.isArray(workshops)) {
-      const participantWorkshops = workshops.map(workshop => String(workshop.id));
-      setValue("workshops", participantWorkshops);
+    // ----- workshops
+    if (Array.isArray(workshops)) {
+      defaults.workshops = workshops.map(w => String(w.id));
     }
 
-    // Handle Arrival Details safely
+    // ----- arrival
     if (arrival) {
       Object.entries(arrival).forEach(([key, value]) => {
-        if (value !== null && value !== undefined) {
-          setValue(
-            key,
-            key.includes("hour") || key.includes("minute") ? String(value).padStart(2, "0") : value
-          );
-        }
+        if (value === null || value === undefined) return;
+        defaults[key] =
+          key.includes("hour") || key.includes("minute")
+            ? String(value).padStart(2, "0")
+            : value;
       });
     }
 
-    // Handle Contributions (Talks & Posters)
-    if (contributions && Array.isArray(contributions) && sessions.length > 0) {
-      const updatedTalks = contributions
-        .filter(contribution => contribution.type === "talk")
-        .map(talk => ({ ...talk }));
+    // ----- contributions
+    const talks = (contributions || [])
+      .filter(c => c.type === "talk")
+      .map(t => ({ ...t }));
 
-      const updatedPosters = contributions
-        .filter(contribution => contribution.type === "poster")
-        .map(poster => ({ ...poster }));
+    const posters = (contributions || [])
+      .filter(c => c.type === "poster")
+      .map(p => ({ ...p }));
 
+    defaults.talks = talks;
+    defaults.posters = posters;
 
-      // Set values in form so they persist on submit
-      setValue("talks", updatedTalks);
-      setValue("posters", updatedPosters);
+    defaults.wantsToContribute = (talks.length > 0 || posters.length > 0) ? "true" : "false";
 
-      // Set wantsToContribute if at least one talk or poster exists
-      if (updatedTalks.length > 0 || updatedPosters.length > 0) {
-        setValue("wantsToContribute", "yes");
-      }
-    }
-
-    // Handle Accommodation
+    // ----- accommodation
     if (accommodation?.registration_type_id) {
-      setValue("registration_type_id", String(accommodation.registration_type_id));
+      defaults.registration_type_id = String(accommodation.registration_type_id);
     }
 
-    // Handle Extra Options safely
+    // ----- extras
     if (extra_options) {
-      setValue("excursion", extra_options.excursion === "0" ? "false" : "true");
-      setValue("buy_tshirt", extra_options.buy_tshirt === "0" ? "false" : "true");
-      setValue("tshirt_size", extra_options.tshirt_size || "");
+      defaults.excursion = extra_options.excursion === "0" ? "false" : "true";
+      defaults.buy_tshirt = extra_options.buy_tshirt === "0" ? "false" : "true";
+      defaults.tshirt_size = extra_options.tshirt_size || "";
     }
 
-  }, [participant, sessions, setValue]);
+    reset(defaults, {
+      keepDirty: false,
+      keepTouched: false,
+    });
+
+    setUnsavedChanges(false);  
+  }, [participant, sessions, reset]);
+
 
 
   const onSubmit = async (formData) => {
@@ -228,6 +231,7 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
 
   const hasAdminNotes = !!participant?.participant?.admin_notes;
 
+  console.log("participant? ", participant);
 
 
   return (

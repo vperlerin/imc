@@ -142,7 +142,6 @@ const TalkPosterForm = ({
       {/* Printing (Only for Posters) */}
       {!isTalk && !isEditing && (
         <>
-          {/* Display warning message if print value changes while editing */}
           {isEditing && printChanged && (
             <div className="alert alert-warning mt-2 fw-bolder">
               Changing this option will update the total fees. The treasurer will be notified, and you may need to be reimbursed or pay more.
@@ -156,7 +155,6 @@ const TalkPosterForm = ({
             {!isAdmin && <p className="form-text mt-0">{conferenceData.poster_print.desc}</p>}
 
             <div className="text-center btn-group d-block" role="group">
-              {/* Fetch the watched value to ensure reactivity */}
               {(() => {
                 return (
                   <>

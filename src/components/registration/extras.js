@@ -22,7 +22,7 @@ const ExtrasForm = ({
   // Ensure boolean values are correctly retrieved from form state
   const buyTShirt = normalizeBoolean(watch("buy_tshirt") ?? "false");
   const tshirtSize = watch("tshirt_size") ?? "";
-  const excursion = normalizeBoolean(watch("excursion") ?? "false");
+  const excursion = normalizeBoolean(watch("excursion") ?? "true");
 
   // Food restrictions (array)
   const foodRestrictions = watch("food_restrictions") ?? [];

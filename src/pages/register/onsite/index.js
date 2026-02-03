@@ -83,8 +83,7 @@ const MainForm = () => {
     trigger,
     watch,
   } = useForm({
-    defaultValues: {
-      // Food restrictions (used in Extras)
+    defaultValues: { 
       food_restrictions: [],
       food_restrictions_other: "",
     },

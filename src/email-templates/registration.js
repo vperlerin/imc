@@ -6,10 +6,8 @@ const getSessionName = (sessionId, sessions = []) => {
   return session ? session.name : "Unknown Session";
 };
 
-// NEW: format food restrictions (ON-SITE only)
-const formatFoodRestrictionsHtml = (participant) => {
-  // Expecting either participant.food_restrictions OR participant.participant.food_restrictions
-  const list =
+ const formatFoodRestrictionsHtml = (participant) => {
+   const list =
     participant?.food_restrictions ||
     participant?.participant?.food_restrictions ||
     [];
@@ -56,6 +54,8 @@ const formatFoodRestrictionsHtml = (participant) => {
   `;
 };
 
+const isTruthyPrint = (v) => v === "1" || v === 1 || v === true || v === "true";
+
 const registrationDetails = (
   curParticipant,
   curParticipantAccomodation,
@@ -67,8 +67,7 @@ const registrationDetails = (
   paymentMethods,
   registrationTypes,
   sessions,
-  // NEW: pass participant wrapper so we can access food restrictions
-  participantWrapper,
+  
 ) => {
   const isOnline = curParticipant.is_online === "1";
   const totalDue = parseFloat(curParticipant.total_due) || 0;
@@ -263,7 +262,7 @@ const registrationDetails = (
 
         ${
           // NEW: show food restrictions ONLY for ON-SITE participants
-          participantWrapper ? formatFoodRestrictionsHtml(participantWrapper) : ""
+          participant ? formatFoodRestrictionsHtml(participant) : ""
         }
 
         <strong>Comments:</strong> ${curParticipantOptions.comments || "No comments provided."}<br><br>
@@ -331,8 +330,7 @@ export const registrationEmailToTeam = (
       workshops,
       paymentMethods,
       registrationTypes,
-      sessions,
-      participant, // NEW
+      sessions, 
     )
   );
 };
@@ -421,7 +419,7 @@ export const registrationEmailToParticipant = (
           paymentMethods,
           registrationTypes,
           sessions,
-          participant, // NEW
+          participant,  
         )}
     `;
 };

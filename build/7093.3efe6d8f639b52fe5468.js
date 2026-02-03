@@ -9,7 +9,7 @@
 // Normalize boolean values to always be "true" or "false"
 const f=e=>!0===e||"true"===e||1===e?"true":"false"
 // Ensure boolean values are correctly retrieved from form state
-,b=f(p("buy_tshirt")??"false"),g=p("tshirt_size")??"",x=f(p("excursion")??"false"),v=p("food_restrictions")??[],j=p("food_restrictions_other")??"",y=Array.isArray(v)&&v.includes("other"),[_,N]=(0,l.useState)("true"===b),w=a.costs.tshirts.models.flatMap((e=>a.costs.tshirts.sizes.map((a=>`${e.charAt(0).toUpperCase()+e.slice(1)} ${a}`)))),k=(0,l.useMemo)((()=>[{key:"vegetarian",label:"Vegetarian"},{key:"vegan",label:"Vegan"},{key:"coeliac",label:"Coeliac (gluten-free)"},{key:"lactose_intolerant",label:"Lactose intolerant"},{key:"other",label:"Other"}]),[]);
+,b=f(p("buy_tshirt")??"false"),g=p("tshirt_size")??"",x=f(p("excursion")??"true"),v=p("food_restrictions")??[],j=p("food_restrictions_other")??"",y=Array.isArray(v)&&v.includes("other"),[_,N]=(0,l.useState)("true"===b),w=a.costs.tshirts.models.flatMap((e=>a.costs.tshirts.sizes.map((a=>`${e.charAt(0).toUpperCase()+e.slice(1)} ${a}`)))),k=(0,l.useMemo)((()=>[{key:"vegetarian",label:"Vegetarian"},{key:"vegan",label:"Vegan"},{key:"coeliac",label:"Coeliac (gluten-free)"},{key:"lactose_intolerant",label:"Lactose intolerant"},{key:"other",label:"Other"}]),[]);
 // Sync T-Shirt selection with state
 // Sync T-Shirt selection with state
 (0,l.useEffect)((()=>{N("true"===b),"true"!==b&&u("tshirt_size","")}),[b,u]),

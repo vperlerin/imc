@@ -1,7 +1,5 @@
 <?php
 
-
-
 class ParticipantManager
 {
     private $pdo;
@@ -64,6 +62,88 @@ class ParticipantManager
         $stmt->execute([$email]);
         return $stmt->fetchColumn() > 0;
     }
+
+    private function saveFoodRestrictions($participantId, $data)
+    {
+        if (!isset($data['food_restrictions']) || !is_array($data['food_restrictions'])) {
+            return;
+        } 
+        
+        $allowed = ['vegetarian', 'vegan', 'coeliac', 'lactose_intolerant', 'other'];
+
+        $items = [];
+        foreach ($data['food_restrictions'] as $row) {
+            if (is_string($row)) {
+                $items[] = ['restriction' => trim($row)];
+            } elseif (is_array($row)) {
+                $items[] = $row;
+            }
+        }
+
+        $stmt = $this->pdo->prepare("
+            DELETE FROM participant_food_restrictions
+            WHERE participant_id = :participant_id
+        ");
+        $stmt->execute([':participant_id' => (int) $participantId]);
+
+        if (empty($items)) {
+            return;
+        }
+
+        // ON DUPLICATE KEY UPDATE is not needed after DELETE, but keeping it doesn't break anything.
+        $stmt = $this->pdo->prepare("
+        INSERT INTO participant_food_restrictions
+            (participant_id, restriction, other_text, created_at)
+        VALUES
+            (:participant_id, :restriction, :other_text, NOW())
+        ");
+
+        $seen = [];
+
+        foreach ($items as $row) {
+            $restriction = isset($row['restriction']) ? trim((string) $row['restriction']) : '';
+
+            if ($restriction === '' || !in_array($restriction, $allowed, true)) {
+                throw new Exception("Invalid food restriction: " . $restriction);
+            }
+
+            if (isset($seen[$restriction])) {
+                continue;
+            }
+            $seen[$restriction] = true;
+
+            $otherText = null;
+
+            if ($restriction === 'other') {
+                // ✅ CHANGE 1: support your current front-end field name
+                $otherText = isset($row['other_text']) ? trim((string) $row['other_text']) : '';
+
+                if ($otherText === '' && isset($data['food_restrictions_other'])) {
+                    $otherText = trim((string) $data['food_restrictions_other']);
+                }
+
+                // (optional legacy support, keep if you want)
+                if ($otherText === '' && isset($data['food_restrictions_other'])) {
+                    $otherText = trim((string) $data['food_restrictions_other']);
+                }
+
+                if ($otherText === '') {
+                    throw new Exception("food_restrictions_other is required when restriction is 'other'.");
+                }
+
+                if (mb_strlen($otherText) > 255) {
+                    $otherText = mb_substr($otherText, 0, 255);
+                }
+            }
+
+            $stmt->execute([
+                ':participant_id' => (int) $participantId,
+                ':restriction'    => $restriction,
+                ':other_text'     => $otherText,
+            ]);
+        }
+    }
+ 
 
     public function saveParticipant($data, $passwordHash)
     {
@@ -301,6 +381,9 @@ class ParticipantManager
                     ]);
                 }
             }
+
+            // 12. Insert food restrictions (multiple)
+            $this->saveFoodRestrictions($participantId, $data);
 
             $this->pdo->commit();
             return $participantId;
@@ -1048,7 +1131,7 @@ class ParticipantManager
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    
+
 
 
     /**

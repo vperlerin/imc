@@ -12,7 +12,7 @@ import { useSelector } from 'react-redux';
 const Header = ({ showRegBtn = true }) => {
   const isLoggedIn = useSelector(authSelectors.isLoggedIn);
   const title = `${cd.name} ${cd.year}`;
-
+ 
   return (
     <>
       <div className={classnames(showRegBtn && css.minWrap, 'd-flex align-items-center justify-content-between')}>

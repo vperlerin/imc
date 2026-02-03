@@ -1,23 +1,23 @@
 {
   "year": 2026,
   "num": "45th",
-  "welcome": "Bievenue !",
+  "welcome": "Bienvenue !",
   "thank_you": "Merci !",
   "name": "IMC",
   "name_display": "International Meteor Conference",
   "dates": {
-    "start": "2026-09-18",
-    "end": "2026-09-21"
+    "start": "2026-09-24",
+    "end": "2026-09-27"
   },
   "location": "Barcelonette, France",
-  "hotel": "Séloane",
+  "hotel": "TBD",
   "consulat": "French consulate",
   "deadlines": {
-    "reg": "2026-08-09",
+    "reg": "2026-08-10",
     "paper": "2026-10-31",
-    "full_reimbursement_before": "2026-05-01",
-    "half_reimbursement_before": "2026-07-15",
-    "early_birds": "2026-05-01"
+    "full_reimbursement_before": "2026-07-01",
+    "half_reimbursement_before": "2026-08-10",
+    "early_birds": "2026-07-01"
   },
   "poster_dim": "A0 size (84.1cm x 118.9cm  / 33.1″ x 46.8″)",
   "poster_print": {
@@ -37,7 +37,7 @@
   ],
   "costs": {
     "after_early_birds": 30,
-    "admin": "15€",
+    "admin": "15€", 
     "online": 20,
     "rooms": [
       {
@@ -83,7 +83,7 @@
   "co_organizer": [
     {
       "abbr": "IMO",
-      "name": "International meteor organization",
+      "name": "International Meteor Organization",
       "website": "https://imo.net"
     },
     { 
@@ -94,10 +94,10 @@
   "workshops": [
     {
       "title": "Spectroscopy Workshop",
-      "date": "2026-09-18",
-      "period": "09:30 to 12:30 CEST",
+      "date": "2026-09-23?",
+      "period": "14:00 to 18:00 CEST and 09:30 - 12:30 CEST?",
       "cost": 22.50,
-      "description": "including coffee break and lunch",
+      "description": "including coffee break and lunch?",
       "email_to": {
         "name": "Joe Zender",
         "email": "joe.zender@esa.int"
@@ -105,7 +105,7 @@
     },
     {
       "title": "Radio Workshop",
-      "date": "2026-09-17",
+      "date": "NONE?",
       "period": "09:30 to 17:00 CEST",
       "cost": 26.5,
       "cost_online": 5,
