@@ -5,6 +5,10 @@ $allowed_origins = [
     "http://localhost:3000"
 ];
 
+ini_set('display_errors', '1');
+ini_set('display_startup_errors', '1');
+error_reporting(E_ALL);
+
 if (isset($_SERVER['HTTP_ORIGIN']) && in_array($_SERVER['HTTP_ORIGIN'], $allowed_origins)) {
     header("Access-Control-Allow-Origin: " . $_SERVER['HTTP_ORIGIN']);
 }
@@ -40,7 +44,6 @@ $admin_notes = isset($_GET['admin_notes']) && filter_var($_GET['admin_notes'], F
 try {
     $participantManager = new ParticipantManager($pdo);
     $participant = $participantManager->getParticipantDetails($participantId, $admin_notes);
-    print_r($participant);
     echo json_encode(["success" => true, "data" => $participant]);
 } catch (Exception $e) {
     echo json_encode(["success" => false, "message" => $e->getMessage()]);
