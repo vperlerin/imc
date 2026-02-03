@@ -1270,7 +1270,7 @@ class ParticipantManager
         // Assumes table: food_restrictions(participant_id, restriction)
         $stmt = $this->pdo->prepare("
             SELECT fr.restriction
-            FROM food_restrictions fr
+            FROM participant_food_restrictions fr
             WHERE fr.participant_id = :participant_id
             ORDER BY fr.restriction ASC
         ");
