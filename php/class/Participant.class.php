@@ -1266,21 +1266,27 @@ class ParticipantManager
         $stmt->execute([':participant_id' => $participantId]);
         $extraOptions = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        // 6bis. Fetch food restrictions (multiple)
-        // Assumes table: food_restrictions(participant_id, restriction)
+
+        // 6bis. Fetch food restrictions (multiple) + other_text from participant_food_restrictions
         $stmt = $this->pdo->prepare("
-            SELECT fr.restriction
+            SELECT fr.restriction, fr.other_text
             FROM participant_food_restrictions fr
             WHERE fr.participant_id = :participant_id
             ORDER BY fr.restriction ASC
         ");
         $stmt->execute([':participant_id' => $participantId]);
-        $foodRestrictions = $stmt->fetchAll(PDO::FETCH_COLUMN);
+        $foodRows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // Optional: if you also store the free text "other" in extra_options (adjust field name)
+        // list of restriction strings
+        $foodRestrictions = array_column($foodRows, 'restriction');
+
+        // other text (only for restriction='other')
         $foodOtherText = null;
-        if (is_array($extraOptions)) {
-            $foodOtherText = $extraOptions['other_text'] ?? null; // rename if needed
+        foreach ($foodRows as $row) {
+            if ($row['restriction'] === 'other' && $row['other_text'] !== null && trim($row['other_text']) !== '') {
+                $foodOtherText = $row['other_text'];
+                break;
+            }
         }
 
         // 7. Fetch contributions
