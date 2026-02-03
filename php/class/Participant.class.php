@@ -1280,7 +1280,7 @@ class ParticipantManager
         // Optional: if you also store the free text "other" in extra_options (adjust field name)
         $foodOtherText = null;
         if (is_array($extraOptions)) {
-            $foodOtherText = $extraOptions['food_other_text'] ?? null; // rename if needed
+            $foodOtherText = $extraOptions['other_text'] ?? null; // rename if needed
         }
 
         // 7. Fetch contributions
