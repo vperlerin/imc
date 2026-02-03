@@ -35,13 +35,12 @@ if (!$participantId || !is_numeric($participantId)) {
     exit;
 }
 
-// Check if admin_notes parameter is set and convert to boolean
 $admin_notes = isset($_GET['admin_notes']) && filter_var($_GET['admin_notes'], FILTER_VALIDATE_BOOLEAN);
 
 try {
     $participantManager = new ParticipantManager($pdo);
     $participant = $participantManager->getParticipantDetails($participantId, $admin_notes);
-
+    print_r($participant);
     echo json_encode(["success" => true, "data" => $participant]);
 } catch (Exception $e) {
     echo json_encode(["success" => false, "message" => $e->getMessage()]);
