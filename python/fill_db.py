@@ -91,15 +91,18 @@ if table_is_empty("workshops"):
 # Insert `registration_types` (rooms) if the table is empty
 if table_is_empty("registration_types"):
     for room in data.get("costs", {}).get("rooms", []):
-        total = int(room.get("total", 0))  
-        sort_order =  int(room.get("sort_order", 0))  
+        total = int(room.get("total", 0))
+        sort_order = int(room.get("sort_order", 0))
+
         sql_statements.append(
-            "INSERT INTO registration_types (type, price, description, total, room_left, sort_order) VALUES ('%s', %.2f, '%s', %d, %d);" % (
-                room["type"].replace("'", "''"), 
-                float(room["price"]), 
-                room["description"].replace("'", "''"), 
-                total,  # Set total
-                total,   # Set left = total
+            "INSERT INTO registration_types "
+            "(type, price, description, total, room_left, sort_order) "
+            "VALUES ('%s', %.2f, '%s', %d, %d, %d);" % (
+                room["type"].replace("'", "''"),
+                float(room["price"]),
+                room["description"].replace("'", "''"),
+                total,
+                total,
                 sort_order
             )
         )
