@@ -45,7 +45,7 @@ $currentDate = date("d-m-Y");
 // Generate filename
 $fileName = "IMC{$currentYear}-Accommodations-{$currentDate}.xlsx";
 
-// Create new Spreadsheet
+// Create new Spreadsheet (keeps a default sheet at index 0)
 $spreadsheet = new Spreadsheet();
 $spreadsheet->getProperties()
     ->setCreator("IMC {$currentYear}")
@@ -55,9 +55,6 @@ $spreadsheet->getProperties()
     ->setDescription("Excel export for accommodations.")
     ->setKeywords("conference accommodations export")
     ->setCategory("Accommodation Data");
-
-// 🚀 **Remove default sheet (fixes duplicate sheet error)**
-$spreadsheet->removeSheetByIndex(0);
 
 // Define column headers
 $headers = ["Registered On", "Name", "Country", "Organization", "Registration Type", "Comments", "Confirmed"];
@@ -83,22 +80,20 @@ function populateSheet($spreadsheet, $title, $data, $headers)
     foreach ($data as $participant) {
         $fullName = trim(
             (isset($participant['title']) ? $participant['title'] . ' ' : '') .
-                (isset($participant['first_name']) ? $participant['first_name'] . ' ' : '') .
-                (isset($participant['last_name']) ? $participant['last_name'] : '')
+            (isset($participant['first_name']) ? $participant['first_name'] . ' ' : '') .
+            (isset($participant['last_name']) ? $participant['last_name'] : '')
         );
 
         $country = isset($participant["country"]) ? $participant["country"] : "N/A";
-        $organization = isset($participant["organization"]) && !empty($participant["organization"])
+        $organization = (isset($participant["organization"]) && !empty($participant["organization"]))
             ? $participant["organization"]
             : " - ";
 
-        // Get comments (handle empty)
-        $comments = isset($participant["comments"]) && !empty($participant["comments"])
+        $comments = (isset($participant["comments"]) && !empty($participant["comments"]))
             ? $participant["comments"]
             : " - ";
 
-        // Get confirmed status
-        $confirmedStatus = isset($participant["confirmation_sent"]) && $participant["confirmation_sent"] == "1"
+        $confirmedStatus = (isset($participant["confirmation_sent"]) && $participant["confirmation_sent"] == "1")
             ? "YES"
             : "NO";
 
@@ -146,20 +141,25 @@ if (!empty($noAccommodation)) {
     $createdSheets++;
 }
 
-// If we created at least one real sheet, remove the default empty sheet
 if ($createdSheets > 0) {
+    // Remove the default empty sheet that Spreadsheet starts with
     $spreadsheet->removeSheetByIndex(0);
+
+    // Activate the first real sheet
     $spreadsheet->setActiveSheetIndex(0);
 } else {
-    // No data: use default sheet and show a message
+    // No data: use the default sheet and show a message
     $sheet = $spreadsheet->getSheet(0);
     $sheet->setTitle('No data');
     $sheet->setCellValue('A1', 'No accommodation records found for this export.');
+
     $spreadsheet->setActiveSheetIndex(0);
 }
 
 // Ensure output buffer is clean
-if (ob_get_length()) ob_end_clean();
+if (ob_get_length()) {
+    ob_end_clean();
+}
 
 header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
 header("Content-Disposition: attachment; filename=\"$fileName\"");
