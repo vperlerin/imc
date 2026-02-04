@@ -23,9 +23,7 @@ const AccomodationForm = ({
     setValue("payment_method_id", paymentMethods.length > 0 ? paymentMethods[paymentMethods.length - 1].id : "");
     trigger();
   };
-
-  console.log("registrationTypes? ", registrationTypes);
-
+   
   const hiddenRegistrationTypes  = ['single', 'double']; 
 
   return (

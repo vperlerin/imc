@@ -44,23 +44,27 @@
         "price": 250,
         "description": "Quadruple room in the IMC host",
         "total": 68,
+        "sort_order": 1,
         "type": "quadruple"
       },
       {
         "price": 350,
         "description": "Double room in the IMC host",
         "total": 12,
+        "sort_order": 2,
         "type": "double"
       },
       {
         "price": 500,
         "description": "Single room in the IMC host",
         "total": 8,
+        "sort_order": 3,
         "type": "single"
       },
       {
         "price": 200,
         "description": "No accommodation",
+        "sort_order": 4,
         "type": "no"
       }
     ],
@@ -91,7 +95,7 @@
       "website": "https://www.vigie-ciel.org/"
     }
   ],
-  "workshops": [ 
+  "workshops": [
     {
       "slug": "radio",
       "title": "Radio Workshop",
