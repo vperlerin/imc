@@ -169,9 +169,11 @@ CREATE TABLE IF NOT EXISTS registration_types (
     type VARCHAR(100) NOT NULL UNIQUE,
     price DECIMAL(10,2) UNSIGNED NOT NULL DEFAULT 0.00,
     description TEXT NOT NULL,
-    total INT UNSIGNED NOT NULL DEFAULT 0,  
-    room_left INT UNSIGNED NOT NULL DEFAULT 0   
+    sort_order INT NOT NULL DEFAULT 0,
+    total INT UNSIGNED NOT NULL DEFAULT 0,
+    room_left INT UNSIGNED NOT NULL DEFAULT 0
 ) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 
 -- Participant Accommodation Table
 CREATE TABLE IF NOT EXISTS accommodation (
