@@ -21,8 +21,8 @@ const Workshops = ({
 
   // For online version, we don't display the workshops without price
   const filteredWorkshops = isOnline
-    ? workshops.filter((workshop) => parseFloat(workshop.price_online) !== 0)
-    : workshops;
+                            ? workshops.filter((workshop) => parseFloat(workshop.price_online) !== 0)
+                            : workshops;
 
   // Function to toggle selection
   const toggleWorkshop = (workshopId, shouldSelect) => {

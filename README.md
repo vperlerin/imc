@@ -2,7 +2,11 @@ IMC
 
 WARNING: NEVER PUSH FROM THE SERVER
 
-run composer on server 
+run composer on server (composer install)
+1) On /imc do  mv composer.json  ../composer.json
+2) cd..
+3) composer install
+
 {
     "require": {
         "phpoffice/phpspreadsheet": "^1.25"

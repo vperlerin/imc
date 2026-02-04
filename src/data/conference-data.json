@@ -37,7 +37,7 @@
   ],
   "costs": {
     "after_early_birds": 30,
-    "admin": "15€", 
+    "admin": "15€",
     "online": 20,
     "rooms": [
       {
@@ -86,26 +86,16 @@
       "name": "International Meteor Organization",
       "website": "https://imo.net"
     },
-    { 
+    {
       "name": "Vigie-Ciel",
       "website": "https://www.vigie-ciel.org/"
     }
   ],
-  "workshops": [
+  "workshops": [ 
     {
-      "title": "Spectroscopy Workshop",
-      "date": "2026-09-23?",
-      "period": "14:00 to 18:00 CEST and 09:30 - 12:30 CEST?",
-      "cost": 22.50,
-      "description": "including coffee break and lunch?",
-      "email_to": {
-        "name": "Joe Zender",
-        "email": "vperlerin@gmail.com"
-      }
-    },
-    {
+      "slug": "radio",
       "title": "Radio Workshop",
-      "date": "NONE?",
+      "date": "2026-09-23",
       "period": "09:30 to 17:00 CEST",
       "cost": 26.5,
       "cost_online": 5,

@@ -1,3 +1,28 @@
+import { conferenceData as cd } from "data/conference-data";
+
+const getWorkshopSubLinks = () => {
+  if (!Array.isArray(cd?.workshops)) return [];
+
+  return cd.workshops
+    .filter((w) => {
+      if (!w?.title || !w?.slug) return false;
+
+      // optional: hide workshops explicitly marked as NONE / TBD
+      const date = (w?.date || "").toUpperCase();
+      if (["NONE", "NONE?", "TBD", "TBD?"].includes(date)) {
+        return false;
+      }
+
+      return true;
+    })
+    .map((w) => ({
+      title: w.title,
+      link: `/program/workshops/${w.slug}`,
+    }));
+};
+
+const workshopSubLinks = getWorkshopSubLinks();
+
 export const menuItems = [
   {
     title: "Program",
@@ -5,8 +30,7 @@ export const menuItems = [
     subLinks: [
       { title: "Daily Program", link: "/program" },
       { title: "Posters & Demos", link: "/program/posters" },
-      { title: "Radio Workshop", link: "/program/workshops/radio" },
-      { title: "Spectroscopy Workshop", link: "/program/workshops/spectro" },
+      ...workshopSubLinks,
     ],
   },
   {
@@ -16,7 +40,7 @@ export const menuItems = [
       { title: "Participants", link: "/community/participants" },
       { title: "Excursion", link: "/community/excursion" },
       { title: "Scientific and Local Organizing Committee", link: "/community/soc" },
-     
+
     ],
   },
   {

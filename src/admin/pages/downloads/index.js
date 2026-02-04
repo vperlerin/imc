@@ -22,7 +22,12 @@ const AdminDownloads = () => {
       {!isLoc && !isSoc && (
         <div className="mb-4">
           <h5 className="mb-3">Finance</h5>
-          <DocButton className="d-block fw-bolder" link={`${process.env.REACT_APP_API_URL}/doc_participants.php`} title="Financial details" />
+          <DocButton 
+            className="d-block fw-bolder" 
+            link={`${process.env.REACT_APP_API_URL}/doc_participants.php`} 
+               subTitle="(total cost, total paid, remaining dues…)"
+            title="Financial details" 
+          />
         </div>
       )}
 
@@ -30,8 +35,18 @@ const AdminDownloads = () => {
         <div className="mb-4">
           <h5 className="mb-3">Accommodations & Arrivals</h5>
           <div className="d-flex flex-column flex-md-row gap-2">
-            <DocButton className="d-block fw-bolder" link={`${process.env.REACT_APP_API_URL}/doc_accommodations.php`} title="Accomodations" /> 
-            <DocButton className="d-block fw-bolder" link={`${process.env.REACT_APP_API_URL}/doc_arrival.php`} title="Arrivals" />
+            <DocButton 
+              className="d-block fw-bolder" 
+              link={`${process.env.REACT_APP_API_URL}/doc_accommodations.php`} 
+              subTitle="(registration type, food restrictions, roomates…)"
+              title="Accomodations" 
+            /> 
+            <DocButton 
+              className="d-block fw-bolder" 
+              link={`${process.env.REACT_APP_API_URL}/doc_arrival.php`} 
+              subTitle="(arrival, departure…)" 
+              title="Arrivals" 
+              />
           </div>
         </div>
       )}
@@ -40,8 +55,18 @@ const AdminDownloads = () => {
         <div className="mb-4">
           <h5 className="mb-3">Workshops</h5>
           <div className="d-flex flex-column flex-md-row gap-2">
-            <DocButton className="d-block fw-bolder" link={`${process.env.REACT_APP_API_URL}/doc_workshops.php?workshop_id=1`} title="Spectrography Workshop Participants" />
-            <DocButton className="d-block fw-bolder" link={`${process.env.REACT_APP_API_URL}/doc_workshops.php?workshop_id=2`} title="Radio Workshop Participants" />
+            <DocButton 
+              className="d-block fw-bolder" 
+              link={`${process.env.REACT_APP_API_URL}/doc_workshops.php?workshop_id=1`} 
+              subTitle="(participants info)"  
+              title="Spectrography Workshop Participants" 
+            /> 
+            <DocButton 
+              className="d-block fw-bolder" 
+              link={`${process.env.REACT_APP_API_URL}/doc_workshops.php?workshop_id=2`} 
+              subTitle="(participants info)"   
+              title="Radio Workshop Participants" 
+            />
           </div>
         </div>
       )}
@@ -49,15 +74,30 @@ const AdminDownloads = () => {
       <div className="mb-4">
         <h5 className="mb-3">Contributions</h5>
         <div className="d-flex gap-2">
-          <DocButton className="d-block fw-bolder" link={`${process.env.REACT_APP_API_URL}/doc_posters.php`} title="Posters" />
-          <DocButton className="d-block fw-bolder" link={`${process.env.REACT_APP_API_URL}/doc_talks.php`} title="Talks" />
+          <DocButton 
+            className="d-block fw-bolder" 
+            link={`${process.env.REACT_APP_API_URL}/doc_posters.php`} 
+            subTitle="(full list of posters)" 
+            title="Posters" 
+          />
+          <DocButton 
+            className="d-block fw-bolder" 
+            link={`${process.env.REACT_APP_API_URL}/doc_talks.php`} 
+            subTitle="(full list of talks)"  
+            title="Talks" 
+          />
         </div>
       </div>
 
        <div className="mb-4">
         <h5 className="mb-3">T-shirts</h5>
         <div className="d-flex gap-2">
-          <DocButton className="d-block fw-bolder" link={`${process.env.REACT_APP_API_URL}/doc_tshirts.php`} title="T-shirts" /> 
+          <DocButton 
+            className="d-block fw-bolder" 
+            link={`${process.env.REACT_APP_API_URL}/doc_tshirts.php`} 
+            subTitle="(participants who wants a t-shirt with size)"   
+            title="T-shirts" 
+          /> 
         </div>
       </div>
 

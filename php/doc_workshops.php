@@ -130,9 +130,7 @@ function createSheet($spreadsheet, $sheetName, $participants, $headerStyle)
         $sheet->getColumnDimension($col)->setAutoSize(true);
     }
 }
-
-
-
+ 
 //**Create "Onsite Participants" Sheet**
 if (!empty($onsiteParticipants)) {
     createSheet($spreadsheet, "Onsite Participants", $onsiteParticipants, $headerStyle);
