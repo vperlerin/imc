@@ -1,13 +1,12 @@
 <?php
-
 /**
  * doc_arrival.php
  * Exports an Excel file titled "Arrival..." with columns:
- * Title | First name | Last name | Gender | Email | Arrival | Departure | Accommodation | Comments/Roomates
+ * Title | First name | Last name | Gender | Email | Time of Arrival | Time of Departure | Accommodation
  *
- * Requirements:
+ * Rules:
  * - ONLY ONSITE participants: p.is_online = 0
- * - Exclude cancelled and not confirmed participants
+ * - ONLY CONFIRMED participants: p.confirmation_sent = 1
  * - Include those without accommodation (show "No")
  * - Sort by Last name, then First name (A→Z)
  */
@@ -43,11 +42,11 @@ try {
 
 /**
  * Fetch rows:
- * - ONSITE only (p.is_online = 0)
- * - EXCLUDE p.status in ('cancelled','not_confirmed')  (NULLs allowed)
- * - LEFT JOIN accommodation + registration_types to keep participants without a room
- * - Map accommodation to 'No' when NULL or equal to 'no'
- * - Sort alphabetically by last name, then first name
+ * - Onsite only
+ * - Confirmed only (confirmation_sent = 1)
+ * - Keep participants without a room via LEFT JOINs
+ * - Map missing/“no” accommodation to “No”
+ * - Sort alphabetically
  */
 $sql = "
     SELECT
@@ -56,7 +55,6 @@ $sql = "
         p.last_name,
         p.gender,
         p.email,
-        p.comments,
         ar.arrival_date,
         ar.arrival_hour,
         ar.arrival_minute,
@@ -72,7 +70,7 @@ $sql = "
     LEFT JOIN accommodation a       ON a.participant_id = p.id
     LEFT JOIN registration_types rt ON rt.id = a.registration_type_id
     WHERE p.is_online = 0
-      AND (p.status IS NULL OR p.status NOT IN ('cancelled','not_confirmed'))
+      AND p.confirmation_sent = 1
     ORDER BY p.last_name ASC, p.first_name ASC
 ";
 $stmt = $pdo->prepare($sql);
@@ -80,7 +78,7 @@ $stmt->execute();
 $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 /**
- * Format "YYYY-MM-DD HH:MM" from date + hour + minute.
+ * Build "YYYY-MM-DD HH:MM" from date + hour + minute.
  * If hour is missing, return just the date. If date is empty, return ''.
  */
 function formatDateTimeParts($date, $hour, $minute): string
@@ -102,7 +100,7 @@ $spreadsheet->getProperties()
     ->setLastModifiedBy("IMC {$currentYear}")
     ->setTitle("Arrival...")
     ->setSubject("Arrivals / Departures")
-    ->setDescription("Arrival list export (onsite only).")
+    ->setDescription("Arrival list export (onsite + confirmed only).")
     ->setCategory("Logistics");
 
 // Use default first sheet
@@ -118,8 +116,7 @@ $headers = [
     "Email",
     "Arrival",
     "Departure",
-    "Accommodation",
-    "Comments/Roomates"
+    "Accommodation"
 ];
 $sheet->fromArray([$headers], null, 'A1');
 
@@ -130,15 +127,13 @@ $headerStyle = [
     'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
     'borders' => ['bottom' => ['borderStyle' => Border::BORDER_THIN]]
 ];
-$sheet->getStyle('A1:I1')->applyFromArray($headerStyle);
+$sheet->getStyle('A1:H1')->applyFromArray($headerStyle);
 
 // Data rows
 $data = [];
 foreach ($rows as $r) {
     $arrival = formatDateTimeParts($r['arrival_date'] ?? '', $r['arrival_hour'] ?? '', $r['arrival_minute'] ?? '');
     $depart  = formatDateTimeParts($r['departure_date'] ?? '', $r['departure_hour'] ?? '', $r['departure_minute'] ?? '');
-
-    $comments = isset($r['comments']) && trim((string)$r['comments']) !== '' ? $r['comments'] : '';
 
     $data[] = [
         $r['title'] ?? '',
@@ -149,15 +144,14 @@ foreach ($rows as $r) {
         $arrival,
         $depart,
         $r['accommodation'] ?? 'No',
-        $comments,
     ];
 }
 if (!empty($data)) {
     $sheet->fromArray($data, null, 'A2');
 }
 
-// Auto-size columns (A..I)
-foreach (range('A', 'I') as $col) {
+// Auto-size columns
+foreach (range('A', 'H') as $col) {
     $sheet->getColumnDimension($col)->setAutoSize(true);
 }
 
