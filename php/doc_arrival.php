@@ -1,8 +1,9 @@
 <?php
+
 /**
  * doc_arrival.php
  * Exports an Excel file titled "Arrival..." with columns:
- * Title | First name | Last name | Gender | Email | Time of Arrival | Time of Departure | Accommodation
+ * Title | First name | Last name | Gender | Email | Arrival | Departure | Accommodation | Comments/Roomates
  *
  * Requirements:
  * - ONLY ONSITE participants: p.is_online = 0
@@ -55,6 +56,7 @@ $sql = "
         p.last_name,
         p.gender,
         p.email,
+        p.comments,
         ar.arrival_date,
         ar.arrival_hour,
         ar.arrival_minute,
@@ -116,7 +118,8 @@ $headers = [
     "Email",
     "Arrival",
     "Departure",
-    "Accommodation"
+    "Accommodation",
+    "Comments/Roomates"
 ];
 $sheet->fromArray([$headers], null, 'A1');
 
@@ -127,13 +130,15 @@ $headerStyle = [
     'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
     'borders' => ['bottom' => ['borderStyle' => Border::BORDER_THIN]]
 ];
-$sheet->getStyle('A1:H1')->applyFromArray($headerStyle);
+$sheet->getStyle('A1:I1')->applyFromArray($headerStyle);
 
 // Data rows
 $data = [];
 foreach ($rows as $r) {
     $arrival = formatDateTimeParts($r['arrival_date'] ?? '', $r['arrival_hour'] ?? '', $r['arrival_minute'] ?? '');
     $depart  = formatDateTimeParts($r['departure_date'] ?? '', $r['departure_hour'] ?? '', $r['departure_minute'] ?? '');
+
+    $comments = isset($r['comments']) && trim((string)$r['comments']) !== '' ? $r['comments'] : '';
 
     $data[] = [
         $r['title'] ?? '',
@@ -144,14 +149,15 @@ foreach ($rows as $r) {
         $arrival,
         $depart,
         $r['accommodation'] ?? 'No',
+        $comments,
     ];
 }
 if (!empty($data)) {
     $sheet->fromArray($data, null, 'A2');
 }
 
-// Auto-size columns
-foreach (range('A', 'H') as $col) {
+// Auto-size columns (A..I)
+foreach (range('A', 'I') as $col) {
     $sheet->getColumnDimension($col)->setAutoSize(true);
 }
 

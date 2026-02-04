@@ -57,7 +57,7 @@ $spreadsheet->getProperties()
     ->setCategory("Accommodation Data");
 
 // Define column headers (added Food restrictions)
-$headers = ["Registered On", "Name", "Country", "Organization", "Registration Type", "Food restrictions", "Comments", "Confirmed"];
+$headers = ["Registered On", "Name", "Country", "Organization", "Registration Type", "Food restrictions", "Comments/Roomates", "Confirmed"];
 
 /**
  * Populates an Excel sheet with participant data.
