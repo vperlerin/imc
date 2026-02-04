@@ -30,7 +30,7 @@ use PhpOffice\PhpSpreadsheet\Style\Border;
 try {
     $pdo = Connect::getPDO();
 } catch (Exception $e) {
-    die($e->getMessage()); 
+    die($e->getMessage());
 }
 
 // Initialize accommodation manager
@@ -83,23 +83,23 @@ function populateSheet($spreadsheet, $title, $data, $headers)
     foreach ($data as $participant) {
         $fullName = trim(
             (isset($participant['title']) ? $participant['title'] . ' ' : '') .
-            (isset($participant['first_name']) ? $participant['first_name'] . ' ' : '') .
-            (isset($participant['last_name']) ? $participant['last_name'] : '')
+                (isset($participant['first_name']) ? $participant['first_name'] . ' ' : '') .
+                (isset($participant['last_name']) ? $participant['last_name'] : '')
         );
 
         $country = isset($participant["country"]) ? $participant["country"] : "N/A";
-        $organization = isset($participant["organization"]) && !empty($participant["organization"]) 
-            ? $participant["organization"] 
+        $organization = isset($participant["organization"]) && !empty($participant["organization"])
+            ? $participant["organization"]
             : " - ";
-        
+
         // Get comments (handle empty)
-        $comments = isset($participant["comments"]) && !empty($participant["comments"]) 
-            ? $participant["comments"] 
+        $comments = isset($participant["comments"]) && !empty($participant["comments"])
+            ? $participant["comments"]
             : " - ";
 
         // Get confirmed status
-        $confirmedStatus = isset($participant["confirmation_sent"]) && $participant["confirmation_sent"] == "1" 
-            ? "YES" 
+        $confirmedStatus = isset($participant["confirmation_sent"]) && $participant["confirmation_sent"] == "1"
+            ? "YES"
             : "NO";
 
         // Insert row data
@@ -132,18 +132,31 @@ function populateSheet($spreadsheet, $title, $data, $headers)
     $sheet->getStyle('A1:G1')->applyFromArray($headerStyle);
 }
 
+$createdSheets = 0;
+
 // Populate "Staying at the hostel"
 if (!empty($stayingAtHostel)) {
     populateSheet($spreadsheet, "Staying at the hostel", $stayingAtHostel, $headers);
+    $createdSheets++;
 }
 
 // Populate "No Accommodation"
 if (!empty($noAccommodation)) {
     populateSheet($spreadsheet, "No Accommodation", $noAccommodation, $headers);
+    $createdSheets++;
 }
 
-// Ensure the first sheet is active
-$spreadsheet->setActiveSheetIndex(0);
+// If we created at least one real sheet, remove the default empty sheet
+if ($createdSheets > 0) {
+    $spreadsheet->removeSheetByIndex(0);
+    $spreadsheet->setActiveSheetIndex(0);
+} else {
+    // No data: use default sheet and show a message
+    $sheet = $spreadsheet->getSheet(0);
+    $sheet->setTitle('No data');
+    $sheet->setCellValue('A1', 'No accommodation records found for this export.');
+    $spreadsheet->setActiveSheetIndex(0);
+}
 
 // Ensure output buffer is clean
 if (ob_get_length()) ob_end_clean();
