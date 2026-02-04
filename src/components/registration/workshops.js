@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import cssForm from "styles/components/form.module.scss";
-import React from "react";
+import React, { useMemo } from "react";
 import StepDislay from "components/registration/stepDisplay";
 import { formatFullDate } from "utils/date";
 
@@ -8,6 +8,7 @@ const Workshops = ({
   isAdmin = false,
   isOnline = false,
   isDebugMode = false,
+  conferenceData: cd,
   errors,
   step,
   stepTotal,
@@ -16,15 +17,31 @@ const Workshops = ({
   watch,
   workshops,
 }) => {
-  // Watch selected workshop IDs
   const selectedWorkshops = watch("workshops") || [];
 
-  // For online version, we don't display the workshops without price
   const filteredWorkshops = isOnline
-                            ? workshops.filter((workshop) => parseFloat(workshop.price_online) !== 0)
-                            : workshops;
+    ? workshops.filter((workshop) => parseFloat(workshop.price_online) !== 0)
+    : workshops;
 
-  // Function to toggle selection
+  const workshopLinks = useMemo(() => {
+    const list = Array.isArray(cd?.workshops) ? cd.workshops : [];
+
+    const withSlug = list.filter((w) => !!w?.title && !!w?.slug);
+    const filteredByMode = withSlug.filter((w) => {
+      if (isOnline) {
+        const v = w?.cost_online ?? w?.price_online ?? 0;
+        return parseFloat(v) !== 0;
+      }
+      const v = w?.cost ?? w?.price ?? 0;
+      return parseFloat(v) !== 0;
+    });
+
+    return filteredByMode.map((w) => ({
+      title: w.title,
+      href: `/program/workshops/${w.slug}`,
+    }));
+  }, [isOnline]);
+
   const toggleWorkshop = (workshopId, shouldSelect) => {
     const updatedWorkshops = shouldSelect
       ? selectedWorkshops.includes(workshopId)
@@ -71,10 +88,8 @@ const Workshops = ({
           const workshopId = workshop.id.toString();
           const isSelected = selectedWorkshops.includes(workshopId);
 
-          // unique ids for the btn-check radios
           const yesId = `workshop-${workshopId}-yes`;
           const noId = `workshop-${workshopId}-no`;
-          // group name for the two radios (per workshop)
           const groupName = `workshop-choice-${workshopId}`;
 
           return (
@@ -90,7 +105,11 @@ const Workshops = ({
                 )}
               </label>
 
-              <div className="text-center btn-group d-block mt-3" role="group" aria-label={`Workshop ${workshop.title}`}>
+              <div
+                className="text-center btn-group d-block mt-3"
+                role="group"
+                aria-label={`Workshop ${workshop.title}`}
+              >
                 {/* YES */}
                 <input
                   type="radio"
@@ -139,20 +158,17 @@ const Workshops = ({
           );
         })}
 
-        {!isAdmin && (
+        {!isAdmin && workshopLinks.length > 0 && (
           <p className="text-center">
-            Read more about the{" "}
-            <a href="/program/workshops/radio" target="_blank" rel="noreferrer">
-              Radio Workshop
-            </a>
-            {!isOnline && (
-              <>
-                {" "}and the{" "}
-                <a href="/program/workshops/spectro" target="_blank" rel="noreferrer">
-                  Spectroscopy Workshop
+            Read more about{" "}
+            {workshopLinks.map((w, idx) => (
+              <React.Fragment key={w.href}>
+                {idx > 0 && (idx === workshopLinks.length - 1 ? " and " : ", ")}
+                <a href={w.href} target="_blank" rel="noreferrer">
+                  {w.title}
                 </a>
-              </>
-            )}
+              </React.Fragment>
+            ))}
             .
           </p>
         )}

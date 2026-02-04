@@ -43,19 +43,19 @@
       {
         "price": 250,
         "description": "Quadruple room in the IMC host",
-        "number": 68,
+        "total": 68,
         "type": "quadruple"
       },
       {
         "price": 350,
         "description": "Double room in the IMC host",
-        "number": 12,
+        "total": 12,
         "type": "double"
       },
       {
         "price": 500,
         "description": "Single room in the IMC host",
-        "number": 8,
+        "total": 8,
         "type": "single"
       },
       {

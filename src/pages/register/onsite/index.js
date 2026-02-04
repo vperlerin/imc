@@ -177,8 +177,7 @@ const MainForm = () => {
   useEffect(() => {
     if (!participant || !password) return;
 
-    console.log("WHERE IS THE FOOD? ", participant);
-
+ 
     const sendEmails = async () => {
       try {
         const emailToTeam = registrationEmailToTeam(participant, workshops, paymentMethods, registrationTypes, sessions);

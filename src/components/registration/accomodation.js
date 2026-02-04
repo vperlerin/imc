@@ -24,6 +24,8 @@ const AccomodationForm = ({
     trigger();
   };
 
+  console.log("registrationTypes? ", registrationTypes);
+
   const hiddenRegistrationTypes  = ['single', 'double']; 
 
   return (
@@ -56,7 +58,7 @@ const AccomodationForm = ({
                     type="radio"
                     id={`registration-${registration.id}`}
                     className={classNames("form-check-input", { "is-invalid": !!errors.registration_type_id })}
-                    value={registration.id} // Now using ID instead of type
+                    value={registration.id} 
                     {...register("registration_type_id", { required: "Please select a registration type" })}
                   />
                   <label className="form-check-label d-block" htmlFor={`registration-${registration.id}`}>
