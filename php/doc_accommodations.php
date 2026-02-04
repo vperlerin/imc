@@ -56,8 +56,8 @@ $spreadsheet->getProperties()
     ->setKeywords("conference accommodations export")
     ->setCategory("Accommodation Data");
 
-// Define column headers
-$headers = ["Registered On", "Name", "Country", "Organization", "Registration Type", "Comments", "Confirmed"];
+// Define column headers (added Food restrictions)
+$headers = ["Registered On", "Name", "Country", "Organization", "Registration Type", "Food restrictions", "Comments", "Confirmed"];
 
 /**
  * Populates an Excel sheet with participant data.
@@ -89,6 +89,10 @@ function populateSheet($spreadsheet, $title, $data, $headers)
             ? $participant["organization"]
             : " - ";
 
+        $foodRestrictions = (isset($participant["food_restrictions"]) && trim($participant["food_restrictions"]) !== '')
+            ? $participant["food_restrictions"]
+            : " - ";
+
         $comments = (isset($participant["comments"]) && !empty($participant["comments"]))
             ? $participant["comments"]
             : " - ";
@@ -104,6 +108,7 @@ function populateSheet($spreadsheet, $title, $data, $headers)
             $country,
             $organization,
             isset($participant["registration_type"]) ? $participant["registration_type"] : "n/a",
+            $foodRestrictions,
             $comments,
             $confirmedStatus
         ], NULL, "A$row");
@@ -111,8 +116,8 @@ function populateSheet($spreadsheet, $title, $data, $headers)
         $row++;
     }
 
-    // Auto-size columns
-    foreach (range('A', 'G') as $col) {
+    // Auto-size columns (A..H)
+    foreach (range('A', 'H') as $col) {
         $sheet->getColumnDimension($col)->setAutoSize(true);
     }
 
@@ -124,7 +129,7 @@ function populateSheet($spreadsheet, $title, $data, $headers)
         'borders' => ['bottom' => ['borderStyle' => Border::BORDER_THIN]]
     ];
 
-    $sheet->getStyle('A1:G1')->applyFromArray($headerStyle);
+    $sheet->getStyle('A1:H1')->applyFromArray($headerStyle);
 }
 
 $createdSheets = 0;

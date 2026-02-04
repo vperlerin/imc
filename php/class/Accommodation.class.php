@@ -18,10 +18,8 @@ class AccommodationManager
         $stmt->execute([$participantId, $data['registration_type']]);
     }
 
-
     public function getParticipantsWithRegistrationDetails($typeFilter)
     {
-        // Define the base query with necessary joins
         $sql = "
             SELECT
                 p.id AS participant_id,
@@ -34,35 +32,59 @@ class AccommodationManager
                 p.comments,
                 p.confirmation_sent,
                 r.id AS registration_type_id,
-                r.type AS registration_type
+                r.type AS registration_type,
+
+                -- aggregated food restrictions, one string per participant
+                COALESCE(
+                    GROUP_CONCAT(
+                        DISTINCT
+                        CASE
+                            WHEN pfr.restriction = 'vegetarian' THEN 'Vegetarian'
+                            WHEN pfr.restriction = 'vegan' THEN 'Vegan'
+                            WHEN pfr.restriction = 'coeliac' THEN 'Coeliac (gluten-free)'
+                            WHEN pfr.restriction = 'lactose_intolerant' THEN 'Lactose intolerant'
+                            WHEN pfr.restriction = 'other' THEN CONCAT('Other: ', pfr.other_text)
+                            ELSE pfr.restriction
+                        END
+                        ORDER BY
+                            CASE pfr.restriction
+                                WHEN 'vegetarian' THEN 1
+                                WHEN 'vegan' THEN 2
+                                WHEN 'coeliac' THEN 3
+                                WHEN 'lactose_intolerant' THEN 4
+                                WHEN 'other' THEN 5
+                                ELSE 99
+                            END
+                        SEPARATOR ', '
+                    ),
+                    ''
+                ) AS food_restrictions
+
             FROM participants p
             JOIN accommodation a ON p.id = a.participant_id
             JOIN registration_types r ON a.registration_type_id = r.id
+            LEFT JOIN participant_food_restrictions pfr ON pfr.participant_id = p.id
             WHERE 1
-            ";
+        ";
 
-        // Modify the WHERE clause based on $typeFilter
         if ($typeFilter === 'no') {
-            $sql .= " AND r.type = 'no'"; // Only participants with 'no' accommodation
+            $sql .= " AND r.type = 'no'";
         } else {
-            $sql .= " AND r.type != 'no'"; // Only participants with valid registration types (not 'no')
+            $sql .= " AND r.type != 'no'";
         }
 
-        // Remove duplicate participants based on their ID
-        $sql .= " GROUP BY p.id"; // Group by participant ID to avoid duplicates
+        // Group by participant ID so we keep 1 row per participant and can aggregate restrictions
+        $sql .= " GROUP BY p.id";
 
-        // Order the results by registration type
+        // Order
         $sql .= " ORDER BY r.type ASC, p.confirmation_sent DESC";
 
-        // Prepare and execute the query
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute();
 
-        // Return the fetched results
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-
-
+ 
     public function gatAvailableRooms() {
         // SQL query to calculate available rooms per registration type
         $sql = "
