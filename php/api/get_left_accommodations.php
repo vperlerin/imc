@@ -96,11 +96,15 @@ function fetchRegistrationTypesLive(PDO $pdo): array
 try {
     $rows = fetchRegistrationTypesLive($pdo);
 
-    // Apply optional type filter (kept compatible with your previous API)
+    // Apply optional type filter (kept compatible with previous API)
     if ($typeFilter === 'no') {
-        $rows = array_values(array_filter($rows, fn($r) => $r['type'] === 'no'));
+        $rows = array_values(array_filter($rows, function ($r) {
+            return isset($r['type']) && $r['type'] === 'no';
+        }));
     } elseif ($typeFilter === 'not_no') {
-        $rows = array_values(array_filter($rows, fn($r) => $r['type'] !== 'no'));
+        $rows = array_values(array_filter($rows, function ($r) {
+            return isset($r['type']) && $r['type'] !== 'no';
+        }));
     }
 
     echo json_encode(["success" => true, "data" => $rows]);
