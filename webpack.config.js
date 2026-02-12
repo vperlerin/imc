@@ -44,7 +44,9 @@ module.exports = (env, argv) => {
         chunkFilename: devMode ? '[id].css' : '[id].[contenthash].css',
       }),
       new BundleAnalyzerPlugin({ analyzerMode: devMode ? "disabled" : "static" }),
-      new Dotenv({ path: path.resolve(__dirname, './env/.env') }),
+      new Dotenv({
+        path: path.resolve(__dirname, devMode ? './env/dev/.env' : './env/prod/.env'),
+      }),
 
       // Copy everything from /public (except index.html) to /build
       new CopyWebpackPlugin({
@@ -143,7 +145,7 @@ module.exports = (env, argv) => {
           ]
         },
         {
-           test: /\.(pdf|pptx?|docx?|xlsx?|zip)$/i,
+          test: /\.(pdf|pptx?|docx?|xlsx?|zip)$/i,
           type: 'asset/resource',
           generator: {
             // Emits to /build/lectures/<original name>.<ext>

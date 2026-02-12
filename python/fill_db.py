@@ -87,7 +87,6 @@ if table_is_empty("workshops"):
         )
 
 
-
 # Insert `registration_types` (rooms) if the table is empty
 if table_is_empty("registration_types"):
     for room in data.get("costs", {}).get("rooms", []):

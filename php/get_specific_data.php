@@ -128,7 +128,7 @@ try {
     $memcached->set($cacheKey, $results, $cacheTTL);
   }
 
-  // Always dynamic availability live
+  // Always dynamic availability live: no cache as we compute the # of room available
   $results['registration_types'] = fetchRegistrationTypesLive($pdo);
 
   echo json_encode([

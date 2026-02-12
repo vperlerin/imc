@@ -32,8 +32,8 @@ const ForgotPassword = () => {
             Reset Password</a>`,
           to: response.data.email,
           toName: "IMC Participant",
-          fromName: "IMC 2026",
-          replyTo: "no-reply@imc2026.imo.net",
+          fromName: `IMC ${cd.year}`,
+          replyTo: `no-reply@${cd.year}.imo.net`,
           replyName: "no-reply",
         });
 
