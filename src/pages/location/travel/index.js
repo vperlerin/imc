@@ -1,44 +1,96 @@
 import PageContain from "components/page-contain";
 import React from "react";
 import GoogleMap from "components/g-map";
+import { Link } from 'react-router-dom';
+
 
 const Travel = () => {
   return (
     <PageContain title="Travel Information">
-      <p>Come back soon</p>
-      {/*
-      <h3>How to travel to Soest</h3>
-      <p>he location of the IMC 2026 will be the small city of Soest, situated 10 kilometers away from Utrecht: the fourth largest city of the country, located in the centre of the Netherlands. Soest is easily reachable by road, train (thanks to the major railway hub Utrecht Central) and airplane (via Schiphol Airport and Rotterdam-The Hague Airport).</p>
+      <h3>How to travel to Barcelonnette</h3>
+      <div className="ps-md-3 md-5">
+        <p>
+          The location of IMC 2026 will be the town of Barcelonnette, situated in the Ubaye Valley in the department of Alpes-de-Haute-Provence, southeastern France.
+          Barcelonnette is a beautiful mountain town — but it is relatively remote and requires some planning to reach.
+        </p>
+      </div>
 
+      <h4 className="mt-4">By Airplane</h4>
+      <div className="ps-md-3">
+        <p className="mb-0">The most convenient airports are:</p>
+        <ul>
+          <li><strong>Marseille Provence Airport (MRS)</strong></li>
+          <li><strong>Nice Côte d’Azur Airport (NCE)</strong></li>
+        </ul>
 
-      <h4>By airplane</h4>
+        <p>
+          From <strong>Marseille Airport</strong>, the drive to Barcelonnette takes approximately <strong>2h30 to 3h</strong> (around 160 km).
+            <br/>
+          From <strong>Nice Airport</strong>, the drive takes approximately <strong>3h30 to 4h</strong> depending on traffic and mountain road conditions.
+          <br/>
+          Car rental is strongly recommended from either airport, as public transport connections to Barcelonnette are limited and time-consuming.
+        </p>
+      </div>
+
+      <h4 className="mt-4">By Train</h4>
+      <div className="ps-md-3">
+        <p className="mb-0">
+          There is no train station in Barcelonnette. The closest main railway stations are:
+        </p>
+
+        <ul>
+          <li><strong>Aix-en-Provence TGV</strong></li>
+          <li><strong>Marseille Saint-Charles</strong></li>
+          <li><strong>Gap</strong> (regional trains)</li>
+        </ul>
+
+        <p>
+          From Paris, a TGV train to Aix-en-Provence TGV takes about <strong>3 hours</strong>. From there, the onward journey by bus to Barcelonnette takes approximately <strong>3h30 to 4h</strong>.
+          <br/>
+          Alternatively, you may travel via <strong>Gap</strong>. From Gap, Barcelonnette is about <strong>1h30 by car</strong> or regional bus.
+          <br/>
+          Overall travel time from Paris to Barcelonnette by train and bus is typically <strong>6h30 to 8h</strong>, depending on connections.
+        </p>
+      </div>
+
+      <h4 className="mt-4">By Car</h4>
+      <div className="ps-md-3">
+        <p className="mb-0">
+          Driving is often the most practical option.
+        </p>
+
+        <ul>
+          <li>From Marseille / Aix-en-Provence: approximately <strong>2h30-3h</strong></li>
+          <li>From Grenoble: approximately <strong>2h30-3h</strong></li>
+          <li>From Nice: approximately <strong>3h30-4h</strong></li>
+          <li>From Gap: approximately <strong>1h30</strong></li>
+        </ul>
+
+        <p>
+          Please note that access roads are mountain roads (mainly the D900). Travel times may vary depending on traffic and weather conditions. Outside the summer season, certain mountain passes near the Italian border may be subject to restrictions.
+        </p>
+      </div>
+
+      <h4 className="mt-4">Parking</h4>
+      <div className="ps-md-3">
+        <p>???</p>
+      </div>
+
+    
+      <GoogleMap />
+
       <p>
-        If you plan on travelling by airplane you can opt to fly to <a className="fw-bolder" href="https://www.schiphol.nl/en/" target="_blank" rel="noopener noreferrer">Schiphol Airport</a> or <a className="fw-bolder" href="https://www.rotterdamthehagueairport.nl/en/" target="_blank" rel="noopener noreferrer">Rotterdam-The Hague Airport</a> , which both offer various connections to European and global destinations. From there, either rent a car or continue travelling by train.</p>
-
-      <h4>By Train</h4>
-      <p>
-        Plan your international train travel to <a className="fw-bolder" href="https://www.ns.nl/en/station-information/ut/utrecht-centraal" target="_blank" rel="noopener noreferrer"> Utrecht Central station</a>. If you are taking the train from one of the airports, you can travel in just 30 minutes from Schiphol to the Utrecht Central train station. The trip will be a bit longer from Rotterdam-The Hague airport; take the bus and subway to Rotterdam Central station and then take a train to Utrecht Central. From there, you can reach the hostel from the Soest-Zuid train station. Once you arrive, take a left across the tracks to the Bosstraat. Walk 600 meters and you will have arrived at the hostel.</p>
-
-
-      <h4>By Car</h4>
-      <p>
-        As Soest is located near the city of Utrecht, it is readily accessible by car via the A2, A12, A27, and A28 highways. Amsterdam is just 30 minutes away, and Brussels and Cologne are a two-hour drive.
+        If you require assistance with travel planning, the Local Organising Committee (LOC) will be happy to help. Please contact us via the {' '}
+        <Link
+          aria-label="Contact"
+          className="fw-bolder"
+          to="/contact"
+          title="Contact"
+        >
+          contact page
+        </Link>.
       </p>
-
-
-      <p>From the direction of the city of Utrecht (the A28), take exit 4 to Soest. You will pass an industrial area. Cross the railway line and turn left 200m after the traffic lights (Pimpelmees). After 100m follow Bosstraat (bend to the right). You will see the hostel on your right after about 400m.
-      </p>
-
-      <p>From the direction of the city Amersfoort you can reach Soest via several routes. In Soest you drive in the direction of the industrial area. Cross the tracks and turn left 50 metres after the traffic lights. Then follow the road to the right; the hostel is on your right.
-      </p>
-
-      <p>From the direction of the city Amsterdam/Hilversum (A1) or Hilversum (A27), take exit 10 to Soest. Turn right at Paleis Soestdijk (Soestdijk Palace). Turn left at the first set of traffic lights. Follow the road all the way (2 km) until it bends at a right angle. After 200m take the first street on the right (de Pimpelmees). This street changes into the Bosstraat. The hostel is on your right after 400m. </p>
-
-
-      <p><b>Parking:</b> You can park for free in front of the hostel. Charging of your electric car is possible at one of the charging stations at the parking area.</p>
-  
-      <GoogleMap/>
-      */}
+ 
     </PageContain>
   );
 };

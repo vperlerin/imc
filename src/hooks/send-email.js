@@ -12,7 +12,7 @@ export const sendEmail = async ({
   replyName,
   bcc = [],
   token = null,
-}) => { 
+}) => {   
   try {
     const response = await axios.post(
       API_URL,

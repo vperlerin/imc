@@ -1,31 +1,42 @@
 import classNames from "classnames";
 import css from "./index.module.scss";
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { getPaymentMethodById } from "utils/payment_method";
 
 const getPaypalPrice = (price) => {
   return Math.round((price + (0.034 * price + 0.35) / 0.966) * 100) / 100;
 };
 
-const getRegInfo = (id, registrationTypes) => {
-  const registration = registrationTypes.find(item => item.id === id);
-  if (!registration) return "Description not found";
+const toNumber = (v, fallback = 0) => {
+  const n = Number(v);
+  return Number.isFinite(n) ? n : fallback;
+};
 
-  const isLastItem = registrationTypes[registrationTypes.length - 1].id === id;
+const getRegInfo = (id, registrationTypes) => {
+  const regId = toNumber(id, null);
+  const registration = (registrationTypes || []).find((item) => toNumber(item.id) === regId);
+
+  if (!registration) {
+    return { description: "", price: 0 };
+  }
+
+  const isNoAccommodation = String(registration.type).toLowerCase() === "no";
+
   return {
-    description: isLastItem ? "(no accommodation)" : "+ " + registration.description,
-    price: parseFloat(registration.price),
+    description: isNoAccommodation ? "(no accommodation)" : `+ ${registration.description}`,
+    price: toNumber(registration.price, 0),
+    type: String(registration.type || ""),
   };
 };
 
 const getSelectedWorkshops = (selectedWorkshopIds = [], workshops = [], isOnline) => {
   if (!Array.isArray(selectedWorkshopIds)) selectedWorkshopIds = [];
 
-  const selected = workshops
-    .filter(workshop => selectedWorkshopIds.includes(String(workshop.id)))
-    .map(workshop => ({
+  const selected = (workshops || [])
+    .filter((workshop) => selectedWorkshopIds.includes(String(workshop.id)))
+    .map((workshop) => ({
       title: workshop.title,
-      price: isOnline ? parseFloat(workshop.price_online) : parseFloat(workshop.price),
+      price: isOnline ? toNumber(workshop.price_online, 0) : toNumber(workshop.price, 0),
     }));
 
   const totalPrice = selected.reduce((sum, workshop) => sum + workshop.price, 0);
@@ -54,60 +65,66 @@ const Summary = ({
   const posters = watch("posters") || [];
 
   // Registration & Accommodation Cost
-  const { description: registration_description, price: registration_price } = getRegInfo(registration_type, registrationTypes);
-  const lateFee = (!isEarlyBird || isEarlyBird === '0') ? conferenceData.costs.after_early_birds : 0;
+  const { description: registration_description, price: registration_price } = useMemo(
+    () => getRegInfo(registration_type, registrationTypes),
+    [registration_type, registrationTypes]
+  );
+
+  const lateFee = !isEarlyBird || isEarlyBird === "0" ? toNumber(conferenceData?.costs?.after_early_birds, 0) : 0;
   const totalRoomCost = registration_price + lateFee;
 
   // Workshops Costs
-  const { selected: selectedWorkshops, totalPrice: workshopCost } = getSelectedWorkshops(selectedWorkshopIds, workshops, isOnline);
+  const { selected: selectedWorkshops, totalPrice: workshopCost } = useMemo(
+    () => getSelectedWorkshops(selectedWorkshopIds, workshops, isOnline),
+    [selectedWorkshopIds, workshops, isOnline]
+  );
 
   // T-shirt Cost
-  const tshirtCost = buyTShirt ? parseFloat(conferenceData.costs.tshirts.price) : 0;
+  const tshirtCost = buyTShirt ? toNumber(conferenceData?.costs?.tshirts?.price, 0) : 0;
 
   // Printed Posters Cost
-  const printedPosters = posters.filter(poster => poster.print === "true" || poster.print === "1");
+  const printedPosters = (posters || []).filter((poster) => poster.print === "true" || poster.print === "1");
   const numberOfPrintedPosters = printedPosters.length;
-  const printedPostersCost = numberOfPrintedPosters * conferenceData.poster_print.price;
+  const printedPostersCost = numberOfPrintedPosters * toNumber(conferenceData?.poster_print?.price, 0);
 
   // Payment Method
   const paymentMethodName = getPaymentMethodById(paymentMethodId, paymentMethods);
   const isPaypal = paymentMethodName === "paypal";
 
-  let totalCost = totalRoomCost + workshopCost + tshirtCost + printedPostersCost;
-  const paypalFee = isPaypal ? getPaypalPrice(totalCost) - totalCost : 0;
-  totalCost += paypalFee;
+  // Compute totals (memoized)
+  const { totalCost, paypalFee, totalOnlineCost, onlinePaypalFee } = useMemo(() => {
+    let totalCostLocal = totalRoomCost + workshopCost + tshirtCost + printedPostersCost;
+    const paypalFeeLocal = isPaypal ? getPaypalPrice(totalCostLocal) - totalCostLocal : 0;
+    totalCostLocal += paypalFeeLocal;
 
-  // Online conference cost calculation
-  const onlineConferenceCost = conferenceData.costs.online;
-  let totalOnlineCost = workshopCost + onlineConferenceCost;
-  const onlinePaypalFee = isPaypal ? getPaypalPrice(totalOnlineCost) - totalOnlineCost : 0;
-  totalOnlineCost += onlinePaypalFee;
+    const onlineConferenceCost = toNumber(conferenceData?.costs?.online, 0);
+    let totalOnlineCostLocal = workshopCost + onlineConferenceCost;
+    const onlinePaypalFeeLocal = isPaypal ? getPaypalPrice(totalOnlineCostLocal) - totalOnlineCostLocal : 0;
+    totalOnlineCostLocal += onlinePaypalFeeLocal;
+
+    return {
+      totalCost: totalCostLocal,
+      paypalFee: paypalFeeLocal,
+      totalOnlineCost: totalOnlineCostLocal,
+      onlinePaypalFee: onlinePaypalFeeLocal,
+    };
+  }, [
+    totalRoomCost,
+    workshopCost,
+    tshirtCost,
+    printedPostersCost,
+    isPaypal,
+    conferenceData,
+  ]);
+
+  const onlineConferenceCost = toNumber(conferenceData?.costs?.online, 0);
 
   // Automatically update total and PayPal fee when form values change
   useEffect(() => {
-    // T-shirt Cost
-    const tshirtCost = buyTShirt ? parseFloat(conferenceData.costs.tshirts.price) : 0;
-
-    // Printed Posters Cost
-    const printedPosters = posters.filter(poster => poster.print === "true" || poster.print === "1");
-    const numberOfPrintedPosters = printedPosters.length;
-    const printedPostersCost = numberOfPrintedPosters * conferenceData.poster_print.price;
-
-    let totalCost = totalRoomCost + workshopCost + tshirtCost + printedPostersCost;
-    const paypalFee = isPaypal ? getPaypalPrice(totalCost) - totalCost : 0;
-    totalCost += paypalFee;
-
-    // Online conference cost calculation
-    const onlineConferenceCost = conferenceData.costs.online;
-    let totalOnlineCost = workshopCost + onlineConferenceCost;
-    const onlinePaypalFee = isPaypal ? getPaypalPrice(totalOnlineCost) - totalOnlineCost : 0;
-    totalOnlineCost += onlinePaypalFee; 
-
-
     if (isOnline) {
       if (isPaypal) {
         setTotal(totalOnlineCost - onlinePaypalFee);
-        setPaypalFee(onlinePaypalFee); 
+        setPaypalFee(onlinePaypalFee);
       } else {
         setTotal(totalOnlineCost);
         setPaypalFee(0);
@@ -115,30 +132,22 @@ const Summary = ({
     } else {
       if (isPaypal) {
         setTotal(totalCost - paypalFee);
-        setPaypalFee(paypalFee); 
+        setPaypalFee(paypalFee);
       } else {
         setTotal(totalCost);
-        setPaypalFee(0); 
+        setPaypalFee(0);
       }
     }
   }, [
     isOnline,
-    paymentMethodId, // Ensure this triggers re-execution
+    isPaypal,
     totalCost,
+    paypalFee,
     totalOnlineCost,
+    onlinePaypalFee,
     setTotal,
     setPaypalFee,
-    onlinePaypalFee,
-    paypalFee,
-    buyTShirt,
-    tshirtSize,
-    registration_type,
-    selectedWorkshopIds,
-    posters,
-    paymentMethods,
-    paymentMethodId
   ]);
- 
 
   return (
     <>
@@ -146,11 +155,15 @@ const Summary = ({
         <p className="fw-bolder alert alert-info">
           {!isOnline ? (
             <>
-              Please review your registration details and total cost carefully before submitting. If any changes are needed, go back and update your selections. Once registered, you will receive a password that allows you to update only your travel details and contributions (talks & posters).
+              Please review your registration details and total cost carefully before submitting. If any changes are
+              needed, go back and update your selections. Once registered, you will receive a password that allows you
+              to update only your travel details and contributions (talks & posters).
             </>
           ) : (
             <>
-              Please review your registration details before submitting. If any changes are needed, go back and update your selections. Once registered, you will receive a password that allows you to update only your eventual contributions (talks).
+              Please review your registration details before submitting. If any changes are needed, go back and update
+              your selections. Once registered, you will receive a password that allows you to update only your eventual
+              contributions (talks).
             </>
           )}
         </p>
@@ -162,7 +175,9 @@ const Summary = ({
           <thead>
             <tr>
               <th scope="col">Description</th>
-              <th scope="col" className="text-end">Price</th>
+              <th scope="col" className="text-end">
+                Price
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -174,7 +189,7 @@ const Summary = ({
             ) : (
               <tr>
                 <td className="ps-3 text-muted">Online Conference Registration</td>
-                <td className="text-end">{parseFloat(onlineConferenceCost).toFixed(2)}€</td>
+                <td className="text-end">{onlineConferenceCost.toFixed(2)}€</td>
               </tr>
             )}
 

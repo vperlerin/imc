@@ -72,7 +72,7 @@ const MainForm = () => {
 
   const loading = specificdataLoading || participantLoading || isSaving;
   const error = [errorMsg, emailStatus.error, participantError, specificDataError].filter(Boolean);
- 
+  
   const {
     control,
     register,
@@ -171,49 +171,52 @@ const MainForm = () => {
     } finally {
       setisSaving(false);
     }
-  };
- 
+  }; 
 
-  useEffect(() => {
-    if (!participant || !password) return;
+useEffect(() => {
+  if (!participant || !password) return;
 
- 
-    const sendEmails = async () => {
-      try {
-        const emailToTeam = registrationEmailToTeam(participant, workshops, paymentMethods, registrationTypes, sessions);
-        const emailToParticipant = registrationEmailToParticipant(
-          participant,
-          workshops,
-          paymentMethods,
-          registrationTypes,
-          sessions,
-          password
-        );
+  const sendEmails = async () => {
+    try {
+      const freshSpecific = await fetchSpecificData();
+      const freshRegistrationTypes = freshSpecific.registration_types || [];
 
-        const attendingWorkshops = participant.workshops?.filter((workshop) => workshop.attending === "1") || [];
+      const soldOutTypes = freshRegistrationTypes
+        .filter((rt) => String(rt?.type || "").toLowerCase() !== "no")
+        .filter((rt) => Number(rt?.total || 0) > 0)
+        .filter((rt) => Number(rt?.room_left || 0) <= 0);
 
-        const bccRecipients = process.env.REACT_APP_BCC_ALL
-          ? process.env.REACT_APP_BCC_ALL.split(",").map((email) => ({ email, name: "BCC Recipient" }))
-          : [];
+      const bccRecipients = process.env.REACT_APP_BCC_ALL
+        ? process.env.REACT_APP_BCC_ALL.split(",").map((email) => ({ email, name: "BCC Recipient" }))
+        : [];
 
-        const workshopEmailPromises = attendingWorkshops.map(async (workshop) => {
-          return sendEmail({
-            subject: `Workshop Registration`,
-            message: `Hey ${workshop.responsible_name.split(" ")[0]},<br><br>
-                      ${participant.participant.first_name} ${participant.participant.last_name} (${participant.participant.email})
-                      has just registered for the "${workshop.title}" (ON-SITE).<br>See you,<br>V./<br>`,
-            to: workshop.responsible_email,
-            toName: workshop.responsible_name,
-            fromName: `IMC ${cd.year}`,
-            replyTo: participant.participant.email,
-            replyName: participant.participant.first_name + " " + participant.participant.last_name,
-            bcc: bccRecipients,
-          });
-        });
+      if (soldOutTypes.length > 0) {
+        const soldOutListHtml = soldOutTypes
+          .map((rt) => {
+            const label = String(rt.type || "unknown");
+            const total = Number(rt.total || 0);
+            const used = Number(rt.used || 0);
+            return `<li><strong>${label}</strong> (left: 0, used: ${used}, total: ${total})</li>`;
+          })
+          .join("");
 
-        const responseEmailTeam = await sendEmail({
-          subject: "New On-site IMC Registration",
-          message: emailToTeam,
+        const participantName = `${participant?.participant?.first_name || ""} ${participant?.participant?.last_name || ""}`.trim();
+        const participantEmail = participant?.participant?.email || "";
+
+        const alertMessage = `
+          Hey IMC ${cd.year} Team,<br><br>
+          ⚠️ <strong>Room availability alert!</strong><br><br>
+          After the latest registration (${participantName}${participantEmail ? ` — ${participantEmail}` : ""}),
+          the following room type${soldOutTypes.length > 1 ? "s are" : " is"} now <strong>SOLD OUT</strong>:<br><br>
+          <ul>
+            ${soldOutListHtml}
+          </ul>
+          <br>
+        `;
+
+        await sendEmail({
+          subject: `⚠️ IMC ${cd.year} - Room type sold out`,
+          message: alertMessage,
           to: process.env.REACT_APP_CONTACT_EMAIL,
           toName: process.env.REACT_APP_CONTACT_NAME,
           fromName: `IMC ${cd.year}`,
@@ -221,39 +224,88 @@ const MainForm = () => {
           replyName: "Do not reply",
           bcc: bccRecipients,
         });
- 
+      }
 
-        const responseEmailParticipant = await sendEmail({
-          subject: "New On-site IMC Registration",
-          message: emailToParticipant,
-          to: participant.participant.email,
-          toName: `${participant.participant.first_name} ${participant.participant.last_name}`,
+      const emailToTeam = registrationEmailToTeam(
+        participant,
+        workshops,
+        paymentMethods,
+        freshRegistrationTypes,
+        sessions
+      );
+
+      const emailToParticipant = registrationEmailToParticipant(
+        participant,
+        workshops,
+        paymentMethods,
+        freshRegistrationTypes,
+        sessions,
+        password
+      );
+
+      // Workshops emails
+      const attendingWorkshops = participant.workshops?.filter((workshop) => workshop.attending === "1") || [];
+
+      const workshopEmailPromises = attendingWorkshops.map(async (workshop) => {
+        return sendEmail({
+          subject: `Workshop Registration`,
+          message: `Hey ${workshop.responsible_name.split(" ")[0]},<br><br>
+                    ${participant.participant.first_name} ${participant.participant.last_name} (${participant.participant.email})
+                    has just registered for the "${workshop.title}" (ON-SITE).<br>See you,<br>V./<br>`,
+          to: workshop.responsible_email,
+          toName: workshop.responsible_name,
           fromName: `IMC ${cd.year}`,
-          replyTo: "no-reply@imc.net",
-          replyName: "Do not reply",
+          replyTo: participant.participant.email,
+          replyName: participant.participant.first_name + " " + participant.participant.last_name,
           bcc: bccRecipients,
         });
+      });
+
+      // Standard team email
+      const responseEmailTeam = await sendEmail({
+        subject: "New On-site IMC Registration",
+        message: emailToTeam,
+        to: process.env.REACT_APP_CONTACT_EMAIL,
+        toName: process.env.REACT_APP_CONTACT_NAME,
+        fromName: `IMC ${cd.year}`,
+        replyTo: "no-reply@imc.net",
+        replyName: "Do not reply",
+        bcc: bccRecipients,
+      });
+
+      // Participant email
+      const responseEmailParticipant = await sendEmail({
+        subject: "New On-site IMC Registration",
+        message: emailToParticipant,
+        to: participant.participant.email,
+        toName: `${participant.participant.first_name} ${participant.participant.last_name}`,
+        fromName: `IMC ${cd.year}`,
+        replyTo: "no-reply@imc.net",
+        replyName: "Do not reply",
+        bcc: bccRecipients,
+      });
+
+      await Promise.all(workshopEmailPromises);
+
+      setEmailStatus({
+        teamEmailSent: responseEmailTeam,
+        participantEmailSent: responseEmailParticipant,
+        error: null,
+      });
  
 
-        await Promise.all(workshopEmailPromises);
+    } catch (error) {
+      setEmailStatus({
+        teamEmailSent: null,
+        participantEmailSent: null,
+        error: error.message || "Failed to send emails",
+      });
+    }
+  };
 
-        setEmailStatus({
-          teamEmailSent: responseEmailTeam,
-          participantEmailSent: responseEmailParticipant,
-          error: null,
-        });
-      } catch (error) { 
+  sendEmails();
+}, [participant, password, workshops, paymentMethods, sessions]);
 
-        setEmailStatus({
-          teamEmailSent: null,
-          participantEmailSent: null,
-          error: error.message || "Failed to send emails",
-        });
-      }
-    };
-
-    sendEmails();
-  }, [participant, workshops, password, paymentMethods, registrationTypes, sessions]);
 
   if (!isDebugMode && false) {
     return <PageContain title="Register On-site">Come back soon…</PageContain>;

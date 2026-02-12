@@ -45,8 +45,7 @@ const formatFoodRestrictionsHtml = (participantPayload) => {
     </ul>
   `;
 };
- 
- 
+
 const registrationDetails = (
   curParticipant,
   curParticipantAccomodation,
@@ -57,7 +56,7 @@ const registrationDetails = (
   workshops,
   paymentMethods,
   registrationTypes,
-  sessions, 
+  sessions,
 ) => {
   const isOnline = curParticipant.is_online === "1";
   const totalDue = parseFloat(curParticipant.total_due) || 0;
@@ -74,71 +73,65 @@ const registrationDetails = (
             <strong>Date of Birth:</strong> ${curParticipant.dob}<br>
 
             <h3 style="margin-bottom:5px;">Workshops</h3>
-            ${
-              curParticipantWorkshops.length > 0
-                ? `
+            ${curParticipantWorkshops.length > 0
+        ? `
                 <ul style="margin-top:0; padding-left:15px;">
                     ${curParticipantWorkshops
-                      .map(
-                        (workshop) => `
+          .map(
+            (workshop) => `
                         <li><strong>${workshop.title}</strong> on ${workshop.date} (${workshop.period})</li>
                     `,
-                      )
-                      .join("")}
+          )
+          .join("")}
                 </ul>
             `
-                : "No workshops selected.<br>"
-            } 
+        : "No workshops selected.<br>"
+      } 
 
             <h3 style="margin-bottom:5px;">Contributions</h3>
-            ${
-              curParticipantContributions.length > 0
-                ? `
+            ${curParticipantContributions.length > 0
+        ? `
                 <h4 style="margin-bottom:5px;">Talks</h4>
-                ${
-                  curParticipantContributions.filter((c) => c.type === "talk")
-                    .length > 0
-                    ? `
+                ${curParticipantContributions.filter((c) => c.type === "talk")
+          .length > 0
+          ? `
                     <ul style="margin-top:0; padding-left:15px;">
                         ${curParticipantContributions
-                          .filter((c) => c.type === "talk")
-                          .map(
-                            (talk) => `
+            .filter((c) => c.type === "talk")
+            .map(
+              (talk) => `
                             <li><strong>${talk.title}</strong> by ${talk.authors} (${talk.duration})<br>
                             ${talk.abstract}<br><strong>Session:</strong> ${getSessionName(
-                              talk.session_id,
-                              sessions,
-                            )}</li>
+                talk.session_id,
+                sessions,
+              )}</li>
                         `,
-                          )
-                          .join("")}
+            )
+            .join("")}
                     </ul>
                 `
-                    : "No talks submitted."
-                }
+          : "No talks submitted."
+        }
             `
-                : "No contributions."
-            } 
+        : "No contributions."
+      } 
 
             <h3 style="margin-bottom:5px;">Payment Details</h3>
             <strong>Payment Method:</strong>  
-            ${
-              paymentMethods.find((method) => method.id === curParticipant.payment_method_id)
-                ?.method || "Unknown"
-            }<br>
+            ${paymentMethods.find((method) => method.id === curParticipant.payment_method_id)
+        ?.method || "Unknown"
+      }<br>
 
             <strong>Total Due:</strong> 
-            ${
-              curParticipant.payment_method_id === "1"
-                ? (parseFloat(totalDue) + parseFloat(paypalFee)).toFixed(2)
-                : totalDue.toFixed(2)
-            }€<br>
+            ${curParticipant.payment_method_id === "1"
+        ? (parseFloat(totalDue) + parseFloat(paypalFee)).toFixed(2)
+        : totalDue.toFixed(2)
+      }€<br>
 
-            ${
-              curParticipant.payment_method_id === "1"
-                ? `including ${paypalFee.toFixed(2)}€ of PayPal fees<br>`
-                : ""
-            } 
+            ${curParticipant.payment_method_id === "1"
+        ? `including ${paypalFee.toFixed(2)}€ of PayPal fees<br>`
+        : ""
+      } 
         `;
   }
 
@@ -155,133 +148,157 @@ const registrationDetails = (
         <strong>Locamotion:</strong>  by ${curParticipantArrival.travelling}
         <strong>Arrival:</strong> ${curParticipantArrival.arrival_date} at ${curParticipantArrival.arrival_hour}:${curParticipantArrival.arrival_minute}<br>
         <strong>Departure:</strong> ${curParticipantArrival.departure_date} at ${curParticipantArrival.departure_hour}:${curParticipantArrival.departure_minute}<br>
-        ${
-          curParticipantArrival.travelling_details
-            ? `<strong>Details:</strong> ${curParticipantArrival.travelling_details}<br>`
-            : ""
-        } 
+        ${curParticipantArrival.travelling_details
+      ? `<strong>Details:</strong> ${curParticipantArrival.travelling_details}<br>`
+      : ""
+    } 
 
         <h3 style="margin-bottom:5px;">Workshops</h3>
-        ${
-          curParticipantWorkshops.length > 0
-            ? `
+        ${curParticipantWorkshops.length > 0
+      ? `
             <ul style="margin-top:0; padding-left:15px;">
                 ${curParticipantWorkshops
-                  .map(
-                    (workshop) => `
+        .map(
+          (workshop) => `
                     <li>
                         <strong>${workshop.title}</strong> on ${workshop.date} (${workshop.period})<br>
                         Responsible: ${workshop.responsible_name}</a>)
                     </li>
                 `,
-                  )
-                  .join("")}
+        )
+        .join("")}
             </ul>
         `
-            : "No workshops selected.<br>"
-        } 
+      : "No workshops selected.<br>"
+    } 
 
 
         <h3 style="margin-bottom:5px;">Contributions</h3>
-        ${
-          curParticipantContributions.length > 0
-            ? `
+        ${curParticipantContributions.length > 0
+      ? `
             <h4 style="margin-bottom:5px;">Talks</h4>
-            ${
-              curParticipantContributions.filter((c) => c.type === "talk")
-                .length > 0
-                ? `
+            ${curParticipantContributions.filter((c) => c.type === "talk")
+        .length > 0
+        ? `
                 <ul style="margin-top:0; padding-left:15px;">
                     ${curParticipantContributions
-                      .filter((c) => c.type === "talk")
-                      .map(
-                        (talk) => `
+          .filter((c) => c.type === "talk")
+          .map(
+            (talk) => `
                         <li><strong>${talk.title}</strong> by ${talk.authors} (${talk.duration})<br>${talk.abstract}<br><strong>Session:</strong> ${getSessionName(
-                          talk.session_id,
-                          sessions,
-                        )}</li>
+              talk.session_id,
+              sessions,
+            )}</li>
                     `,
-                      )
-                      .join("")}
+          )
+          .join("")}
                 </ul>
             `
-                : "No talks submitted."
-            }
+        : "No talks submitted."
+      }
             
            <h4 style="margin-bottom:5px;">Posters</h4>
-            ${
-              curParticipantContributions.filter((c) => c.type === "poster")
-                .length > 0
-                ? `
+            ${curParticipantContributions.filter((c) => c.type === "poster")
+        .length > 0
+        ? `
                 <ul style="margin-top:0; padding-left:15px;">
                     ${curParticipantContributions
-                      .filter((c) => c.type === "poster")
-                      .map(
-                        (poster) => `
+          .filter((c) => c.type === "poster")
+          .map(
+            (poster) => `
                         <li>
                             <strong>${poster.title}</strong> by ${poster.authors}<br>
                             ${poster.abstract}<br><strong>Session:</strong> ${getSessionName(
-                              poster.session_id,
-                              sessions,
-                            )}
-                            ${
-                              poster.print === "1"
-                                ? "<br><strong>The poster will be printed on site by the LOC.</strong><br>"
-                                : ""
-                            }
+              poster.session_id,
+              sessions,
+            )}
+                            ${poster.print === "1"
+                ? "<br><strong>The poster will be printed on site by the LOC.</strong><br>"
+                : ""
+              }
                         </li>
                     `,
-                      )
-                      .join("")}
+          )
+          .join("")}
                 </ul>
             `
-                : "No posters submitted."
-            }
+        : "No posters submitted."
+      }
 
         `
-            : "No contributions."
-        } 
+      : "No contributions."
+    } 
 
         <h3 style="margin-bottom:5px;">Additional Information</h3>
         <strong>Excursion:</strong> ${curParticipantOptions.excursion === "1" ? "Yes" : "No"}<br>
-        <strong>T-Shirt:</strong> ${
-          curParticipantOptions.buy_tshirt === "1"
-            ? `Yes (Size: ${curParticipantOptions.tshirt_size})`
-            : "No"
-        }<br>
+        <strong>T-Shirt:</strong> ${curParticipantOptions.buy_tshirt === "1"
+      ? `Yes (Size: ${curParticipantOptions.tshirt_size})`
+      : "No"
+    }<br>
 
         ${curParticipant ? formatFoodRestrictionsHtml(curParticipant) : ""}
 
         <strong>Comments:</strong> ${curParticipantOptions.comments || "No comments provided."}<br><br>
 
         <h3 style="margin-bottom:5px;">Payment Details</h3>
-        <strong>Accommodation Type:</strong> ${
-          curParticipantAccomodation.registration_type === "no"
-            ? "No Accommodation"
-            : `${curParticipantAccomodation.registration_type} room`
-        }<br>
+        <strong>Accommodation Type:</strong> ${curParticipantAccomodation.registration_type === "no"
+      ? "No Accommodation"
+      : `${curParticipantAccomodation.registration_type} room`
+    }<br>
        <strong>Payment Method:</strong>  
-        ${
-          paymentMethods.find((method) => method.id === curParticipant.payment_method_id)
-            ?.method || "Unknown"
-        }<br>
+        ${paymentMethods.find((method) => method.id === curParticipant.payment_method_id)
+      ?.method || "Unknown"
+    }<br>
 
         <strong>Total Due:</strong> 
-        ${
-          curParticipant.payment_method_id === "1"
-            ? (parseFloat(totalDue) + parseFloat(paypalFee)).toFixed(2)
-            : totalDue.toFixed(2)
-        }€<br>
+        ${curParticipant.payment_method_id === "1"
+      ? (parseFloat(totalDue) + parseFloat(paypalFee)).toFixed(2)
+      : totalDue.toFixed(2)
+    }€<br>
 
-        ${
-          curParticipant.payment_method_id === "1"
-            ? `including ${paypalFee.toFixed(2)}€ of PayPal fees<br>`
-            : ""
-        } 
+        ${curParticipant.payment_method_id === "1"
+      ? `including ${paypalFee.toFixed(2)}€ of PayPal fees<br>`
+      : ""
+    } 
     `;
 };
 
-export const registrationEmailToWorkshopRep = (participant, workshop) => {};
+const roomsAvailabilityHtml = (rows) => {
+  const list = Array.isArray(rows) ? rows : [];
+
+  const filtered = list.filter((r) => (r?.type || r?.registration_type) !== "no");
+
+  if (!filtered.length) {
+    return `<p><em>Room availability: unavailable.</em></p>`;
+  }
+
+  const items = filtered.map((r) => {
+    const type = String(r?.type ?? r?.registration_type ?? "unknown");
+    const roomLeft = Number(r?.room_left ?? r?.available_rooms ?? 0) || 0;
+    const total = r?.total ?? r?.total_rooms ?? null;
+    const used = r?.used ?? null;
+
+    const label = type.charAt(0).toUpperCase() + type.slice(1);
+
+    const suffixParts = [];
+    if (total !== null && total !== undefined) suffixParts.push(`total: ${Number(total) || 0}`);
+    if (used !== null && used !== undefined) suffixParts.push(`used: ${Number(used) || 0}`);
+
+    const suffix = suffixParts.length ? ` <small style="color:#666">(${suffixParts.join(", ")})</small>` : "";
+
+    return `<li><strong>${label}</strong>: ${roomLeft} left${suffix}</li>`;
+  });
+
+  return `
+    <hr>
+    <h4 style="margin:0 0 8px 0;">On-site room availability (live)</h4>
+    <ul style="margin:0; padding-left:18px;">
+      ${items.join("")}
+    </ul>
+    <hr>
+  `;
+};
+
 
 export const registrationEmailToTeam = (
   participant,
@@ -299,12 +316,19 @@ export const registrationEmailToTeam = (
     contributions: curParticipantContributions,
   } = participant;
 
+
   const isOnline = curParticipant.is_online === "1";
+  const availabilityBlock = !isOnline
+    ? roomsAvailabilityHtml(registrationTypes)
+    : "";
+
   return (
     `
         Hey the IMC ${year} Team, <br><br>
         Good news: a new Participant has just registered for <strong>${isOnline ? "ONLINE" : "ON-SITE"}</strong> IMC ${year}!<br><br>
         <br>
+         ${availabilityBlock}
+        <br/>
         Below are the details of the registration: <hr>
     ` +
     registrationDetails(
@@ -317,7 +341,7 @@ export const registrationEmailToTeam = (
       workshops,
       paymentMethods,
       registrationTypes,
-      sessions, 
+      sessions,
     )
   );
 };
@@ -362,14 +386,14 @@ export const registrationEmailToParticipant = (
     summarySection = `
             <h3 style="margin-bottom:5px;">Summary</h3>
             ${participantIntro(
-              curParticipant,
-              curParticipantAccomodation,
-              curParticipantWorkshops,
-              curParticipantContributions,
-              curPariticipantOptions,
-              sessions,
-              true,
-            )}
+      curParticipant,
+      curParticipantAccomodation,
+      curParticipantWorkshops,
+      curParticipantContributions,
+      curPariticipantOptions,
+      sessions,
+      true,
+    )}
         `;
   }
 
@@ -396,18 +420,18 @@ export const registrationEmailToParticipant = (
         ${summarySection}
         <hr>
         ${registrationDetails(
-          curParticipant,
-          curParticipantAccomodation,
-          curParticipantWorkshops,
-          curParticipantContributions,
-          curPariticipantOptions,
-          curParticipantArrival,
-          workshops,
-          paymentMethods,
-          registrationTypes,
-          sessions,
-          participant,  
-        )}
+    curParticipant,
+    curParticipantAccomodation,
+    curParticipantWorkshops,
+    curParticipantContributions,
+    curPariticipantOptions,
+    curParticipantArrival,
+    workshops,
+    paymentMethods,
+    registrationTypes,
+    sessions,
+    participant,
+  )}
     `;
 };
 
@@ -423,12 +447,12 @@ const participantIntro = (
   const contributionsList =
     curParticipantContributions?.length > 0
       ? curParticipantContributions
-          .map(
-            (contribution) =>
-              `<li>a ${contribution.type === "talk" ? "Talk" : "Poster"} titled "<strong>${contribution.title}</strong>"
+        .map(
+          (contribution) =>
+            `<li>a ${contribution.type === "talk" ? "Talk" : "Poster"} titled "<strong>${contribution.title}</strong>"
             (Session: ${getSessionName(contribution.session_id, sessions)})</li>`,
-          )
-          .join("")
+        )
+        .join("")
       : "No contributions submitted.";
 
   const _pronoun = you ? "you" : curParticipant.gender === "Female" ? "she" : "he";

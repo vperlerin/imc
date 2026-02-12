@@ -1,5 +1,5 @@
 import css from './index.module.scss';
-import classNames from "classnames"; 
+import classNames from "classnames";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { retry } from "utils/retry.js";
@@ -25,13 +25,26 @@ const getRandomGreeting = () => {
     "the IMO is lucky to have you!",
     "de IMO heeft geluk met jou!",
     "you're doing an incredible job!",
-    "je doet ongelooflijk goed werk!"
+    "je doet ongelooflijk goed werk!", 
+    "thanks for everything you do for the IMC!",
+    "your energy makes a real difference!",
+    "keep shining — the IMC needs people like you!",
+    "so grateful to have you on the team!",
+    "you’re making IMC special!", 
+    "the meteor community appreciates you!",
+    "merci pour ton engagement pour l’IMC !",
+    "l'IMO te remercie !",
+    "IMC wouldn’t be the same without you!",
+    "keep up the amazing work — we see you!",
+    "sending you good vibes and clear skies!",
+    "clear skies and good energy today!", 
+    "jij maakt het verschil!"
   ];
 
   const randomMessage = messages[Math.floor(Math.random() * messages.length)];
   return `Hey Marc, ${randomMessage}`;
 }
- 
+
 const AdminDashboard = () => {
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -62,129 +75,129 @@ const AdminDashboard = () => {
   if (error) return <PageContain title="Admin Dashboard"><p className="text-danger">{error}</p></PageContain>;
 
   return (
-    <PageContain isMxWidth> 
-        <h3>{getRandomGreeting()}</h3>
-        <p className="mb-4">Here is a quick summary of what's going on here:</p>
-        <AvailableRooms className="mb-4" showLink/>
-        <div className="d-flex flex-column flex-md-row  gap-3 w-100">
+    <PageContain isMxWidth>
+      <h3>{getRandomGreeting()}</h3>
+      <p className="mb-4">Here is a quick summary of what's going on here:</p>
+      <AvailableRooms className="mb-4" showLink />
+      <div className="d-flex flex-column flex-md-row  gap-3 w-100">
 
-          {/* Confirmed and Unconfirmed Onsite Participants */}
-          <div className={classNames('flex-grow-1 flex-shrink-0 border p-3 rounded-2 position-relative', css.col)}>
-           
-              <h5 className="fw-bold">
-                <Link to="/admin/participants/onsite">
-                  On-site Participants
-                </Link>
-              </h5>
-              <div className="position-absolute border rounded-3 border-3 top-0 end-0 m-2 p-2">
-                ✅  <b className="text-success">{dashboardData.confirmed_onsite}{' '}</b>/ {(parseFloat(dashboardData.unconfirmed_onsite) + parseFloat(dashboardData.confirmed_onsite))}
-              </div>
+        {/* Confirmed and Unconfirmed Onsite Participants */}
+        <div className={classNames('flex-grow-1 flex-shrink-0 border p-3 rounded-2 position-relative', css.col)}>
 
-              <div className="mt-4">
-                <h6>Unconfirmed On-site Participants</h6>
-                {dashboardData.onsite_unconfirmed.length > 0 ? (
-                  <div className="table-responsive" >
-                    <table className="table table-striped">
-                      <thead>
-                        <tr>
-                          <th>ID</th>
-                          <th>Name</th>
-                          <th>Confirmed</th>
-                          <th>Email sent</th>
-                          <td></td>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {dashboardData.onsite_unconfirmed.map((p) => (
-                          <tr key={p.id}>
-                            <td>{p.id}</td>
-                            <td>{p.title} {p.first_name} {p.last_name}</td>
-                            <td>{p.confirmation_sent === "1" ? "✅" : "❌"}</td>
-                            <td className={classNames(p?.confirmation_date && "text-success")}>
-                              {p.confirmation_date ? formatFullDate(p.confirmation_date) : "❌"}
-                            </td>
-                            <td>
-                              <div className="d-flex gap-2 justify-content-end">
-                                <a href={`/admin/participants/onsite/payment/${p.id}`} className="btn btn-sm btn-outline-success fw-bolder">Payments</a>
-                                <a href={`/admin/participants/online/edit/${p.id}`} className="btn btn-sm btn-outline-primary fw-bolder">Edit</a>
-                              </div>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                ) : (
-                  <p className="text-success"><i>No unconfirmed on-site participants: you go to go!</i></p>
-                )}
-              </div> 
+          <h5 className="fw-bold">
+            <Link to="/admin/participants/onsite">
+              On-site Participants
+            </Link>
+          </h5>
+          <div className="position-absolute border rounded-3 border-3 top-0 end-0 m-2 p-2">
+            ✅  <b className="text-success">{dashboardData.confirmed_onsite}{' '}</b>/ {(parseFloat(dashboardData.unconfirmed_onsite) + parseFloat(dashboardData.confirmed_onsite))}
           </div>
 
-
-          {/* Confirmed and Unconfirmed Online Participants */}
-          <div className={classNames('flex-grow-1 flex-shrink-0 border p-3 rounded-2 position-relative', css.col)}>
-            
-              <h5 className="fw-bold">
-                <Link to="/admin/participants/online">
-                  Online Participants
-                </Link>
-              </h5>
-              <div className="position-absolute border rounded-3 border-3 top-0 end-0 m-2 p-2">
-                ✅  <b className="text-success">{dashboardData.confirmed_online}{' '}</b>/ {(parseFloat(dashboardData.unconfirmed_online) + parseFloat(dashboardData.confirmed_online))}
-              </div>
-              {/* Unconfirmed Participants Tables */}
-              <div className="mt-4">
-                <h6>Unconfirmed Online Participants</h6>
-                {dashboardData.online_unconfirmed.length > 0 ? (
-                  <div className="table-responsive" >
-                  <table className="table table-striped">
-                    <thead>
-                      <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Confirmed</th>
-                        <th>Email sent</th>
-                        <th></th>
+          <div className="mt-4">
+            <h6>Unconfirmed On-site Participants</h6>
+            {dashboardData.onsite_unconfirmed.length > 0 ? (
+              <div className="table-responsive" >
+                <table className="table table-striped">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Name</th>
+                      <th>Confirmed</th>
+                      <th>Email sent</th>
+                      <td></td>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {dashboardData.onsite_unconfirmed.map((p) => (
+                      <tr key={p.id}>
+                        <td>{p.id}</td>
+                        <td>{p.title} {p.first_name} {p.last_name}</td>
+                        <td>{p.confirmation_sent === "1" ? "✅" : "❌"}</td>
+                        <td className={classNames(p?.confirmation_date && "text-success")}>
+                          {p.confirmation_date ? formatFullDate(p.confirmation_date) : "❌"}
+                        </td>
+                        <td>
+                          <div className="d-flex gap-2 justify-content-end">
+                            <a href={`/admin/participants/onsite/payment/${p.id}`} className="btn btn-sm btn-outline-success fw-bolder">Payments</a>
+                            <a href={`/admin/participants/online/edit/${p.id}`} className="btn btn-sm btn-outline-primary fw-bolder">Edit</a>
+                          </div>
+                        </td>
                       </tr>
-                    </thead>
-                    <tbody>
-                      {dashboardData.online_unconfirmed.map((p) => (
-                        <tr key={p.id}>
-                          <td>{p.id}</td>
-                          <td>{p.title} {p.first_name} {p.last_name}</td>
-                          <td>{p.confirmation_sent === "1" ? "✅" : "❌"}</td>
-                          <td className={classNames(p?.confirmation_date && "text-success")}>
-                            {p.confirmation_date ? formatFullDate(p.confirmation_date) : "❌"}
-                          </td>
-                          <td>
-                            <div className="d-flex gap-2 justify-content-end">
-                              <a href={`/admin/participants/onsite/payment/${p.id}`} className="btn btn-sm btn-outline-success fw-bolder">Payments</a>
-                              <a href={`/admin/participants/online/edit/${p.id}`} className="btn btn-sm btn-outline-primary fw-bolder">Edit</a>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-                ) : (
-                  <p className="text-success"><i>No unconfirmed online participants: you go to go!</i></p>
-                )}
-              </div> 
-            </div>  
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <p className="text-success"><i>No unconfirmed on-site participants: you go to go!</i></p>
+            )}
+          </div>
         </div>
 
-        {/* Workshop Stats */}
-        <div className={classNames('mt-4 border p-3 rounded-2', css.col)}>
-          <h5>Workshop Attendance</h5>
-          {dashboardData.workshop_stats.length > 0 ? (
-            <div className="table-responsive" >
+
+        {/* Confirmed and Unconfirmed Online Participants */}
+        <div className={classNames('flex-grow-1 flex-shrink-0 border p-3 rounded-2 position-relative', css.col)}>
+
+          <h5 className="fw-bold">
+            <Link to="/admin/participants/online">
+              Online Participants
+            </Link>
+          </h5>
+          <div className="position-absolute border rounded-3 border-3 top-0 end-0 m-2 p-2">
+            ✅  <b className="text-success">{dashboardData.confirmed_online}{' '}</b>/ {(parseFloat(dashboardData.unconfirmed_online) + parseFloat(dashboardData.confirmed_online))}
+          </div>
+          {/* Unconfirmed Participants Tables */}
+          <div className="mt-4">
+            <h6>Unconfirmed Online Participants</h6>
+            {dashboardData.online_unconfirmed.length > 0 ? (
+              <div className="table-responsive" >
+                <table className="table table-striped">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Name</th>
+                      <th>Confirmed</th>
+                      <th>Email sent</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {dashboardData.online_unconfirmed.map((p) => (
+                      <tr key={p.id}>
+                        <td>{p.id}</td>
+                        <td>{p.title} {p.first_name} {p.last_name}</td>
+                        <td>{p.confirmation_sent === "1" ? "✅" : "❌"}</td>
+                        <td className={classNames(p?.confirmation_date && "text-success")}>
+                          {p.confirmation_date ? formatFullDate(p.confirmation_date) : "❌"}
+                        </td>
+                        <td>
+                          <div className="d-flex gap-2 justify-content-end">
+                            <a href={`/admin/participants/onsite/payment/${p.id}`} className="btn btn-sm btn-outline-success fw-bolder">Payments</a>
+                            <a href={`/admin/participants/online/edit/${p.id}`} className="btn btn-sm btn-outline-primary fw-bolder">Edit</a>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <p className="text-success"><i>No unconfirmed online participants: you go to go!</i></p>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Workshop Stats */}
+      <div className={classNames('mt-4 border p-3 rounded-2', css.col)}>
+        <h5>Workshop Attendance</h5>
+        {dashboardData.workshop_stats.length > 0 ? (
+          <div className="table-responsive" >
             <table className="table table-bordered">
               <thead>
                 <tr>
                   <th rowSpan="2">Workshop</th>
                   <th colSpan="2" className="text-center">Online Participants</th>
-                  <th colSpan="2" className="text-centert">Onsite Participants</th>
+                  <th colSpan="2" className="text-center">Onsite Participants</th>
                 </tr>
                 <tr>
 
@@ -212,11 +225,11 @@ const AdminDashboard = () => {
                 ))}
               </tbody>
             </table>
-            </div>
-          ) : (
-            <p><i>No workshop data available.</i></p>
-          )}
-        </div>
+          </div>
+        ) : (
+          <p><i>No workshop data available.</i></p>
+        )}
+      </div>
     </PageContain >
   );
 };

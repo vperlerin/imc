@@ -40,22 +40,20 @@ const s=e=>{e&&e.stopPropagation()}}
 /***/2337:
 /***/(e,t,a)=>{
 /* harmony export */a.d(t,{
-/* harmony export */A:()=>i
+/* harmony export */A:()=>l
 /* harmony export */});
 /* harmony import */a(6540);
-/* harmony import */var s=a(4848);const n=e=>Math.round(100*(e+(.034*e+.35)/.966))/100,i=({isOnline:e,conferenceData:t,participantData:a,registrationTypes:i})=>{if(!a||!a.participant)
-return(0,s.jsx)("div",{className:"alert alert-danger",children:"No participant data available."});const{participant:l,accommodation:r,workshops:o,extra_options:c,contributions:d=[]}=a;
-// Initialize totalRoomCost
-let m=0,p="";
-// Only calculate registration cost if NOT online
-if(!e){const e=((e,t)=>{const a=t.find((t=>t.id===e));return a?{description:t[t.length-1].id===e?"(no accommodation)":"+ "+a.description,price:parseFloat(a.price)}:"Description not found"})(r.registration_type_id,i);p=e.description;const a="0"===l.is_early_bird?t.costs.after_early_birds:0;m=e.price+a}
+/* harmony import */var s=a(4848);const n=e=>Math.round(100*(e+(.034*e+.35)/.966))/100,i=(e,t=0)=>{const a=Number(e);return Number.isFinite(a)?a:t},l=({isOnline:e,conferenceData:t,participantData:a,registrationTypes:l})=>{if(!a||!a.participant)
+return(0,s.jsx)("div",{className:"alert alert-danger",children:"No participant data available."});const{participant:r,accommodation:o,workshops:c,extra_options:d,contributions:m=[]}=a;
+// Registration & Accommodation Cost
+let p=0,u="";if(!e){const e=((e,t)=>{const a=i(e,null),s=(t||[]).find((e=>i(e.id)===a));if(!s)return{description:"",price:0,type:""};const n=String(s.type||"").toLowerCase();return{description:"no"===n?"(no accommodation)":`+ ${s.description}`,price:i(s.price,0),type:n}})(o?.registration_type_id,l);u=e.description;const a="0"===r?.is_early_bird?i(t?.costs?.after_early_birds,0):0;p=e.price+a}
 // Selected Workshops
-const{selected:u,totalPrice:h}=((e=[],t)=>{if(!Array.isArray(e))return{selected:[],totalPrice:0};const a=e.map((e=>({title:e.title,price:t?parseFloat(e.price_online):parseFloat(e.price)}))),s=a.reduce(((e,t)=>e+t.price),0);return{selected:a,totalPrice:s}})(o,e),x="1"===c?.buy_tshirt||"true"===c?.buy_tshirt?parseFloat(t.costs.tshirts.price):0,f=d.filter((e=>"1"===e.print||"true"===e.print)).length,b=f*t.poster_print.price,y="paypal"===(l.payment_method_name||"Unknown").toLowerCase();
+const{selected:h,totalPrice:x}=((e=[],t)=>{if(!Array.isArray(e))return{selected:[],totalPrice:0};const a=e.map((e=>({title:e.title,price:i(t?e.price_online:e.price,0)}))),s=a.reduce(((e,t)=>e+t.price),0);return{selected:a,totalPrice:s}})(c,e),f="1"===d?.buy_tshirt||"true"===d?.buy_tshirt?i(t?.costs?.tshirts?.price,0):0,b=(m||[]).filter((e=>"1"===e.print||"true"===e.print)).length,y=b*i(t?.poster_print?.price,0),j="paypal"===String(r?.payment_method_name||"Unknown").toLowerCase();
 // T-shirt Cost
 // Total Calculation
-let j=m+h+x+b;const g=y?n(j)-j:0;j+=g;
+let g=p+x+f+y;const N=j?n(g)-g:0;g+=N;
 // Online Conference Cost Calculation
-const N=t.costs.online;let _=h+N;const w=y?n(_)-_:0;return _+=w,(0,s.jsxs)("div",{className:"p-2 border rounded flex-shrink-0",children:[(0,s.jsx)("h4",{className:"mb-3",children:"Invoice Summary"}),(0,s.jsxs)("table",{className:"table table-striped table-hover",children:[(0,s.jsx)("thead",{children:(0,s.jsxs)("tr",{children:[(0,s.jsx)("th",{scope:"col",children:"Description"}),(0,s.jsx)("th",{scope:"col",className:"text-end",children:"Price"})]})}),(0,s.jsxs)("tbody",{children:[e?(0,s.jsxs)("tr",{children:[(0,s.jsx)("td",{className:"ps-3 text-muted",children:"Online Conference Registration"}),(0,s.jsxs)("td",{className:"text-end",children:[N.toFixed(2),"€"]})]}):(0,s.jsxs)("tr",{children:[(0,s.jsxs)("td",{className:"ps-3 text-muted",children:["Conference Registration ",p]}),(0,s.jsxs)("td",{className:"text-end",children:[m.toFixed(2),"€"]})]}),u.map(((e,t)=>(0,s.jsxs)("tr",{children:[(0,s.jsx)("td",{className:"ps-3 text-muted",children:e.title}),(0,s.jsxs)("td",{className:"text-end",children:[e.price.toFixed(2),"€"]})]},t))),f>0&&(0,s.jsxs)("tr",{children:[(0,s.jsxs)("td",{className:"ps-3 text-muted",children:["Printed Poster",f>1?"s":""," x ",f]}),(0,s.jsxs)("td",{className:"text-end",children:[b.toFixed(2),"€"]})]}),x>0&&c?.tshirt_size&&(0,s.jsxs)("tr",{children:[(0,s.jsxs)("td",{className:"ps-3 text-muted",children:["T-Shirt (",c.tshirt_size,")"]}),(0,s.jsxs)("td",{className:"text-end",children:[x.toFixed(2),"€"]})]}),y&&(0,s.jsxs)("tr",{children:[(0,s.jsx)("td",{className:"ps-3 text-muted",children:"PayPal Fee (3.4% + 0.35€)"}),(0,s.jsxs)("td",{className:"text-end",children:[e?w.toFixed(2):g.toFixed(2),"€"]})]}),(0,s.jsxs)("tr",{children:[(0,s.jsx)("td",{children:(0,s.jsx)("strong",{children:"TOTAL"})}),(0,s.jsx)("td",{className:"text-end",children:(0,s.jsxs)("strong",{children:[e?_.toFixed(2):j.toFixed(2),"€"]})})]})]})]})]})}}
+const _=i(t?.costs?.online,0);let w=x+_;const v=j?n(w)-w:0;return w+=v,(0,s.jsxs)("div",{className:"p-2 border rounded flex-shrink-0",children:[(0,s.jsx)("h4",{className:"mb-3",children:"Invoice Summary"}),(0,s.jsxs)("table",{className:"table table-striped table-hover",children:[(0,s.jsx)("thead",{children:(0,s.jsxs)("tr",{children:[(0,s.jsx)("th",{scope:"col",children:"Description"}),(0,s.jsx)("th",{scope:"col",className:"text-end",children:"Price"})]})}),(0,s.jsxs)("tbody",{children:[e?(0,s.jsxs)("tr",{children:[(0,s.jsx)("td",{className:"ps-3 text-muted",children:"Online Conference Registration"}),(0,s.jsxs)("td",{className:"text-end",children:[_.toFixed(2),"€"]})]}):(0,s.jsxs)("tr",{children:[(0,s.jsxs)("td",{className:"ps-3 text-muted",children:["Conference Registration ",u]}),(0,s.jsxs)("td",{className:"text-end",children:[p.toFixed(2),"€"]})]}),h.map(((e,t)=>(0,s.jsxs)("tr",{children:[(0,s.jsx)("td",{className:"ps-3 text-muted",children:e.title}),(0,s.jsxs)("td",{className:"text-end",children:[e.price.toFixed(2),"€"]})]},t))),b>0&&(0,s.jsxs)("tr",{children:[(0,s.jsxs)("td",{className:"ps-3 text-muted",children:["Printed Poster",b>1?"s":""," x ",b]}),(0,s.jsxs)("td",{className:"text-end",children:[y.toFixed(2),"€"]})]}),f>0&&d?.tshirt_size&&(0,s.jsxs)("tr",{children:[(0,s.jsxs)("td",{className:"ps-3 text-muted",children:["T-Shirt (",d.tshirt_size,")"]}),(0,s.jsxs)("td",{className:"text-end",children:[f.toFixed(2),"€"]})]}),j&&(0,s.jsxs)("tr",{children:[(0,s.jsx)("td",{className:"ps-3 text-muted",children:"PayPal Fee (3.4% + 0.35€)"}),(0,s.jsxs)("td",{className:"text-end",children:[e?v.toFixed(2):N.toFixed(2),"€"]})]}),(0,s.jsxs)("tr",{children:[(0,s.jsx)("td",{children:(0,s.jsx)("strong",{children:"TOTAL"})}),(0,s.jsx)("td",{className:"text-end",children:(0,s.jsxs)("strong",{children:[(e?w:g).toFixed(2),"€"]})})]})]})]})]})}}
 /***/,
 /***/2810:
 /***/(e,t,a)=>{
@@ -117,10 +115,12 @@ E((e=>!e))}catch(e){$("Failed to confirm the participant. Pleaase, try again lat
 /* harmony export */a.d(t,{
 /* harmony export */Q:()=>/* binding */l
 /* harmony export */});
+/* unused harmony export fetchSpecificData */
 /* harmony import */var s=a(3318),n=a(6540),i=a(1083);
-/* harmony import */const l=()=>{const[e,t]=(0,n.useState)([]),[a,l]=(0,n.useState)([]),[r,o]=(0,n.useState)([]),[c,d]=(0,n.useState)([]),[m,p]=(0,n.useState)(!0),[u,h]=(0,n.useState)(null);// Runs only once when the component mounts
-return(0,n.useEffect)((()=>{(async()=>{try{const e=await(0,s/* .retry */.L)((()=>i/* ["default"] */.A.get("https://imc2026.imo.net/php/get_specific_data.php")));if(!e.data.success)throw new Error(e.data.message||"Failed to fetch specific IMC data. Please, refresh the page.");t(e.data.data.workshops||[]),l(e.data.data.payment_methods||[]),o(e.data.data.registration_types||[]),d(e.data.data.sessions||[])}catch(e){h(e.message||"Failed to fetch specific IMC data. Please, refresh the page.")}finally{p(!1)}})()}),[]),{workshops:e,paymentMethods:a,registrationTypes:r,sessions:c,loading:m,error:u}};
-/***/},
+/* harmony import */
+// api/specific-data/index.js
+const l=()=>{const[e,t]=(0,n.useState)([]),[a,l]=(0,n.useState)([]),[r,o]=(0,n.useState)([]),[c,d]=(0,n.useState)([]),[m,p]=(0,n.useState)(!0),[u,h]=(0,n.useState)(null),x=(0,n.useCallback)((async()=>{p(!0),h(null);try{const e=await(async()=>{const e=await(0,s/* .retry */.L)((()=>i/* ["default"] */.A.get("https://imc2026.imo.net/php/get_specific_data.php")));if(!e?.data?.success)throw new Error(e?.data?.message||"Failed to fetch specific IMC data. Please, refresh the page.");return e.data.data||{}})();t(e.workshops||[]),l(e.payment_methods||[]),o(e.registration_types||[]),d(e.sessions||[])}catch(e){h(e.message||"Failed to fetch specific IMC data. Please, refresh the page.")}finally{p(!1)}}),[]);return(0,n.useEffect)((()=>{x()}),[x]),{error:u,loading:m,paymentMethods:a,refetchSpecificData:x,registrationTypes:r,sessions:c,workshops:e}}}
+/***/,
 /***/4972:
 /***/(e,t,a)=>{
 /* harmony export */a.d(t,{

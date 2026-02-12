@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import React from "react";
+import React, { useMemo } from "react";
 import Loader from "components/loader";
 import { Link } from "react-router-dom";
 import { useApiAvailableRooms } from "@/admin/api/accomodations/index.js";
@@ -9,58 +9,76 @@ const AvailableRooms = ({ className, showLink = false }) => {
 
   if (error) {
     return <div className="text-danger">Error: {error}</div>;
-  }
+  } 
+ 
+  const normalized = useMemo(() => {
+    const rows = Array.isArray(availableRooms) ? availableRooms : [];
 
-  // Function to format room availability
-  const formatRoomAvailability = (roomType, available) => {
-    const roomCapacity = {
-      single: 1,
-      double: 2,
-      quadruple: 4,
-    }[roomType] || 1; // Default to 1 if type is unknown
+    return rows
+      .filter((r) => (r?.type || r?.registration_type) !== "no")
+      .map((r) => {
+        const id = r?.id ?? r?.registration_type_id ?? null;
+        const type = (r?.type ?? r?.registration_type ?? "").toString();
+        const roomLeft = r?.room_left ?? r?.available_rooms ?? 0;
+        const total = r?.total ?? r?.total_rooms ?? null;
+        const used = r?.used ?? null;
 
-    const fullRooms = Math.floor(available);
-    const remainingBeds = Math.round((available - fullRooms) * roomCapacity);
+        return {
+          id,
+          type,
+          roomLeft: Number(roomLeft) || 0,
+          total: total === null ? null : Number(total) || 0,
+          used: used === null ? null : Number(used) || 0,
+        };
+      });
+  }, [availableRooms]);
 
-    let displayText = `${fullRooms} rooms left`;
-    if (remainingBeds > 0) {
-      displayText += ` + ${remainingBeds} bed${remainingBeds > 1 ? "s" : ""}`;
+  const formatAvailability = (row) => {
+    // Prefer the new live fields
+    if (row.total !== null) {
+      // Example: "12 left / 40"
+      return {
+        main: `${row.roomLeft} left`,
+        sub: ` / ${row.total}`,
+      };
     }
 
-    return displayText;
+    // Fallback to old API if total is missing
+    return {
+      main: `${row.roomLeft} left`,
+      sub: "",
+    };
   };
 
   return (
-    <div className={classNames(className, "position-relative", showLink && ' border rounded-2 p-3 ')}>
+    <div className={classNames(className, "position-relative", showLink && " border rounded-2 p-3 ")}>
       {loading && <Loader />}
 
       {showLink && (
-        <h5><Link to="/admin/accomodations">Available Rooms by Type</Link></h5> 
+        <h5>
+          <Link to="/admin/accomodations">Available Rooms by Type</Link>
+        </h5>
       )}
 
-      {error && (
-        <div className="alert alert-danger fw-bolder">{error}</div>
-      )}
-      {!error && !loading && (
+      {!loading && (
         <div className="d-flex flex-column flex-md-row gap-2">
-          {availableRooms?.filter((room) => room.registration_type !== "no")
-            .map((room) => {
-              const roomType = room.registration_type.toLowerCase();
-              const isRoomAvailable = Math.floor(room.available_rooms) <= 0;
+          {normalized.map((row) => {
+            const label = row.type ? row.type.charAt(0).toUpperCase() + row.type.slice(1) : "Unknown";
+            const isSoldOut = row.roomLeft <= 0;
+            const { main, sub } = formatAvailability(row);
 
-              return (
-                <div
-                  key={room.registration_type_id}
-                  className={classNames("p-3 border rounded-2", {
-                    "text-danger": isRoomAvailable,
-                  })}
-                >
-                  {roomType.charAt(0).toUpperCase() + roomType.slice(1)}:
-                  <strong> {formatRoomAvailability(roomType, parseFloat(room.available_rooms))}</strong>
-                  <small className="text-muted"> / {room.total_rooms}</small>
-                </div>
-              );
-            })}
+            return (
+              <div
+                key={row.id ?? row.type}
+                className={classNames("p-3 border rounded-2", {
+                  "text-danger": isSoldOut,
+                })}
+              >
+                {label}:<strong> {main}</strong>
+                {sub && <small className="text-muted">{sub}</small>}
+              </div>
+            );
+          })}
         </div>
       )}
     </div>
