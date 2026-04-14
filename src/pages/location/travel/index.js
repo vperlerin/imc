@@ -13,7 +13,17 @@ const Travel = () => {
           The location of IMC 2026 will be the town of Barcelonnette, situated in the Ubaye Valley in the department of Alpes-de-Haute-Provence, southeastern France.
           Barcelonnette is a beautiful mountain town — but it is relatively remote and requires some planning to reach.
         </p>
-      </div>
+
+        <p>The address of the LOC venue is:</p>
+        <p><strong>Pôle d'accueil universitaire Séolane</strong><br />
+          20 rue du Colonel Charles Péguy<br />
+          04400 Barcelonnette<br />
+          France
+        </p>
+
+        <p><strong>Latitude:</strong> 44.389853 &nbsp; / &nbsp; <strong>Longitude:</strong> 6.642819</p>
+      </div> 
+
 
       <h4 className="mt-4">By Airplane</h4>
       <div className="ps-md-3">
@@ -25,9 +35,9 @@ const Travel = () => {
 
         <p>
           From <strong>Marseille Airport</strong>, the drive to Barcelonnette takes approximately <strong>2h30 to 3h</strong> (around 160 km).
-            <br/>
+          <br />
           From <strong>Nice Airport</strong>, the drive takes approximately <strong>3h30 to 4h</strong> depending on traffic and mountain road conditions.
-          <br/>
+          <br />
           Car rental is strongly recommended from either airport, as public transport connections to Barcelonnette are limited and time-consuming.
         </p>
       </div>
@@ -46,9 +56,9 @@ const Travel = () => {
 
         <p>
           From Paris, a TGV train to Aix-en-Provence TGV takes about <strong>3 hours</strong>. From there, the onward journey by bus to Barcelonnette takes approximately <strong>3h30 to 4h</strong>.
-          <br/>
+          <br />
           Alternatively, you may travel via <strong>Gap</strong>. From Gap, Barcelonnette is about <strong>1h30 by car</strong> or regional bus.
-          <br/>
+          <br />
           Overall travel time from Paris to Barcelonnette by train and bus is typically <strong>6h30 to 8h</strong>, depending on connections.
         </p>
       </div>
@@ -73,10 +83,10 @@ const Travel = () => {
 
       <h4 className="mt-4">Parking</h4>
       <div className="ps-md-3">
-        <p>???</p>
+        <p> You can park for free in front of the hostel. </p>
       </div>
 
-    
+
       <GoogleMap />
 
       <p>
@@ -90,8 +100,8 @@ const Travel = () => {
           contact page
         </Link>.
       </p>
- 
-    </PageContain>
+
+    </PageContain >
   );
 };
 

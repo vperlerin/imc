@@ -1,6 +1,6 @@
 export const getWorkshopById = (id, workshops) => {
-  if (!Array.isArray(workshops)) return "Unknown Workshop (not an array)";
+  if (!Array.isArray(workshops)) return { id: null, title: "Unknown Workshop" };
 
   const workshop = workshops.find((pm) => String(pm.id) === String(id));
-  return workshop ? workshop : "Unknown Workshop";
+  return workshop || { id: null, title: "Unknown Workshop" };
 };

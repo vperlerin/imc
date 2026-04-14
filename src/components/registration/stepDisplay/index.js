@@ -2,7 +2,7 @@ import classNames from 'classnames';
 import css from './index.module.scss';
 import React from "react";
 
-const StepDislay = ({ step, stepTotal }) => {
+const StepDisplay = ({ step, stepTotal }) => {
   return ( 
     <span className={classNames(css.step)}>
       <span>{step}</span>
@@ -13,4 +13,4 @@ const StepDislay = ({ step, stepTotal }) => {
   )
 };
 
-export default StepDislay
+export default StepDisplay

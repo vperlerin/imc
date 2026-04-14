@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import cssForm from "styles/components/form.module.scss";
-import StepDislay from "components/registration/stepDisplay";
+import StepDisplay from "components/registration/stepDisplay";
 import React, { useEffect } from "react";
 import { countries } from 'data/countries';
 
@@ -59,7 +59,7 @@ const IdentityForm = ({
     <>
       {!isAdmin && (
         <h4 className="mb-3 border-bottom pb-2">
-          <StepDislay step={step} stepTotal={stepTotal} />
+          <StepDisplay step={step} stepTotal={stepTotal} />
           Personal Details
         </h4>
       )}
@@ -131,7 +131,7 @@ const IdentityForm = ({
           <label className="col-sm-2 col-form-label fw-bold">Gender</label>
           <div className="col-sm-10">
             <select
-              className={classNames('form-select', errors.title && "is-invalid", cssForm.mdAuto)}
+              className={classNames('form-select', errors.gender && "is-invalid", cssForm.mdAuto)}
               {...register("gender", { required: "Gender is required" })} onBlur={() => trigger("gender")}>
               <option value="">Select a Gender</option>
               <option value="Male">Male</option>
@@ -204,7 +204,7 @@ const IdentityForm = ({
             <label className="col-sm-2 col-form-label fw-bold">Postal Code</label>
             <div className="col-sm-10">
               <input
-                className={classNames('form-control', errors.email && "is-invalid", cssForm.md50)}
+                className={classNames('form-control', errors.postal_code && "is-invalid", cssForm.md50)}
                 placeholder="Postal Code"
                 {...register("postal_code", { required: "Postal Code is required" })}
                 onBlur={() => trigger("postal_code")} />

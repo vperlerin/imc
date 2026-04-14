@@ -23,6 +23,8 @@ import Comments from "components/registration/comments";
 import Summary from "components/billing/summary";
 import { formatFullDate } from "utils/date";
 
+const hasConferenceWorkshops = Array.isArray(cd?.workshops) && cd.workshops.length > 0;
+
 const AdminParticipantsUser = ({ isCurOnline = false }) => {
   const { participantId, tab } = useParams();
   const [errorMsg, setErrorMsg] = useState('');
@@ -49,12 +51,6 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
     specificDataError,
   ].filter(Boolean);
 
-  // Paypal fess
-  useEffect(() => {
-    setPaypalFee(paypalFee);
-  }, [paypalFee])
-
-
   // Detect form changes
   useEffect(() => {
     const subscription = watch(() => {
@@ -63,13 +59,21 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
     return () => subscription.unsubscribe();
   }, [watch]);
 
+  const adminEditBase = `/admin/participants/${isCurOnline ? "online" : "onsite"}/edit/${participantId}`;
+
   useEffect(() => {
     const isValidId = Number.isInteger(Number(participantId)) && Number(participantId) > 0;
 
     if (!tab && isValidId) {
-      navigate(`/admin/participants/onsite/edit/${participantId}/summary`, { replace: true });
+      navigate(`${adminEditBase}/summary`, { replace: true });
     }
-  }, [tab, participantId, navigate]);
+  }, [tab, participantId, navigate, adminEditBase]);
+
+  useEffect(() => {
+    if (tab === "workshops" && !hasConferenceWorkshops && participantId) {
+      navigate(`${adminEditBase}/summary`, { replace: true });
+    }
+  }, [tab, hasConferenceWorkshops, participantId, navigate, adminEditBase]);
 
 
   useEffect(() => {
@@ -226,12 +230,8 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
   ];
 
 
-  const isSummaryReady = (
-    participant &&
-    paymentMethods.length > 0 &&
-    workshops.length > 0 &&
-    registrationTypes.length > 0
-  );
+  const isSummaryReady =
+    participant && paymentMethods.length > 0 && registrationTypes.length > 0;
 
   const hasAdminNotes = !!participant?.participant?.admin_notes;
 
@@ -267,7 +267,7 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
             {[
               { key: "summary", label: "Billing" },
               { key: "identity", label: "Identity" },
-              { key: "workshops", label: "Workshops" },
+              ...(hasConferenceWorkshops ? [{ key: "workshops", label: "Workshops" }] : []),
               ...(!isOnline ? [{ key: "arrival", label: "Arrival" }] : []),
               { key: "contribution", label: "Contribution" },
               ...(!isOnline ? [{ key: "accommodation", label: "Acc. & Pay. Method" }] : [{ key: "accommodation", label: "Pay. Method" }]),
@@ -283,10 +283,10 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
                       activeTab === key && cssTabs.active,
                     )
                   }
-                  href={`/admin/participants/onsite/edit/${participantId}/${key}`}
+                  href={`${adminEditBase}/${key}`}
                   onClick={(e) => {
                     e.preventDefault();
-                    navigate(`/admin/participants/onsite/edit/${participantId}/${key}`);
+                    navigate(`${adminEditBase}/${key}`);
                   }}
                 >
 
@@ -326,7 +326,7 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
                 />
               </>
             )}
-            {tab === "workshops" && (
+            {hasConferenceWorkshops && tab === "workshops" && (
               <Workshops
                 isAdmin
                 isOnline={isOnline}

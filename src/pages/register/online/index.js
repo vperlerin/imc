@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useLocation } from "react-router-dom";
 import { getPaymentMethodById } from "utils/payment_method";
@@ -20,7 +20,17 @@ import { useApiParticipant } from "api/participants";
 import { useApiSpecificData } from "api/specific-data/index.js";
 import { registrationEmailToTeam, registrationEmailToParticipant } from "email-templates/registration";
 
-const totalStep = 5;
+const hasConferenceWorkshops = Array.isArray(cd?.workshops) && cd.workshops.length > 0;
+
+const onlineSteps = {
+  identity: 1,
+  contribution: 2,
+  accommodation: hasConferenceWorkshops ? 4 : 3,
+  summary: hasConferenceWorkshops ? 5 : 4,
+};
+
+const onlineWorkshopStep = hasConferenceWorkshops ? 3 : null;
+const totalStep = onlineSteps.summary;
 
 const MainForm = () => {
   const location = useLocation();
@@ -32,7 +42,8 @@ const MainForm = () => {
     error: null
   });
   const [errorMsg, setErrorMsg] = useState('');
-  const [isSaving, setisSaving] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const emailSentForParticipantIdRef = useRef(null);
   const [participantId, setParticipantId] = useState(null);
   const [paypalFee, setPaypalFee] = useState(0);
   const [password, setPassword] = useState('');
@@ -76,7 +87,7 @@ const MainForm = () => {
   const prevStep = () => setStep(step - 1);
 
   const onSubmit = async (formData) => {
-    setisSaving(true);
+    setIsSaving(true);
     setErrorMsg(null);
     setSuccessMsg(null);
 
@@ -88,7 +99,8 @@ const MainForm = () => {
         is_early_bird: is_early_bird.toString(),
         is_online: "true",
         talks: formData.talks || [],
-        total_due: total,
+        workshops: Array.isArray(formData.workshops) ? formData.workshops : [],
+        total_due: total.toFixed(2),
         paypal_fee: paypalFee?.toFixed(2) || 0,
       }; 
 
@@ -102,17 +114,19 @@ const MainForm = () => {
         setPassword(response.data.password);
       } else {
         setErrorMsg(response.data.message || "Something went wrong.");
-        setSuccessMsg("Registration successful but we couldn't send you an email");
       }
     } catch (error) {
       setErrorMsg("Failed to submit the form. Please try again.");
     } finally {
-      setisSaving(false);
+      setIsSaving(false);
     }
   };
 
   useEffect(() => {
-    if (!participant || !password) return;
+    const participantIdForEmail = participant?.participant?.id ?? participant?.id;
+    if (!participant || !password || participantIdForEmail == null) return;
+    if (emailSentForParticipantIdRef.current === participantIdForEmail) return;
+    emailSentForParticipantIdRef.current = participantIdForEmail;
 
     const sendEmails = async () => {
       try {
@@ -127,7 +141,7 @@ const MainForm = () => {
         const workshopEmailPromises = attendingWorkshops.map(async (workshop) => {
           return sendEmail({
             subject: `Workshop Registration`,
-            message: `Hey ${workshop.responsible_name.split(" ")[0]},<br><br>
+            message: `Hey ${workshop.responsible_name?.split(" ")[0] ?? "there"},<br><br>
                       ${participant.participant.first_name} ${participant.participant.last_name} (${participant.participant.email})
                       has just registered for the "${workshop.title}" (<b>ONLINE version</b>).<br>See you,<br>V./<br>`,
             to: workshop.responsible_email,
@@ -176,10 +190,6 @@ const MainForm = () => {
     sendEmails();
   }, [participant, workshops, password]);
 
-
-    if (!isDebugMode && false) {
-      return <PageContain title="Register Onsite">Come back soon…</PageContain>;
-    }
 
   if (loading) return <Loader />;
 
@@ -266,9 +276,9 @@ const MainForm = () => {
         <form onSubmit={handleSubmit(onSubmit)} className="d-flex flex-grow-1 flex-column position-relative">
    {isSaving && <Loader />}
 
-   <input name="is_online" type="hidden" value="false" {...register("is_online")} />
+   <input name="is_online" type="hidden" value="true" {...register("is_online")} />
 
-          {step === 1 && (
+          {step === onlineSteps.identity && (
             <Identity
               register={register}
               errors={errors}
@@ -281,7 +291,7 @@ const MainForm = () => {
             />
           )}
 
-          {step === 2 && (
+          {step === onlineSteps.contribution && (
             <Contribution
               conferenceData={cd}
               control={control}
@@ -299,7 +309,7 @@ const MainForm = () => {
             />
           )}
 
-          {step === 3 && cd?.workshops?.length > 0 && (
+          {hasConferenceWorkshops && step === onlineWorkshopStep && (
             <Workshops
               conferenceData={cd}
               register={register}
@@ -315,7 +325,7 @@ const MainForm = () => {
             />
           )}
 
-          {step === 4 &&
+          {step === onlineSteps.accommodation && (
             <Accomodation
               isOnline={true}
               conferenceData={cd}
@@ -331,10 +341,9 @@ const MainForm = () => {
               setValue={setValue}
               trigger={trigger}
             />
-          }
+          )}
 
-
-          {step === 5 && !successMsg && (
+          {step === onlineSteps.summary && !successMsg && (
             <Summary
               isOnline={true}
               getValues={getValues}
@@ -363,7 +372,7 @@ const MainForm = () => {
                 </button>
               )}
 
-              {step === totalStep && <button className="btn btn-primary fw-bolder" type="submit">Submit</button>}
+              {step === totalStep && <button className="btn btn-primary fw-bolder" type="submit" disabled={isSaving}>Submit</button>}
             </div>
           </div>
         </form>

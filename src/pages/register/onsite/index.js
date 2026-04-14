@@ -1,6 +1,6 @@
 import css from "./index.module.scss";
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useLocation } from "react-router-dom";
 import { formatFullDate } from "utils/date";
@@ -23,10 +23,23 @@ import { Link } from "react-router-dom";
 import { sendEmail } from "hooks/send-email";
 import { SlArrowLeft, SlArrowRight } from "react-icons/sl";
 import { useApiParticipant } from "api/participants";
-import { useApiSpecificData } from "api/specific-data/index.js";
+import { fetchSpecificData, useApiSpecificData } from "api/specific-data/index.js";
 import { registrationEmailToTeam, registrationEmailToParticipant } from "email-templates/registration";
 
-const totalStep = 8;
+const hasConferenceWorkshops = Array.isArray(cd?.workshops) && cd.workshops.length > 0;
+
+const onsiteSteps = {
+  identity: 1,
+  arrival: hasConferenceWorkshops ? 3 : 2,
+  contribution: hasConferenceWorkshops ? 4 : 3,
+  accommodation: hasConferenceWorkshops ? 5 : 4,
+  extras: hasConferenceWorkshops ? 6 : 5,
+  comments: hasConferenceWorkshops ? 7 : 6,
+  summary: hasConferenceWorkshops ? 8 : 7,
+};
+
+const workshopStep = hasConferenceWorkshops ? 2 : null;
+const totalStep = onsiteSteps.summary;
 
 const calculateAge = (dob) => {
   if (!dob) return null;
@@ -44,20 +57,21 @@ const calculateAge = (dob) => {
 const MainForm = () => {
   const location = useLocation();
   const isDebugMode = new URLSearchParams(location.search).get("debug") === "1";
-  //
+
   const [emailStatus, setEmailStatus] = useState({
     teamEmailSent: null,
     participantEmailSent: null,
     error: null,
   });
   const [errorMsg, setErrorMsg] = useState("");
-  const [isSaving, setisSaving] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [participantId, setParticipantId] = useState(null);
   const [paypalFee, setPaypalFee] = useState(0);
   const [password, setPassword] = useState("");
   const [step, setStep] = useState(1);
   const [successMsg, setSuccessMsg] = useState(null);
   const [total, setTotal] = useState(0);
+  const emailSentForParticipantIdRef = useRef(null);
 
   const {
     workshops,
@@ -118,7 +132,7 @@ const MainForm = () => {
 
   const nextStep = async () => {
     // If we are on Extras step, make sure the "other" text validates
-    if (step === 6 && hasFoodOther) {
+    if (step === onsiteSteps.extras && hasFoodOther) {
       await trigger("food_restrictions_other");
     }
 
@@ -132,7 +146,7 @@ const MainForm = () => {
   const prevStep = () => setStep(step - 1);
 
   const onSubmit = async (formData) => {
-    setisSaving(true);
+    setIsSaving(true);
     setErrorMsg(null);
     setSuccessMsg(null);
 
@@ -145,6 +159,7 @@ const MainForm = () => {
         // make sure we always send predictable shapes
         food_restrictions: Array.isArray(formData.food_restrictions) ? formData.food_restrictions : [],
         food_restrictions_other: (formData.food_restrictions_other ?? "").trim(),
+        workshops: Array.isArray(formData.workshops) ? formData.workshops : [],
 
         is_early_bird: is_early_bird.toString(),
         is_online: "false",
@@ -164,21 +179,23 @@ const MainForm = () => {
         setPassword(response.data.password);
       } else {
         setErrorMsg(response.data.message || "Something went wrong.");
-        setSuccessMsg("Registration successful but we couldn't send you an email");
       }
     } catch (error) {
       setErrorMsg("Failed to submit the form. Please try again.");
     } finally {
-      setisSaving(false);
+      setIsSaving(false);
     }
   }; 
 
-useEffect(() => {
-  if (!participant || !password) return;
+  useEffect(() => {
+    const participantIdForEmail = participant?.participant?.id ?? participant?.id;
+    if (!participant || !password || participantIdForEmail == null) return;
+    if (emailSentForParticipantIdRef.current === participantIdForEmail) return;
+    emailSentForParticipantIdRef.current = participantIdForEmail;
 
-  const sendEmails = async () => {
-    try {
-      const freshSpecific = await fetchSpecificData();
+    const sendEmails = async () => {
+      try {
+        const freshSpecific = await fetchSpecificData();
       const freshRegistrationTypes = freshSpecific.registration_types || [];
 
       const soldOutTypes = freshRegistrationTypes
@@ -249,7 +266,7 @@ useEffect(() => {
       const workshopEmailPromises = attendingWorkshops.map(async (workshop) => {
         return sendEmail({
           subject: `Workshop Registration`,
-          message: `Hey ${workshop.responsible_name.split(" ")[0]},<br><br>
+          message: `Hey ${workshop.responsible_name?.split(" ")[0] ?? "there"},<br><br>
                     ${participant.participant.first_name} ${participant.participant.last_name} (${participant.participant.email})
                     has just registered for the "${workshop.title}" (ON-SITE).<br>See you,<br>V./<br>`,
           to: workshop.responsible_email,
@@ -303,13 +320,9 @@ useEffect(() => {
     }
   };
 
-  sendEmails();
-}, [participant, password, workshops, paymentMethods, sessions]);
+    sendEmails();
+  }, [participant, password, workshops, paymentMethods, sessions]);
 
-
-  if (!isDebugMode && false) {
-    return <PageContain title="Register On-site">Come back soon…</PageContain>;
-  }
 
   if (loading) return <Loader />;
 
@@ -352,7 +365,7 @@ useEffect(() => {
                 <div className="flex-grow-1">
                   <p className="fw-bolder text-danger">The IMC fee is due without any delay.</p>
 
-                  {participant.participant.payment_method_name.toLowerCase === "paypal" ? (
+                  {participant.participant.payment_method_name?.toLowerCase() === "paypal" ? (
                     <div className="mb-3">
                       <p>Click the button below to pay immediately with Paypal.</p>
                       <PayPalForm amount={total + paypalFee} year={cd.year} />
@@ -398,7 +411,7 @@ useEffect(() => {
           <input name="is_early_bird" type="hidden" value={is_early_bird} {...register("is_early_bird")} />
           <input name="is_online" type="hidden" value="false" {...register("is_online")} />
 
-          {step === 1 && (
+          {step === onsiteSteps.identity && (
             <>
               <p className="border rounded-2 p-3">
                 <b>People who need an invitation letter for Visa</b> must send their request without any delay to imc{cd.year}@imo.net. Please,
@@ -421,7 +434,7 @@ useEffect(() => {
             </>
           )}
 
-          {step === 1 && (
+          {step === onsiteSteps.identity && (
             <Identity
               register={register}
               errors={errors}
@@ -433,7 +446,7 @@ useEffect(() => {
             />
           )}
 
-          {step === 2 && cd?.workshops?.length > 0 && (
+          {hasConferenceWorkshops && step === workshopStep && (
             <Workshops
               conferenceData={cd}
               register={register}
@@ -448,7 +461,7 @@ useEffect(() => {
             />
           )}
 
-          {step === 3 && (
+          {step === onsiteSteps.arrival && (
             <Arrival
               conferenceData={cd}
               register={register}
@@ -461,7 +474,7 @@ useEffect(() => {
             />
           )}
 
-          {step === 4 && (
+          {step === onsiteSteps.contribution && (
             <Contribution
               conferenceData={cd}
               control={control}
@@ -478,7 +491,7 @@ useEffect(() => {
             />
           )}
 
-          {step === 5 && (
+          {step === onsiteSteps.accommodation && (
             <Accomodation
               conferenceData={cd}
               control={control}
@@ -495,7 +508,7 @@ useEffect(() => {
             />
           )}
 
-          {step === 6 && (
+          {step === onsiteSteps.extras && (
             <Extras
               conferenceData={cd}
               register={register}
@@ -510,7 +523,7 @@ useEffect(() => {
             />
           )}
 
-          {step === 7 && (
+          {step === onsiteSteps.comments && (
             <>
               <Comments
                 register={register}
@@ -535,7 +548,7 @@ useEffect(() => {
             </>
           )}
 
-          {step === 8 && !successMsg && (
+          {step === onsiteSteps.summary && !successMsg && (
             <Summary
               isOnline={false}
               getValues={getValues}
@@ -574,7 +587,7 @@ useEffect(() => {
               )}
 
               {step === totalStep && (
-                <button className="btn btn-primary fw-bolder" type="submit">
+                <button className="btn btn-primary fw-bolder" type="submit" disabled={isSaving}>
                   Submit
                 </button>
               )}

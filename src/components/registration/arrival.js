@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import cssForm from "styles/components/form.module.scss";
 import React, { useEffect } from "react";
-import StepDislay from "components/registration/stepDisplay";
+import StepDisplay from "components/registration/stepDisplay";
 import { formatFullDate } from "utils/date";
 
 const getDateRange = (startDate, endDate) => {
@@ -41,16 +41,15 @@ const ArrivalForm = ({
   trigger,
   setValue
 }) => {
-  const availableDates = getDateRange(
-    conferenceData.dates.start,
-    conferenceData.dates.end
-  );
+  const availableDates = conferenceData?.dates?.start && conferenceData?.dates?.end
+    ? getDateRange(conferenceData.dates.start, conferenceData.dates.end)
+    : [];
 
   /**
    * Optional: Used for quick test filling.
    */
   const fillTestData = () => {
-    setValue("arrival_date", availableDates[0].value);
+    setValue("arrival_date", availableDates[0]?.value);
     setValue("arrival_hour", "14");
     setValue("arrival_minute", "30");
     setValue("departure_date", availableDates[availableDates.length - 1].value);
@@ -66,7 +65,7 @@ const ArrivalForm = ({
     <>
       {!isAdmin && !isEditing && (
         <h4 className="mb-3 border-bottom pb-2">
-          <StepDislay step={step} stepTotal={stepTotal} />
+          <StepDisplay step={step} stepTotal={stepTotal} />
           Travel Details
         </h4>
       )}
@@ -91,7 +90,7 @@ const ArrivalForm = ({
 
         {!isAdmin && !isEditing && (
           <p className="fw-bolder">
-            If you plan to arrive before {availableDates[0].label}, you must
+            If you plan to arrive before {availableDates[0]?.label}, you must
             arrange your own accommodation.
           </p>
         )}

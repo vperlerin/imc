@@ -9,6 +9,13 @@ import { sendEmail } from "hooks/send-email";
 import { useForm } from "react-hook-form";
 import { conferenceData as cd } from 'data/conference-data';
 
+const escapeHtml = (str) => {
+  if (!str) return "";
+  const el = document.createElement("span");
+  el.textContent = String(str);
+  return el.innerHTML;
+};
+
 const AccordionItem = ({ title, children, id, isOpen, toggle }) => {
   return (
     <div className="accordion-item">
@@ -60,10 +67,10 @@ const Contact = () => {
       const response = await sendEmail({
         subject: data.subject,
         message: `This message has been sent from the IMC${process.env.YEAR} contact form<br><br>
-                  Name: ${data.name}<br>
-                  Email: ${data.email}<br>
-                  Recipient: ${selectedRecipient.name} (${selectedRecipient.email})<br>
-                  Message: ${data.message}<br>`,
+                  Name: ${escapeHtml(data.name)}<br>
+                  Email: ${escapeHtml(data.email)}<br>
+                  Recipient: ${escapeHtml(selectedRecipient.name)} (${escapeHtml(selectedRecipient.email)})<br>
+                  Message: ${escapeHtml(data.message)}<br>`,
         to: selectedRecipient.email,
         toName: selectedRecipient.name,
         fromName: `IMC ${cd.year}`,
@@ -102,7 +109,7 @@ const Contact = () => {
 
       <div className={classNames(css.form, 'position-relative d-flex flex-column flex-md-row gap-md-5 gap-3 mt-2')}>
         <div className={css.faqCol}>
-          <h4 className="mb-md-4 mb-3">We'd love to hear from you! But have you checked our FAQ first?</h4>
+          <h5 className="mb-md-4 mb-3">Please check our FAQ first</h5>
           <div className="accordion accordion-flush mt-2 mb-4" id="customAccordion">
             <AccordionItem
               title="I didn't receive a confirmation email."

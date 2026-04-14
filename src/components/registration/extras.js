@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import cssForm from "styles/components/form.module.scss";
 import React, { useEffect, useMemo, useState } from "react";
-import StepDislay from "components/registration/stepDisplay";
+import StepDisplay from "components/registration/stepDisplay";
 
 const ExtrasForm = ({
   isAdmin,
@@ -33,8 +33,8 @@ const ExtrasForm = ({
   const [wantsTShirt, setWantsTShirt] = useState(buyTShirt === "true");
 
   // Available T-Shirt sizes
-  const tshirt_sizes = conferenceData.costs.tshirts.models.flatMap((model) =>
-    conferenceData.costs.tshirts.sizes.map(
+  const tshirt_sizes = (conferenceData?.costs?.tshirts?.models || []).flatMap((model) =>
+    (conferenceData?.costs?.tshirts?.sizes || []).map(
       (size) => `${model.charAt(0).toUpperCase() + model.slice(1)} ${size}`
     )
   );
@@ -116,7 +116,7 @@ const ExtrasForm = ({
     <>
       {!isAdmin && (
         <h4 className="mb-3 border-bottom pb-2">
-          <StepDislay step={step} stepTotal={stepTotal} />
+          <StepDisplay step={step} stepTotal={stepTotal} />
           Extras
         </h4>
       )}

@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import cssForm from "styles/components/form.module.scss";
-import StepDislay from "components/registration/stepDisplay";
+import StepDisplay from "components/registration/stepDisplay";
 import React, { useEffect, useState } from "react";
 import { gdpr } from 'data/gdpr';
 
@@ -56,9 +56,8 @@ const Comments = ({
     }
   }, [initialData, setValue]);
 
-
   const fillTestData = () => {
-    setValue("comments", "No comment provided.");
+    setValue("comments", "My roomates: John Doe, Jane Doe, Jim Doe");      
     setValue("service_agreement", true);
 
     if (isUnder16) {
@@ -71,7 +70,6 @@ const Comments = ({
     trigger();
   };
 
-
   return (
     <div className="position-relative">
 
@@ -83,7 +81,7 @@ const Comments = ({
 
       {!isAdmin && (
         <h4 className="mb-3 border-bottom pb-2">
-          <StepDislay step={step} stepTotal={stepTotal} />
+          <StepDisplay step={step} stepTotal={stepTotal} />
           Comments, Data Protection and Service Agreement
         </h4>
       )}
@@ -176,7 +174,7 @@ const Comments = ({
                 {...register("service_agreement", { required: "You must accept the service agreement." })}
               />
               <label className="form-check-label" htmlFor="serviceAgreement">
-                By ticking this box, I acknowledge that I have read and that I accept the <a href="/disclaimer" target="blank" rel="no">service agreement and disclaimer</a> .
+                By ticking this box, I acknowledge that I have read and that I accept the <a href="/disclaimer" target="_blank" rel="noopener noreferrer">service agreement and disclaimer</a> .
               </label>
             </div>
             {errors.service_agreement && <p className="text-danger">{errors.service_agreement.message}</p>}

@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import cssForm from "styles/components/form.module.scss";
 import React, { useEffect, useRef } from "react";
-import StepDislay from "components/registration/stepDisplay";
+import StepDisplay from "components/registration/stepDisplay";
 import TalkPosterForm from "./talkPoster";
 import { MdAdd } from "react-icons/md";
 import { FiInfo } from "react-icons/fi";
@@ -89,8 +89,9 @@ const ContributionForm = ({
 
   const fillTestData = () => {
     setWantsToContribute("true");
-    removeTalk();
-    if (!isOnline) removePoster();
+    // Remove all existing talks/posters before filling test data
+    if (talks.length > 0) removeTalk();
+    if (!isOnline && posters.length > 0) removePoster();
 
     const meteorPhysicsSession = sessions.find((s) => s.name === "Meteor physics and dynamics")?.id || sessions[0]?.id;
     const radioMeteorSession = sessions.find((s) => s.name === "Radio meteor work")?.id || sessions[0]?.id;
@@ -138,7 +139,7 @@ const ContributionForm = ({
 
       {!isAdmin && !isEditing && (
         <h4 className="mb-3 border-bottom pb-2">
-          <StepDislay step={step} stepTotal={stepTotal} />
+          <StepDisplay step={step} stepTotal={stepTotal} />
           Contributions
         </h4>
       )}
@@ -198,8 +199,9 @@ const ContributionForm = ({
                     return;
                   }
 
-                  removeTalk();
-                  removePoster();
+                  // Remove all talks and posters
+                  if (talks.length > 0) removeTalk();
+                  if (posters.length > 0) removePoster();
                 }
                 setWantsToContribute("false");
               }}

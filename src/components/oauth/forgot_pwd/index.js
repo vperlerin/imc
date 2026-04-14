@@ -4,6 +4,7 @@ import cssForm from "styles/components/form.module.scss";
 import Loader from "components/loader";
 import React, { useState } from "react";
 import axios from "axios";
+import { conferenceData as cd } from "data/conference-data";
 import { sendEmail } from "hooks/send-email";
 
 const ForgotPassword = () => {

@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import cssForm from "styles/components/form.module.scss";
 import React, { useMemo } from "react";
-import StepDislay from "components/registration/stepDisplay";
+import StepDisplay from "components/registration/stepDisplay";
 
 const Accomodation = ({
   isAdmin = false,
@@ -46,7 +46,7 @@ const Accomodation = ({
 
     setValue(
       "payment_method_id",
-      paymentMethods.length > 0 ? String(paymentMethods[paymentMethods.length - 1].id) : ""
+      paymentMethods?.length > 0 ? String(paymentMethods[paymentMethods.length - 1].id) : ""
     );
 
     trigger();
@@ -56,7 +56,7 @@ const Accomodation = ({
     <>
       {!isAdmin && (
         <h4 className="mb-3 border-bottom pb-2">
-          <StepDislay step={step} stepTotal={stepTotal} />
+          <StepDisplay step={step} stepTotal={stepTotal} />
           {!isOnline && <>Accommodation &</>} Payment Method
         </h4>
       )}
@@ -77,7 +77,7 @@ const Accomodation = ({
           <div className="mb-4 mt-2">
             <label className="fw-bold mb-2">Registration Type</label>
             <div className="d-flex flex-column gap-2">
-              {registrationTypes
+              {(registrationTypes || [])
                 .filter((registration) => {
                   if (isAdmin) return true;
                   return !hiddenRegistrationTypes.includes(registration.type);
@@ -139,7 +139,7 @@ const Accomodation = ({
         <div className="mb-3">
           <label className="fw-bold mb-2">Method of Payment</label>
           <div className="d-flex flex-column gap-2">
-            {paymentMethods.length > 0 ? (
+            {paymentMethods?.length > 0 ? (
               paymentMethods.map((method) => (
                 <div key={method.id} className="form-check">
                   <input

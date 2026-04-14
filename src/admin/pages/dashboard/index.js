@@ -5,6 +5,7 @@ import axios from "axios";
 import { retry } from "utils/retry.js";
 import PageContain from "@/admin/components/page-contain";
 import Loader from "components/loader";
+import { formatFullDate } from "utils/date";
 import { Link } from "react-router-dom";
 import AvailableRooms from '@/admin/components/rooms';
 
@@ -128,7 +129,7 @@ const AdminDashboard = () => {
                 </table>
               </div>
             ) : (
-              <p className="text-success"><i>No unconfirmed on-site participants: you go to go!</i></p>
+              <p className="text-success"><i>No unconfirmed on-site participants</i></p>
             )}
           </div>
         </div>
@@ -181,7 +182,7 @@ const AdminDashboard = () => {
                 </table>
               </div>
             ) : (
-              <p className="text-success"><i>No unconfirmed online participants: you go to go!</i></p>
+              <p className="text-success"><i>No unconfirmed online participants</i></p>
             )}
           </div>
         </div>

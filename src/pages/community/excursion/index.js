@@ -16,7 +16,30 @@ const images = [ex1, ex2, ex3, ex4, ex5];
 const Excursion = () => {
   return (
     <PageContain title="Excursion">
-      <p>Come back soon.</p>
+      <p>Friday afternoon usually means excursion time at the conference. But this year, since we are gathering in France, we thought it would be only fitting to replace the traditional outing with something a little more local: an <b>International Pétanque Tournament</b>.</p>
+
+      <p>For those unfamiliar with this French institution, pétanque is a wonderfully simple and dangerously addictive game in which players throw metal balls, called boules, trying to land as close as possible to a small wooden target ball known as the cochonnet. It may look leisurely at first glance, but do not be fooled: pétanque is a subtle mix of skill, strategy, concentration, and cheerful rivalry.</p>
+
+      <p>Whether you are a seasoned champion of the village square or a complete beginner, this will be the perfect opportunity to enjoy a classic piece of French culture, share a few laughs, and perhaps discover unexpected talents among your fellow participants. Friendly competition is encouraged. Excessive bragging rights may follow.</p>
+
+      <p>A very small pétanque glossary:</p>
+      <ul>
+        <li><b>Boules:</b> the metal balls thrown by the players.</li>
+        <li><b>Cochonnet:</b> the small target ball that everyone aims for. It is also sometimes called the jack.</li>
+        <li><b>Tir:</b> a shot aimed at knocking an opponent’s boule away.</li>
+        <li><b>Pointe:</b> a more delicate throw aimed at placing your boule as close as possible to the cochonnet.</li>
+        <li><b>Mène:</b> one round of play.</li>
+        <li><b>Terrain:</b> the playing area, which can be gravel, dirt, or any suitably pétanque-worthy surface.</li>
+      </ul>
+
+      <p>This year, forget the bus tour: bring your aim, your team spirit, and your best French sporting elegance for an afternoon of international pétanque.</p>
+
+      <div className={classNames('d-flex gap-3 mt-4', css.gallery)}>
+        <img src={ex1} className=' rounded-2' />
+        <img src={ex2} className=' rounded-2' />
+        <img src={ex3} className=' rounded-2' />
+        <img src={ex4} className=' rounded-2' />
+      </div>
 
       {/*
       <p>Due to an update in logistics, the originally planned boat trip on the river Vecht has been replaced with a rich cultural excursion to the historic city of Utrecht. While we were unable to secure a boat with sufficient capacity, we're excited to offer an alternative program that will be equally memorable and enriching.</p>
