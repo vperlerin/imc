@@ -55,6 +55,27 @@ class ParticipantManager
         }
     }
 
+    /**
+     * Update only can_be_public (public participants page consent). Does not touch other participant fields.
+     */
+    public function setParticipantCanBePublic($participantId, $canBePublic)
+    {
+        $id = (int) $participantId;
+        $check = $this->pdo->prepare("SELECT id FROM participants WHERE id = ? LIMIT 1");
+        $check->execute([$id]);
+        if (!$check->fetchColumn()) {
+            return false;
+        }
+
+        $flag = $canBePublic ? 1 : 0;
+        $stmt = $this->pdo->prepare(
+            "UPDATE participants SET can_be_public = ?, updated_at = NOW() WHERE id = ?"
+        );
+        $stmt->execute([$flag, $id]);
+
+        return true;
+    }
+
 
     public function emailExists($email)
     {
@@ -1064,7 +1085,6 @@ class ParticipantManager
         if ($confirmedOnly) {
             $selectFields = "
             p.id,
-            p.title,
             CASE WHEN p.can_be_public = 1 THEN p.first_name ELSE '' END AS first_name,
             CASE WHEN p.can_be_public = 1 THEN p.last_name ELSE 'Anonymous' END AS last_name,
             CASE WHEN p.can_be_public = 1 THEN p.organization ELSE '' END AS organization, 
@@ -1085,6 +1105,7 @@ class ParticipantManager
             p.total_paid,
             p.paypal_fee,
             p.status,
+            p.can_be_public,
             COALESCE(pm.method, 'Unknown') AS payment_method_name
         ";
         }
@@ -1153,6 +1174,7 @@ class ParticipantManager
             p.total_paid,
             p.paypal_fee,
             p.status,
+            p.can_be_public,
             COALESCE(pm.method, 'Unknown') AS payment_method_name
         ";
         }

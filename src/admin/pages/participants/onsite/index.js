@@ -3,6 +3,7 @@ import classNames from 'classnames';
 import cssTabs from 'styles/components/tabs.module.scss';
 import PageContain from "@/admin/components/page-contain";
 import Loader from "components/loader";
+import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { CiSearch } from "react-icons/ci";
 import { useApiOnsiteParticipants } from "api/participants/onsite.js";
@@ -22,6 +23,8 @@ const AdminParticipantsOnsite = () => {
   const [showHardDeleteConfirm, setShowHardDeleteConfirm] = useState(false);
   const [success, setSuccess] = useState('');
   const [errorDeletion, setErrorDeletion] = useState('');
+  const [publicListingError, setPublicListingError] = useState('');
+  const [canPublicSavingId, setCanPublicSavingId] = useState(null);
   const navigate = useNavigate();
   const { participants, loading, error, setParticipants } = useApiOnsiteParticipants(false, true);
   const { deleteParticipant, errorDelete, isDeleting } = useApiDeleteParticipant(setParticipants, setFilteredParticipants);
@@ -62,6 +65,31 @@ const AdminParticipantsOnsite = () => {
   const totalCancelled = participants.filter(p => p.status === "cancelled").length;
   const totalConfirmed = participants.filter(p => p.confirmation_sent === "1" && p.status !== "cancelled").length;
   const totalUnconfirmed = participants.filter(p => p.confirmation_sent !== "1" && p.status !== "cancelled").length;
+
+  const handleCanBePublicChange = async (participant, nextChecked) => {
+    setPublicListingError('');
+    setCanPublicSavingId(participant.id);
+    try {
+      const { data } = await axios.post(
+        `${process.env.REACT_APP_API_URL}/admin/api/set_participant_can_be_public.php?id=${participant.id}`,
+        { can_be_public: nextChecked }
+      );
+      if (data?.success) {
+        const flag = nextChecked ? 1 : 0;
+        setParticipants((prev) =>
+          prev.map((p) => (p.id === participant.id ? { ...p, can_be_public: flag } : p))
+        );
+      } else {
+        setPublicListingError(data?.message || "Could not update public listing preference.");
+      }
+    } catch (err) {
+      setPublicListingError(
+        err.response?.data?.message || "Could not update public listing preference."
+      );
+    } finally {
+      setCanPublicSavingId(null);
+    }
+  };
 
   // Handle delete button click
   const handleDeleteClick = (participant) => {
@@ -129,6 +157,9 @@ const AdminParticipantsOnsite = () => {
       )}
       {error && (
         <p className="alert alert-danger fw-bolder">{error}</p>
+      )}
+      {publicListingError && (
+        <div className="alert alert-danger fw-bolder">{publicListingError}</div>
       )}
 
       {loading || isDeleting ? (
@@ -214,7 +245,12 @@ const AdminParticipantsOnsite = () => {
             </li>
           </ul>
 
-          <AdminTable participants={filteredParticipants} onDelete={handleDeleteClick} />
+          <AdminTable
+            participants={filteredParticipants}
+            onDelete={handleDeleteClick}
+            onCanBePublicChange={handleCanBePublicChange}
+            canBePublicSavingId={canPublicSavingId}
+          />
         </>
       )}
 

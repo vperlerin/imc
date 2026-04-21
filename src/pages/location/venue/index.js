@@ -9,39 +9,46 @@ import GoogleMap from "components/g-map";
 import ven1 from 'assets/img/illus/venue/ven1.jpg';
 import ven2 from 'assets/img/illus/venue/ven2.jpg';
 import ven3 from 'assets/img/illus/venue/ven3.jpg';
+import ven4 from 'assets/img/illus/venue/ven4.jpg';
 
 // Store images in an array for dynamic access
-const images = [ven1, ven2, ven3];
+const images = [ven1, ven2, ven3, ven4];
 
 const Venue = () => {
   return (
     <PageContain title="Location Venue">
       <div
         className="mt-3 mb-4 d-flex flex-column flex-md-row-reverse gap-3 align-items-stretch flex-md-row"
-      > 
+      >
+        <div>
         <p>
           The International Meteor Conference 2026 will take place at Séolane, a university and scientific hosting center located in Barcelonnette, in the heart of the Ubaye Valley in the French Alps. Séolane is designed for scientific schools, conferences, seminars, and residential events, making it a particularly fitting setting for IMC 2026.
 
           The center combines accommodation, catering, conference spaces, and work rooms in one place, which will allow participants to stay, meet, and attend the conference in a single venue. Séolane can host up to 70 people in residence and around 100 people for conferences and working sessions.
-
-          More single and double rooms can be found of course at nearby hotels (see also
-          {' '}
-          <Link
-            aria-label="Extra accodommation"
-            className="fw-bolder"
-            to="/location/extra"
-            title="Extra accodommation"
-          >
-            Extra accommodation
-          </Link>
-          ).
         </p>
+ 
+        More rooms can be found of course at nearby hotels (see also
+        {' '}
+        <Link
+          aria-label="Extra accodommation"
+          className="fw-bolder"
+          to="/location/extra"
+          title="Extra accodommation"
+        >
+          Extra accommodation
+        </Link>
+        ).
+        </div>
         <div
           className={classNames(css.illusBg, 'rounded-2')}
           style={{ backgroundImage: `url(${images[0]})` }}
         />
 
       </div>
+
+      <p>
+          <b>Barcelonnette is located at an altitude of 1,100 m. Although it lies in Provence, nights can be chilly even in September, so participants are encouraged to bring warm clothing!</b>
+        </p>
 
       <div
         className="mt-3 mb-4 d-flex flex-column gap-3 align-items-stretch flex-md-row"
@@ -67,7 +74,7 @@ const Venue = () => {
       >
         <div>
           <h2>Conference and working facilities</h2>
-          <p> 
+          <p>
             Séolane offers facilities well suited to a scientific meeting such as IMC. These include a 100-seat conference room, three meeting rooms, a lounge/bar area suitable for informal exchanges or poster-style sessions, and two laboratory rooms equipped with scientific benches. The venue also provides the usual seminar equipment such as whiteboards, paperboards, digital projectors, screens, badges, and sound equipment.
           </p>
           <p>
@@ -77,7 +84,7 @@ const Venue = () => {
         <div
           className={classNames(css.illusBg, 'rounded-2')}
           style={{ backgroundImage: `url(${images[2]})` }}
-        /> 
+        />
       </div>
 
 
@@ -86,31 +93,31 @@ const Venue = () => {
       >
         <div>
           <h2>Setting</h2>
-          <p> 
-          Séolane is located at Pôle d’accueil universitaire Séolane, Quartier du 11ème BCA, Chemin des casernes, 04400 Barcelonnette, France.
+          <p>
+            Séolane is located at Pôle d’accueil universitaire Séolane, Quartier du 11ème BCA, Chemin des casernes, 04400 Barcelonnette, France.
 
           </p>
           <p>
-          Barcelonnette lies in the Ubaye Valley, a mountain region known for both its scientific interest and its outdoor environment. The valley offers a rich Alpine setting, with opportunities for hiking and other nature activities in summer, while the town itself provides a pleasant small-mountain atmosphere for a conference stay.
-          {' '}
-          <Link
-            aria-label="Travel information"
-            className="fw-bolder"
-            to="/location/travel"
-            title="Travel information"
-          >
-            Travel information
-          </Link>
+            Barcelonnette lies in the Ubaye Valley, a mountain region known for both its scientific interest and its outdoor environment. The valley offers a rich Alpine setting, with opportunities for hiking and other nature activities in summer, while the town itself provides a pleasant small-mountain atmosphere for a conference stay.
+            {' '}
+            <Link
+              aria-label="Travel information"
+              className="fw-bolder"
+              to="/location/travel"
+              title="Travel information"
+            >
+              Travel information
+            </Link>
           </p>
         </div>
         <div
           className={classNames(css.illusBg, 'rounded-2')}
-          style={{ backgroundImage: `url(${images[2]})` }}
-        /> 
+          style={{ backgroundImage: `url(${images[3]})` }}
+        />
       </div>
 
 
- 
+
       {/*flex-md-row-reverse
         <p>
           The IMC 2026 will take place in the cozy and spacious <a className="fw-bolder" href="https://www.stayokay.com/en/hostel/soest" target="_blank" rel="noopener noreferrer">Stayokay Soest</a> venue that combines the architecture of a historical school building with modern facilities, creating a vibrant conference atmosphere in a green and forested area. Nature-minded delegates will be able to absorb the sandy expanse of the nearby stunning Soesterduinen inland dune complex. The venue accommodates meeting rooms for plenary sessions with smaller rooms for ad hoc meetings, poster sessions or other activities. It will be available entirely for the conference and offers everything for a comfortable stay. From rooms with private bathrooms, a breakfast and dinner, to a nice terrace with a campfire. The venue is also a sustainable choice thanks to its sustainable solutions to facilitate our conference. Check out the <a className="fw-bolder" href="https://vimeo.com/175690257" target="_blank" rel="noopener noreferrer">venue's video</a> for an impression.   </p>

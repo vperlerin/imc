@@ -9,6 +9,7 @@ import { useCountryName } from 'hooks/country-name';
 import { Link } from "react-router-dom";
 import ReactCountryFlag from "react-country-flag";
 import Loader from "components/loader";
+import { getPublicParticipantLabel } from "utils/public-participant-display";
 
 
 const Participants = () => {
@@ -22,9 +23,9 @@ const Participants = () => {
   }
 
   const filterParticipants = (participants) => {
+    const q = searchQuery.toLowerCase();
     return participants.filter((participant) => {
-      const fullName = `${participant.title} ${participant.first_name} ${participant.last_name}`.toLowerCase();
-      return fullName.includes(searchQuery.toLowerCase());
+      return getPublicParticipantLabel(participant).toLowerCase().includes(q);
     });
   };
 
@@ -92,7 +93,7 @@ const Participants = () => {
                   <ul className="list-unstyled">
                     {onsiteByCountry[country].map((participant) => (
                       <li key={participant.id} className="d-flex flex-column mb-2">
-                        {participant.title} {participant.first_name} {participant.last_name}
+                        {getPublicParticipantLabel(participant)}
                         {participant.organization && <small className="text-muted">({participant.organization})</small>}
                       </li>
                     ))}
@@ -136,7 +137,7 @@ const Participants = () => {
                   <ul className="list-unstyled">
                     {onlineByCountry[country].map((participant) => (
                       <li key={participant.id} className="d-flex flex-column mb-2">
-                        {participant.title} {participant.first_name} {participant.last_name}
+                        {getPublicParticipantLabel(participant)}
                         {participant.organization && <small className="text-muted">({participant.organization})</small>}
                       </li>
                     ))}

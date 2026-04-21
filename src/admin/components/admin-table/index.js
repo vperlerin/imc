@@ -4,7 +4,14 @@ import { FaRegTrashAlt } from "react-icons/fa";
 import React, { useState } from "react";
 import { formatFullDate } from "utils/date";
 
-const AdminTable = ({ participants, withActions = true, customActions = null, onDelete = null }) => {
+const AdminTable = ({
+  participants,
+  withActions = true,
+  customActions = null,
+  onDelete = null,
+  onCanBePublicChange = null,
+  canBePublicSavingId = null,
+}) => {
   const [sortColumn, setSortColumn] = useState(null);
   const [sortOrder, setSortOrder] = useState("asc");
 
@@ -65,11 +72,19 @@ const AdminTable = ({ participants, withActions = true, customActions = null, on
       valueB = valueB === "1" ? 1 : 0;
     }
 
+    if (sortColumn === "can_be_public") {
+      valueA = valueA === "1" || valueA === 1 ? 1 : 0;
+      valueB = valueB === "1" || valueB === 1 ? 1 : 0;
+    }
+
     if (valueA < valueB) return sortOrder === "asc" ? -1 : 1;
     if (valueA > valueB) return sortOrder === "asc" ? 1 : -1;
     return 0;
   });
 
+
+  const baseDataCols = 9 + (onCanBePublicChange ? 1 : 0);
+  const colSpan = baseDataCols + (withActions || customActions ? 1 : 0);
 
   return (
     <div className="table-responsive" style={{ maxWidth: "calc(100vw - 2rem)" }}>
@@ -79,6 +94,15 @@ const AdminTable = ({ participants, withActions = true, customActions = null, on
             <th className={css.cursor} onClick={() => handleSort("id")}>#</th>
             <th className={css.cursor} onClick={() => handleSort("created_at")}>Reg. Date</th>
             <th className={css.cursor} onClick={() => handleSort("last_name")}>Name</th>
+            {onCanBePublicChange && (
+              <th
+                className={css.cursor}
+                title="Show name on /community/participants"
+                onClick={() => handleSort("can_be_public")}
+              >
+                Public list
+              </th>
+            )}
             <th className={css.cursor} onClick={() => handleSort("total_due")}>Total</th>
             <th className={css.cursor} onClick={() => handleSort("total_paid")}>Paid</th>
             <th className={css.cursor} onClick={() => handleSort("due_amount")}>Due</th>
@@ -102,6 +126,18 @@ const AdminTable = ({ participants, withActions = true, customActions = null, on
                   <td>{participant.id}</td>
                   <td>{participant.created_at.split(" ")[0]}</td>
                   <td>{participant.title} {participant.first_name} {participant.last_name}</td>
+                  {onCanBePublicChange && (
+                    <td>
+                      <input
+                        type="checkbox"
+                        className="form-check-input"
+                        title="Show name on public participants page"
+                        checked={participant.can_be_public === "1" || participant.can_be_public === 1}
+                        disabled={canBePublicSavingId === participant.id}
+                        onChange={(e) => onCanBePublicChange(participant, e.target.checked)}
+                      />
+                    </td>
+                  )}
                   <td>{isPaypal ? (totalDue + paypalFee).toFixed(2) : totalDue.toFixed(2)}€</td>
                   <td>{totalPaid.toFixed(2)}€</td>
                   <td className={classNames({ "text-success": amountDue === 0 })}>
@@ -144,7 +180,7 @@ const AdminTable = ({ participants, withActions = true, customActions = null, on
             })
           ) : (
             <tr>
-              <td colSpan={withActions ? 10 : 9} className="text-center">No participants found.</td>
+              <td colSpan={colSpan} className="text-center">No participants found.</td>
             </tr>
           )}
         </tbody>
