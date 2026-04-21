@@ -65,7 +65,7 @@
         "description": "Single room for a person with reduced mobility in the IMC host",
         "total": 1,
         "sort_order": 4,
-        "type": "single_reduced_mobility"
+        "type": "single_accessible"
       },
       {
         "price": 200,

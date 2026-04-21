@@ -1,4 +1,5 @@
 import React from "react";
+import { offersOnsitePosterPrint } from "utils/poster-print";
 
 const getPaypalPrice = (price) => {
   return Math.round((price + (0.034 * price + 0.35) / 0.966) * 100) / 100;
@@ -76,11 +77,12 @@ const StaticSummary = ({ isOnline, conferenceData, participantData, registration
   const buyTShirt = extra_options?.buy_tshirt === "1" || extra_options?.buy_tshirt === "true";
   const tshirtCost = buyTShirt ? toNumber(conferenceData?.costs?.tshirts?.price, 0) : 0;
 
-  // Printed Posters Cost
+  // Printed Posters Cost (only when conference offers on-site printing at a positive price)
+  const posterPrintOffered = offersOnsitePosterPrint(conferenceData);
   const printedPosters = (contributions || []).filter(
     (contribution) => contribution.print === "1" || contribution.print === "true"
   );
-  const numberOfPrintedPosters = printedPosters.length;
+  const numberOfPrintedPosters = posterPrintOffered ? printedPosters.length : 0;
   const printedPostersCost = numberOfPrintedPosters * toNumber(conferenceData?.poster_print?.price, 0);
 
   // Payment Method
@@ -133,7 +135,7 @@ const StaticSummary = ({ isOnline, conferenceData, participantData, registration
           ))}
 
           {/* Printed Posters */}
-          {numberOfPrintedPosters > 0 && (
+          {posterPrintOffered && numberOfPrintedPosters > 0 && (
             <tr>
               <td className="ps-3 text-muted">
                 Printed Poster{numberOfPrintedPosters > 1 ? "s" : ""} x {numberOfPrintedPosters}

@@ -2,6 +2,7 @@ import classNames from "classnames";
 import css from "./index.module.scss";
 import React, { useEffect, useMemo } from "react";
 import { getPaymentMethodById } from "utils/payment_method";
+import { offersOnsitePosterPrint } from "utils/poster-print";
 
 const getPaypalPrice = (price) => {
   return Math.round((price + (0.034 * price + 0.35) / 0.966) * 100) / 100;
@@ -82,9 +83,10 @@ const Summary = ({
   // T-shirt Cost
   const tshirtCost = buyTShirt ? toNumber(conferenceData?.costs?.tshirts?.price, 0) : 0;
 
-  // Printed Posters Cost
+  // Printed Posters Cost (only when conference offers on-site printing at a positive price)
+  const posterPrintOffered = offersOnsitePosterPrint(conferenceData);
   const printedPosters = (posters || []).filter((poster) => poster.print === "true" || poster.print === "1");
-  const numberOfPrintedPosters = printedPosters.length;
+  const numberOfPrintedPosters = posterPrintOffered ? printedPosters.length : 0;
   const printedPostersCost = numberOfPrintedPosters * toNumber(conferenceData?.poster_print?.price, 0);
 
   // Payment Method
@@ -200,7 +202,7 @@ const Summary = ({
               </tr>
             ))}
 
-            {numberOfPrintedPosters > 0 && (
+            {posterPrintOffered && numberOfPrintedPosters > 0 && (
               <tr>
                 <td className="ps-3 text-muted">
                   Poster{numberOfPrintedPosters > 1 && "s"} to print x {numberOfPrintedPosters}

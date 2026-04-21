@@ -3,6 +3,7 @@ import React, { useMemo } from "react";
 import Loader from "components/loader";
 import { Link } from "react-router-dom";
 import { useApiAvailableRooms } from "@/admin/api/accomodations/index.js";
+import { formatRegistrationTypeTitle } from "utils/registration-type-display";
 
 const AvailableRooms = ({ className, showLink = false }) => {
   const { availableRooms, loading, error } = useApiAvailableRooms();
@@ -63,7 +64,7 @@ const AvailableRooms = ({ className, showLink = false }) => {
       {!loading && (
         <div className="d-flex flex-column flex-md-row gap-2">
           {normalized.map((row) => {
-            const label = row.type ? row.type.charAt(0).toUpperCase() + row.type.slice(1) : "Unknown";
+            const label = row.type ? formatRegistrationTypeTitle(row.type) : "Unknown";
             const isSoldOut = row.roomLeft <= 0;
             const { main, sub } = formatAvailability(row);
 

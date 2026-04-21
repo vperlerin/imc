@@ -2,6 +2,7 @@ import classNames from "classnames";
 import cssForm from "styles/components/form.module.scss";
 import React, { useMemo } from "react";
 import StepDisplay from "components/registration/stepDisplay";
+import { formatRegistrationTypeForDisplay } from "utils/registration-type-display";
 
 const Accomodation = ({
   isAdmin = false,
@@ -52,7 +53,7 @@ const Accomodation = ({
     trigger();
   };
  
-
+ 
   return (
     <>
       {!isAdmin && (
@@ -115,7 +116,7 @@ const Accomodation = ({
                       {registration.description}
                       <small className="text-muted d-block">
                         {registration.type !== "no"
-                          ? `Standard accommodation in a ${registration.type} room for 3 nights (only) with full board + participation in the conference, conference materials, coffee breaks, and excursion (price per person).`
+                          ? `Standard accommodation in a ${formatRegistrationTypeForDisplay(registration.type)} room for 3 nights (only) with full board + participation in the conference, conference materials, coffee breaks, and excursion (price per person).`
                           : `All meals except breakfasts + participation in the conference, conference materials, coffee breaks, and excursion (price per person).`}
                       </small>
                     </label>
@@ -161,7 +162,7 @@ const Accomodation = ({
                     htmlFor={`payment-${method.id}`}
                   >
                     {method.method}
-                    <div className="form-text">
+                    <div className="form-text mt-0">
                       {method.method === "Paypal"
                         ? "Additional fees apply."
                         : method.method === "Bank Transfer"

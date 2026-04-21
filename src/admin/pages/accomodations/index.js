@@ -5,6 +5,7 @@ import Loader from "components/loader";
 import { useApiParticipantsWithRegistration } from "api/participants/accommodations.js";
 import DocButton from "@/admin/components/doc-button";
 import AvailableRooms from '@/admin/components/rooms';
+import { formatRegistrationTypeTitle } from "utils/registration-type-display";
 
 const AdminAccommodations = ({ typeFilter = "" }) => {
   const [curFilter, setCurFilter] = useState(typeFilter || "not_no");
@@ -133,7 +134,11 @@ const AdminAccommodations = ({ typeFilter = "" }) => {
                       <td>
                         {participant.title} {participant.first_name} {participant.last_name}
                       </td>
-                      <td>{participant.registration_type || ""}</td>
+                      <td>
+                        {participant.registration_type
+                          ? formatRegistrationTypeTitle(participant.registration_type)
+                          : ""}
+                      </td>
                       <td>{participant.confirmation_sent === "1" ? "✅" : "❌"}</td>
                       <td>{participant.comments || ""}</td>
                     </tr>

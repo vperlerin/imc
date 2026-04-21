@@ -19,10 +19,13 @@ const ExtrasForm = ({
   const normalizeBoolean = (value) =>
     value === true || value === "true" || value === 1 ? "true" : "false";
 
+  // When false: excursion is not collected in this form / admin / registration emails (not "no excursion at the conference").
+  const withExcursion = conferenceData?.with_excursion !== false;
+
   // Ensure boolean values are correctly retrieved from form state
   const buyTShirt = normalizeBoolean(watch("buy_tshirt") ?? "false");
   const tshirtSize = watch("tshirt_size") ?? "";
-  const excursion = normalizeBoolean(watch("excursion") ?? "true");
+  const excursion = normalizeBoolean(watch("excursion") ?? (withExcursion ? "true" : "false"));
 
   // Food restrictions (array)
   const foodRestrictions = watch("food_restrictions") ?? [];
@@ -74,6 +77,11 @@ const ExtrasForm = ({
     }
   }, [hasFoodOther, foodOtherText, setValue, trigger]);
 
+  useEffect(() => {
+    if (withExcursion) return;
+    setValue("excursion", "false", { shouldValidate: true, shouldDirty: false });
+  }, [withExcursion, setValue]);
+
   const handleTShirtSelection = (value) => {
     setValue("buy_tshirt", normalizeBoolean(value), {
       shouldDirty: true,
@@ -102,7 +110,9 @@ const ExtrasForm = ({
   };
 
   const fillTestData = () => {
-    setValue("excursion", "true");
+    if (withExcursion) {
+      setValue("excursion", "true");
+    }
     setValue("buy_tshirt", "true");
     setValue("tshirt_size", "Men L");
 
@@ -195,40 +205,42 @@ const ExtrasForm = ({
           )}
         </div>
 
-        {/* Excursion */}
-        <div className="mb-4">
-          <label className="fw-bold mb-2">
-            Do you want to participate in the excursion (at no extra cost)?
-          </label>
-          <div className="d-flex flex-column gap-2">
-            {["true", "false"].map((option) => (
-              <div key={option} className="form-check">
-                <input
-                  type="radio"
-                  id={`excursion-${option}`}
-                  className={classNames("form-check-input", { "is-invalid": errors.excursion })}
-                  value={option}
-                  {...register("excursion", { required: "Please select an option" })}
-                  checked={excursion === option}
-                  onChange={(e) =>
-                    setValue("excursion", normalizeBoolean(e.target.value), {
-                      shouldDirty: true,
-                      shouldValidate: true,
-                    })
-                  }
-                />
-                <label className="form-check-label" htmlFor={`excursion-${option}`}>
-                  {option === "true" ? "Yes" : "No"}
-                </label>
-              </div>
-            ))}
+        {/* Excursion preference (only when managed via this registration flow) */}
+        {withExcursion && (
+          <div className="mb-4">
+            <label className="fw-bold mb-2">
+              Do you want to participate in the excursion (at no extra cost)?
+            </label>
+            <div className="d-flex flex-column gap-2">
+              {["true", "false"].map((option) => (
+                <div key={option} className="form-check">
+                  <input
+                    type="radio"
+                    id={`excursion-${option}`}
+                    className={classNames("form-check-input", { "is-invalid": errors.excursion })}
+                    value={option}
+                    {...register("excursion", { required: "Please select an option" })}
+                    checked={excursion === option}
+                    onChange={(e) =>
+                      setValue("excursion", normalizeBoolean(e.target.value), {
+                        shouldDirty: true,
+                        shouldValidate: true,
+                      })
+                    }
+                  />
+                  <label className="form-check-label" htmlFor={`excursion-${option}`}>
+                    {option === "true" ? "Yes" : "No"}
+                  </label>
+                </div>
+              ))}
+            </div>
+            {errors.excursion && (
+              <p className="text-danger">
+                <small>{errors.excursion.message}</small>
+              </p>
+            )}
           </div>
-          {errors.excursion && (
-            <p className="text-danger">
-              <small>{errors.excursion.message}</small>
-            </p>
-          )}
-        </div>
+        )}
 
         {/* Buy T-Shirt */}
         <div className="mb-3">

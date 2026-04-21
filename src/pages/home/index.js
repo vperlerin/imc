@@ -58,9 +58,14 @@ const Home = () => {
               </p>
 
               <div className={classnames('d-flex flex-column align-items-center justify-content-center mb-3 p-3', showEarlyBirdNotice && ' border rounded-2')}>
+                {cd.year === 2026 && ( 
+                    <p className="mb-3">
+                      Exceptionally, the number of on-site participants at IMC 2026 is limited to 80, so hurry up!
+                    </p> 
+                )}
                 <Link
                   aria-label="Register"
-                  className={classnames('btn btn-outline-primary fw-bolder d-block', showEarlyBirdNotice && 'mb-2')}
+                  className={classnames('btn btn-outline-primary fw-bolder d-block', showEarlyBirdNotice && 'mb-3')}
                   to="/register"
                   title="Register Now"
                 >

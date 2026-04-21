@@ -1,4 +1,6 @@
 import { conferenceData as cd } from "data/conference-data";
+import { offersOnsitePosterPrint } from "utils/poster-print";
+import { formatRegistrationTypeTitle } from "utils/registration-type-display";
 
 const year = process.env.REACT_APP_YEAR || "2026";
 
@@ -108,13 +110,13 @@ const billingTableHtml = (participantData, registrationTypes, isOnline) => {
       lines.push({ description: w.title, price });
     });
 
-  // 3. Printed posters
+  // 3. Printed posters (only when a positive unit price is configured)
   const printedPosters = (contributions || []).filter((c) => c.print === "1" || c.print === "true");
-  if (printedPosters.length > 0) {
-    const unitPrice = toNumber(cd?.poster_print?.price, 0);
+  const unitPosterPrintPrice = toNumber(cd?.poster_print?.price, 0);
+  if (printedPosters.length > 0 && offersOnsitePosterPrint(cd)) {
     lines.push({
       description: `Printed Poster${printedPosters.length > 1 ? "s" : ""} x ${printedPosters.length}`,
-      price: printedPosters.length * unitPrice,
+      price: printedPosters.length * unitPosterPrintPrice,
     });
   }
 
@@ -231,7 +233,10 @@ const registrationDetails = (
   const contributionCard = (c) => {
     const typeLabel = c.type === "talk" ? "Talk" : "Poster";
     const durationPart = c.duration ? ` — ${c.duration}` : "";
-    const printPart = c.type === "poster" && c.print === "1" ? `<br><strong>Printed on site by the LOC.</strong>` : "";
+    const printPart =
+      c.type === "poster" && c.print === "1" && offersOnsitePosterPrint(cd)
+        ? `<br><strong>Printed on site by the LOC.</strong>`
+        : "";
     return (
       `<div style="margin:6px 0; padding:6px 0; border-bottom:1px solid ${emailStyles.borderColor};">` +
       `<strong>${c.title}</strong> <span style="color:${emailStyles.colorMuted};">(${typeLabel}${durationPart})</span><br>` +
@@ -298,9 +303,11 @@ const registrationDetails = (
     html += `<div style="margin:6px 0;">No contributions.</div>`; 
   }
 
-  // Additional info
+  // Additional info (excursion omitted from emails when not managed via registration comms)
   html += sectionHeading("Additional Information")
-    + row("Excursion:", curParticipantOptions.excursion === "1" ? "Yes" : "No")
+    + (cd?.with_excursion !== false
+      ? row("Excursion:", curParticipantOptions.excursion === "1" ? "Yes" : "No")
+      : "")
     + row("T-Shirt:", curParticipantOptions.buy_tshirt === "1" ? `Yes (Size: ${curParticipantOptions.tshirt_size || "—"})` : "No");
   html += formatFoodRestrictionsHtml(fullParticipant || curParticipant);
   html += row("Comments:", curParticipant.comments || "No comments provided.");
@@ -326,7 +333,7 @@ const roomsAvailabilityHtml = (rows) => {
     const roomLeft = Number(r?.room_left ?? r?.available_rooms ?? 0) || 0;
     const total = r?.total ?? r?.total_rooms ?? null;
     const used = r?.used ?? null;
-    const label = type.charAt(0).toUpperCase() + type.slice(1);
+    const label = formatRegistrationTypeTitle(type);
     const suffixParts = [];
     if (total != null) suffixParts.push(`total: ${Number(total) || 0}`);
     if (used != null) suffixParts.push(`used: ${Number(used) || 0}`);
@@ -484,7 +491,7 @@ const participantIntro = (
   // Accommodation
   const accomValue = curParticipantAccomodation.registration_type === "no"
     ? "Own arrangement"
-    : `${curParticipantAccomodation.registration_type.charAt(0).toUpperCase() + curParticipantAccomodation.registration_type.slice(1)} room at the LOC`;
+    : `${formatRegistrationTypeTitle(curParticipantAccomodation.registration_type)} room at the LOC`;
 
   // Workshops
   const workshopsValue = curParticipantWorkshops.length === 0
@@ -497,12 +504,13 @@ const participantIntro = (
     contributionsValue = curParticipantContributions.map((c) => {
       const label = c.type === "talk" ? "Talk" : "Poster";
       const session = getSessionName(c.session_id, sessions);
-      const printNote = c.type === "poster" && c.print === "1" ? " — <strong>printed on site</strong>" : "";
+      const printNote =
+        c.type === "poster" && c.print === "1" && offersOnsitePosterPrint(cd) ? " — <strong>printed on site</strong>" : "";
       return `${label}: <strong>${c.title}</strong> (${session})${printNote}`;
     }).join("<br>");
   }
 
-  // Extras
+  // Extras (excursion omitted when not managed via registration comms)
   const excursion = curParticipantOptions.excursion === "1" ? "Yes" : "No";
   const tshirt = curParticipantOptions.buy_tshirt === "1"
     ? `Yes (${curParticipantOptions.tshirt_size})`
@@ -512,7 +520,7 @@ const participantIntro = (
     row("Accommodation:", accomValue) +
     row("Workshops:", workshopsValue) +
     row("Contributions:", contributionsValue) +
-    row("Excursion:", excursion) +
+    (cd?.with_excursion !== false ? row("Excursion:", excursion) : "") +
     row("T-Shirt:", tshirt)
   );
 };

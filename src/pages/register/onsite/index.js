@@ -25,6 +25,7 @@ import { SlArrowLeft, SlArrowRight } from "react-icons/sl";
 import { useApiParticipant } from "api/participants";
 import { fetchSpecificData, useApiSpecificData } from "api/specific-data/index.js";
 import { registrationEmailToTeam, registrationEmailToParticipant } from "email-templates/registration";
+import { formatRegistrationTypeTitle } from "utils/registration-type-display";
 
 const hasConferenceWorkshops = Array.isArray(cd?.workshops) && cd.workshops.length > 0;
 
@@ -210,7 +211,7 @@ const MainForm = () => {
       if (soldOutTypes.length > 0) {
         const soldOutListHtml = soldOutTypes
           .map((rt) => {
-            const label = String(rt.type || "unknown");
+            const label = formatRegistrationTypeTitle(rt.type || "unknown");
             const total = Number(rt.total || 0);
             const used = Number(rt.used || 0);
             return `<li><strong>${label}</strong> (left: 0, used: ${used}, total: ${total})</li>`;

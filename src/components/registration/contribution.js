@@ -7,6 +7,7 @@ import { MdAdd } from "react-icons/md";
 import { FiInfo } from "react-icons/fi";
 import { formatFullDate } from "utils/date";
 import { useFieldArray } from "react-hook-form";
+import { offersOnsitePosterPrint } from "utils/poster-print";
 
 // !hardcode in DB
 const talkDurations = ["10min", "15min", "20min", "25min", "30min"];
@@ -110,7 +111,7 @@ const ContributionForm = ({
         authors: "Alice Brown, Bob White",
         abstract: "An overview of detecting meteors using radio waves.",
         session_id: radioMeteorSession,
-        print: true,
+        print: offersOnsitePosterPrint(conferenceData),
       });
     }
   };

@@ -2,6 +2,7 @@ import classNames from "classnames";
 import cssForm from "styles/components/form.module.scss";
 import { FiTrash2 } from "react-icons/fi";
 import React, { useEffect, useState } from "react";
+import { offersOnsitePosterPrint } from "utils/poster-print";
 
 const TalkPosterForm = ({
   isAdmin = false,
@@ -20,6 +21,7 @@ const TalkPosterForm = ({
 }) => {
   const [printChanged, setPrintChanged] = useState(false);
   const isTalk = type === "talk";
+  const posterPrintOffered = offersOnsitePosterPrint(conferenceData);
 
   const printValue = watch(`${type}s.${index}.print`) ?? initialValues.print;
   const initialPrintValue = initialValues.print === true || initialValues.print === "true" || initialValues.print === 1 || initialValues.print === "1";
@@ -31,6 +33,11 @@ const TalkPosterForm = ({
       setValue(`${type}s.${index}.session_id`, initialValues.session_id);
     }
   }, [initialValues.session_id, setValue, index, type]);
+
+  useEffect(() => {
+    if (isTalk || posterPrintOffered) return;
+    setValue(`${type}s.${index}.print`, "false", { shouldValidate: true, shouldDirty: false });
+  }, [isTalk, posterPrintOffered, type, index, setValue]);
 
   useEffect(() => {
     if (isEditing && initialPrintValue !== isPrinted) {
@@ -139,8 +146,8 @@ const TalkPosterForm = ({
         </div>
       )}
 
-      {/* Printing (Only for Posters) */}
-      {!isTalk && !isEditing && (
+      {/* Printing (Only for Posters, when LOC offers paid on-site printing) */}
+      {!isTalk && !isEditing && posterPrintOffered && (
         <>
           {isEditing && printChanged && (
             <div className="alert alert-warning mt-2 fw-bolder">
@@ -152,7 +159,9 @@ const TalkPosterForm = ({
             <label className="fw-bold pb-0">
               Do you want to have your poster printed on-site for {conferenceData.poster_print.price}€?
             </label>
-            {!isAdmin && <p className="form-text mt-0">{conferenceData.poster_print.desc}</p>}
+            {!isAdmin && conferenceData.poster_print?.desc && (
+              <p className="form-text mt-0">{conferenceData.poster_print.desc}</p>
+            )}
 
             <div className="text-center btn-group d-block" role="group">
               {(() => {

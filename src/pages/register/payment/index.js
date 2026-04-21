@@ -4,11 +4,14 @@ import React from "react";
 import PayPalForm from 'components/paypal';
 import { CiWarning } from "react-icons/ci";
 import { conferenceData as cd } from "data/conference-data";
+import { offersOnsitePosterPrint } from "utils/poster-print";
+import { formatRegistrationTypeForDisplay } from "utils/registration-type-display";
 import { formatFullDate, formatFullDatePlusXDays } from 'utils/date';
 import { Link } from 'react-router-dom';
 
 const Payment = () => {
   const hasWorkShops = cd.workshops?.length > 0;
+  const offersPosterPrint = offersOnsitePosterPrint(cd);
 
   const formatWorkshop = (workshop) => {
     const onsite = `onsite: €${workshop.cost.toFixed(2)}`;
@@ -32,16 +35,29 @@ const Payment = () => {
 
       <h3>Registration fees</h3>
       <p>
-        Together with the IMC registration form, the full IMC registration fee together with supplements for T-shirt ({cd.costs.tshirts.price}€), printed posters ({cd.poster_print.price}€ per poster) {!hasWorkShops ? <>,</> : <>and</>}
-        {hasWorkShops && (<>, and any workshop participation ( {cd.workshops.map((workshop, index) => (
-          <span key={index}>
-            {index > 0 && " – "}
-            {formatWorkshop(workshop)}
-          </span>
-        ))}),</>)} must be paid.
+        Together with the IMC registration form, the full IMC registration fee together with supplements for T-shirt ({cd.costs.tshirts.price}€)
+        {offersPosterPrint && (
+          <>, printed posters ({cd.poster_print.price}€ per poster)</>
+        )}
+        {hasWorkShops && (
+          <>
+            {offersPosterPrint ? ", and " : " and "}
+            any workshop participation (
+            {cd.workshops.map((workshop, index) => (
+              <span key={index}>
+                {index > 0 && " – "}
+                {formatWorkshop(workshop)}
+              </span>
+            ))}
+            )
+          </>
+        )}
+        {!hasWorkShops && !offersPosterPrint ? "," : hasWorkShops || offersPosterPrint ? "," : null} must be paid.
       </p>
 
-      <p>Please note that the LOC cannot print posters larger than {cd.poster_print.size}.</p>
+      {offersPosterPrint && cd.poster_print?.size && (
+        <p>Please note that the LOC cannot print posters larger than {cd.poster_print.size}.</p>
+      )}
 
       <p>
         The IMC on-site registration fee is either:
@@ -52,8 +68,8 @@ const Payment = () => {
           <li key={index}>
             <strong>{room.price}€</strong> - {room.description} - <span>({room.price + cd.costs.after_early_birds}€ after {formatFullDate(cd.deadlines.early_birds)})</span>
             <span className="d-block">
-              {room.number
-                ? `Standard accommodation in a ${room.type} room for 3 nights (only) with full board + participation in the conference, conference materials, coffee breaks, and excursion (price per person).`
+              {room.type !== "no"
+                ? `Standard accommodation in a ${formatRegistrationTypeForDisplay(room.type)} room for 3 nights (only) with full board + participation in the conference, conference materials, coffee breaks, and excursion (price per person).`
                 : `All meals except breakfasts + participation in the conference, conference materials, coffee breaks, and excursion (price per person).`}
             </span>
           </li>
