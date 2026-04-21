@@ -51,6 +51,7 @@ const Accomodation = ({
 
     trigger();
   };
+ 
 
   return (
     <>
@@ -79,7 +80,9 @@ const Accomodation = ({
             <div className="d-flex flex-column gap-2">
               {(registrationTypes || [])
                 .filter((registration) => {
-                  if (isAdmin) return true;
+                  if (isAdmin) { 
+                    return true;
+                  }
                   return !hiddenRegistrationTypes.includes(registration.type);
                 })
                 .map((registration) => (
