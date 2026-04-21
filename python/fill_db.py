@@ -14,7 +14,7 @@ sys.setdefaultencoding("utf-8")
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 JSON_PATH = os.path.join(BASE_DIR, "imc", "src", "data", "conference-data.json")
 SQL_PATH = os.path.join(BASE_DIR, "python", "insert_data.sql")
-ENV_PATH = os.path.join(BASE_DIR, "env", ".env")
+ENV_PATH = os.path.join(BASE_DIR, "env/prod", ".env")
 
 # Load environment variables manually
 if os.path.exists(ENV_PATH):
