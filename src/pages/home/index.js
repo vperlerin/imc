@@ -96,7 +96,7 @@ const Home = () => {
             ))}.
           </p>
 
-          <div className={classnames(css.organizers, 'd-flex align-items-center justify-content-center gap-3')}>
+          <div className={classnames(css.organizers, 'd-flex align-items-center justify-content-center gap-3 mb-5')}>
             {cd.co_organizer.slice(0, 2).map((org, index) => (
               <a className={css.org} key={org.abbr} href={org.website} target="_blank" rel="noopener noreferrer">
                 <img src={orgImages[index]} className={classnames('img-fluid', css.orgImg)} alt={org.name} />

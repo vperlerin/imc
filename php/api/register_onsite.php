@@ -23,6 +23,7 @@ require_once __DIR__ . "/../class/Accommodation.class.php";
 require_once __DIR__ . "/../class/Payment.class.php";
 require_once __DIR__ . "/../class/Extras.class.php";
 require_once __DIR__ . "/../class/Registrationtype.class.php";
+require_once __DIR__ . "/../lib/registration_types_live.php";
 
 try {
     $pdo = Connect::getPDO();
@@ -106,11 +107,44 @@ try {
 
     $participant_id = $participantManager->saveParticipant($data, $password_hash);
 
+    // Room types that just became sold out and have not had a team alert yet (INSERT IGNORE = one alert per type)
+    $sold_out_first_alert_types = [];
+    try {
+        $liveTypes = fetchRegistrationTypesLive($pdo);
+        foreach ($liveTypes as $r) {
+            $total = (int) ($r["total"] ?? 0);
+            $roomLeft = (int) ($r["room_left"] ?? 0);
+            $type = strtolower((string) ($r["type"] ?? ""));
+            if ($type === "no" || $total <= 0) {
+                continue;
+            }
+            if ($roomLeft > 0) {
+                continue;
+            }
+            $rid = (int) $r["id"];
+            $ins = $pdo->prepare("INSERT IGNORE INTO sold_out_room_alert_sent (registration_type_id) VALUES (?)");
+            $ins->execute([$rid]);
+            if ($ins->rowCount() > 0) {
+                $sold_out_first_alert_types[] = [
+                    "id" => $rid,
+                    "type" => (string) $r["type"],
+                    "description" => (string) ($r["description"] ?? ""),
+                    "total" => $total,
+                    "used" => (int) ($r["used"] ?? 0),
+                ];
+            }
+        }
+    } catch (Throwable $e) {
+        // Missing table or DB error: registration still succeeds; no first-alert payload
+        $sold_out_first_alert_types = [];
+    }
+
     echo json_encode([
         "success" => true,
         "message" => "Registration successful",
         "participant_id" => $participant_id,
         "password" => $plain_password,
+        "sold_out_first_alert_types" => $sold_out_first_alert_types,
     ]);
 } catch (Exception $e) {
     echo json_encode([

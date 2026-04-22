@@ -73,6 +73,8 @@ const MainForm = () => {
   const [successMsg, setSuccessMsg] = useState(null);
   const [total, setTotal] = useState(0);
   const emailSentForParticipantIdRef = useRef(null);
+  /** Types that just became sold out for this registration (from API); only those get one team alert email ever per type */
+  const soldOutFirstAlertTypesRef = useRef([]);
 
   const {
     workshops,
@@ -175,6 +177,9 @@ const MainForm = () => {
       });
 
       if (response.data.success) {
+        soldOutFirstAlertTypesRef.current = Array.isArray(response.data.sold_out_first_alert_types)
+          ? response.data.sold_out_first_alert_types
+          : [];
         setSuccessMsg(`Registration successful! (ID: ${response.data.participant_id}) `);
         setParticipantId(response.data.participant_id);
         setPassword(response.data.password);
@@ -199,17 +204,15 @@ const MainForm = () => {
         const freshSpecific = await fetchSpecificData();
       const freshRegistrationTypes = freshSpecific.registration_types || [];
 
-      const soldOutTypes = freshRegistrationTypes
-        .filter((rt) => String(rt?.type || "").toLowerCase() !== "no")
-        .filter((rt) => Number(rt?.total || 0) > 0)
-        .filter((rt) => Number(rt?.room_left || 0) <= 0);
-
       const bccRecipients = process.env.REACT_APP_BCC_ALL
         ? process.env.REACT_APP_BCC_ALL.split(",").map((email) => ({ email, name: "BCC Recipient" }))
         : [];
 
-      if (soldOutTypes.length > 0) {
-        const soldOutListHtml = soldOutTypes
+      const firstSoldOutTypes = soldOutFirstAlertTypesRef.current;
+      soldOutFirstAlertTypesRef.current = [];
+
+      if (firstSoldOutTypes.length > 0) {
+        const soldOutListHtml = firstSoldOutTypes
           .map((rt) => {
             const label = formatRegistrationTypeTitle(rt.type || "unknown");
             const total = Number(rt.total || 0);
@@ -225,7 +228,7 @@ const MainForm = () => {
           Hey IMC ${cd.year} Team,<br><br>
           ⚠️ <strong>Room availability alert!</strong><br><br>
           After the latest registration (${participantName}${participantEmail ? ` — ${participantEmail}` : ""}),
-          the following room type${soldOutTypes.length > 1 ? "s are" : " is"} now <strong>SOLD OUT</strong>:<br><br>
+          the following room type${firstSoldOutTypes.length > 1 ? "s are" : " is"} now <strong>SOLD OUT</strong>:<br><br>
           <ul>
             ${soldOutListHtml}
           </ul>

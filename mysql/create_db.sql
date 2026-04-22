@@ -175,6 +175,13 @@ CREATE TABLE IF NOT EXISTS registration_types (
 ) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
+-- First-time "room sold out" alert per registration type (see register_onsite.php)
+CREATE TABLE IF NOT EXISTS sold_out_room_alert_sent (
+    registration_type_id INT NOT NULL PRIMARY KEY,
+    sent_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (registration_type_id) REFERENCES registration_types(id) ON DELETE CASCADE
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Participant Accommodation Table
 CREATE TABLE IF NOT EXISTS accommodation (
     id INT AUTO_INCREMENT PRIMARY KEY,
