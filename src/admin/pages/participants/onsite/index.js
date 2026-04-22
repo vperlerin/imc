@@ -250,6 +250,7 @@ const AdminParticipantsOnsite = () => {
             onDelete={handleDeleteClick}
             onCanBePublicChange={handleCanBePublicChange}
             canBePublicSavingId={canPublicSavingId}
+            isOnsite
           />
         </>
       )}

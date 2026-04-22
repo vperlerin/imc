@@ -1158,7 +1158,8 @@ class ParticipantManager
             CASE WHEN p.can_be_public = 1 THEN p.last_name ELSE 'Anonymous' END AS last_name,
             CASE WHEN p.can_be_public = 1 THEN p.organization ELSE '' END AS organization, 
             CASE WHEN p.can_be_public = 1 THEN p.title ELSE '' END AS title, 
-            p.country
+            p.country,
+            IFNULL(rt.type, 'no') AS accommodation_type
         ";
         } else {
             $selectFields = "
@@ -1175,7 +1176,8 @@ class ParticipantManager
             p.paypal_fee,
             p.status,
             p.can_be_public,
-            COALESCE(pm.method, 'Unknown') AS payment_method_name
+            COALESCE(pm.method, 'Unknown') AS payment_method_name,
+            IFNULL(rt.type, 'no') AS accommodation_type
         ";
         }
 
@@ -1192,6 +1194,8 @@ class ParticipantManager
                 WHERE sub_pay.participant_id = pay.participant_id
             )
         ) AS pm ON pm.participant_id = p.id
+        LEFT JOIN accommodation acc ON acc.participant_id = p.id
+        LEFT JOIN registration_types rt ON rt.id = acc.registration_type_id
         WHERE p.is_online = 0 AND $statusCondition
     ";
 

@@ -3,6 +3,26 @@ import classNames from "classnames";
 import { FaRegTrashAlt } from "react-icons/fa";
 import React, { useState } from "react";
 import { formatFullDate } from "utils/date";
+import { conferenceData } from "data/conference-data";
+
+const onsiteAccommodationRooms = conferenceData?.costs?.rooms ?? [];
+const onsiteAccommodationTypesSet = new Set(
+  onsiteAccommodationRooms
+    .map((r) => String(r?.type ?? "").toLowerCase().trim())
+    .filter(Boolean),
+);
+const unknownOnsiteAccommodationFallback = String(
+  onsiteAccommodationRooms.find(
+    (r) => String(r?.type ?? "").toLowerCase().trim() === "no",
+  )?.type ?? "no",
+).toLowerCase();
+
+const formatOnsiteAccommodationType = (raw) => {
+  const t = String(raw ?? "")
+    .toLowerCase()
+    .trim();
+  return onsiteAccommodationTypesSet.has(t) ? t : unknownOnsiteAccommodationFallback;
+};
 
 const AdminTable = ({
   participants,
@@ -11,6 +31,7 @@ const AdminTable = ({
   onDelete = null,
   onCanBePublicChange = null,
   canBePublicSavingId = null,
+  isOnsite = false,
 }) => {
   const [sortColumn, setSortColumn] = useState(null);
   const [sortOrder, setSortOrder] = useState("asc");
@@ -66,6 +87,11 @@ const AdminTable = ({
       valueB = b.payment_method_name ? b.payment_method_name.toLowerCase() : "";
     }
 
+    if (sortColumn === "accommodation_type") {
+      valueA = formatOnsiteAccommodationType(a.accommodation_type);
+      valueB = formatOnsiteAccommodationType(b.accommodation_type);
+    }
+
     // Handle confirmation_sent as boolean-like sorting
     if (sortColumn === "confirmation_sent") {
       valueA = valueA === "1" ? 1 : 0;
@@ -83,7 +109,7 @@ const AdminTable = ({
   });
 
 
-  const baseDataCols = 9 + (onCanBePublicChange ? 1 : 0);
+  const baseDataCols = 9 + (onCanBePublicChange ? 1 : 0) + (isOnsite ? 1 : 0);
   const colSpan = baseDataCols + (withActions || customActions ? 1 : 0);
 
   return (
@@ -107,6 +133,15 @@ const AdminTable = ({
             <th className={css.cursor} onClick={() => handleSort("total_paid")}>Paid</th>
             <th className={css.cursor} onClick={() => handleSort("due_amount")}>Due</th>
             <th className={css.cursor} onClick={() => handleSort("payment_method")}>Method</th>
+            {isOnsite && (
+              <th
+                className={css.cursor}
+                title="Accommodation"
+                onClick={() => handleSort("accommodation_type")}
+              >
+                Acc.
+              </th>
+            )}
             <th className={css.cursor} onClick={() => handleSort("confirmation_sent")}>Confirmed</th>
             <th className={css.cursor} onClick={() => handleSort("confirmation_date")}>Conf. Email</th>
             {(withActions || customActions) && <th></th>}
@@ -144,6 +179,9 @@ const AdminTable = ({
                     {amountDue.toFixed(2)}€
                   </td>
                   <td>{participant.payment_method_name || "n/a"}</td>
+                  {isOnsite && (
+                    <td>{formatOnsiteAccommodationType(participant.accommodation_type)}</td>
+                  )}
                   <td>{participant.confirmation_sent === "1" ? "✅" : "❌"}</td>
                   <td className={classNames(participant.status === 'cancelled' ? "text-warning" : participant?.confirmation_date && "text-success")}>
                     {participant.status === 'cancelled'
