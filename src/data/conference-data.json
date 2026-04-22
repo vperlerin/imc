@@ -15,9 +15,9 @@
   "deadlines": {
     "reg": "2026-08-10",
     "paper": "2026-10-31",
-    "full_reimbursement_before": "2026-07-01",
+    "full_reimbursement_before": "2026-06-30",
     "half_reimbursement_before": "2026-08-10",
-    "early_birds": "2026-07-01"
+    "early_birds": "2026-06-30"
   },
   "poster_dim": "A0 size (84.1cm x 118.9cm  / 33.1″ x 46.8″)",
   "poster_print": {

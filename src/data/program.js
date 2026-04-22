@@ -60,7 +60,7 @@ export const programData = {
         type: "sep",
       },
       {
-        session: "SESSION 2 - part II",
+        session: "SESSION 2 - Part II",
         chair: "TBD",
         lectures: [
           { period: "10:30 - 10:47", title: '', authors: '', link: '' },

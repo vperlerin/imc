@@ -42,10 +42,10 @@ const Pratical = () => {
             to="https://www.diplomatie.gouv.fr/en/"
             title="Weather Forecast"
           >
-            the French Ministry for Europe and Foreign Affairs' websit
+            the French Ministry for Europe and Foreign Affairs' website
           </Link>{' '}
 
-          or the French consulate or embassy in your country
+          or the French consulate or embassy in your country.
         </p> 
         <p>If you require an invitation letter for visa purposes, please provide: </p>
         <ul>

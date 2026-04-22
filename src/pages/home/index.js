@@ -51,10 +51,10 @@ const Home = () => {
             <>
               <p>
                 The {cd.num} International Meteor Conference (IMC {cd.year}) will be held in {cd.location} from {formatConferenceDates(cd.dates.start, cd.dates.end)}.
-                The IMC is the annual meeting of the IMO, which brings together amateurs from all over the world who engage in meteor observation, analysis and instrumentation.
+                The IMC is the annual meeting of the IMO, which brings together professionals and amateurs from all over the world who engage in meteor observation, analysis and instrumentation.
               </p>
               <p>
-                Its objectives are to encourage, support and coordinate meteor observing, to improve the quality of amateur observations, to disseminate observations and results to other amateurs and professionals and to make global analyses of observations received world-wide. The program includes talks on the latest developments, poster sessions and entertainment.
+                Its objectives are to encourage, support and coordinate meteor observing, to improve the quality of meteor observations, to disseminate observations and results to other amateurs and professionals and to make global analyses of observations received world-wide. The program includes talks on the latest developments, poster sessions and entertainment.
               </p>
 
               <div className={classnames('d-flex flex-column align-items-center justify-content-center mb-3 p-3', showEarlyBirdNotice && ' border rounded-2')}>

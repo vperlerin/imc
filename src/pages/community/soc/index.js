@@ -45,9 +45,9 @@ const Soc = () => {
         <div className={css.col}>
           <h3>Local Organizing Committee</h3>
 
-          {soc.loc.intro && <p dangerouslySetInnerHTML={{ __html: soc.loc.intro }} />}
+          {soc.loc?.intro && <p dangerouslySetInnerHTML={{ __html: soc.loc.intro }} />}
 
-          <h4>Chair</h4>
+          <h4 className="mt-md-4 mt-3">Chair</h4>
           <ul>
             {soc.loc.chair.map((chair, idx) => (
               <li key={`loc-chair-${idx}`} dangerouslySetInnerHTML={{ __html: chair }} />

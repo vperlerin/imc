@@ -6,7 +6,7 @@ export const socData = {
       "Marc Gyssens (IMO, U. Hasselt)",
       "Regina Rudawska (ESA-ESTEC)",
       "Maximilian Vovk (Western U.)",
-      "Jérémie Vaubaillon",
+      "Jérémie Vaubaillon (IMCCE)",
     ],
   },
   loc: {
@@ -16,6 +16,14 @@ export const socData = {
     chair: ["François Colas"],
     members: [ 
       "Karl Antier", 
+      "Marc Bretton", 
+      "Yohan Archambaud", 
+      "Lucie Maquet", 
+      "Adrien Malgoyre",  
+      "Sarah Anderson",  
+      "Pierre Vernazza",  
+      "Asma Steinhausser",  
+      "Brigitte Zanda",  
     ],
     reg: [
       "Registration and finance: Marc Gyssens<br/>Website: Vincent Perlerin - sponsored by Mike Hankey",

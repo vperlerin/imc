@@ -22,7 +22,7 @@ const Posters = () => {
           </ol>
         </>
       ) : (
-        <p>No posters available for the moment.</p>
+        <p>No posters available at the moment.</p>
       )}
 
       {demos.length > 0 && (

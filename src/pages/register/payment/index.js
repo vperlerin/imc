@@ -122,11 +122,11 @@ const Payment = () => {
       <p>Transfers in Euro from an EU member state or another EEA country (Norway, Iceland, and Liechtenstein) should be free, however, or at least no more expensive than a domestic bank transfer, provided they are done correctly.</p>
 
       <h4>3. Other payment methods</h4>
-      <p>If you cannot use either the international bank transfer or the PayPal service, please contact the <a href="mailto:treasurer@imo.net" rel="noopener noreferrer">IMO Treasurer</a> for instructions.</p>
+      <p>If you cannot use either the international bank transfer or the PayPal service, please contact the <a href="mailto:treasurer@imo.net">IMO Treasurer</a> for instructions.</p>
 
 
       <h3 className="mt-3">Cancellation Policy</h3>
-      <p>The cancellation policy for the IMC{cd.year} is as follows: </p>
+      <p>The cancellation policy for the IMC {cd.year} is as follows: </p>
       <ul>
         <li>
           <b>Until {formatFullDate(cd.deadlines.full_reimbursement_before)}:</b>  full reimbursement, except for {cd.costs.admin} administrative costs.
@@ -136,7 +136,7 @@ const Payment = () => {
             and {formatFullDate(cd.deadlines.half_reimbursement_before)}:</b> partial reimbursement of half of the registration fee;
         </li>
         <li>
-          After <b>{formatFullDatePlusXDays(cd.deadlines.half_reimbursement_before, 1)}{' '}</b>: no reimbursement.
+          After <b>{formatFullDate(cd.deadlines.half_reimbursement_before)}{' '}</b>: no reimbursement.
         </li>
       </ul>
 

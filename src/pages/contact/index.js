@@ -137,7 +137,7 @@ const Contact = () => {
               isOpen={openItem === "item3"}
               toggle={toggleItem}
             >
-              Everything is explained here: <Link aria-label="Payment Information" to="/payment">Payment Information</Link>.
+              Everything is explained here: <Link aria-label="Payment Information" to="/register/payment">Payment Information</Link>.
             </AccordionItem>
 
             <AccordionItem

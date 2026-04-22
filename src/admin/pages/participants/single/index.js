@@ -234,10 +234,7 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
     participant && paymentMethods.length > 0 && registrationTypes.length > 0;
 
   const hasAdminNotes = !!participant?.participant?.admin_notes;
-
-  console.log("participant? ", participant);
-
-
+ 
   return (
     <PageContain
       breadcrumb={breadcrumb}

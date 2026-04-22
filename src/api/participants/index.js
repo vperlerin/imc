@@ -19,9 +19,7 @@ export const useApiParticipant = (
     setError(null);
 
     try {
-      const endpoint = isOnline
-                       ? "get_online_participant"
-                       : "get_onsite_participant";
+      const endpoint = isOnline  ? "get_online_participant" : "get_onsite_participant";
       const response = await retry(() =>
         axios.get(`${process.env.REACT_APP_API_URL}/api/${endpoint}.php`, {
           params: {
