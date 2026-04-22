@@ -96,24 +96,33 @@ fi
 
 echo -e "${CYAN}Loading env from: $ENV_FILE${RESET}"
 
-# Load .env file safely, ignoring empty lines and invalid entries
-while IFS='=' read -r key value || [[ -n "$key" ]]; do
-  # Skip comments and empty lines
-  if [[ -z "$key" || "$key" =~ ^# ]]; then
-    continue
-  fi
+# Load .env file safely, ignoring empty lines and invalid entries.
+# Split only on the first '=' so values may contain '='; strip CRLF; skip empty keys after trim.
+while IFS= read -r line || [[ -n "${line}" ]]; do
+  line="${line%$'\r'}"
 
-  # Trim whitespace from key and value
+  # Skip blank / whitespace-only lines
+  [[ -z "${line//[[:space:]]/}" ]] && continue
+  # Skip full-line comments (optional leading whitespace, then #)
+  [[ "$line" =~ ^[[:space:]]*# ]] && continue
+  [[ "$line" != *=* ]] && continue
+
+  key="${line%%=*}"
+  value="${line#*=}"
+
   key=$(echo "$key" | xargs)
   value=$(echo "$value" | xargs)
 
-  # Ensure key is a valid identifier
+  # Skip malformed lines (no key after trim, e.g. "=value" or whitespace-only)
+  if [[ -z "$key" ]]; then
+    continue
+  fi
+
   if [[ ! "$key" =~ ^[a-zA-Z_][a-zA-Z0-9_]*$ ]]; then
     echo -e "${YELLOW}⚠️ Warning: Invalid environment variable '$key' in .env file. Skipping...${RESET}"
     continue
   fi
 
-  # Export variable, removing surrounding quotes
   export "$key"="${value//\"/}"
 done < "$ENV_FILE"
 
