@@ -13,7 +13,12 @@ import { offersOnsitePosterPrint } from "utils/poster-print";
 const talkDurations = ["10min", "15min", "20min", "25min", "30min"];
 
 const normalizeBooleanString = (value) =>
-  value === true || value === "true" || value === 1 ? "true" : "false";
+  value === true ||
+  value === "true" ||
+  value === 1 ||
+  value === "1"
+    ? "true"
+    : "false";
 
 const ContributionForm = ({
   isAdmin = false,

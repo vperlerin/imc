@@ -49,7 +49,7 @@ var u=t(9879),h=t(5846),p=t(9785);
 // EXTERNAL MODULE: ./src/utils/date.js
 // ./src/components/registration/contribution.js
 // !hardcode in DB
-const b=["10min","15min","20min","25min","30min"],x=({isAdmin:e=!1,isEditing:s=!1,conferenceData:t,control:a,isDebugMode:x=!1,isOnline:f=!1,register:j,errors:g,step:N,stepTotal:w,trigger:y,setValue:v,sessions:k,watch:$})=>{const{fields:_,append:A,remove:C}=(0,p/* useFieldArray */.jz)({control:a,name:"talks"}),{fields:T,append:D,remove:F}=(0,p/* useFieldArray */.jz)({control:a,name:"posters"}),S=!0===(V=$("wantsToContribute")??"false")||"true"===V||1===V?"true":"false";var V;const E="true"===S,P=e=>{v("wantsToContribute",e,{shouldDirty:!0,shouldValidate:!0})},q=(0,l.useRef)(!1);(0,l.useEffect)((()=>{E?
+const b=["10min","15min","20min","25min","30min"],x=({isAdmin:e=!1,isEditing:s=!1,conferenceData:t,control:a,isDebugMode:x=!1,isOnline:f=!1,register:j,errors:g,step:N,stepTotal:w,trigger:y,setValue:v,sessions:k,watch:$})=>{const{fields:_,append:A,remove:C}=(0,p/* useFieldArray */.jz)({control:a,name:"talks"}),{fields:T,append:D,remove:F}=(0,p/* useFieldArray */.jz)({control:a,name:"posters"}),S=!0===(V=$("wantsToContribute")??"false")||"true"===V||1===V||"1"===V?"true":"false";var V;const E="true"===S,P=e=>{v("wantsToContribute",e,{shouldDirty:!0,shouldValidate:!0})},q=(0,l.useRef)(!1);(0,l.useEffect)((()=>{E?
 // If data is already loaded (admin/edit) and forms exist, do nothing
 _.length>0||T.length>0?q.current=!0:q.current||(q.current=!0):q.current=!1}
 // Default behavior: add a first TALK

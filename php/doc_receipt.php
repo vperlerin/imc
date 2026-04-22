@@ -24,6 +24,34 @@ require_once __DIR__ . "/../vendor/autoload.php";
 
 use TCPDF;
 
+/**
+ * Interpret stored is_early_bird (0/1, strings, booleans) — align with src/utils/early-bird.js
+ */
+function imc_participant_is_early_bird($value): bool
+{
+    if ($value === false || $value === 0 || $value === '0') {
+        return false;
+    }
+    if ($value === true || $value === 1 || $value === '1') {
+        return true;
+    }
+    if ($value === null) {
+        return true;
+    }
+    $s = strtolower(trim((string) $value));
+    if (in_array($s, ['0', 'false', 'no', 'off', ''], true)) {
+        return false;
+    }
+    if (in_array($s, ['1', 'true', 'yes', 'on'], true)) {
+        return true;
+    }
+    if (is_numeric($value)) {
+        return ((int) $value) !== 0;
+    }
+
+    return true;
+}
+
 // Validate participant ID
 $participantId = $_GET['id'] ?? null;
 if (!$participantId || !is_numeric($participantId)) {
@@ -89,7 +117,11 @@ if (!$isOnline) {
       break;
     }
   }
-  $lateFee = ($participant['is_early_bird'] ?? "1") === "0" ? floatval($conferenceData['costs']['after_early_birds']) : 0;
+  $participantRow = $participant['participant'] ?? [];
+  $earlyBirdVal = $participantRow['is_early_bird'] ?? null;
+  $lateFee = imc_participant_is_early_bird($earlyBirdVal)
+    ? 0.0
+    : floatval($conferenceData['costs']['after_early_birds']);
   $totalRoomCost = isset($price) ? $price + $lateFee : $lateFee;
 }
 

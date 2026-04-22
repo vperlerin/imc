@@ -3,7 +3,7 @@ import Contribution from "components/registration/contribution";
 import Loader from "components/loader";
 import PageContain from "components/page-contain";
 import classNames from "classnames";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { conferenceData as cd } from "data/conference-data";
 import { authSelectors, fetchUser } from 'store/auth';
 import { Link } from "react-router-dom";
@@ -23,7 +23,6 @@ const UpdateRegistration = () => {
   const [participantId, setParticipantId] = useState(null);
   const [unsavedChanges, setUnsavedChanges] = useState(false);
   const [fetchTrigger, setFetchTrigger] = useState(0);
-  const hasFetchedParticipant = useRef(false);
   let isOnline = false;
   const user = useSelector(authSelectors.getUser);
   const { control, register, handleSubmit, getValues, setValue, formState: { errors }, trigger, watch } = useForm();
@@ -34,32 +33,6 @@ const UpdateRegistration = () => {
   isOnline = participant?.participant?.is_online === "1";
 
   useBlockNavigation(unsavedChanges);
-
-  useEffect(() => {
-    if (!participant || sessions.length === 0) {
-      return;
-    }
-
-    // Handle Contributions (Talks & Posters)
-    if (participant.contributions && Array.isArray(participant.contributions) && sessions.length > 0) {
-      const updatedTalks = participant.contributions
-        .filter(contribution => contribution.type === "talk")
-        .map(talk => ({ ...talk }));
-
-      const updatedPosters = participant.contributions
-        .filter(contribution => contribution.type === "poster")
-        .map(poster => ({ ...poster }));
-
-      // Set values in form so they persist on submit
-      setValue("talks", updatedTalks);
-      setValue("posters", updatedPosters);
-
-      // Set wantsToContribute if at least one talk or poster exists
-      if (updatedTalks.length > 0 || updatedPosters.length > 0) {
-        setValue("wantsToContribute", "1");
-      }
-    }
-  }, [participant, sessions, setValue]);
 
   // Detect form changes to prevent accidental navigation
   useEffect(() => {
@@ -81,12 +54,10 @@ const UpdateRegistration = () => {
     }
   }, [user]);
 
-  // Populate form with participant data when available
+  // Populate arrival + contributions whenever participant loads or refetches (must match Contribution's "true"/"false")
   useEffect(() => {
-    if (!participant || sessions.length === 0 || hasFetchedParticipant.current) return;
-    hasFetchedParticipant.current = true;
+    if (!participant || sessions.length === 0) return;
 
-    // Set arrival details
     if (participant.arrival) {
       Object.keys(participant.arrival).forEach((key) => {
         if (participant.arrival[key] !== null) {
@@ -94,29 +65,23 @@ const UpdateRegistration = () => {
             key,
             key.includes("hour") || key.includes("minute")
               ? participant.arrival[key].toString().padStart(2, "0")
-              : participant.arrival[key]
+              : participant.arrival[key],
           );
         }
       });
     }
 
-    // Process contributions
     const contributions = participant.contributions || [];
+    const updatedTalks = contributions.filter((c) => c.type === "talk").map((talk) => ({ ...talk }));
+    const updatedPosters = contributions.filter((c) => c.type === "poster").map((poster) => ({ ...poster }));
 
-    const updatedTalks = contributions
-      .filter(c => c.type === "talk")
-      .map(talk => ({ ...talk || sessions[0]?.id }));
-
-    const updatedPosters = contributions
-      .filter(c => c.type === "poster")
-      .map(poster => ({ ...poster || sessions[0]?.id }));
-
-    // Store data in form fields
     setValue("talks", updatedTalks);
     setValue("posters", updatedPosters);
- 
-
-  }, [participant, sessions, setValue]);
+    setValue(
+      "wantsToContribute",
+      updatedTalks.length > 0 || updatedPosters.length > 0 ? "true" : "false",
+    );
+  }, [participant, sessions, setValue, fetchTrigger]);
 
   // Form submission handler
   const onSubmit = async (formData) => {

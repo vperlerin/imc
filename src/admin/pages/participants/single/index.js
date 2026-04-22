@@ -22,6 +22,7 @@ import Extras from "components/registration/extras";
 import Comments from "components/registration/comments";
 import Summary from "components/billing/summary";
 import { formatFullDate } from "utils/date";
+import { isParticipantEarlyBird } from "utils/early-bird";
 
 const hasConferenceWorkshops = Array.isArray(cd?.workshops) && cd.workshops.length > 0;
 
@@ -365,7 +366,7 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
               <Accommodation
                 isAdmin
                 isOnline={isOnline}
-                isEarlyBird={participant?.participant.is_early_bird === 1 || participant?.participant.is_early_bird === '1'}
+                isEarlyBird={isParticipantEarlyBird(participant?.participant?.is_early_bird)}
                 conferenceData={cd}
                 control={control}
                 register={register}
@@ -441,7 +442,7 @@ const AdminParticipantsUser = ({ isCurOnline = false }) => {
               <Summary
                 isAdmin
                 isOnline={isOnline}
-                isEarlyBird={participant?.participant.is_early_bird === 1 || participant?.participant.is_early_bird === '1'}
+                isEarlyBird={isParticipantEarlyBird(participant?.participant?.is_early_bird)}
                 conferenceData={cd}
                 getValues={getValues}
                 setValue={setValue}

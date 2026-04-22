@@ -1,8 +1,11 @@
 import { conferenceData as cd } from "data/conference-data";
 import { offersOnsitePosterPrint } from "utils/poster-print";
+import { isParticipantEarlyBird } from "utils/early-bird";
 import { formatRegistrationTypeTitle } from "utils/registration-type-display";
 
 const year = process.env.REACT_APP_YEAR || "2026";
+
+const hasWorkshops = (cd.workshops?.length ?? 0) > 0;
 
 // Email-safe design tokens (inline styles only for broad client compatibility)
 const emailStyles = {
@@ -98,17 +101,21 @@ const billingTableHtml = (participantData, registrationTypes, isOnline) => {
     lines.push({ description: "Online Conference Registration", price: onlineCost });
   } else {
     const regInfo = getRegInfo(accommodation?.registration_type_id, registrationTypes);
-    const lateFee = participant?.is_early_bird === "0" ? toNumber(cd?.costs?.after_early_birds, 0) : 0;
+    const lateFee = isParticipantEarlyBird(participant?.is_early_bird)
+      ? 0
+      : toNumber(cd?.costs?.after_early_birds, 0);
     lines.push({ description: `Conference Registration ${regInfo.description}`, price: regInfo.price + lateFee });
   }
 
-  // 2. Workshops (only those the participant is attending)
-  (pWorkshops || [])
-    .filter((w) => w.attending === "1" || w.attending === "true")
-    .forEach((w) => {
-      const price = isOnline ? toNumber(w.price_online, 0) : toNumber(w.price, 0);
-      lines.push({ description: w.title, price });
-    });
+  // 2. Workshops (only when the conference offers workshops and the participant is attending)
+  if (hasWorkshops) {
+    (pWorkshops || [])
+      .filter((w) => w.attending === "1" || w.attending === "true")
+      .forEach((w) => {
+        const price = isOnline ? toNumber(w.price_online, 0) : toNumber(w.price, 0);
+        lines.push({ description: w.title, price });
+      });
+  }
 
   // 3. Printed posters (only when a positive unit price is configured)
   const printedPosters = (contributions || []).filter((c) => c.print === "1" || c.print === "true");
@@ -249,9 +256,12 @@ const registrationDetails = (
   };
 
   if (isOnline) {
-    const workshopsHtml = curParticipantWorkshops.length > 0
-      ? curParticipantWorkshops.map(workshopRow).join("")
-      : `<div style="margin:6px 0;">No workshops selected.</div>`;
+    const workshopsBlock = hasWorkshops
+      ? sectionHeading("Workshops") +
+        (curParticipantWorkshops.length > 0
+          ? curParticipantWorkshops.map(workshopRow).join("")
+          : `<div style="margin:6px 0;">No workshops selected.</div>`)
+      : "";
     const contributionsHtml = curParticipantContributions.length > 0
       ? curParticipantContributions.map(contributionCard).join("")
       : `<div style="margin:6px 0;">No contributions.</div>`;
@@ -261,8 +271,7 @@ const registrationDetails = (
       row("Name:", `${curParticipant.title} ${curParticipant.first_name} ${curParticipant.last_name}`) +
       row("Email:", curParticipant.email) +
       row("Date of Birth:", curParticipant.dob || "—") +
-      sectionHeading("Workshops") +
-      workshopsHtml +
+      workshopsBlock +
       sectionHeading("Contributions") +
       contributionsHtml +
       sectionHeading("Invoice Summary") +
@@ -287,12 +296,14 @@ const registrationDetails = (
     + row("Departure:", `${curParticipantArrival.departure_date || "—"} at ${curParticipantArrival.departure_hour || "—"}:${curParticipantArrival.departure_minute || "—"}`);
   if (curParticipantArrival.travelling_details) html += row("Details:", curParticipantArrival.travelling_details);
 
-  // Workshops
-  html += sectionHeading("Workshops");
-  if (curParticipantWorkshops.length > 0) {
-    html += curParticipantWorkshops.map(workshopRow).join("");
-  } else {
-    html += `<div style="margin:6px 0;">No workshops selected.</div>`;
+  // Workshops (only when the conference offers workshops)
+  if (hasWorkshops) {
+    html += sectionHeading("Workshops");
+    if (curParticipantWorkshops.length > 0) {
+      html += curParticipantWorkshops.map(workshopRow).join("");
+    } else {
+      html += `<div style="margin:6px 0;">No workshops selected.</div>`;
+    }
   }
 
   // Contributions
@@ -493,10 +504,14 @@ const participantIntro = (
     ? "Own arrangement"
     : `${formatRegistrationTypeTitle(curParticipantAccomodation.registration_type)} room at the LOC`;
 
-  // Workshops
-  const workshopsValue = curParticipantWorkshops.length === 0
-    ? "None"
-    : curParticipantWorkshops.map((w) => w.title).join(", ");
+  const workshopsLine = hasWorkshops
+    ? row(
+        "Workshops:",
+        curParticipantWorkshops.length === 0
+          ? "None"
+          : curParticipantWorkshops.map((w) => w.title).join(", "),
+      )
+    : "";
 
   // Contributions
   let contributionsValue = "None";
@@ -518,7 +533,7 @@ const participantIntro = (
 
   return (
     row("Accommodation:", accomValue) +
-    row("Workshops:", workshopsValue) +
+    workshopsLine +
     row("Contributions:", contributionsValue) +
     (cd?.with_excursion !== false ? row("Excursion:", excursion) : "") +
     row("T-Shirt:", tshirt)

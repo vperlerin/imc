@@ -3,6 +3,7 @@ import css from "./index.module.scss";
 import React, { useEffect, useMemo } from "react";
 import { getPaymentMethodById } from "utils/payment_method";
 import { offersOnsitePosterPrint } from "utils/poster-print";
+import { isParticipantEarlyBird } from "utils/early-bird";
 
 const getPaypalPrice = (price) => {
   return Math.round((price + (0.034 * price + 0.35) / 0.966) * 100) / 100;
@@ -71,7 +72,9 @@ const Summary = ({
     [registration_type, registrationTypes]
   );
 
-  const lateFee = !isEarlyBird || isEarlyBird === "0" ? toNumber(conferenceData?.costs?.after_early_birds, 0) : 0;
+  const lateFee = isParticipantEarlyBird(isEarlyBird)
+    ? 0
+    : toNumber(conferenceData?.costs?.after_early_birds, 0);
   const totalRoomCost = registration_price + lateFee;
 
   // Workshops Costs

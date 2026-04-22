@@ -1,5 +1,6 @@
 import React from "react";
 import { offersOnsitePosterPrint } from "utils/poster-print";
+import { isParticipantEarlyBird } from "utils/early-bird";
 
 const getPaypalPrice = (price) => {
   return Math.round((price + (0.034 * price + 0.35) / 0.966) * 100) / 100;
@@ -61,8 +62,9 @@ const StaticSummary = ({ isOnline, conferenceData, participantData, registration
     const regInfo = getRegInfo(accommodation?.registration_type_id, registrationTypes);
     registrationDescription = regInfo.description;
 
-    const lateFee =
-      participant?.is_early_bird === "0" ? toNumber(conferenceData?.costs?.after_early_birds, 0) : 0;
+    const lateFee = isParticipantEarlyBird(participant?.is_early_bird)
+      ? 0
+      : toNumber(conferenceData?.costs?.after_early_birds, 0);
 
     totalRoomCost = regInfo.price + lateFee;
   }
