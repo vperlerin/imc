@@ -53,7 +53,7 @@ const IdentityForm = ({
 
     trigger();
   };
-  
+
 
   return (
     <>
@@ -154,8 +154,8 @@ const IdentityForm = ({
                   {
                     required: "Phone number is required",
                     pattern: {
-                      value: /^\+\d{1,3}\s?\d+$/,
-                      message: "Invalid phone number format - please add +Country Code. Ex: +33 686 753 89"
+                      value: /^[\d\s\-().+]{7,20}$/,
+                      message: "Invalid phone number format. Ex: +1 (555) 123-4567 or 06 12 34 56 78"
                     }
                   })}
                 onBlur={() => trigger("phone")}
