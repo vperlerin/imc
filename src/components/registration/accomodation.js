@@ -22,23 +22,27 @@ const Accomodation = ({
 
   // Hide ONLY types that are sold out for the public:
   // - total > 0 means capacity-limited accommodation
-  // - room_left <= 0 means sold out
+  // - beds_left <= 0 means sold out (no more bookable beds)
   // - total === 0 is "no accommodation" -> never hidden
+  // Falls back to `room_left` for backward compatibility: it is now kept in sync
+  // with `beds_left` server-side (see php/lib/registration_types_live.php).
+  const isTypeSoldOut = (r) => {
+    if (Number(r?.total) <= 0) return false;
+    const bedsLeft = Number(r?.beds_left ?? r?.room_left ?? 0);
+    return bedsLeft <= 0;
+  };
+
   const hiddenRegistrationTypes = useMemo(() => {
     if (!Array.isArray(registrationTypes)) {
       return [];
     }
 
-    return registrationTypes
-      .filter((r) => Number(r?.total) > 0 && Number(r?.room_left) <= 0)
-      .map((r) => r.type);
+    return registrationTypes.filter(isTypeSoldOut).map((r) => r.type);
   }, [registrationTypes]);
 
 
   const fillTestData = () => {
-    const availableRegistrationTypes = (registrationTypes || []).filter((rt) => {
-      return !(Number(rt?.total) > 0 && Number(rt?.room_left) <= 0);
-    });
+    const availableRegistrationTypes = (registrationTypes || []).filter((rt) => !isTypeSoldOut(rt));
 
     setValue(
       "registration_type_id",

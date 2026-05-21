@@ -1,7 +1,9 @@
 import { conferenceData as cd } from "data/conference-data";
 import { offersOnsitePosterPrint } from "utils/poster-print";
 import { isParticipantEarlyBird } from "utils/early-bird";
-import { formatRegistrationTypeTitle } from "utils/registration-type-display";
+import { formatRegistrationTypeForDisplay, formatRegistrationTypeTitle } from "utils/registration-type-display";
+
+const pluralizeEmail = (n, singular, plural) => `${n} ${n === 1 ? singular : plural}`;
 
 const year = process.env.REACT_APP_YEAR || "2026";
 
@@ -341,15 +343,41 @@ const roomsAvailabilityHtml = (rows) => {
 
   const items = filtered.map((r) => {
     const type = String(r?.type ?? r?.registration_type ?? "unknown");
-    const roomLeft = Number(r?.room_left ?? r?.available_rooms ?? 0) || 0;
-    const total = r?.total ?? r?.total_rooms ?? null;
-    const used = r?.used ?? null;
     const label = formatRegistrationTypeTitle(type);
-    const suffixParts = [];
-    if (total != null) suffixParts.push(`total: ${Number(total) || 0}`);
-    if (used != null) suffixParts.push(`used: ${Number(used) || 0}`);
-    const suffix = suffixParts.length ? ` <span style="color:${emailStyles.colorMuted};">(${suffixParts.join(", ")})</span>` : "";
-    return `<li style="margin:2px 0;"><strong>${label}</strong>: ${roomLeft} left${suffix}</li>`;
+    const typeLabel = formatRegistrationTypeForDisplay(type) || "room";
+
+    const totalRooms = Number(r?.total_rooms ?? r?.total ?? 0) || 0;
+    const bedsPerRoom = Number(r?.beds_per_room ?? 1) || 1;
+    const bedsTotal = Number(r?.beds_total ?? totalRooms * bedsPerRoom) || 0;
+    const used = Number(r?.used ?? 0) || 0;
+    const bedsLeftFallback = Math.max(bedsTotal - used, 0);
+    const bedsLeft = Number(r?.beds_left ?? r?.room_left ?? bedsLeftFallback) || 0;
+    const roomsLeft =
+      r?.rooms_left != null ? Number(r.rooms_left) || 0 : Math.floor(bedsLeft / Math.max(bedsPerRoom, 1));
+    const partialBedsLeft =
+      r?.partial_beds_left != null
+        ? Number(r.partial_beds_left) || 0
+        : bedsLeft % Math.max(bedsPerRoom, 1);
+
+    let main;
+    if (bedsLeft <= 0) {
+      main = "Sold out";
+    } else {
+      const parts = [];
+      if (roomsLeft > 0) {
+        parts.push(`${pluralizeEmail(roomsLeft, `${typeLabel} room`, `${typeLabel} rooms`)} left`);
+      }
+      if (partialBedsLeft > 0) {
+        parts.push(`${pluralizeEmail(partialBedsLeft, "bed", "beds")} in a ${typeLabel} room`);
+      }
+      main = parts.join(" + ");
+    }
+
+    const suffix = bedsTotal > 0
+      ? ` <span style="color:${emailStyles.colorMuted};">(${bedsLeft} / ${bedsTotal} beds)</span>`
+      : "";
+
+    return `<li style="margin:2px 0;"><strong>${label}</strong>: ${main}${suffix}</li>`;
   });
 
   return `<div style="margin:16px 0; padding:14px 18px; background-color:${emailStyles.bgSubtle}; border:1px solid ${emailStyles.borderColor};">

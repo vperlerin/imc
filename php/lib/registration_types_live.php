@@ -1,12 +1,59 @@
 <?php
 
 /**
- * Live registration_types with computed room_left (same logic as get_specific_data.php).
+ * Live registration_types with bed-accurate capacity computation.
+ *
+ * Capacity model:
+ *   - `total`            : number of physical rooms for this type (legacy column).
+ *   - `beds_per_room`    : beds per room (triple=3, double=2, single=1, ...).
+ *   - `beds_total`       : total * beds_per_room (= bookable seats for the type).
+ *   - `used`             : COUNT(*) of active on-site accommodation rows for this type.
+ *   - `beds_left`        : max(beds_total - used, 0).
+ *   - `rooms_left`       : floor(beds_left / beds_per_room) -- fully untouched rooms.
+ *   - `partial_beds_left`: beds_left mod beds_per_room -- free beds inside a partially-used room.
+ *
+ * Back-compat: `room_left` is returned equal to `beds_left` so existing consumers
+ * (sold-out detection in register_onsite.php, hide-filter in accomodation.js) keep
+ * working correctly without any change of their own logic.
+ *
+ * Deploy safety: if the `beds_per_room` column does not exist yet (code deployed
+ * before the mysql/add_beds_per_room.sql migration is run), the query transparently
+ * falls back to a hardcoded CASE expression by `type`. Same behavior either way.
  *
  * @return array<int, array<string, mixed>>
  */
 function fetchRegistrationTypesLive(PDO $pdo): array
 {
+    // Detect once per request whether the new column exists.
+    $hasBedsCol = false;
+    try {
+        $check = $pdo->query(
+            "SELECT 1 FROM information_schema.COLUMNS
+             WHERE TABLE_SCHEMA = DATABASE()
+               AND TABLE_NAME   = 'registration_types'
+               AND COLUMN_NAME  = 'beds_per_room'
+             LIMIT 1"
+        );
+        $hasBedsCol = $check && (bool) $check->fetchColumn();
+    } catch (Throwable $e) {
+        $hasBedsCol = false;
+    }
+
+    // $bedsExpr is composed only of fixed strings (never user input) -> safe to interpolate.
+    $bedsExpr = $hasBedsCol
+        ? "rt.beds_per_room"
+        : "CASE rt.type
+            WHEN 'septuple' THEN 7
+            WHEN 'sextuple' THEN 6
+            WHEN 'quintuple' THEN 5
+             WHERE 'quadruple' THEN 4
+             WHEN 'triple' THEN 3
+             WHEN 'double' THEN 2
+             WHEN 'single' THEN 1
+             WHEN 'single_accessible' THEN 1
+             ELSE 1
+           END";
+
     $sql = "
     SELECT
       rt.id,
@@ -14,13 +61,16 @@ function fetchRegistrationTypesLive(PDO $pdo): array
       rt.price,
       rt.description,
       rt.sort_order,
-      rt.total,
-      rt.room_left AS room_left_stored,
-      COALESCE(x.used, 0) AS used,
-      CASE
-        WHEN rt.total > 0 THEN GREATEST(rt.total - COALESCE(x.used, 0), 0)
-        ELSE 0
-      END AS room_left
+      rt.total                                                       AS total_rooms,
+      ({$bedsExpr})                                                  AS beds_per_room,
+      (rt.total * ({$bedsExpr}))                                     AS beds_total,
+      COALESCE(x.used, 0)                                            AS used,
+      GREATEST(rt.total * ({$bedsExpr}) - COALESCE(x.used, 0), 0)    AS beds_left,
+      FLOOR(GREATEST(rt.total * ({$bedsExpr}) - COALESCE(x.used, 0), 0)
+            / GREATEST(({$bedsExpr}), 1))                            AS rooms_left,
+      (GREATEST(rt.total * ({$bedsExpr}) - COALESCE(x.used, 0), 0)
+            MOD GREATEST(({$bedsExpr}), 1))                          AS partial_beds_left,
+      rt.room_left                                                   AS room_left_stored
     FROM registration_types rt
     LEFT JOIN (
       SELECT
@@ -41,16 +91,33 @@ function fetchRegistrationTypesLive(PDO $pdo): array
     $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     return array_map(function ($r) {
+        $totalRooms      = isset($r["total_rooms"]) ? (int) $r["total_rooms"] : 0;
+        $bedsPerRoom     = isset($r["beds_per_room"]) ? (int) $r["beds_per_room"] : 1;
+        $bedsTotal       = isset($r["beds_total"]) ? (int) $r["beds_total"] : 0;
+        $used            = isset($r["used"]) ? (int) $r["used"] : 0;
+        $bedsLeft        = isset($r["beds_left"]) ? (int) $r["beds_left"] : 0;
+        $roomsLeft       = isset($r["rooms_left"]) ? (int) $r["rooms_left"] : 0;
+        $partialBedsLeft = isset($r["partial_beds_left"]) ? (int) $r["partial_beds_left"] : 0;
+
         return [
-            "id" => (int) $r["id"],
-            "type" => (string) $r["type"],
-            "price" => isset($r["price"]) ? (float) $r["price"] : 0.0,
-            "description" => isset($r["description"]) ? (string) $r["description"] : "",
-            "sort_order" => isset($r["sort_order"]) ? (int) $r["sort_order"] : 0,
-            "total" => isset($r["total"]) ? (int) $r["total"] : 0,
-            "used" => isset($r["used"]) ? (int) $r["used"] : 0,
-            "room_left" => isset($r["room_left"]) ? (int) $r["room_left"] : 0,
-            "room_left_stored" => isset($r["room_left_stored"]) ? (int) $r["room_left_stored"] : null,
+            "id"                => (int) $r["id"],
+            "type"              => (string) $r["type"],
+            "price"             => isset($r["price"]) ? (float) $r["price"] : 0.0,
+            "description"       => isset($r["description"]) ? (string) $r["description"] : "",
+            "sort_order"        => isset($r["sort_order"]) ? (int) $r["sort_order"] : 0,
+            // Keep `total` = number of rooms (matches existing JSON shape).
+            "total"             => $totalRooms,
+            "total_rooms"       => $totalRooms,
+            "beds_per_room"     => $bedsPerRoom,
+            "beds_total"        => $bedsTotal,
+            "used"              => $used,
+            "beds_left"         => $bedsLeft,
+            "rooms_left"        => $roomsLeft,
+            "partial_beds_left" => $partialBedsLeft,
+            // Legacy field: now expresses remaining BEDS so existing `<= 0` sold-out
+            // checks (PHP register_onsite, JS hide-filter) keep working.
+            "room_left"         => $bedsLeft,
+            "room_left_stored"  => isset($r["room_left_stored"]) ? (int) $r["room_left_stored"] : null,
         ];
     }, $rows);
 }

@@ -87,21 +87,28 @@ if table_is_empty("workshops"):
         )
 
 
-# Insert `registration_types` (rooms) if the table is empty
+# Insert `registration_types` (rooms) if the table is empty.
+# - `total` is the number of physical rooms.
+# - `beds_per_room` is the number of beds per room (triple=3, double=2, single=1, ...);
+#   defaults to 1 if the JSON entry omits it (e.g. the "no accommodation" pseudo-type).
+# - `room_left` is seeded to `total * beds_per_room` (total bed capacity); live
+#   availability is recomputed at query time from the accommodation table.
 if table_is_empty("registration_types"):
     for room in data.get("costs", {}).get("rooms", []):
         total = int(room.get("total", 0))
+        beds_per_room = int(room.get("beds", 1))
         sort_order = int(room.get("sort_order", 0))
 
         sql_statements.append(
             "INSERT INTO registration_types "
-            "(type, price, description, total, room_left, sort_order) "
-            "VALUES ('%s', %.2f, '%s', %d, %d, %d);" % (
+            "(type, price, description, total, beds_per_room, room_left, sort_order) "
+            "VALUES ('%s', %.2f, '%s', %d, %d, %d, %d);" % (
                 room["type"].replace("'", "''"),
                 float(room["price"]),
                 room["description"].replace("'", "''"),
                 total,
-                total,
+                beds_per_room,
+                total * beds_per_room,
                 sort_order
             )
         )

@@ -84,33 +84,4 @@ class AccommodationManager
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
- 
-    public function gatAvailableRooms() {
-        // SQL query to calculate available rooms per registration type
-        $sql = "
-            SELECT 
-                r.id AS registration_type_id,
-                r.type AS registration_type,
-                r.total AS total_rooms,
-                IFNULL(r.total, 0) - 
-                    CASE 
-                        WHEN r.type = 'single' THEN IFNULL(COUNT(a.id), 0)
-                        WHEN r.type = 'double' THEN IFNULL(COUNT(a.id), 0) / 2
-                        WHEN r.type = 'quadruple' THEN IFNULL(COUNT(a.id), 0) / 4
-                        ELSE 0
-                    END AS available_rooms
-            FROM registration_types r
-            LEFT JOIN accommodation a ON r.id = a.registration_type_id
-            GROUP BY r.id
-            ORDER BY r.type;
-        ";
-    
-        // Prepare and execute the query
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute();
-    
-        // Return the fetched results as an associative array
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-    
 }

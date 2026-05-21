@@ -41,6 +41,7 @@
     "online": 20,
     "rooms": [
       {
+        "beds":3,
         "price": 250,
         "description": "Quadruple room in the IMC host",
         "total": 68,
@@ -48,6 +49,7 @@
         "type": "quadruple"
       },
       {
+        "beds":2,
         "price": 350,
         "description": "Double room in the IMC host",
         "total": 12,
@@ -55,6 +57,7 @@
         "type": "double"
       },
       {
+        "beds":1,
         "price": 500,
         "description": "Single room in the IMC host",
         "total": 8,
@@ -62,6 +65,7 @@
         "type": "single"
       },
       {
+        "beds": 1,
         "price": 200,
         "description": "No accommodation",
         "sort_order": 4,

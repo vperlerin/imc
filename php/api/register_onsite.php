@@ -112,13 +112,14 @@ try {
     try {
         $liveTypes = fetchRegistrationTypesLive($pdo);
         foreach ($liveTypes as $r) {
-            $total = (int) ($r["total"] ?? 0);
-            $roomLeft = (int) ($r["room_left"] ?? 0);
+            $totalRooms = (int) ($r["total_rooms"] ?? $r["total"] ?? 0);
+            // `room_left` is kept in sync with `beds_left` by fetchRegistrationTypesLive.
+            $bedsLeft = (int) ($r["beds_left"] ?? $r["room_left"] ?? 0);
             $type = strtolower((string) ($r["type"] ?? ""));
-            if ($type === "no" || $total <= 0) {
+            if ($type === "no" || $totalRooms <= 0) {
                 continue;
             }
-            if ($roomLeft > 0) {
+            if ($bedsLeft > 0) {
                 continue;
             }
             $rid = (int) $r["id"];
@@ -129,7 +130,10 @@ try {
                     "id" => $rid,
                     "type" => (string) $r["type"],
                     "description" => (string) ($r["description"] ?? ""),
-                    "total" => $total,
+                    "total" => $totalRooms,
+                    "total_rooms" => $totalRooms,
+                    "beds_per_room" => (int) ($r["beds_per_room"] ?? 1),
+                    "beds_total" => (int) ($r["beds_total"] ?? 0),
                     "used" => (int) ($r["used"] ?? 0),
                 ];
             }

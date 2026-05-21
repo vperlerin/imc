@@ -164,6 +164,10 @@ CREATE TABLE IF NOT EXISTS contributions (
 
 
 -- Registration Types Table
+-- `total` = number of physical rooms for this type.
+-- `beds_per_room` = beds (= bookable seats) per room (triple=3, double=2, single=1, ...).
+-- `room_left` is a legacy column kept in sync with the seeded "beds total" (total * beds_per_room).
+-- Live availability is computed at query time from accommodation rows (see php/lib/registration_types_live.php).
 CREATE TABLE IF NOT EXISTS registration_types (
     id INT AUTO_INCREMENT PRIMARY KEY,
     type VARCHAR(100) NOT NULL UNIQUE,
@@ -171,6 +175,7 @@ CREATE TABLE IF NOT EXISTS registration_types (
     description TEXT NOT NULL,
     sort_order INT NOT NULL DEFAULT 0,
     total INT UNSIGNED NOT NULL DEFAULT 0,
+    beds_per_room INT UNSIGNED NOT NULL DEFAULT 1,
     room_left INT UNSIGNED NOT NULL DEFAULT 0
 ) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

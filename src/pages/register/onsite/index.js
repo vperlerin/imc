@@ -215,9 +215,11 @@ const MainForm = () => {
         const soldOutListHtml = firstSoldOutTypes
           .map((rt) => {
             const label = formatRegistrationTypeTitle(rt.type || "unknown");
-            const total = Number(rt.total || 0);
+            const totalRooms = Number(rt.total_rooms ?? rt.total ?? 0) || 0;
+            const bedsPerRoom = Number(rt.beds_per_room ?? 1) || 1;
+            const bedsTotal = Number(rt.beds_total ?? totalRooms * bedsPerRoom) || 0;
             const used = Number(rt.used || 0);
-            return `<li><strong>${label}</strong> (left: 0, used: ${used}, total: ${total})</li>`;
+            return `<li><strong>${label}</strong> (0 beds left, ${used} / ${bedsTotal} beds used, ${totalRooms} rooms x ${bedsPerRoom} beds)</li>`;
           })
           .join("");
 
