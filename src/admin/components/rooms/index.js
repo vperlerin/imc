@@ -98,7 +98,7 @@ const AvailableRooms = ({ className, showLink = false }) => {
                 })}
               >
                 {label}: <strong>{main}</strong>
-                {sub && <small className="text-muted">{sub}</small>}
+                {sub && <small className="d-block text-muted">{sub}</small>}
               </div>
             );
           })}
