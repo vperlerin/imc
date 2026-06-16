@@ -12,7 +12,7 @@ const GoogleMap = () => {
         allowFullScreen
         loading="lazy"
         referrerPolicy="no-referrer-when-downgrade"
-        title="Barcelonette"
+        title="Barcelonnette"
       ></iframe>
     </div>
   );

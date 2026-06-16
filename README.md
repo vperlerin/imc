@@ -1,5 +1,8 @@
 IMC
 
+UPDATE ACCOMODATION.php in case of quintuple, sextuple... rooms.
+
+
 WARNING: NEVER PUSH FROM THE SERVER
 
 run composer on server (composer install)
