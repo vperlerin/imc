@@ -21,9 +21,22 @@ if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
 }
 
 
+session_set_cookie_params([
+    'lifetime' => 259200,
+    'path' => '/',
+    'secure' => true,
+    'httponly' => true,
+    'samesite' => 'None'
+]);
 session_start();
-session_destroy();  
-setcookie(session_name(), '', time() - 3600, '/');  
+session_destroy();
+setcookie(session_name(), '', [
+    'expires' => time() - 3600,
+    'path' => '/',
+    'secure' => true,
+    'httponly' => true,
+    'samesite' => 'None'
+]);
 header("Content-Type: application/json");
 echo json_encode(["success" => true, "message" => "Logged out successfully"]);
 ?>

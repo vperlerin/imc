@@ -14,6 +14,13 @@ if (isset($_SERVER['HTTP_ORIGIN']) && in_array($_SERVER['HTTP_ORIGIN'], $allowed
 header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
 
+session_set_cookie_params([
+    'lifetime' => 259200, // 3 days
+    'path' => '/',
+    'secure' => true,
+    'httponly' => true,
+    'samesite' => 'None'
+]);
 session_start();
 
 require_once __DIR__ . "/../config.php";
@@ -107,14 +114,6 @@ $_SESSION["is_admin"] = $isAdmin;
 $_SESSION["role"] = $userRole;
 $_SESSION["participant_id"] = $participantId;
 $_SESSION["admin_id"] = $adminId;
-
-// Ensure session cookie is sent
-setcookie(session_name(), session_id(), [
-    'expires' => time() + 259200, // 3 days
-    'secure' => true,
-    'httponly' => true,
-    'samesite' => 'None'
-]);
 
 // Return user info
 $response = [
