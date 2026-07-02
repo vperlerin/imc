@@ -21,13 +21,11 @@ if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
 }
 
 
-session_set_cookie_params([
-    'lifetime' => 259200,
-    'path' => '/',
-    'secure' => true,
-    'httponly' => true,
-    'samesite' => 'None'
-]);
+ini_set('session.cookie_lifetime', 259200);
+ini_set('session.cookie_path', '/');
+ini_set('session.cookie_secure', 1);
+ini_set('session.cookie_httponly', 1);
+ini_set('session.cookie_samesite', 'None');
 session_start();
 session_destroy();
 setcookie(session_name(), '', [

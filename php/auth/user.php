@@ -13,13 +13,11 @@ if (isset($_SERVER['HTTP_ORIGIN']) && in_array($_SERVER['HTTP_ORIGIN'], $allowed
 header("Access-Control-Allow-Methods: GET, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
 
-session_set_cookie_params([
-    'lifetime' => 259200,
-    'path' => '/',
-    'secure' => true,
-    'httponly' => true,
-    'samesite' => 'None'
-]);
+ini_set('session.cookie_lifetime', 259200);
+ini_set('session.cookie_path', '/');
+ini_set('session.cookie_secure', 1);
+ini_set('session.cookie_httponly', 1);
+ini_set('session.cookie_samesite', 'None');
 session_start();
 
 // Handle preflight OPTIONS request
