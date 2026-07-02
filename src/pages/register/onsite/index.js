@@ -110,7 +110,9 @@ const MainForm = () => {
   const dob = watch("dob");
   const age = calculateAge(dob);
   const isUnder16 = age !== null && age < 16;
-  const is_early_bird = new Date() < new Date(cd.deadlines.early_birds);
+  const now = new Date();
+  const localDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  const is_early_bird = localDate <= cd.deadlines.early_birds;
 
   // Food restrictions watches (for step validation)
   const foodRestrictions = watch("food_restrictions") ?? [];
@@ -425,7 +427,7 @@ const MainForm = () => {
                 visa application will be submitted.
               </p>
 
-              {new Date() < new Date(cd.deadlines.early_birds) && (
+              {is_early_bird && (
                 <p className="d-flex border rounded-2 p-3 border-info text-info gap-2 mb-5">
                   <CiWarning className={css.warning} />
                   <span>

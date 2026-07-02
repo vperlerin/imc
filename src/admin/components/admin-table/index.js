@@ -159,7 +159,7 @@ const AdminTable = ({
               return (
                 <tr key={participant.id} className={participant.status === 'cancelled' ? 'text-warning ' : ''}>
                   <td>{participant.id}</td>
-                  <td>{participant.created_at.split(" ")[0]}</td>
+                  <td className="text-nowrap">{participant.created_at.split(" ")[0]}</td>
                   <td>{participant.title} {participant.first_name} {participant.last_name}</td>
                   {onCanBePublicChange && (
                     <td>
@@ -175,7 +175,10 @@ const AdminTable = ({
                   )}
                   <td>{isPaypal ? (totalDue + paypalFee).toFixed(2) : totalDue.toFixed(2)}€</td>
                   <td>{totalPaid.toFixed(2)}€</td>
-                  <td className={classNames({ "text-success": amountDue === 0 })}>
+                  <td className={classNames({
+                    "text-success": amountDue === 0,
+                    "text-danger": amountDue < 0,
+                  })}>
                     {amountDue.toFixed(2)}€
                   </td>
                   <td>{participant.payment_method_name || "n/a"}</td>

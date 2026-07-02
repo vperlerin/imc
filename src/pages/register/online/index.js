@@ -74,7 +74,9 @@ const MainForm = () => {
     watch
   } = useForm();
 
-  const is_early_bird = new Date() < new Date(cd.deadlines.early_birds);
+  const now = new Date();
+  const localDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  const is_early_bird = localDate <= cd.deadlines.early_birds;
 
   const nextStep = async () => {
     const isValid = await trigger();
