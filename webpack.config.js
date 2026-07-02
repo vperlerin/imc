@@ -184,6 +184,14 @@ module.exports = (env, argv) => {
       hot: true,
       port: 3000,
       open: false,
+      proxy: [
+        {
+          context: ['/php'],
+          target: 'https://imc2026.imo.net',
+          changeOrigin: true,
+          secure: true,
+        },
+      ],
     }
   };
 };
