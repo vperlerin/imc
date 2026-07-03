@@ -31,17 +31,21 @@ if (!isset($_SESSION["user_id"])) {
 }
 
 $participantId = $_SESSION["participant_id"] ?? null;
-if (!$participantId) {
-    http_response_code(403);
-    echo json_encode(["success" => false, "message" => "Only registered participants can create offers"]);
-    exit;
-}
+$isAdmin = $_SESSION["is_admin"] ?? false;
 
-$isOnline = $_SESSION["is_online"] ?? null;
-if ($isOnline) {
-    http_response_code(403);
-    echo json_encode(["success" => false, "message" => "Only on-site participants can create carpooling offers"]);
-    exit;
+if (!$isAdmin) {
+    if (!$participantId) {
+        http_response_code(403);
+        echo json_encode(["success" => false, "message" => "Only registered participants can create offers"]);
+        exit;
+    }
+
+    $isOnline = $_SESSION["is_online"] ?? null;
+    if ($isOnline) {
+        http_response_code(403);
+        echo json_encode(["success" => false, "message" => "Only on-site participants can create carpooling offers"]);
+        exit;
+    }
 }
 
 require_once __DIR__ . "/../../config.php";

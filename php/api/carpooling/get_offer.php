@@ -77,6 +77,20 @@ try {
         if ($requester) {
             $response['requester'] = $requester;
         }
+    } elseif (!$isOwner && $isAdmin && !$participantId) {
+        $adminId = $_SESSION["admin_id"] ?? null;
+        if ($adminId) {
+            $adminStmt = $pdo->prepare("SELECT email FROM admins WHERE id = ?");
+            $adminStmt->execute([$adminId]);
+            $admin = $adminStmt->fetch(PDO::FETCH_ASSOC);
+            if ($admin) {
+                $response['requester'] = [
+                    'first_name' => 'Admin',
+                    'last_name' => '',
+                    'email' => $admin['email'],
+                ];
+            }
+        }
     }
 
     echo json_encode($response);
