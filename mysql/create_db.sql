@@ -226,3 +226,27 @@ CREATE TABLE IF NOT EXISTS participant_food_restrictions (
       restriction <> 'other' OR (other_text IS NOT NULL AND LENGTH(TRIM(other_text)) > 0)
     )
 ) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- Carpooling Offers Table
+CREATE TABLE IF NOT EXISTS carpooling_offers (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    participant_id INT NOT NULL,
+    departure_location_key VARCHAR(100) NOT NULL,
+    departure_location_custom VARCHAR(255) DEFAULT NULL,
+    departure_date DATE NOT NULL,
+    departure_hour TINYINT UNSIGNED DEFAULT NULL CHECK (departure_hour IS NULL OR departure_hour BETWEEN 0 AND 23),
+    departure_minute TINYINT UNSIGNED DEFAULT NULL CHECK (departure_minute IS NULL OR departure_minute BETWEEN 0 AND 59),
+    destination VARCHAR(255) NOT NULL DEFAULT 'Conference venue',
+    total_seats TINYINT UNSIGNED NOT NULL CHECK (total_seats BETWEEN 1 AND 8),
+    luggage_capacity ENUM('unknown', 'small_bag', 'cabin_suitcase', 'large_suitcase', 'limited') NOT NULL DEFAULT 'unknown',
+    possible_detour BOOLEAN NOT NULL DEFAULT FALSE,
+    languages VARCHAR(255) DEFAULT NULL,
+    comments TEXT DEFAULT NULL,
+    admin_notes TEXT DEFAULT NULL,
+    status ENUM('open', 'full', 'cancelled') NOT NULL DEFAULT 'open',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (participant_id) REFERENCES participants(id) ON DELETE CASCADE,
+    INDEX idx_carpooling_offers_filters (departure_location_key, departure_date, status)
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

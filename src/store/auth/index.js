@@ -10,6 +10,7 @@ const loadAuthState = () => {
     role: null,
     participantId: null,
     adminId: null,
+    isOnlineParticipant: null,
   };
 };
 
@@ -26,9 +27,10 @@ const authSlice = createSlice({
     },
     setUser: (state, action) => {
       state.user = { ...action.payload };
-      state.role = action.payload.role || "participant"; // Default role
+      state.role = action.payload.role || "participant";
       state.participantId = action.payload.participant_id || null;
       state.adminId = action.payload.admin_id || null;
+      state.isOnlineParticipant = action.payload.is_online ?? null;
     },
     logout: (state) => {
       state.oauth = null;
@@ -37,6 +39,7 @@ const authSlice = createSlice({
       state.role = null;
       state.participantId = null;
       state.adminId = null;
+      state.isOnlineParticipant = null;
       localStorage.removeItem("session");
     },
   },
@@ -59,6 +62,7 @@ export const fetchUser = () => async (dispatch) => {
       participant_id: response.data.user?.participant_id || null,
       admin_id: response.data.user?.admin_id || null,
       is_admin: response.data.user?.is_admin || false,
+      is_online: response.data.user?.is_online ?? null,
     };
 
     dispatch(authActions.setUser(user));
@@ -76,6 +80,7 @@ export const authSelectors = {
   getUser: (state) => state.auth.user,
   isAdmin: (state) => !!state.auth.user?.is_admin,  
   isParticipant: (state) => !!state.auth.participantId,  
+  isOnlineParticipant: (state) => !!state.auth.isOnlineParticipant,
   isSoc: (state) => state.auth.user?.role === "soc",
   isLoc: (state) => state.auth.user?.role === "loc",
   isLoggedIn: (state) => !!state.auth.user,

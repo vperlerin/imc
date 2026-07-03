@@ -26,8 +26,8 @@ const UpdateRegistration = () => {
   let isOnline = false;
   const user = useSelector(authSelectors.getUser);
   const { control, register, handleSubmit, getValues, setValue, formState: { errors }, trigger, watch } = useForm();
- 
-  const { participant, loading: participantLoading } = useApiParticipant(participantId, isOnline,  fetchTrigger);
+
+  const { participant, loading: participantLoading } = useApiParticipant(participantId, isOnline, fetchTrigger);
   const { loading: specificDataLoading, sessions } = useApiSpecificData();
   const { logout, loading: logoutLoading } = useApiLogout();
   isOnline = participant?.participant?.is_online === "1";
@@ -145,20 +145,35 @@ const UpdateRegistration = () => {
               )}
             </p>
             {!isOnline && (
-            <div className="d-flex gap-2 mb-2"> 
-                <button
-                  className={classNames('btn fw-bolder', activeSection === "arrival" ? 'btn-primary' : 'btn-outline-primary')}
-                  onClick={() => setActiveSection(activeSection === "arrival" ? null : "arrival")}
-                >
-                  Travel Details
-                </button> 
-              <button
-                className={classNames('btn fw-bolder', activeSection === "contributions" ? 'btn-primary' : 'btn-outline-primary')}
-                onClick={() => setActiveSection(activeSection === "contributions" ? null : "contributions")}
-              >
-                Contributions
-              </button>
-            </div>
+              <>
+                <div className="d-flex flex-wrap gap-2 mb-3">
+                  <button
+                    type="button"
+                    className={classNames(
+                      'btn fw-bolder',
+                      activeSection === 'arrival' ? 'btn-primary' : 'btn-outline-primary'
+                    )}
+                    aria-expanded={activeSection === 'arrival'}
+                    aria-controls="travel-details-section"
+                    onClick={() => setActiveSection(activeSection === 'arrival' ? null : 'arrival')}
+                  >
+                    Travel Details
+                  </button>
+
+                  <button
+                    type="button"
+                    className={classNames(
+                      'btn fw-bolder',
+                      activeSection === 'contributions' ? 'btn-primary' : 'btn-outline-primary'
+                    )}
+                    aria-expanded={activeSection === 'contributions'}
+                    aria-controls="contributions-section"
+                    onClick={() => setActiveSection(activeSection === 'contributions' ? null : 'contributions')}
+                  >
+                    Contributions
+                  </button>
+                </div>
+              </>
             )}
 
             {errMsg && (
@@ -182,6 +197,27 @@ const UpdateRegistration = () => {
               </div>
             )}
           </div>
+
+          {!activeSection && !isOnline && (
+            <div className="alert alert-success mt-3" role="alert">
+              <div className="d-flex flex-column justify-content-between align-items-md-center gap-3">
+                <div>
+                  <span className="badge border border-success text-uppercase me-2">New</span> 
+                  <span className="fw-bolder">CARPOOLING</span>
+                  <p className="mt-2">We strongly encourage participants to use it to coordinate shared rides, as the conference is in a remote location with limited public transport options, and to help reduce fossil-fuel use.{' '}</p>
+                  <p>If you experience any issue, please <Link to="/contact" className="alert-link">contact us</Link> right away.</p>
+                </div>
+
+                <Link
+                  to="/location/carpooling"
+                  className="btn btn-outline-success fw-bolder text-nowrap "
+                  aria-label="Open the carpooling tool"
+                >
+                  Carpooling
+                </Link>
+              </div>
+            </div>
+          )}
 
           {(!!activeSection || isOnline) && (
             <div className="mt-2 position-relative">

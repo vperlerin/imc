@@ -14,6 +14,15 @@ const Travel = () => {
 
         <div className="alert alert-success fw-bolder">
           In the context of climate change and the necessity to reduce fossil-fuel use, we strongly encourage participants to choose lower-carbon travel options whenever possible. Please consider travelling by train and/or carpooling with other participants, especially for the final part of the journey to Barcelonnette.
+          <br />
+          <Link
+            aria-label="Carpooling"
+            className="btn btn-outline-success fw-bolder mt-2"
+            to="/location/carpooling"
+            title="Carpooling"
+          >
+            Carpooling
+          </Link>
         </div>
 
 
@@ -25,7 +34,7 @@ const Travel = () => {
           <br /><br />
           44.3900, 6.6423  /  44°23'24"N, 6°38'32"E
         </p>
- 
+
 
         <h4>By plane</h4>
         <p>The most convenient airport is usually <a href="https://www.marseille-airport.com/" target="_blank" rel="noopener noreferrer">Marseille Provence Airport (MRS)</a>. From there, you can either rent a car and drive to Barcelonnette, or continue by public transport via Marseille Saint-Charles and the regional ZOU! bus network.</p>

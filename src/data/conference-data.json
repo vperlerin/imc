@@ -54,7 +54,7 @@
         "beds": 2,
         "sort_order": 2,
         "type": "double"
-      }, 
+      },
       {
         "price": 350,
         "description": "Single room in the IMC host",
@@ -129,5 +129,49 @@
       "name": "IMC 2026 Team"
     }
   ],
-  "with_excursion": false
+  "with_excursion": false,
+  "carpooling": {
+    "locations": [
+      {
+        "key": "marseille-provence-airport",
+        "label": "Marseille Provence Airport"
+      },
+      {
+        "key": "marseille-saint-charles",
+        "label": "Marseille Saint-Charles station"
+      },
+      {
+        "key": "aix-en-provence-tgv",
+        "label": "Aix-en-Provence TGV station"
+      },
+      {
+        "key": "lyon-saint-exupery-airport",
+        "label": "Lyon Saint-Exupéry Airport"
+      },
+      {
+        "key": "lyon-part-dieu",
+        "label": "Lyon Part-Dieu station"
+      },
+      {
+        "key": "gap-station",
+        "label": "Gap station"
+      },
+      {
+        "key": "valence-tgv",
+        "label": "Valence TGV station"
+      },
+      {
+        "key": "paris-cdg",
+        "label": "Paris CDG airport"
+      },
+      {
+        "key": "paris-gare-lyon",
+        "label": "Paris Gare Lyon station"
+      },
+      {
+        "key": "paris-orly",
+        "label": "Paris Orly airport"
+      }
+    ]
+  }
 }

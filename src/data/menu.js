@@ -1,4 +1,5 @@
 import { conferenceData as cd } from "data/conference-data";
+ 
 
 const getWorkshopSubLinks = () => {
   if (!Array.isArray(cd?.workshops)) return [];
@@ -22,6 +23,7 @@ const getWorkshopSubLinks = () => {
 };
 
 const workshopSubLinks = getWorkshopSubLinks();
+const hasCarpooling = Array.isArray(cd?.carpooling?.locations) && cd.carpooling.locations.length > 0;
 
 export const menuItems = [
   {
@@ -50,6 +52,7 @@ export const menuItems = [
       { title: "Conference Venue", link: "/location/venue" },
       { title: "Extra Accommodations", link: "/location/extra" },
       { title: "Travel Info", link: "/location/travel" },
+      ...(hasCarpooling ? [{ isGreen: true, title: "Carpooling", link: "/location/carpooling" }] : []),
       { title: "Practical Info", link: "/location/practical" },
       { title: "Sights & Surroundings", link: "/location/surroundings" },
     ],

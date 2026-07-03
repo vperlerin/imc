@@ -2,9 +2,9 @@ import axios from "axios";
 import React, { useState } from "react";
 import Loader from "components/loader";
 import PasswordInput from "components/form/pwd";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, Link } from "react-router-dom";
-import { authActions, authSelectors } from "store/auth";
+import { useDispatch } from "react-redux";
+import { useNavigate, Link, useLocation } from "react-router-dom";
+import { authActions } from "store/auth";
 import classNames from "classnames";
 import css from "./index.module.scss";
 import cssForm from "styles/components/form.module.scss";
@@ -16,7 +16,12 @@ const Login = () => {
   const [error, setError] = useState(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const userRole = useSelector((state) => state.auth.role);
+  const location = useLocation();
+  const loginMessage = location.state?.message;
+  const from = location.state?.from;
+  const redirectPath = from
+    ? `${from.pathname || ""}${from.search || ""}${from.hash || ""}`
+    : null;
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -36,6 +41,11 @@ const Login = () => {
   
       dispatch(authActions.setSession("authenticated"));
       await dispatch(authActions.fetchUser());
+
+      if (redirectPath) {
+        navigate(redirectPath, { replace: true });
+        return;
+      }
   
       // Redirect user based on role
       switch (response.data.user.role) {
@@ -65,6 +75,7 @@ const Login = () => {
       {isLoading && <Loader />}
       <form onSubmit={handleSubmit} className={classNames(cssForm.xSmallW, "w-100 border p-3 rounded-2")}>
         {error && <div className="alert alert-danger fw-bolder">{error}</div>}
+        {loginMessage && <div className="alert alert-info fw-bolder">{loginMessage}</div>}
 
         <div className="mb-3">
           <label htmlFor="emailInput" className="form-label">Email address</label>

@@ -1,0 +1,19 @@
+"use strict";(self.webpackChunkimc2026=self.webpackChunkimc2026||[]).push([[9179],{
+/***/2827:
+/***/(s,l,i)=>{i.r(l),
+/* harmony export */i.d(l,{
+/* harmony export */default:()=>d
+/* harmony export */});
+/* harmony import */var a=i(8983),e=i(1448),t=i(7647),c=i(8057),o=(i(6540),i(4848));
+/* harmony import */const d=()=>{const s=(0/* .authSelectors */,e/* .useSelector */.d4)(a.Pg.isLoc),l=(0/* .authSelectors */,e/* .useSelector */.d4)(a.Pg.isSoc);
+return(0/* ["default"] */,o.jsxs)(t.A,{breadcrumb:[{url:"/admin/downloads",name:"Downloads"}],isMaxWidth:!0,title:"Downloads",children:[!s&&!l&&(0,o.jsxs)("div",{className:"mb-4",children:[(0,o.jsx)("h5",{className:"mb-3",children:"Finance"}),(0/* ["default"] */,o.jsx)(c.A,{className:"d-block fw-bolder",link:"https://imc2026.imo.net/php/doc_participants.php",subTitle:"(total cost, total paid, remaining dues…)",title:"Financial details"})]}),!l&&(0,o.jsxs)("div",{className:"mb-4",children:[(0,o.jsx)("h5",{className:"mb-3",children:"Accommodations & Arrivals"}),(0,o.jsxs)("div",{className:"d-flex flex-column flex-md-row gap-2",children:[(0/* ["default"] */,o.jsx)(c.A,{className:"d-block fw-bolder",link:"https://imc2026.imo.net/php/doc_accommodations.php",subTitle:"(registration type, food restrictions, roomates…)",title:"Accomodations"}),(0/* ["default"] */,o.jsx)(c.A,{className:"d-block fw-bolder",link:"https://imc2026.imo.net/php/doc_arrival.php",subTitle:"(arrival, departure…)",title:"Arrivals"})]})]}),!l&&(0,o.jsxs)("div",{className:"mb-4",children:[(0,o.jsx)("h5",{className:"mb-3",children:"Workshops"}),(0,o.jsxs)("div",{className:"d-flex flex-column flex-md-row gap-2",children:[(0/* ["default"] */,o.jsx)(c.A,{className:"d-block fw-bolder",link:"https://imc2026.imo.net/php/doc_workshops.php?workshop_id=1",subTitle:"(participants info)",title:"Spectrography Workshop Participants"}),(0/* ["default"] */,o.jsx)(c.A,{className:"d-block fw-bolder",link:"https://imc2026.imo.net/php/doc_workshops.php?workshop_id=2",subTitle:"(participants info)",title:"Radio Workshop Participants"})]})]}),(0,o.jsxs)("div",{className:"mb-4",children:[(0,o.jsx)("h5",{className:"mb-3",children:"Contributions"}),(0,o.jsxs)("div",{className:"d-flex gap-2",children:[(0/* ["default"] */,o.jsx)(c.A,{className:"d-block fw-bolder",link:"https://imc2026.imo.net/php/doc_posters.php",subTitle:"(full list of posters)",title:"Posters"}),(0/* ["default"] */,o.jsx)(c.A,{className:"d-block fw-bolder",link:"https://imc2026.imo.net/php/doc_talks.php",subTitle:"(full list of talks)",title:"Talks"})]})]}),(0,o.jsxs)("div",{className:"mb-4",children:[(0,o.jsx)("h5",{className:"mb-3",children:"T-shirts"}),(0,o.jsx)("div",{className:"d-flex gap-2",children:(0/* ["default"] */,o.jsx)(c.A,{className:"d-block fw-bolder",link:"https://imc2026.imo.net/php/doc_tshirts.php",subTitle:"(participants who wants a t-shirt with size)",title:"T-shirts"})})]})]})};
+/* harmony default export */}
+/***/,
+/***/8057:
+/***/(s,l,i)=>{
+/* harmony export */i.d(l,{
+/* harmony export */A:()=>c
+/* harmony export */});
+/* harmony import */var a=i(8027),e=(i(6540),i(4976),i(4848));
+/* harmony import */const t={xls:(0/* .FaFileExcel */,e.jsx)(a.Ru,{className:"mt-1"})},c=({className:s,format:l="xls",link:i,subTitle:a="",title:c="Download"})=>(0,e.jsxs)("a",{href:i,className:`btn btn-outline-success d-inline-flex align-items-start gap-2 ${s}`,"aria-label":`Download ${c} in ${l.toUpperCase()} format`,children:[t[l]||null,(0,e.jsxs)("div",{className:"d-flex flex-column align-items-start",children:[c,a&&(0,e.jsx)("span",{className:"text-muted fw-normal",children:a})]})]})}
+/***/}]);

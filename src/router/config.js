@@ -8,6 +8,8 @@ import ProtectedRoute from "hooks/protected-route";
 // Lazy-load pages using relative paths (Webpack resolves them correctly)
 const lazyPages = {
   Home: lazy(() => import("pages/home")),
+  Carpooling: lazy(() => import("pages/location/carpooling")),
+  CarpoolingOffer: lazy(() => import("pages/location/carpooling/offer")),
   Disclaimer: lazy(() => import("pages/disclaimer")),
   Contact: lazy(() => import("pages/contact")),
   Excursion: lazy(() => import("pages/community/excursion")),
@@ -57,8 +59,13 @@ const Placeholder = ({ title }) => (
   </div>
 );
 
+const CARPOOLING_LOGIN_MESSAGE = 'To access our Carpooling system, use the email address you used for registration and the password you received in your confirmation email. If you lost your password, click “Forgot your password?” and follow the instructions.';
+
 const routeConfig = [
   { path: "/", element: <lazyPages.Home /> },
+  { path: "/location/carpooling", element: <ProtectedRoute loginMessage={CARPOOLING_LOGIN_MESSAGE}><lazyPages.Carpooling /></ProtectedRoute> },
+  { path: "/location/carpooling/offer", element: <ProtectedRoute loginMessage={CARPOOLING_LOGIN_MESSAGE}><lazyPages.CarpoolingOffer /></ProtectedRoute> },
+  { path: "/location/carpooling/offer/:id", element: <ProtectedRoute loginMessage={CARPOOLING_LOGIN_MESSAGE}><lazyPages.CarpoolingOffer /></ProtectedRoute> },
   { path: "/disclaimer", element: <lazyPages.Disclaimer /> },
   { path: "/contact", element: <lazyPages.Contact /> },
   { path: "/community/excursion", element: <lazyPages.Excursion /> },

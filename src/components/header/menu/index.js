@@ -25,6 +25,7 @@ const Menu = ({ cd }) => {
   const isLoc = useSelector(authSelectors.isLoc);
   const isSoc = useSelector(authSelectors.isSoc);
   const isParticipant = useSelector(authSelectors.isParticipant);
+  const isOnlineParticipant = useSelector(authSelectors.isOnlineParticipant);
   const isLoggedIn = useSelector(authSelectors.isLoggedIn);
   const { logout, loading: logoutLoading, error: logoutError } = useApiLogout(); // Use logout hook
 
@@ -129,7 +130,7 @@ const Menu = ({ cd }) => {
                               key={sub.link}
                               onClick={onToggle}
                               to={sub.link}
-                              className={classnames(isSubActive && css.active)}
+                              className={classnames(isSubActive && css.active, sub.isGreen && 'fw-bolder text-success')}
                               title={sub.title}
                             >
                               {sub.title}
@@ -194,6 +195,18 @@ const Menu = ({ cd }) => {
                       title="Admin"
                     >
                       SOC Admin
+                    </Link>
+                  )}
+
+                  {isParticipant && !isOnlineParticipant && (
+                    <Link
+                      aria-label="Carpooling"
+                      className="btn btn-outline-success px-3 fw-bolder"
+                      to="/location/carpooling"
+                      onClick={(e) => { e.preventDefault();  goTo('/location/carpooling'); }}
+                      title="Carpooling"
+                    >
+                      Carpooling
                     </Link>
                   )}
 
