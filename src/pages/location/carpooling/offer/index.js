@@ -133,8 +133,8 @@ const CarpoolingOffer = () => {
           comments: offer.comments || '',
           status: offer.status || 'open',
         });
-      } catch {
-        setSubmitError('Failed to load the offer. Please try again.');
+      } catch (err) {
+        setSubmitError(err.response?.data?.message || 'Failed to load the offer. Please try again.');
       } finally {
         setLoadingOffer(false);
       }
@@ -214,8 +214,8 @@ const CarpoolingOffer = () => {
       } else {
         setSubmitError(response.data.message || 'Failed to save the offer.');
       }
-    } catch {
-      setSubmitError('An error occurred. Please try again.');
+    } catch (err) {
+      setSubmitError(err.response?.data?.message || 'An error occurred. Please try again.');
     } finally {
       setSubmitting(false);
     }

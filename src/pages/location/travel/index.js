@@ -13,8 +13,10 @@ const Travel = () => {
         <p>Barcelonnette is located in the Ubaye Valley, in the Alpes-de-Haute-Provence, in southeastern France. As there is no railway station in Barcelonnette itself, most public-transport journeys finish with a bus, taxi, or rental car from Gap or Marseille.</p>
 
         <div className="alert alert-success fw-bolder">
-          In the context of climate change and the necessity to reduce fossil-fuel use, we strongly encourage participants to choose lower-carbon travel options whenever possible. Please consider travelling by train and/or carpooling with other participants, especially for the final part of the journey to Barcelonnette.
-          <br />
+          <p>
+            In the context of climate change and the necessity to reduce fossil-fuel use, we strongly encourage participants to choose lower-carbon travel options whenever possible. Please consider travelling by train and/or carpooling with other participants, especially for the final part of the journey to Barcelonnette.
+          </p>
+          You can either offer a ride or contact a driver offering a ride to the conference venue using the carpooling system:<br />
           <Link
             aria-label="Carpooling"
             className="btn btn-outline-success fw-bolder mt-2"

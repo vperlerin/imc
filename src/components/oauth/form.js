@@ -27,18 +27,18 @@ const Login = () => {
     event.preventDefault();
     setError(null);
     setIsLoading(true);
-  
+
     try {
       const response = await axios.post(
         `${process.env.REACT_APP_API_URL}/auth/login.php`,
         { email, password },
         { headers: { "Content-Type": "application/json" }, withCredentials: true }
       );
-  
+
       if (!response.data?.success) {
         throw new Error(response.data?.message || "Invalid response from server");
       }
-  
+
       dispatch(authActions.setSession("authenticated"));
       await dispatch(authActions.fetchUser());
 
@@ -46,7 +46,7 @@ const Login = () => {
         navigate(redirectPath, { replace: true });
         return;
       }
-  
+
       // Redirect user based on role
       switch (response.data.user.role) {
         case "admin":
@@ -68,14 +68,29 @@ const Login = () => {
       setIsLoading(false);
     }
   };
-  
+
 
   return (
-    <div className={classNames(css.login, "flex-grow-1 d-flex h-100 align-items-center justify-content-center position-relative")}>
+    <div className={classNames(css.login, "flex-grow-1 d-flex flex-column h-100 align-items-center justify-content-center position-relative")}>
+
+      {loginMessage &&
+        <>
+          <p className="fw-bolder text-start w-100">
+            In the context of climate change and the need to reduce fossil-fuel use, we strongly encourage participants to choose lower-carbon travel options whenever possible, including carpooling.
+          </p>
+
+          <p className="text-start w-100">
+            Our Carpooling System allows you to either offer a ride or contact a driver offering a ride to the conference venue.
+          </p>
+          <div className="alert alert-info fw-bolder">{loginMessage}</div>
+        </>
+      }
+
+
       {isLoading && <Loader />}
       <form onSubmit={handleSubmit} className={classNames(cssForm.xSmallW, "w-100 border p-3 rounded-2")}>
         {error && <div className="alert alert-danger fw-bolder">{error}</div>}
-        {loginMessage && <div className="alert alert-info fw-bolder">{loginMessage}</div>}
+
 
         <div className="mb-3">
           <label htmlFor="emailInput" className="form-label">Email address</label>

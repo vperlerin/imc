@@ -94,7 +94,7 @@ const Carpooling = () => {
         setError(response.data.message || 'Failed to load offers.');
       }
     } catch (err) {
-      setError('Failed to load carpooling offers. Please try again.');
+      setError(err.response?.data?.message || 'Failed to load carpooling offers. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -126,8 +126,8 @@ const Carpooling = () => {
       } else {
         setAlert({ type: 'danger', message: response.data.message || 'Failed to delete offer.' });
       }
-    } catch {
-      setAlert({ type: 'danger', message: 'An error occurred while deleting the offer.' });
+    } catch (err) {
+      setAlert({ type: 'danger', message: err.response?.data?.message || 'An error occurred while deleting the offer.' });
     } finally {
       setDeletingId(null);
     }
@@ -159,40 +159,53 @@ const Carpooling = () => {
       const departureLabel = locationMap[offer.departure_location_key] || offer.departure_location_custom || offer.departure_location_key;
       const departureDateLabel = formatFullDate(offer.departure_date, true, false);
 
-      await sendEmail({
+      const driverEmail = await sendEmail({
         subject: 'Carpooling request for your conference ride offer',
         message:
-          `Hello ${offerData.driver_first_name},\n\n` +
-          `${requester.first_name} ${requester.last_name} is interested in your carpooling offer from ${departureLabel} on ${departureDateLabel}.\n\n` +
-          `For privacy and security reasons, participant contact details are not displayed directly on the website.\n\n` +
-          `You can reply directly to this email to contact ${requester.first_name} and arrange the ride.\n\n` +
-          `Best regards,\nThe IMC organizing team`,
+          `Hello ${offerData.driver_first_name},<br><br>` +
+          `${requester.first_name} ${requester.last_name} is interested in your carpooling offer from ${departureLabel} on ${departureDateLabel}.<br><br>` +
+          `For privacy and security reasons, participant contact details are not displayed directly on the website.<br><br>` +
+          `You can reply directly to this email to contact ${requester.first_name} and arrange the ride.<br><br>` +
+          `Best regards,<br>The IMC organizing team`,
         to: offerData.driver_email,
         toName: `${offerData.driver_first_name} ${offerData.driver_last_name}`,
         fromName: 'IMC 2026',
         replyTo: requester.email,
         replyName: `${requester.first_name} ${requester.last_name}`,
+        bcc: process.env.REACT_APP_BCC_ALL ? process.env.REACT_APP_BCC_ALL.split(',').map(email => ({ email, name: 'BCC Recipient' })) : [],
       });
 
-      await sendEmail({
+      if (!driverEmail.success) {
+        setAlert({ type: 'danger', message: driverEmail.message || 'Failed to send the contact email.' });
+        return;
+      }
+
+      const requesterEmail = await sendEmail({
         subject: 'Your carpooling request has been sent',
         message:
-          `Hello ${requester.first_name},\n\n` +
-          `Your interest in the carpooling offer from ${departureLabel} on ${departureDateLabel} has been sent to ${offerData.driver_first_name} ${offerData.driver_last_name}.\n\n` +
-          `They may contact you directly if they can offer you a seat.\n\n` +
-          `Best regards,\nThe IMC organizing team`,
+          `Hello ${requester.first_name},<br><br>` +
+          `Your interest in the carpooling offer from ${departureLabel} on ${departureDateLabel} has been sent to ${offerData.driver_first_name} ${offerData.driver_last_name}.<br><br>` +
+          `They may contact you directly if they can offer you a seat.<br><br>` +
+          `Best regards,<br>The IMC organizing team`,
         to: requester.email,
         toName: `${requester.first_name} ${requester.last_name}`,
         fromName: 'IMC 2026',
+        bcc: process.env.REACT_APP_BCC_ALL ? process.env.REACT_APP_BCC_ALL.split(',').map(email => ({ email, name: 'BCC Recipient' })) : [],
       });
+
+      if (!requesterEmail.success) {
+        setAlert({ type: 'warning', message: 'Your request was sent to the driver, but the confirmation email to you could not be delivered.' });
+        setContactedOffers((prev) => new Set(prev).add(offer.id));
+        return;
+      }
 
       setContactedOffers((prev) => new Set(prev).add(offer.id));
       setAlert({
         type: 'success',
         message: 'Your request has been sent to the participant who posted this offer.',
       });
-    } catch {
-      setAlert({ type: 'danger', message: 'An error occurred while sending the contact request.' });
+    } catch (err) {
+      setAlert({ type: 'danger', message: err.response?.data?.message || 'An error occurred while sending the contact request.' });
     } finally {
       setContactingId(null);
     }
@@ -207,38 +220,28 @@ const Carpooling = () => {
   return (
     <PageContain title="Carpooling">
       <div className="ps-md-3 mb-4">
-        <p>
-          In the context of climate change and the need to reduce fossil-fuel use, we strongly
-          encourage participants to choose lower-carbon travel options whenever possible, including
-          carpooling. On this page, confirmed on-site participants can offer available seats in their
-          car to help others reach the conference venue.
-        </p>
 
-        <p className="small text-muted">
+        <p >
           By using this carpooling feature, you agree that the information you submit may be shared
           only with confirmed on-site conference participants, and only for the purpose of organizing
           shared rides.
         </p>
 
-        <p className="small text-muted">
+        <p >
           This feature is intended solely to help confirmed on-site participants organize shared
           rides. Any misuse, inappropriate behavior, or abuse should be reported immediately to the
           Organizing Committee via the{' '}
-          <Link className="fw-bolder" to="/contact">contact form</Link>.
-        </p>
-
-        <p className="small text-muted fw-bolder">
+          <Link className="fw-bolder" to="/contact">contact form</Link>. 
           The IMO does not manage or take responsibility for any financial arrangements between
           drivers and passengers. We trust all participants to handle this matter responsibly,
           fairly, and respectfully.
         </p>
-
-        <p className="small text-muted">
-          Arrangements for return journeys after the conference should be coordinated directly
-          between participants during the conference.
+        <p>
+          <b>Arrangements for return journeys after the conference should be coordinated directly
+            between participants during the conference.</b>
         </p>
 
-        {isOnsiteParticipant && (
+        {(isOnsiteParticipant || isAdmin) && (
           <div className="d-flex justify-content-center my-4">
             <Link
               className="btn btn-outline-success fw-bolder px-4"
@@ -257,32 +260,35 @@ const Carpooling = () => {
       )}
 
       <div className={classNames(cssForm.smallW, 'mx-auto mb-4')}>
-        <div className="row g-2 mb-3">
-          <div className="col-sm-6">
-            <select
-              className="form-select"
-              value={filterDate}
-              onChange={(e) => setFilterDate(e.target.value)}
-            >
-              <option value="">All dates</option>
-              {availableDates.map(({ value, label }) => (
-                <option key={value} value={value}>{label}</option>
-              ))}
-            </select>
+
+        {hasAnyOffers && (
+          <div className="row g-2 mb-3">
+            <div className="col-sm-6">
+              <select
+                className="form-select"
+                value={filterDate}
+                onChange={(e) => setFilterDate(e.target.value)}
+              >
+                <option value="">All dates</option>
+                {availableDates.map(({ value, label }) => (
+                  <option key={value} value={value}>{label}</option>
+                ))}
+              </select>
+            </div>
+            <div className="col-sm-6">
+              <select
+                className="form-select"
+                value={filterLocation}
+                onChange={(e) => setFilterLocation(e.target.value)}
+              >
+                <option value="">All departure locations</option>
+                {carpoolingLocations.map(({ value, label }) => (
+                  <option key={value} value={value}>{label}</option>
+                ))}
+              </select>
+            </div>
           </div>
-          <div className="col-sm-6">
-            <select
-              className="form-select"
-              value={filterLocation}
-              onChange={(e) => setFilterLocation(e.target.value)}
-            >
-              <option value="">All departure locations</option>
-              {carpoolingLocations.map(({ value, label }) => (
-                <option key={value} value={value}>{label}</option>
-              ))}
-            </select>
-          </div>
-        </div>
+        )} 
 
         {loading && (
           <div className="text-center py-4">
@@ -305,102 +311,104 @@ const Carpooling = () => {
         )}
 
         {!loading && hasOffers && (
-          <div className="d-flex flex-column gap-3">
-            {filteredOffers.map((offer) => {
-              const isOwner = participantId && parseInt(offer.participant_id) === parseInt(participantId);
-              const canEdit = isOwner || isAdmin;
-              const departureLabel = locationMap[offer.departure_location_key] || offer.departure_location_custom || offer.departure_location_key;
-              const timeStr = formatTime(offer.departure_hour, offer.departure_minute);
-              const alreadyContacted = contactedOffers.has(offer.id);
+          <>
+            <h4 className="mt-3">Current offers to the conference venue</h4>
 
-              return (
-                <div key={offer.id} className="card">
-                  <div className="card-body">
-                    <div className="d-flex justify-content-between align-items-start mb-2">
-                      <h6 className="card-title mb-0 fw-bolder">
-                        {offer.driver_first_name} {offer.driver_last_name}
-                      </h6>
-                      {offer.status !== 'open' && (
-                        <span className={classNames(
-                          'badge',
-                          offer.status === 'full' ? 'bg-warning text-dark' : 'bg-secondary'
-                        )}>
-                          {offer.status}
-                        </span>
-                      )}
-                    </div>
+            <div className="d-flex flex-column gap-3">
+              {filteredOffers.map((offer) => {
+                const isOwner = participantId && parseInt(offer.participant_id) === parseInt(participantId);
+                const canEdit = isOwner || isAdmin;
+                const departureLabel = locationMap[offer.departure_location_key] || offer.departure_location_custom || offer.departure_location_key;
+                const timeStr = formatTime(offer.departure_hour, offer.departure_minute);
+                const alreadyContacted = contactedOffers.has(offer.id);
 
-                    <div className="row g-2 small mb-2">
-                      <div className="col-sm-6">
-                        <strong>From:</strong> {departureLabel}
+                return (
+                  <div key={offer.id} className="card">
+                    <div className="card-body">
+                      <div className="d-flex justify-content-between align-items-start mb-2">
+                        <h6 className="card-title mb-0 fw-bolder">
+                          {offer.driver_first_name} {offer.driver_last_name} - From {departureLabel}
+                        </h6>
+                        {offer.status !== 'open' && (
+                          <span className={classNames(
+                            'badge',
+                            offer.status === 'full' ? 'bg-warning text-dark' : 'bg-secondary'
+                          )}>
+                            {offer.status}
+                          </span>
+                        )}
                       </div>
-                      <div className="col-sm-6">
-                        <strong>To:</strong> {offer.destination || 'Conference venue'}
-                      </div>
-                      <div className="col-sm-6">
-                        <strong>Date:</strong> {formatFullDate(offer.departure_date, true, false)}
-                        {timeStr && ` at ${timeStr}`}
-                      </div>
-                      <div className="col-sm-6">
-                        <strong>Seats:</strong> {offer.total_seats}
-                      </div>
-                      <div className="col-sm-6">
-                        <strong>Luggage:</strong> {LUGGAGE_LABELS[offer.luggage_capacity] || offer.luggage_capacity}
-                      </div>
-                      <div className="col-sm-6">
-                        <strong>Detour possible:</strong> {offer.possible_detour ? 'Yes' : 'No'}
-                      </div>
-                      {offer.languages && (
+
+                      <div className="row g-2 small mb-2">
                         <div className="col-sm-6">
-                          <strong>Languages:</strong> {offer.languages}
+                          <strong>Date:</strong> {formatFullDate(offer.departure_date, true, false)}
+                          {timeStr && ` at ${timeStr}`}
                         </div>
-                      )}
-                    </div>
+                        <div className="col-sm-6">
+                          <strong>To:</strong> {offer.destination || 'Conference venue'}
+                        </div>
 
-                    {offer.comments && (
-                      <p className="small text-muted mb-2">{offer.comments}</p>
-                    )}
+                        <div className="col-sm-6">
+                          <strong>Seats:</strong> {offer.total_seats}
+                        </div>
+                        <div className="col-sm-6">
+                          <strong>Luggage:</strong> {LUGGAGE_LABELS[offer.luggage_capacity] || offer.luggage_capacity}
+                        </div>
+                        <div className="col-sm-6">
+                          <strong>Detour possible:</strong> {offer.possible_detour ? 'Yes' : 'No'}
+                        </div>
+                        {offer.languages && (
+                          <div className="col-sm-6">
+                            <strong>Languages:</strong> {offer.languages}
+                          </div>
+                        )}
+                      </div>
 
-                    <div className="d-flex gap-2 mt-2">
-                      {!isOwner && isOnsiteParticipant && (
-                        <button
-                          className={classNames(
-                            'btn btn-sm fw-bolder',
-                            alreadyContacted ? 'btn-secondary' : 'btn-outline-success'
-                          )}
-                          disabled={alreadyContacted || contactingId === offer.id}
-                          onClick={() => handleContact(offer)}
-                        >
-                          {contactingId === offer.id
-                            ? 'Sending...'
-                            : alreadyContacted
-                            ? 'Already contacted'
-                            : 'Contact'}
-                        </button>
+                      {offer.comments && (
+                        <p className="small mb-3">{offer.comments}</p>
                       )}
-                      {canEdit && (
-                        <>
-                          <Link
-                            className="btn btn-sm btn-outline-primary fw-bolder"
-                            to={`/location/carpooling/offer/${offer.id}`}
-                          >
-                            Edit
-                          </Link>
+
+                      <div className="d-flex gap-2 mt-2 justify-content-end">
+                        {!isOwner && (isOnsiteParticipant || isAdmin) && (
                           <button
-                            className="btn btn-sm btn-outline-danger fw-bolder"
-                            disabled={deletingId === offer.id}
-                            onClick={() => handleDelete(offer.id)}
+                            className={classNames(
+                              'btn  fw-bolder',
+                              alreadyContacted ? 'btn-secondary' : 'btn-outline-success'
+                            )}
+                            disabled={alreadyContacted || contactingId === offer.id}
+                            onClick={() => handleContact(offer)}
                           >
-                            {deletingId === offer.id ? 'Deleting...' : 'Delete'}
+                            {contactingId === offer.id
+                              ? 'Sending...'
+                              : alreadyContacted
+                                ? 'Already contacted'
+                                : 'Contact'}
                           </button>
-                        </>
-                      )}
+                        )}
+                        {canEdit && (
+                          <>
+                            <Link
+                              className="btn  btn-outline-primary fw-bolder"
+                              to={`/location/carpooling/offer/${offer.id}`}
+                            >
+                              Edit
+                            </Link>
+                            <button
+                              className="btn  btn-outline-danger fw-bolder"
+                              disabled={deletingId === offer.id}
+                              onClick={() => handleDelete(offer.id)}
+                            >
+                              {deletingId === offer.id ? 'Deleting...' : 'Delete'}
+                            </button>
+                          </>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          </>
         )}
       </div>
     </PageContain>
