@@ -35,12 +35,13 @@ if (!isset($_SESSION["user_id"])) {
 
 // Fetch user details from session
 $userData = [
-    "id" => $_SESSION["user_id"], // Always returns the participant ID if available
+    "id" => $_SESSION["user_id"],
     "email" => $_SESSION["email"],
     "is_admin" => $_SESSION["is_admin"] ?? false,
     "role" => $_SESSION["role"] ?? "participant",
     "participant_id" => $_SESSION["participant_id"] ?? null,
     "admin_id" => $_SESSION["admin_id"] ?? null,
+    "is_online" => $_SESSION["is_online"] ?? null,
 ];
 
 $response = [

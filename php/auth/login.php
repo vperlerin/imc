@@ -58,7 +58,7 @@ if (empty($email) || empty($password)) {
 function getUser($conn, $email, $table, $isAdminTable = false) {
     $query = $isAdminTable 
         ? "SELECT id, email, password_hash, role FROM `$table` WHERE email = ?" 
-        : "SELECT id, email, password_hash FROM `$table` WHERE email = ?";
+        : "SELECT id, email, password_hash, is_online FROM `$table` WHERE email = ?";
     
     $stmt = $conn->prepare($query);
     $stmt->bind_param("s", $email);
@@ -115,24 +115,26 @@ setcookie(session_name(), session_id(), [
     'samesite' => 'None'
 ]);
 
-$_SESSION["user_id"] = $user["id"]; // Always use participant ID if exists
+$_SESSION["user_id"] = $user["id"];
 $_SESSION["email"] = $user["email"];
 $_SESSION["is_admin"] = $isAdmin;
 $_SESSION["role"] = $userRole;
 $_SESSION["participant_id"] = $participantId;
 $_SESSION["admin_id"] = $adminId;
+$_SESSION["is_online"] = $participantUser ? (bool) $participantUser["is_online"] : null;
 
 // Return user info
 $response = [
     "success" => true,
     "message" => "Login successful",
     "user" => [
-        "id" => $user["id"], // Always use participant ID if available
+        "id" => $user["id"],
         "email" => $user["email"],
         "is_admin" => $isAdmin,
         "role" => $userRole,
         "participant_id" => $participantId,
-        "admin_id" => $adminId
+        "admin_id" => $adminId,
+        "is_online" => $_SESSION["is_online"]
     ]
 ];
 
