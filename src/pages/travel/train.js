@@ -75,30 +75,30 @@ const Train = ({ activeTab = "start" }) => {
                     <span className={css.routeSeparator} aria-hidden="true">&gt;</span>
                     <span>Gap station</span>
                   </td>
-                  <td data-label="Dep. Time">07h02</td>
-                  <td data-label="Arr. Time">10h56</td>
-                  <td data-label="Duration">3h54</td>
+                  <td data-label="Dep. Time">07:02</td>
+                  <td data-label="Arr. Time">10:56</td>
+                  <td data-label="Duration">3:54</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('45,60€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">12h33</td>
-                  <td data-label="Arr. Time">16h26</td>
-                  <td data-label="Duration">3h53</td>
+                  <td data-label="Dep. Time">12:33</td>
+                  <td data-label="Arr. Time">16:26</td>
+                  <td data-label="Duration">3:53</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('45,60€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">16h02</td>
-                  <td data-label="Arr. Time">19h58</td>
-                  <td data-label="Duration">3h56</td>
+                  <td data-label="Dep. Time">16:02</td>
+                  <td data-label="Arr. Time">19:58</td>
+                  <td data-label="Duration">3:56</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('45,60€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">17h59</td>
-                  <td data-label="Arr. Time">21h57</td>
-                  <td data-label="Duration">3h58</td>
+                  <td data-label="Dep. Time">17:59</td>
+                  <td data-label="Arr. Time">21:57</td>
+                  <td data-label="Duration">3:58</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('45,60€')}</td>
                 </tr>
@@ -111,30 +111,30 @@ const Train = ({ activeTab = "start" }) => {
                     <span className={css.routeSeparator} aria-hidden="true">&gt;</span>
                     <span>Gap station</span>
                   </td>
-                  <td data-label="Dep. Time">07h41</td>
-                  <td data-label="Arr. Time">10h56</td>
-                  <td data-label="Duration">3h15</td>
+                  <td data-label="Dep. Time">07:41</td>
+                  <td data-label="Arr. Time">10:56</td>
+                  <td data-label="Duration">3:15</td>
                   <td data-label="Change">Direct</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('34,00€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">13h11</td>
-                  <td data-label="Arr. Time">16h26</td>
-                  <td data-label="Duration">3h15</td>
+                  <td data-label="Dep. Time">13:11</td>
+                  <td data-label="Arr. Time">16:26</td>
+                  <td data-label="Duration">3:15</td>
                   <td data-label="Change">Direct</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('34,00€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">16h41</td>
-                  <td data-label="Arr. Time">19h58</td>
-                  <td data-label="Duration">3h17</td>
+                  <td data-label="Dep. Time">16:41</td>
+                  <td data-label="Arr. Time">19:58</td>
+                  <td data-label="Duration">3:17</td>
                   <td data-label="Change">Direct</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('34,00€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">18h41</td>
-                  <td data-label="Arr. Time">21h57</td>
-                  <td data-label="Duration">3h16</td>
+                  <td data-label="Dep. Time">18:41</td>
+                  <td data-label="Arr. Time">21:57</td>
+                  <td data-label="Duration">3:16</td>
                   <td data-label="Change">Direct</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('34,00€')}</td>
                 </tr>
@@ -147,37 +147,37 @@ const Train = ({ activeTab = "start" }) => {
                     <span className={css.routeSeparator} aria-hidden="true">&gt;</span>
                     <span>Gap station</span>
                   </td>
-                  <td data-label="Dep. Time">10h44</td>
-                  <td data-label="Arr. Time">16h26</td>
-                  <td data-label="Duration">5h42</td>
+                  <td data-label="Dep. Time">10:44</td>
+                  <td data-label="Arr. Time">16:26</td>
+                  <td data-label="Duration">5:42</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('40 to 50€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">15h52</td>
-                  <td data-label="Arr. Time">19h58</td>
-                  <td data-label="Duration">4h06</td>
+                  <td data-label="Dep. Time">15:52</td>
+                  <td data-label="Arr. Time">19:58</td>
+                  <td data-label="Duration">4:06</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('40 to 50€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">16h10</td>
-                  <td data-label="Arr. Time">20h29</td>
-                  <td data-label="Duration">4h19</td>
+                  <td data-label="Dep. Time">16:10</td>
+                  <td data-label="Arr. Time">20:29</td>
+                  <td data-label="Duration">4:19</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('60 to 90€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">17h44</td>
-                  <td data-label="Arr. Time">21h57</td>
-                  <td data-label="Duration">4h13</td>
+                  <td data-label="Dep. Time">17:44</td>
+                  <td data-label="Arr. Time">21:57</td>
+                  <td data-label="Duration">4:13</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('40 to 50€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">18h28</td>
-                  <td data-label="Arr. Time">22h33</td>
-                  <td data-label="Duration">4h05</td>
+                  <td data-label="Dep. Time">18:28</td>
+                  <td data-label="Arr. Time">22:33</td>
+                  <td data-label="Duration">4:05</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('60 to 90€')}</td>
                 </tr>
@@ -190,30 +190,30 @@ const Train = ({ activeTab = "start" }) => {
                     <span className={css.routeSeparator} aria-hidden="true">&gt;</span>
                     <span>Gap station</span>
                   </td>
-                  <td data-label="Dep. Time">09h14</td>
-                  <td data-label="Arr. Time">12h52</td>
-                  <td data-label="Duration">3h38</td>
+                  <td data-label="Dep. Time">09:14</td>
+                  <td data-label="Arr. Time">12:52</td>
+                  <td data-label="Duration">3:38</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('45 to 50€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">14h10</td>
-                  <td data-label="Arr. Time">18h39</td>
-                  <td data-label="Duration">4h29</td>
+                  <td data-label="Dep. Time">14:10</td>
+                  <td data-label="Arr. Time">18:39</td>
+                  <td data-label="Duration">4:29</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('45 to 50€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">14h37</td>
-                  <td data-label="Arr. Time">19h58</td>
-                  <td data-label="Duration">5h21</td>
+                  <td data-label="Dep. Time">14:37</td>
+                  <td data-label="Arr. Time">19:58</td>
+                  <td data-label="Duration">5:21</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('45 to 50€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">19h19</td>
-                  <td data-label="Arr. Time">22h33</td>
-                  <td data-label="Duration">3h14</td>
+                  <td data-label="Dep. Time">19:19</td>
+                  <td data-label="Arr. Time">22:33</td>
+                  <td data-label="Duration">3:14</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('55 to 70€')}</td>
                 </tr>
@@ -226,58 +226,58 @@ const Train = ({ activeTab = "start" }) => {
                     <span className={css.routeSeparator} aria-hidden="true">&gt;</span>
                     <span>Gap station</span>
                   </td>
-                  <td data-label="Dep. Time">06h16</td>
-                  <td data-label="Arr. Time">10h43</td>
-                  <td data-label="Duration">4h27</td>
+                  <td data-label="Dep. Time">06:16</td>
+                  <td data-label="Arr. Time">10:43</td>
+                  <td data-label="Duration">4:27</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('~50€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">08h20</td>
-                  <td data-label="Arr. Time">12h52</td>
-                  <td data-label="Duration">4h32</td>
+                  <td data-label="Dep. Time">08:20</td>
+                  <td data-label="Arr. Time">12:52</td>
+                  <td data-label="Duration">4:32</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('~50€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">08h45</td>
-                  <td data-label="Arr. Time">13h09</td>
-                  <td data-label="Duration">4h24</td>
+                  <td data-label="Dep. Time">08:45</td>
+                  <td data-label="Arr. Time">13:09</td>
+                  <td data-label="Duration">4:24</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('~50€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">11h10</td>
-                  <td data-label="Arr. Time">16h10</td>
-                  <td data-label="Duration">5h00</td>
+                  <td data-label="Dep. Time">11:10</td>
+                  <td data-label="Arr. Time">16:10</td>
+                  <td data-label="Duration">5:00</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('~50€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">13h10</td>
-                  <td data-label="Arr. Time">17h21</td>
-                  <td data-label="Duration">4h11</td>
+                  <td data-label="Dep. Time">13:10</td>
+                  <td data-label="Arr. Time">17:21</td>
+                  <td data-label="Duration">4:11</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('65 to 80€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">14h16</td>
-                  <td data-label="Arr. Time">18h39</td>
-                  <td data-label="Duration">4h23</td>
+                  <td data-label="Dep. Time">14:16</td>
+                  <td data-label="Arr. Time">18:39</td>
+                  <td data-label="Duration">4:23</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('~50€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">16h20</td>
-                  <td data-label="Arr. Time">20h29</td>
-                  <td data-label="Duration">4h09</td>
+                  <td data-label="Dep. Time">16:20</td>
+                  <td data-label="Arr. Time">20:29</td>
+                  <td data-label="Duration">4:09</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('~50€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">18h39</td>
-                  <td data-label="Arr. Time">22h33</td>
-                  <td data-label="Duration">3h54</td>
+                  <td data-label="Dep. Time">18:39</td>
+                  <td data-label="Arr. Time">22:33</td>
+                  <td data-label="Duration">3:54</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('~50€')}</td>
                 </tr>
@@ -290,44 +290,44 @@ const Train = ({ activeTab = "start" }) => {
                     <span className={css.routeSeparator} aria-hidden="true">&gt;</span>
                     <span>Gap station</span>
                   </td>
-                  <td data-label="Dep. Time">06h54</td>
-                  <td data-label="Arr. Time">10h43</td>
-                  <td data-label="Duration">3h49</td>
+                  <td data-label="Dep. Time">06:54</td>
+                  <td data-label="Arr. Time">10:43</td>
+                  <td data-label="Duration">3:49</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('41,40€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">09h55</td>
-                  <td data-label="Arr. Time">12h52</td>
-                  <td data-label="Duration">2h57</td>
+                  <td data-label="Dep. Time">09:55</td>
+                  <td data-label="Arr. Time">12:52</td>
+                  <td data-label="Duration">2:57</td>
                   <td data-label="Change">Direct</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('34,20€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">12h25</td>
-                  <td data-label="Arr. Time">16h10</td>
-                  <td data-label="Duration">3h45</td>
+                  <td data-label="Dep. Time">12:25</td>
+                  <td data-label="Arr. Time">16:10</td>
+                  <td data-label="Duration">3:45</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('41,40€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">14h26</td>
-                  <td data-label="Arr. Time">17h21</td>
-                  <td data-label="Duration">2h55</td>
+                  <td data-label="Dep. Time">14:26</td>
+                  <td data-label="Arr. Time">17:21</td>
+                  <td data-label="Duration">2:55</td>
                   <td data-label="Change">Direct</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('34,20€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">17h47</td>
-                  <td data-label="Arr. Time">20h29</td>
-                  <td data-label="Duration">2h42</td>
+                  <td data-label="Dep. Time">17:47</td>
+                  <td data-label="Arr. Time">20:29</td>
+                  <td data-label="Duration">2:42</td>
                   <td data-label="Change">Direct</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('34,20€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">19h57</td>
-                  <td data-label="Arr. Time">22h33</td>
-                  <td data-label="Duration">2h36</td>
+                  <td data-label="Dep. Time">19:57</td>
+                  <td data-label="Arr. Time">22:33</td>
+                  <td data-label="Duration">2:36</td>
                   <td data-label="Change">Direct</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('34,20€')}</td>
                 </tr>
@@ -340,52 +340,52 @@ const Train = ({ activeTab = "start" }) => {
                     <span className={css.routeSeparator} aria-hidden="true">&gt;</span>
                     <span>Gap station</span>
                   </td>
-                  <td data-label="Dep. Time">08h30</td>
-                  <td data-label="Arr. Time">16h26</td>
-                  <td data-label="Duration">7h56</td>
+                  <td data-label="Dep. Time">08:30</td>
+                  <td data-label="Arr. Time">16:26</td>
+                  <td data-label="Duration">7:56</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('90 to 110€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">09h57</td>
-                  <td data-label="Arr. Time">17h21</td>
-                  <td data-label="Duration">7h24</td>
+                  <td data-label="Dep. Time">09:57</td>
+                  <td data-label="Arr. Time">17:21</td>
+                  <td data-label="Duration">7:24</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('100 to 150€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">11h58</td>
-                  <td data-label="Arr. Time">18h39</td>
-                  <td data-label="Duration">6h41</td>
+                  <td data-label="Dep. Time">11:58</td>
+                  <td data-label="Arr. Time">18:39</td>
+                  <td data-label="Duration">6:41</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('85 to 130€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">12h35</td>
-                  <td data-label="Arr. Time">19h58</td>
-                  <td data-label="Duration">7h23</td>
+                  <td data-label="Dep. Time">12:35</td>
+                  <td data-label="Arr. Time">19:58</td>
+                  <td data-label="Duration">7:23</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('~70€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">13h57</td>
-                  <td data-label="Arr. Time">20h29</td>
-                  <td data-label="Duration">6h32</td>
+                  <td data-label="Dep. Time">13:57</td>
+                  <td data-label="Arr. Time">20:29</td>
+                  <td data-label="Duration">6:32</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('~70€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">16h31</td>
-                  <td data-label="Arr. Time">22h33</td>
-                  <td data-label="Duration">6h02</td>
+                  <td data-label="Dep. Time">16:31</td>
+                  <td data-label="Arr. Time">22:33</td>
+                  <td data-label="Duration">6:02</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('~100€')}</td>
                 </tr>
 
                 <tr>
-                  <td data-label="Dep. Time">07h14</td>
-                  <td data-label="Arr. Time">12h52</td>
-                  <td data-label="Duration">5h38</td>
+                  <td data-label="Dep. Time">07:14</td>
+                  <td data-label="Arr. Time">12:52</td>
+                  <td data-label="Duration">5:38</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('75 to 90€')}</td>
                 </tr>
@@ -397,37 +397,37 @@ const Train = ({ activeTab = "start" }) => {
                     <span className={css.routeSeparator} aria-hidden="true">&gt;</span>
                     <span>Gap station</span>
                   </td>
-                  <td data-label="Dep. Time">11h46</td>
-                  <td data-label="Arr. Time">17h21</td>
-                  <td data-label="Duration">5h35</td>
+                  <td data-label="Dep. Time">11:46</td>
+                  <td data-label="Arr. Time">17:21</td>
+                  <td data-label="Duration">5:35</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('50 to 70€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">12h14</td>
-                  <td data-label="Arr. Time">18h39</td>
-                  <td data-label="Duration">6h25</td>
+                  <td data-label="Dep. Time">12:14</td>
+                  <td data-label="Arr. Time">18:39</td>
+                  <td data-label="Duration">6:25</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('60 to 90€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">12h38</td>
-                  <td data-label="Arr. Time">19h58</td>
-                  <td data-label="Duration">7h20</td>
+                  <td data-label="Dep. Time">12:38</td>
+                  <td data-label="Arr. Time">19:58</td>
+                  <td data-label="Duration">7:20</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('70 to 100€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">14h42</td>
-                  <td data-label="Arr. Time">20h29</td>
-                  <td data-label="Duration">5h47</td>
+                  <td data-label="Dep. Time">14:42</td>
+                  <td data-label="Arr. Time">20:29</td>
+                  <td data-label="Duration">5:47</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('100 to 140€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">17h14</td>
-                  <td data-label="Arr. Time">22h33</td>
-                  <td data-label="Duration">5h19</td>
+                  <td data-label="Dep. Time">17:14</td>
+                  <td data-label="Arr. Time">22:33</td>
+                  <td data-label="Duration">5:19</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('100 to 140€')}</td>
                 </tr>
@@ -459,44 +459,44 @@ const Train = ({ activeTab = "start" }) => {
                     <span className={css.routeSeparator} aria-hidden="true">&gt;</span>
                     <span>Marseille Provence Airport</span>
                   </td>
-                  <td data-label="Dep. Time">06h20</td>
-                  <td data-label="Arr. Time">10h24</td>
-                  <td data-label="Duration">4h04</td>
+                  <td data-label="Dep. Time">06:20</td>
+                  <td data-label="Arr. Time">10:24</td>
+                  <td data-label="Duration">4:04</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('45.60€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">09h40</td>
-                  <td data-label="Arr. Time">13h44</td>
-                  <td data-label="Duration">4h04</td>
+                  <td data-label="Dep. Time">09:40</td>
+                  <td data-label="Arr. Time">13:44</td>
+                  <td data-label="Duration">4:04</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('45.60€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">09h58</td>
-                  <td data-label="Arr. Time">15h00</td>
-                  <td data-label="Duration">5h02</td>
+                  <td data-label="Dep. Time">09:58</td>
+                  <td data-label="Arr. Time">15:00</td>
+                  <td data-label="Duration">5:02</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('45.60€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">14h05</td>
-                  <td data-label="Arr. Time">18h03</td>
-                  <td data-label="Duration">3h58</td>
+                  <td data-label="Dep. Time">14:05</td>
+                  <td data-label="Arr. Time">18:03</td>
+                  <td data-label="Duration">3:58</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('45.60€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">15h24</td>
-                  <td data-label="Arr. Time">20h00</td>
-                  <td data-label="Duration">4h36</td>
+                  <td data-label="Dep. Time">15:24</td>
+                  <td data-label="Arr. Time">20:00</td>
+                  <td data-label="Duration">4:36</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('45.60€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">18h41</td>
-                  <td data-label="Arr. Time">22h59</td>
-                  <td data-label="Duration">4h18</td>
+                  <td data-label="Dep. Time">18:41</td>
+                  <td data-label="Arr. Time">22:59</td>
+                  <td data-label="Duration">4:18</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('45.60€')}</td>
                 </tr>
@@ -509,37 +509,37 @@ const Train = ({ activeTab = "start" }) => {
                     <span className={css.routeSeparator} aria-hidden="true">&gt;</span>
                     <span>Marseille Saint-Charles station</span>
                   </td>
-                  <td data-label="Dep. Time">06h20</td>
-                  <td data-label="Arr. Time">09h49</td>
-                  <td data-label="Duration">3h29</td>
+                  <td data-label="Dep. Time">06:20</td>
+                  <td data-label="Arr. Time">09:49</td>
+                  <td data-label="Duration">3:29</td>
                   <td data-label="Change">Direct</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('34.00€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">09h40</td>
-                  <td data-label="Arr. Time">12h49</td>
-                  <td data-label="Duration">3h09</td>
+                  <td data-label="Dep. Time">09:40</td>
+                  <td data-label="Arr. Time">12:49</td>
+                  <td data-label="Duration">3:09</td>
                   <td data-label="Change">Direct</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('34.00€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">14h05</td>
-                  <td data-label="Arr. Time">17h19</td>
-                  <td data-label="Duration">3h14</td>
+                  <td data-label="Dep. Time">14:05</td>
+                  <td data-label="Arr. Time">17:19</td>
+                  <td data-label="Duration">3:14</td>
                   <td data-label="Change">Direct</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('34.00€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">15h24</td>
-                  <td data-label="Arr. Time">18h49</td>
-                  <td data-label="Duration">3h25</td>
+                  <td data-label="Dep. Time">15:24</td>
+                  <td data-label="Arr. Time">18:49</td>
+                  <td data-label="Duration">3:25</td>
                   <td data-label="Change">Direct</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('34.00€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">18h41</td>
-                  <td data-label="Arr. Time">21h49</td>
-                  <td data-label="Duration">3h08</td>
+                  <td data-label="Dep. Time">18:41</td>
+                  <td data-label="Arr. Time">21:49</td>
+                  <td data-label="Duration">3:08</td>
                   <td data-label="Change">Direct</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('34.00€')}</td>
                 </tr>
@@ -552,58 +552,58 @@ const Train = ({ activeTab = "start" }) => {
                     <span className={css.routeSeparator} aria-hidden="true">&gt;</span>
                     <span>Aix-en-Provence TGV station</span>
                   </td>
-                  <td data-label="Dep. Time">06h20</td>
-                  <td data-label="Arr. Time">10h32</td>
-                  <td data-label="Duration">4h12</td>
+                  <td data-label="Dep. Time">06:20</td>
+                  <td data-label="Arr. Time">10:32</td>
+                  <td data-label="Duration">4:12</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('40 to 50€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">07h29</td>
-                  <td data-label="Arr. Time">12h41</td>
-                  <td data-label="Duration">5h12</td>
+                  <td data-label="Dep. Time">07:29</td>
+                  <td data-label="Arr. Time">12:41</td>
+                  <td data-label="Duration">5:12</td>
                   <td data-label="Change">2</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('80 to 110€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">09h40</td>
-                  <td data-label="Arr. Time">13h44</td>
-                  <td data-label="Duration">4h04</td>
+                  <td data-label="Dep. Time">09:40</td>
+                  <td data-label="Arr. Time">13:44</td>
+                  <td data-label="Duration">4:04</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('40 to 50€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">09h58</td>
-                  <td data-label="Arr. Time">14h49</td>
-                  <td data-label="Duration">4h51</td>
+                  <td data-label="Dep. Time">09:58</td>
+                  <td data-label="Arr. Time">14:49</td>
+                  <td data-label="Duration">4:51</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('60 to 80€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">14h05</td>
-                  <td data-label="Arr. Time">18h25</td>
-                  <td data-label="Duration">4h20</td>
+                  <td data-label="Dep. Time">14:05</td>
+                  <td data-label="Arr. Time">18:25</td>
+                  <td data-label="Duration">4:20</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('40 to 50€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">14h25</td>
-                  <td data-label="Arr. Time">19h59</td>
-                  <td data-label="Duration">5h34</td>
+                  <td data-label="Dep. Time">14:25</td>
+                  <td data-label="Arr. Time">19:59</td>
+                  <td data-label="Duration">5:34</td>
                   <td data-label="Change">2</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('~80€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">15h24</td>
-                  <td data-label="Arr. Time">20h24</td>
-                  <td data-label="Duration">5h00</td>
+                  <td data-label="Dep. Time">15:24</td>
+                  <td data-label="Arr. Time">20:24</td>
+                  <td data-label="Duration">5:00</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('40 to 50€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">16h28</td>
-                  <td data-label="Arr. Time">22h41</td>
-                  <td data-label="Duration">6h13</td>
+                  <td data-label="Dep. Time">16:28</td>
+                  <td data-label="Arr. Time">22:41</td>
+                  <td data-label="Duration">6:13</td>
                   <td data-label="Change">2</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('90 to 120€')}</td>
                 </tr>
@@ -616,37 +616,37 @@ const Train = ({ activeTab = "start" }) => {
                     <span className={css.routeSeparator} aria-hidden="true">&gt;</span>
                     <span>Lyon Saint-Exupéry airport/TGV</span>
                   </td>
-                  <td data-label="Dep. Time">09h58</td>
-                  <td data-label="Arr. Time">15h20</td>
-                  <td data-label="Duration">5h22</td>
+                  <td data-label="Dep. Time">09:58</td>
+                  <td data-label="Arr. Time">15:20</td>
+                  <td data-label="Duration">5:22</td>
                   <td data-label="Change">2</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('80 to 100€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">11h52</td>
-                  <td data-label="Arr. Time">15h49</td>
-                  <td data-label="Duration">3h57</td>
+                  <td data-label="Dep. Time">11:52</td>
+                  <td data-label="Arr. Time">15:49</td>
+                  <td data-label="Duration">3:57</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('45 to 50€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">14h25</td>
-                  <td data-label="Arr. Time">17h49</td>
-                  <td data-label="Duration">3h24</td>
+                  <td data-label="Dep. Time">14:25</td>
+                  <td data-label="Arr. Time">17:49</td>
+                  <td data-label="Duration">3:24</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('60 to 80€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">16h28</td>
-                  <td data-label="Arr. Time">19h42</td>
-                  <td data-label="Duration">3h14</td>
+                  <td data-label="Dep. Time">16:28</td>
+                  <td data-label="Arr. Time">19:42</td>
+                  <td data-label="Duration">3:14</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('60 to 80€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">17h47</td>
-                  <td data-label="Arr. Time">21h48</td>
-                  <td data-label="Duration">4h01</td>
+                  <td data-label="Dep. Time">17:47</td>
+                  <td data-label="Arr. Time">21:48</td>
+                  <td data-label="Duration">4:01</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('45 to 50€')}</td>
                 </tr>
@@ -659,44 +659,44 @@ const Train = ({ activeTab = "start" }) => {
                     <span className={css.routeSeparator} aria-hidden="true">&gt;</span>
                     <span>Lyon Part-Dieu station</span>
                   </td>
-                  <td data-label="Dep. Time">07h29</td>
-                  <td data-label="Arr. Time">11h48</td>
-                  <td data-label="Duration">4h19</td>
+                  <td data-label="Dep. Time">07:29</td>
+                  <td data-label="Arr. Time">11:48</td>
+                  <td data-label="Duration">4:19</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('65 to 80€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">09h58</td>
-                  <td data-label="Arr. Time">14h40</td>
-                  <td data-label="Duration">4h42</td>
+                  <td data-label="Dep. Time">09:58</td>
+                  <td data-label="Arr. Time">14:40</td>
+                  <td data-label="Duration">4:42</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('~ 50€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">11h52</td>
-                  <td data-label="Arr. Time">16h44</td>
-                  <td data-label="Duration">4h52</td>
+                  <td data-label="Dep. Time">11:52</td>
+                  <td data-label="Arr. Time">16:44</td>
+                  <td data-label="Duration">4:52</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('~ 50€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">14h25</td>
-                  <td data-label="Arr. Time">18h44</td>
-                  <td data-label="Duration">4h19</td>
+                  <td data-label="Dep. Time">14:25</td>
+                  <td data-label="Arr. Time">18:44</td>
+                  <td data-label="Duration">4:19</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('~ 50€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">16h28</td>
-                  <td data-label="Arr. Time">20h02</td>
-                  <td data-label="Duration">3h34</td>
+                  <td data-label="Dep. Time">16:28</td>
+                  <td data-label="Arr. Time">20:02</td>
+                  <td data-label="Duration">3:34</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('65 to 80€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">17h47</td>
-                  <td data-label="Arr. Time">22h44</td>
-                  <td data-label="Duration">4h57</td>
+                  <td data-label="Dep. Time">17:47</td>
+                  <td data-label="Arr. Time">22:44</td>
+                  <td data-label="Duration">4:57</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('~ 50€')}</td>
                 </tr>
@@ -709,51 +709,51 @@ const Train = ({ activeTab = "start" }) => {
                     <span className={css.routeSeparator} aria-hidden="true">&gt;</span>
                     <span>Valence TGV station</span>
                   </td>
-                  <td data-label="Dep. Time">07h29</td>
-                  <td data-label="Arr. Time">10h15</td>
-                  <td data-label="Duration">2h46</td>
+                  <td data-label="Dep. Time">07:29</td>
+                  <td data-label="Arr. Time">10:15</td>
+                  <td data-label="Duration">2:46</td>
                   <td data-label="Change">Direct</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('34.20€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">09h58</td>
-                  <td data-label="Arr. Time">12h50</td>
-                  <td data-label="Duration">2h52</td>
+                  <td data-label="Dep. Time">09:58</td>
+                  <td data-label="Arr. Time">12:50</td>
+                  <td data-label="Duration">2:52</td>
                   <td data-label="Change">Direct</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('34.20€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">11h52</td>
-                  <td data-label="Arr. Time">16h33</td>
-                  <td data-label="Duration">4h41</td>
+                  <td data-label="Dep. Time">11:52</td>
+                  <td data-label="Arr. Time">16:33</td>
+                  <td data-label="Duration">4:41</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('41.40€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">14h25</td>
-                  <td data-label="Arr. Time">18h33</td>
-                  <td data-label="Duration">4h08</td>
+                  <td data-label="Dep. Time">14:25</td>
+                  <td data-label="Arr. Time">18:33</td>
+                  <td data-label="Duration">4:08</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('41.40€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">16h28</td>
-                  <td data-label="Arr. Time">19h11</td>
-                  <td data-label="Duration">2h43</td>
+                  <td data-label="Dep. Time">16:28</td>
+                  <td data-label="Arr. Time">19:11</td>
+                  <td data-label="Duration">2:43</td>
                   <td data-label="Change">Direct</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('34.20€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">17h47</td>
-                  <td data-label="Arr. Time">21h33</td>
-                  <td data-label="Duration">3h46</td>
+                  <td data-label="Dep. Time">17:47</td>
+                  <td data-label="Arr. Time">21:33</td>
+                  <td data-label="Duration">3:46</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('41.40€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">18h57</td>
-                  <td data-label="Arr. Time">22h50</td>
-                  <td data-label="Duration">3h53</td>
+                  <td data-label="Dep. Time">18:57</td>
+                  <td data-label="Arr. Time">22:50</td>
+                  <td data-label="Duration">3:53</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('41.40€')}</td>
                 </tr>
@@ -766,44 +766,44 @@ const Train = ({ activeTab = "start" }) => {
                     <span className={css.routeSeparator} aria-hidden="true">&gt;</span>
                     <span>Paris CDG airport/TGV</span>
                   </td>
-                  <td data-label="Dep. Time">06h20</td>
-                  <td data-label="Arr. Time">16h02</td>
-                  <td data-label="Duration">9h42</td>
+                  <td data-label="Dep. Time">06:20</td>
+                  <td data-label="Arr. Time">16:02</td>
+                  <td data-label="Duration">9:42</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('150 to 250€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">07h29</td>
-                  <td data-label="Arr. Time">16h02</td>
-                  <td data-label="Duration">8h33</td>
+                  <td data-label="Dep. Time">07:29</td>
+                  <td data-label="Arr. Time">16:02</td>
+                  <td data-label="Duration">8:33</td>
                   <td data-label="Change">2</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('180 to 250€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">09h58</td>
-                  <td data-label="Arr. Time">17h34</td>
-                  <td data-label="Duration">7h36</td>
+                  <td data-label="Dep. Time">09:58</td>
+                  <td data-label="Arr. Time">17:34</td>
+                  <td data-label="Duration">7:36</td>
                   <td data-label="Change">2</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('105 to 130€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">11h52</td>
-                  <td data-label="Arr. Time">18h57</td>
-                  <td data-label="Duration">7h05</td>
+                  <td data-label="Dep. Time">11:52</td>
+                  <td data-label="Arr. Time">18:57</td>
+                  <td data-label="Duration">7:05</td>
                   <td data-label="Change">2</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('150 to 230€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">14h25</td>
-                  <td data-label="Arr. Time">20h27</td>
-                  <td data-label="Duration">6h02</td>
+                  <td data-label="Dep. Time">14:25</td>
+                  <td data-label="Arr. Time">20:27</td>
+                  <td data-label="Duration">6:02</td>
                   <td data-label="Change">2</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('90 to 140€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">16h28</td>
-                  <td data-label="Arr. Time">22h02</td>
-                  <td data-label="Duration">5h34</td>
+                  <td data-label="Dep. Time">16:28</td>
+                  <td data-label="Arr. Time">22:02</td>
+                  <td data-label="Duration">5:34</td>
                   <td data-label="Change">2</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('100 to 130€')}</td>
                 </tr>
@@ -816,44 +816,44 @@ const Train = ({ activeTab = "start" }) => {
                     <span className={css.routeSeparator} aria-hidden="true">&gt;</span>
                     <span>Paris Gare de Lyon station</span>
                   </td>
-                  <td data-label="Dep. Time">07h29</td>
-                  <td data-label="Arr. Time">13h58</td>
-                  <td data-label="Duration">6h29</td>
+                  <td data-label="Dep. Time">07:29</td>
+                  <td data-label="Arr. Time">13:58</td>
+                  <td data-label="Duration">6:29</td>
                   <td data-label="Change">2</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('120 to 140€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">09h58</td>
-                  <td data-label="Arr. Time">16h12</td>
-                  <td data-label="Duration">6h14</td>
+                  <td data-label="Dep. Time">09:58</td>
+                  <td data-label="Arr. Time">16:12</td>
+                  <td data-label="Duration">6:14</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('150 to 220€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">11h52</td>
-                  <td data-label="Arr. Time">17h46</td>
-                  <td data-label="Duration">5h54</td>
+                  <td data-label="Dep. Time">11:52</td>
+                  <td data-label="Arr. Time">17:46</td>
+                  <td data-label="Duration">5:54</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('150 to 160€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">14h25</td>
-                  <td data-label="Arr. Time">19h46</td>
-                  <td data-label="Duration">5h21</td>
+                  <td data-label="Dep. Time">14:25</td>
+                  <td data-label="Arr. Time">19:46</td>
+                  <td data-label="Duration">5:21</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('140 to 150€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">16h28</td>
-                  <td data-label="Arr. Time">21h46</td>
-                  <td data-label="Duration">5h18</td>
+                  <td data-label="Dep. Time">16:28</td>
+                  <td data-label="Arr. Time">21:46</td>
+                  <td data-label="Duration">5:18</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('150 to 210€')}</td>
                 </tr>
                 <tr>
-                  <td data-label="Dep. Time">17h47</td>
-                  <td data-label="Arr. Time">23h50</td>
-                  <td data-label="Duration">6h03</td>
+                  <td data-label="Dep. Time">17:47</td>
+                  <td data-label="Arr. Time">23:50</td>
+                  <td data-label="Duration">6:03</td>
                   <td data-label="Change">1</td>
                   <td data-label="Ind. Price" className={css.price}>{sncfPriceLink('80 to 100€')}</td>
                 </tr>
