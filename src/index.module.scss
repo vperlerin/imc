@@ -69,7 +69,8 @@ html {
   font-weight: 900;
 }
 
-:global {  
+:global {   
+
   .modal-backdrop {
     --bs-backdrop-bg: #CCCCCC; // modal overlay
   }

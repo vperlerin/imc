@@ -103,7 +103,7 @@ const Venue = () => {
             <Link
               aria-label="Travel information"
               className="fw-bolder"
-              to="/location/travel"
+              to="/travel"
               title="Travel information"
             >
               Travel information

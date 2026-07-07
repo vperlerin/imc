@@ -202,8 +202,8 @@ const Menu = ({ cd }) => {
                     <Link
                       aria-label="Carpooling"
                       className="btn btn-outline-success px-3 fw-bolder"
-                      to="/location/carpooling"
-                      onClick={(e) => { e.preventDefault();  goTo('/location/carpooling'); }}
+                      to="/travel/carpooling"
+                      onClick={(e) => { e.preventDefault();  goTo('/travel/carpooling'); }}
                       title="Carpooling"
                     >
                       Carpooling

@@ -209,7 +209,7 @@ const UpdateRegistration = () => {
                 </div>
 
                 <Link
-                  to="/location/carpooling"
+                  to="/travel/carpooling"
                   className="btn btn-outline-success fw-bolder text-nowrap "
                   aria-label="Open the carpooling tool"
                 >

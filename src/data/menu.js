@@ -1,5 +1,5 @@
 import { conferenceData as cd } from "data/conference-data";
- 
+
 
 const getWorkshopSubLinks = () => {
   if (!Array.isArray(cd?.workshops)) return [];
@@ -23,7 +23,9 @@ const getWorkshopSubLinks = () => {
 };
 
 const workshopSubLinks = getWorkshopSubLinks();
-const hasCarpooling = Array.isArray(cd?.carpooling?.locations) && cd.carpooling.locations.length > 0;
+const hasCarpooling =
+  Array.isArray(cd?.carpooling?.locations) &&
+  cd.carpooling.locations.length > 0;
 
 export const menuItems = [
   {
@@ -41,8 +43,10 @@ export const menuItems = [
     subLinks: [
       { title: "Participants", link: "/community/participants" },
       { title: "Excursion", link: "/community/excursion" },
-      { title: "Scientific and Local Organizing Committee", link: "/community/soc" },
-
+      {
+        title: "Scientific and Local Organizing Committee",
+        link: "/community/soc",
+      },
     ],
   },
   {
@@ -51,10 +55,19 @@ export const menuItems = [
     subLinks: [
       { title: "Conference Venue", link: "/location/venue" },
       { title: "Extra Accommodations", link: "/location/extra" },
-      { title: "Travel Info", link: "/location/travel" },
-      ...(hasCarpooling ? [{ isGreen: true, title: "Carpooling", link: "/location/carpooling" }] : []),
       { title: "Practical Info", link: "/location/practical" },
       { title: "Sights & Surroundings", link: "/location/surroundings" },
+    ],
+  },
+  {
+    title: "Travel",
+    link: "/travel",
+    subLinks: [
+      { title: "Travel Info", link: "/travel" },
+      { title: "Train ", link: "/travel/train" },
+      ...(hasCarpooling
+        ? [{ isGreen: true, title: "Carpooling", link: "/travel/carpooling" }]
+        : []),
     ],
   },
   {

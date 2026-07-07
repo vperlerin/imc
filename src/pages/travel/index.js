@@ -10,35 +10,40 @@ const Travel = () => {
       <div className="ps-md-3 mb-5">
 
         <h3>How to reach Barcelonnette</h3>
-        <p>Barcelonnette is located in the Ubaye Valley, in the Alpes-de-Haute-Provence, in southeastern France. As there is no railway station in Barcelonnette itself, most public-transport journeys finish with a bus, taxi, or rental car from Gap or Marseille.</p>
+        <p className="fw-bolder">Barcelonnette is located in the Ubaye Valley, in the Alpes-de-Haute-Provence, in southeastern France. As there is no railway station in Barcelonnette itself, most public-transport journeys finish with a bus, taxi, or rental car from Gap or Marseille.</p>
+        <p className="mb-1">The address of the LOC venue is:</p>
 
-        <div className="alert alert-success fw-bolder">
-          <p>
-            In the context of climate change and the necessity to reduce fossil-fuel use, we strongly encourage participants to choose lower-carbon travel options whenever possible. Please consider travelling by train and/or carpooling with other participants, especially for the final part of the journey to Barcelonnette.
-          </p>
-          You can either offer a ride or contact a driver offering a ride to the conference venue using the carpooling system:<br />
-          <Link
-            aria-label="Carpooling"
-            className="btn btn-outline-success fw-bolder mt-2"
-            to="/location/carpooling"
-            title="Carpooling"
-          >
-            Carpooling
-          </Link>
+        <div className="d-flex gap-2 gap-md-4 flex-column flex-md-row align-items-stretch"> 
+          <blockquote className="flex-grow-1 flex-shrink-0 border rounded-2 p-3"><strong>Pôle d'accueil universitaire Séolane</strong><br />
+            Quartier du 11e BCA, Chemin des Casernes<br />
+            04400 Barcelonnette<br />
+            France
+            <br /><br />
+            44.3900, 6.6423 <br /> 44°23'24"N, 6°38'32"E
+          </blockquote>
+
+          <div className="flex-grow-1">
+            <div className="alert alert-success bg-transparent">
+              <p className="fw-bolder">
+                In the context of climate change and the necessity to reduce fossil-fuel use, we strongly encourage participants to choose lower-carbon travel options whenever possible. Please consider travelling by train and/or carpooling with other participants, especially for the final part of the journey to Barcelonnette.
+              </p>
+              You can either offer a ride or contact a driver offering a ride to the conference venue using the Carpooling ride-sharing board:
+              <div className="text-center">
+                <Link
+                  aria-label="Carpooling"
+                  className="btn btn-outline-success fw-bolder mt-2"
+                  to="/travel/carpooling"
+                  title="Carpooling"
+                >
+                  Carpooling
+                </Link>
+              </div>
+            </div>
+          </div>
         </div>
 
 
-        <p>The address of the LOC venue is:</p>
-        <p><strong>Pôle d'accueil universitaire Séolane</strong><br />
-          Quartier du 11è BCA, Chemin des Casernes<br />
-          04400 Barcelonnette<br />
-          France
-          <br /><br />
-          44.3900, 6.6423  /  44°23'24"N, 6°38'32"E
-        </p>
-
-
-        <h4>By plane</h4>
+        <h4 className="mt-4">By plane</h4>
         <p>The most convenient airport is usually <a href="https://www.marseille-airport.com/" target="_blank" rel="noopener noreferrer">Marseille Provence Airport (MRS)</a>. From there, you can either rent a car and drive to Barcelonnette, or continue by public transport via Marseille Saint-Charles and the regional ZOU! bus network.</p>
 
         Possible airport options:
@@ -57,12 +62,14 @@ const Travel = () => {
         </ul>
 
 
-        <h4>By train</h4>
+        <h4 className="mt-4">By train</h4>
         <p>The nearest practical railway station is Gap Gare SNCF. From Gap, Barcelonnette can be reached by bus line 535 (around 1 hour 30 minutes — although we do not yet know if this option will still be available in September), taxi, or rental car.</p>
 
         <p><b>Important:</b> the earlier you buy your train tickets, the cheaper they usually are.</p>
 
-        <p><a href="https://www.sncf-connect.com/en-en" target="_blank" rel="noopener noreferrer">Suggested train routes:</a></p>
+        <p className="border p-3 rounded-2"> You can find detailed train options for <Link className="fw-bolder" to="/travel/train/start">arrival at Gap station on September 24</Link> and <Link className="fw-bolder" to="/travel/train/end">departure from Gap station on September 27</Link>. </p>
+
+        <p className="fw-bolder">Suggested train routes:</p>
         <ul>
           <li>From Paris: take a daytime train from Paris Gare de Lyon, usually with a connection in Valence-Ville or Grenoble. Duration: between 5h40 and 8h30. Prices from around €60.</li>
           <li>From Marseille: take a regional TER train from Marseille Saint-Charles to Gap Gare SNCF. Duration: between 3h15 and 5h50. Prices from around €34.</li>
@@ -71,7 +78,7 @@ const Travel = () => {
         </ul>
 
 
-        <h4>By car</h4>
+        <h4 className="mt-4">By car</h4>
         <p>Approximate driving times to Barcelonnette:</p>
         <ul>
           <li><a href="https://www.google.fr/maps/dir/Marseille+Provence+Airport,+rd+20,+13700+Marignane/Barcelonnette,+04400/@43.9674956,5.2732107,207722m/data=!3m1!1e3!4m14!4m13!1m5!1m1!1s0x12c9e5fde9ee1837:0xe273ff8b8f69ff2e!2m2!1d5.2144565!2d43.4383502!1m5!1m1!1s0x12cc91992a2e9357:0xbcf809d3270f6cbe!2m2!1d6.6503651!2d44.3857245!3e0?entry=ttu&g_ep=EgoyMDI2MDYxNi4wIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener noreferrer">From Marseille</a>: about 3 hours / 210 km</li>
@@ -86,7 +93,7 @@ const Travel = () => {
 
 
 
-        <h4 className="mt-4">Parking</h4>
+        <h4 className="mt-4" className="mt-4">Parking</h4>
         <div className="ps-md-3">
           <p>You can park for free in front of the venue. </p>
         </div>

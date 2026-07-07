@@ -1,0 +1,276 @@
+@use 'styles/index' as *;
+
+// -----------------------------------------------------------------------------
+// Design tokens — derived from the page background (var(--imc-bg) / #1c1c29)
+// so the card reads as "on top of" the page rather than a hardcoded color.
+// -----------------------------------------------------------------------------
+$train-card-bg: color-mix(in srgb, var(--imc-bg) 85%, white 15%);
+$train-header-bg: color-mix(in srgb, var(--imc-bg) 70%, white 8%);
+$train-border: color-mix(in srgb, var(--imc-bg) 60%, white 18%);
+$train-text: #f4f4f8;
+$train-text-muted: #a9a9bd;
+$train-accent: #ffb648;
+$train-radius: 10px;
+
+.travelTableWrapper {
+  border-radius: $train-radius;
+  overflow-x: auto;
+  padding: 0.5rem;
+
+  @include media-breakpoint-down(md) {
+    background-color: transparent;
+    border: none;
+    padding: 0;
+  }
+}
+
+.travelTable {
+  width: 100%;
+  border-collapse: collapse;
+  color: $train-text;
+  font-size: 0.9375rem;
+  box-sizing: border-box;
+
+  * {
+    box-sizing: border-box;
+  }
+
+  caption {
+    caption-side: top;
+    display: block;
+    text-align: left;
+    padding: 0.5rem 0.75rem 1rem;
+    font-style: italic;
+    font-size: 0.85rem;
+    width: 100%;
+  }
+
+  thead th {
+    text-align: left;
+    padding: 0.75rem;
+    background-color: $train-header-bg;
+    color: $train-text-muted;
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    font-weight: 600;
+    border-bottom: 2px solid $train-border;
+    white-space: nowrap;
+
+    // numeric column, aligned right for scannability
+    &:last-child {
+      text-align: right;
+    }
+  }
+
+  tbody td {
+    padding: 0.65rem 0.75rem;
+    border-bottom: 1px solid $train-border;
+    vertical-align: top;
+  }
+
+  tbody tr:hover td {
+    background-color: rgba(255, 255, 255, 0.03);
+  }
+
+  .departure,
+  .arrival {
+    font-weight: 600;
+    vertical-align: top;
+  }
+
+  .arrival {
+    border-right: 1px solid $train-border;
+  }
+
+  .route {
+    display: none;
+  }
+
+  .price {
+    font-weight: bolder;
+    text-align: right;
+  }
+
+  // ---------------------------------------------------------------------
+  // Grouping: the markup only expresses "same departure" via rowSpan, which
+  // has no DOM boundary to hang a block on. :has() lets us detect a group's
+  // first row (contains td.departure) and its last row (the row right
+  // before the next group's first row, or simply the final row) so the
+  // whole run of <tr> reads as a single bracketed block on desktop too.
+  // ---------------------------------------------------------------------
+  tbody tr:has(> td.departure) {
+    border-top: 2px solid $train-border;
+  }
+
+  tbody tr:first-child {
+    border-top: none;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Mobile (< md): table semantics are dropped in favor of one card per
+// departure group. data-label attributes (already on every <td>) become the
+// visible labels via ::before.
+// -----------------------------------------------------------------------------
+.travelTable {
+  @include media-breakpoint-down(md) {
+    display: block;
+
+    thead {
+      display: none;
+    }
+
+    tbody {
+      display: block;
+    }
+
+    tr {
+      display: flex;
+      flex-wrap: wrap;
+      background-color: $train-card-bg;
+      border-left: 1px solid $train-border;
+      border-right: 1px solid $train-border;
+      column-gap: 0;
+      padding: 0 0.55rem;
+    }
+
+    td {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: flex-start;
+      width: 25%;
+      min-width: 0;
+      padding: 0.45rem 0.2rem 0.5rem;
+      border-bottom: none;
+      font-size: 0.9rem;
+      line-height: 1.2;
+
+      &::before {
+        content: attr(data-label);
+        color: $train-text-muted;
+        font-size: 0.65rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin-bottom: 0.22rem;
+        flex-shrink: 0;
+      }
+    }
+
+    td[data-label="Dep. Time"]::before {
+      content: "Dep.";
+    }
+
+    td[data-label="Arr. Time"]::before {
+      content: "Arr.";
+    }
+
+    td[data-label="Duration"]::before {
+      content: "Dur.";
+    }
+
+    td[data-label="Ind. Price"]::before {
+      content: "Price";
+    }
+
+    td[data-label="Change"] {
+      display: none;
+    }
+
+    .price {
+      align-items: flex-end;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    // First row of a group: card top edge.
+    tr:has(> td.departure) {
+      margin-top: 1rem;
+      border-top: 1px solid $train-border;
+      border-top-left-radius: $train-radius;
+      border-top-right-radius: $train-radius;
+      padding-top: 0.6rem;
+    }
+
+    tr:first-child {
+      margin-top: 0;
+    }
+
+    // Every row after the group's first one is another departure time for
+    // the same route — give it a divider so the entries within a block
+    // stay legible without looking like separate cards.
+    tr:not(:has(> td.departure)) {
+      border-top: 1px dashed $train-border;
+      padding-top: 0.4rem;
+    }
+
+    // Last row of a group: either the row right before the next group's
+    // header row, or the very last row in the table.
+    tr:has(+ tr > td.departure),
+    tr:last-child {
+      border-bottom: 1px solid $train-border;
+      border-bottom-left-radius: $train-radius;
+      border-bottom-right-radius: $train-radius;
+      padding-bottom: 0.6rem;
+    }
+
+    .route {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      flex-direction: row;
+      gap: 0.45rem;
+      width: 100%;
+      padding: 0 0 0.55rem;
+      margin-bottom: 0.15rem;
+      border-bottom: 1px solid $train-border;
+      color: $train-text;
+      font-size: 1rem;
+      font-weight: 700;
+
+      &::before {
+        content: none;
+      }
+    }
+
+    .routeSeparator {
+      color: $train-accent;
+      flex-shrink: 0;
+    }
+
+    .departure,
+    .arrival {
+      display: none;
+    }
+  }
+}
+
+
+@include media-breakpoint-down(md) {
+  .tabs {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    align-items: center;
+    width: 100% !important;
+    padding: 0 1rem;
+    border: none medium;
+
+    a {
+      border: 1px solid var(--bs-nav-tabs-border-color) !important;
+      border-radius: var(--bs-nav-tabs-border-radius) !important;
+      flex-grow: 1;
+    }
+
+    li {
+      text-align: center;
+      width: 100% !important;
+    }
+    
+    .active {
+      background-color: #000;
+    }
+
+  }
+}

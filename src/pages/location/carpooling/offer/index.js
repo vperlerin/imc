@@ -109,7 +109,7 @@ const CarpoolingOffer = () => {
         const isOwner = participantId && parseInt(offer.participant_id) === parseInt(participantId);
 
         if (!isOwner && !isAdmin) {
-          navigate('/location/carpooling', { replace: true });
+          navigate('/travel/carpooling', { replace: true });
           return;
         }
 
@@ -201,7 +201,7 @@ const CarpoolingOffer = () => {
       }
 
       if (response.data.success) {
-        navigate('/location/carpooling', {
+        navigate('/travel/carpooling', {
           state: {
             alert: {
               type: 'success',
@@ -450,7 +450,7 @@ const CarpoolingOffer = () => {
           )}
 
           <div className="d-flex justify-content-between align-items-center mt-4">
-            <Link to="/location/carpooling" className="btn btn-outline-secondary fw-bolder">
+            <Link to="/travel/carpooling" className="btn btn-outline-secondary fw-bolder">
               Back
             </Link>
             <button

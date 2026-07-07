@@ -74,15 +74,11 @@ const Login = () => {
     <div className={classNames(css.login, "flex-grow-1 d-flex flex-column h-100 align-items-center justify-content-center position-relative")}>
 
       {loginMessage &&
-        <>
-          <p className="fw-bolder text-start w-100">
-            In the context of climate change and the need to reduce fossil-fuel use, we strongly encourage participants to choose lower-carbon travel options whenever possible, including carpooling.
-          </p>
-
-          <p className="text-start w-100">
-            Our Carpooling System allows you to either offer a ride or contact a driver offering a ride to the conference venue.
-          </p>
+        <>  
           <div className="alert alert-info fw-bolder">{loginMessage}</div>
+          <p className="fw-bolder text-start w-100">
+            Our Carpooling ride-sharing board allows you to either offer a ride or contact a driver offering a ride to the conference venue.
+          </p>
         </>
       }
 

@@ -245,7 +245,7 @@ const Carpooling = () => {
           <div className="d-flex justify-content-center my-4">
             <Link
               className="btn btn-outline-success fw-bolder px-4"
-              to="/location/carpooling/offer"
+              to="/travel/carpooling/offer"
             >
               Offer a ride
             </Link>
@@ -389,7 +389,7 @@ const Carpooling = () => {
                           <>
                             <Link
                               className="btn  btn-outline-primary fw-bolder"
-                              to={`/location/carpooling/offer/${offer.id}`}
+                              to={`/travel/carpooling/offer/${offer.id}`}
                             >
                               Edit
                             </Link>

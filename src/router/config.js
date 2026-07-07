@@ -30,7 +30,8 @@ const lazyPages = {
   ResetPassword: lazy(() => import("pages/password/reset.js")),
   Soc: lazy(() => import("pages/community/soc")),
   Surroundings: lazy(() => import("pages/community/surroundings")),
-  Travel: lazy(() => import("pages/location/travel")),
+  Train: lazy(() => import("pages/travel/train")),
+  Travel: lazy(() => import("pages/travel")),
   Topics: lazy(() => import("pages/submission/topics")),
   UpdateRegistration: lazy(() => import("pages/update-registration")),
   Venue: lazy(() => import("pages/location/venue")),
@@ -59,13 +60,13 @@ const Placeholder = ({ title }) => (
   </div>
 );
 
-const CARPOOLING_LOGIN_MESSAGE = 'To access our Carpooling system, use the email address you used for registration and the password you received in your confirmation email. If you lost your password, click “Forgot your password?” and follow the instructions.';
+const CARPOOLING_LOGIN_MESSAGE = 'To access our Carpooling ride-sharing board, use the email address you used for registration and the password you received in your confirmation email. If you lost your password, click “Forgot your password?” and follow the instructions.';
 
 const routeConfig = [
   { path: "/", element: <lazyPages.Home /> },
-  { path: "/location/carpooling", element: <ProtectedRoute loginMessage={CARPOOLING_LOGIN_MESSAGE}><lazyPages.Carpooling /></ProtectedRoute> },
-  { path: "/location/carpooling/offer", element: <ProtectedRoute loginMessage={CARPOOLING_LOGIN_MESSAGE}><lazyPages.CarpoolingOffer /></ProtectedRoute> },
-  { path: "/location/carpooling/offer/:id", element: <ProtectedRoute loginMessage={CARPOOLING_LOGIN_MESSAGE}><lazyPages.CarpoolingOffer /></ProtectedRoute> },
+  { path: "/travel/carpooling", element: <ProtectedRoute loginMessage={CARPOOLING_LOGIN_MESSAGE}><lazyPages.Carpooling /></ProtectedRoute> },
+  { path: "/travel/carpooling/offer", element: <ProtectedRoute loginMessage={CARPOOLING_LOGIN_MESSAGE}><lazyPages.CarpoolingOffer /></ProtectedRoute> },
+  { path: "/travel/carpooling/offer/:id", element: <ProtectedRoute loginMessage={CARPOOLING_LOGIN_MESSAGE}><lazyPages.CarpoolingOffer /></ProtectedRoute> },
   { path: "/disclaimer", element: <lazyPages.Disclaimer /> },
   { path: "/contact", element: <lazyPages.Contact /> },
   { path: "/community/excursion", element: <lazyPages.Excursion /> },
@@ -76,7 +77,10 @@ const routeConfig = [
   { path: "/login", element: <lazyPages.Login /> },
   { path: "/location/extra", element: <lazyPages.Extra /> },
   { path: "/location/practical", element: <lazyPages.Practical /> },
-  { path: "/location/travel", element: <lazyPages.Travel /> },
+  { path: "/travel", element: <lazyPages.Travel /> },
+  { path: "/travel/train", element: <lazyPages.Train activeTab="start" /> },
+  { path: "/travel/train/start", element: <lazyPages.Train activeTab="start" /> },
+  { path: "/travel/train/end", element: <lazyPages.Train activeTab="end" /> },
   { path: "/location/venue", element: <lazyPages.Venue /> },
   { path: "/location/surroundings", element: <lazyPages.Surroundings /> },
   { path: "/program", element: <lazyPages.Program /> },
