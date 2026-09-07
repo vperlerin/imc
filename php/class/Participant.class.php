@@ -421,7 +421,7 @@ class ParticipantManager
             $this->pdo->beginTransaction();
 
             // 1. Handle boolean fields (without can_be_public)
-            $booleanFields = ['is_online', 'confirmation_sent'];
+            $booleanFields = ['is_online', 'is_early_bird', 'confirmation_sent'];
             foreach ($booleanFields as $field) {
                 if (!isset($data[$field])) {
                     $data[$field] = 0;
@@ -494,7 +494,7 @@ class ParticipantManager
                 ':country' => $data['country'],
                 ':organization' => $data['organization'] ?? null,
                 ':is_online' => $data['is_online'],
-                ':is_early_bird' => filter_var($data['is_early_bird'], FILTER_VALIDATE_BOOLEAN),
+                ':is_early_bird' => $data['is_early_bird'],
                 ':confirmation_sent' => $data['confirmation_sent'],
                 ':password_hash' => $passwordHash,
                 ':paypal_fee' => $data['paypal_fee'] ?? 0,
@@ -654,7 +654,7 @@ class ParticipantManager
                 ':city' => $data['city'],
                 ':country' => $data['country'],
                 ':organization' => $data['organization'] ?? null,
-                ':is_online' => 'FALSE',
+                ':is_online' => $data['is_online'],
                 ':paypal_fee' => $data['paypal_fee'],
                 ':comments' => $data['comments'] ?? null,
                 ':payment_method_id' => (int) ($data['payment_method_id'] ?? 0),
@@ -932,8 +932,8 @@ class ParticipantManager
                 ':email' => $data['email'],
                 ':country' => $data['country'],
                 ':organization' => $data['organization'] ?? null,
-                ':is_online' => filter_var($data['is_online'], FILTER_VALIDATE_BOOLEAN),
-                ':is_early_bird' => filter_var($data['is_early_bird'], FILTER_VALIDATE_BOOLEAN),
+                ':is_online' => $data['is_online'],
+                ':is_early_bird' => $data['is_early_bird'],
                 ':paypal_fee' => $data['paypal_fee'],
                 ':comments' => $data['comments'] ?? null,
                 ':payment_method_id' => (int) ($data['payment_method_id'] ?? 0),
@@ -1130,7 +1130,7 @@ class ParticipantManager
             $query .= " AND p.confirmation_sent = 1";
             $query .= " ORDER BY p.country, p.last_name, p.first_name";
         } else {
-            $query .= " GROUP BY p.id ORDER BY 
+            $query .= " ORDER BY
                     CASE 
                         WHEN p.confirmation_sent = 1 AND p.confirmation_date IS NOT NULL THEN 1 
                         ELSE 0 
@@ -1194,7 +1194,11 @@ class ParticipantManager
                 WHERE sub_pay.participant_id = pay.participant_id
             )
         ) AS pm ON pm.participant_id = p.id
-        LEFT JOIN accommodation acc ON acc.participant_id = p.id
+        LEFT JOIN accommodation acc ON acc.id = (
+              SELECT MAX(acc_latest.id)
+              FROM accommodation acc_latest
+              WHERE acc_latest.participant_id = p.id
+          )
         LEFT JOIN registration_types rt ON rt.id = acc.registration_type_id
         WHERE p.is_online = 0 AND $statusCondition
     ";
@@ -1203,7 +1207,7 @@ class ParticipantManager
             $query .= " AND p.confirmation_sent = 1";
             $query .= " ORDER BY p.country, p.last_name, p.first_name";
         } else {
-            $query .= " GROUP BY p.id ORDER BY 
+            $query .= " ORDER BY
                     CASE 
                         WHEN p.confirmation_sent = 1 AND p.confirmation_date IS NOT NULL THEN 1 
                         ELSE 0 

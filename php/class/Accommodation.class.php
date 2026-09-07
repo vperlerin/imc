@@ -74,7 +74,7 @@ class AccommodationManager
         }
 
         // Group by participant ID so we keep 1 row per participant and can aggregate restrictions
-        $sql .= " GROUP BY p.id";
+        $sql .= " GROUP BY p.id, r.id, r.type";
 
         // Order
         $sql .= " ORDER BY r.type ASC, p.confirmation_sent DESC";
