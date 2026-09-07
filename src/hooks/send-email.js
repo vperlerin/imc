@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = process.env.REACT_APP_MAILER_API_URL || "https://www.imo.net/members/api/imc_mailer_api/send_email";
+const API_URL = process.env.REACT_APP_MAILER_API_URL || "/php/api/send_email.php";
 
 export const sendEmail = async ({
   subject,
@@ -31,6 +31,7 @@ export const sendEmail = async ({
         headers: {
           "Content-Type": "application/json",
         },
+        withCredentials: true,
       },
     );
 

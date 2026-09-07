@@ -4,7 +4,7 @@
 /* harmony export */t.d(a,{
 /* harmony export */Z:()=>/* binding */n
 /* harmony export */});
-/* harmony import */var s=t(1083);const r="MISSING_ENV_VAR".REACT_APP_MAILER_API_URL||"https://www.imo.net/members/api/imc_mailer_api/send_email",n=async({subject:e,message:a,to:t,toName:n,fromName:i,replyTo:l,replyName:o,bcc:c=[],token:d=null})=>{try{return"success"===(await s/* ["default"] */.A.post(r,{subject:e,message:a,to:t,to_name:n,from_name:i,reply_to:l,reply_name:o,bcc:c,token:d},{headers:{"Content-Type":"application/json"}})).data.status?{success:!0,message:"Email sent successfully."}:{success:!1,message:"Failed to send email."}}catch(e){return{success:!1,message:"An error occurred while sending the email."}}}}
+/* harmony import */var s=t(1083);const r="MISSING_ENV_VAR".REACT_APP_MAILER_API_URL||"/php/api/send_email.php",n=async({subject:e,message:a,to:t,toName:n,fromName:i,replyTo:l,replyName:o,bcc:c=[],token:d=null})=>{try{return"success"===(await s/* ["default"] */.A.post(r,{subject:e,message:a,to:t,to_name:n,from_name:i,reply_to:l,reply_name:o,bcc:c,token:d},{headers:{"Content-Type":"application/json"},withCredentials:!0})).data.status?{success:!0,message:"Email sent successfully."}:{success:!1,message:"Failed to send email."}}catch(e){return{success:!1,message:"An error occurred while sending the email."}}}}
 /***/,
 /***/3058:
 /***/(e,a,t)=>{t.r(a),
