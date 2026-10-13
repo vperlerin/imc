@@ -26,7 +26,7 @@ return(0,d.jsxs)("tr",{className:"cancelled"===e.status?"text-warning ":"",child
 /* harmony export */a.d(t,{
 /* harmony export */Z:()=>/* binding */i
 /* harmony export */});
-/* harmony import */var n=a(1083);const s="MISSING_ENV_VAR".REACT_APP_MAILER_API_URL||"/php/api/send_email.php",i=async({subject:e,message:t,to:a,toName:i,fromName:r,replyTo:l,replyName:c,bcc:o=[],token:d=null})=>{try{return"success"===(await n/* ["default"] */.A.post(s,{subject:e,message:t,to:a,to_name:i,from_name:r,reply_to:l,reply_name:c,bcc:o,token:d},{headers:{"Content-Type":"application/json"},withCredentials:!0})).data.status?{success:!0,message:"Email sent successfully."}:{success:!1,message:"Failed to send email."}}catch(e){return{success:!1,message:"An error occurred while sending the email."}}}}
+/* harmony import */var n=a(1083);const s="MISSING_ENV_VAR".REACT_APP_MAILER_API_URL||"/php/api/send_email.php",i=async({subject:e,message:t,to:a,toName:i,fromName:r,replyTo:l,replyName:c,bcc:o=[],token:d=null})=>{try{return"success"===(await n/* ["default"] */.A.post(s,{subject:e,message:t,to:a,to_name:i,from_name:r,reply_to:l,reply_name:c,bcc:o,token:d},{headers:{"Content-Type":"application/json"}})).data.status?{success:!0,message:"Email sent successfully."}:{success:!1,message:"Failed to send email."}}catch(e){return{success:!1,message:"An error occurred while sending the email."}}}}
 /***/,
 /***/2337:
 /***/(e,t,a)=>{

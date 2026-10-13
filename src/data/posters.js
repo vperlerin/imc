@@ -1,26 +1,19 @@
 export const postersData = [
-  /*
   {
-    title: "Multi-instrument detection and study of Tau-Taurid fireball over Hungary in 2024",
-    authors: "Csilla Szárnya, József Vinkó, Livia Deme, Veronika Barta et al.",
-  },
-  */ 
-];
-
-
-export const demosData = [
-  /*
-  {
-    title: "Micrometeorites demo",
-    authors: "Guido Jonker",
+    title: "Automatic classification of AMOS composite images using YOLO models",
+    authors:
+      "Karol Havrila, Samuel Fodor, Juraj Tóth, Tomáš Paulech, Viera Krešnáková, Peter Butka",
   },
   {
-    title: "Meteorite impact demo",
-    authors: "Felix Bettonvil",
+    title: "Open database of the UMA/SMA Meteor Detection Network",
+    authors:
+      "Alberto Castellón Serrano, Alberto Javier Castro-Tirado, Beatriz Barros Blanco, José Ignacio García-Escobar, I. Fernandez-Contreras, F. Calvo, Maria Gritsevich",
   },
   {
-    title: "Color checker demo: Assessing meteorite color properties",
-    authors: "Sebastiaan J. de Vet",
+    title: "Lyrid meteor shower observed by the European Fireball Network",
+    authors:
+      "Lukáš Shrbený, Pavel Spurný, Jiří Borovička",
   }
-    */
 ];
+
+export const demosData = [];

@@ -231,6 +231,20 @@ const Program = () => {
                               <dd className={classNames(item.type === "sep" && css.sep, "mt-1 mt-md-0 ms-2 ms-md-0")}>
                                 <strong className="d-block">
                                   {(() => {
+                                    // Several files for one talk: plain title, one linked badge per file
+                                    if (Array.isArray(lecture.link)) {
+                                      return (
+                                        <>
+                                          {lecture.title}{" "}
+                                          {lecture.link.map((file) => (
+                                            <a key={file} href={resolveLectureHref(file)} target="_blank" rel="noopener noreferrer" className={css.fileBadge}>
+                                              [{getFileExtTag(file)}]
+                                            </a>
+                                          )).reduce((acc, el) => (acc.length ? [...acc, " ", el] : [el]), [])}
+                                        </>
+                                      );
+                                    }
+
                                     const href = resolveLectureHref(lecture.link);
                                     const ext = getFileExtTag(lecture.link || href);
                                     const badge = ext ? <span className={css.fileBadge}>[{ext}]</span> : null;

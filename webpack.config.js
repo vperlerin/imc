@@ -1,5 +1,6 @@
 const Dotenv = require('dotenv-webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const fs = require('fs');
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
@@ -9,6 +10,16 @@ const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
 module.exports = (env, argv) => {
   const devMode = argv.mode !== 'production';
+  const envPath = path.resolve(__dirname, devMode ? './env/dev/.env' : './env/prod/.env');
+
+  if (!fs.existsSync(envPath)) {
+    throw new Error(`Missing Webpack environment file: ${envPath}`);
+  }
+
+  const envContents = fs.readFileSync(envPath, 'utf8');
+  if (!/^\s*REACT_APP_API_URL\s*=\s*\S+/m.test(envContents)) {
+    throw new Error(`REACT_APP_API_URL is missing or empty in ${envPath}`);
+  }
 
   return {
     entry: './src/index.js',
@@ -45,7 +56,7 @@ module.exports = (env, argv) => {
       }),
       new BundleAnalyzerPlugin({ analyzerMode: devMode ? "disabled" : "static" }),
       new Dotenv({
-        path: path.resolve(__dirname, devMode ? './env/dev/.env' : './env/prod/.env'),
+        path: envPath,
       }),
 
       // Copy everything from /public (except index.html) to /build
@@ -145,7 +156,7 @@ module.exports = (env, argv) => {
           ]
         },
         {
-          test: /\.(pdf|pptx?|docx?|xlsx?|zip)$/i,
+          test: /\.(pdf|ppt[xm]?|docx?|xlsx?|zip)$/i,
           type: 'asset/resource',
           generator: {
             // Emits to /build/lectures/<original name>.<ext>
